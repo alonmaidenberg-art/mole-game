@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="bgg" cx="50%" cy="38%" r="75%">
+      <stop offset="0" stop-color="#a6ec7c"/><stop offset="0.55" stop-color="#4fb84a"/><stop offset="1" stop-color="#23803a"/>
+    </radialGradient>
+    <linearGradient id="fur" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#9c6b43"/><stop offset="1" stop-color="#6f4527"/>
+    </linearGradient>
+    <linearGradient id="mound" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8a5630"/><stop offset="1" stop-color="#5a3216"/>
+    </linearGradient>
+  </defs><rect width="512" height="512" rx="112" fill="url(#bgg)"/>
+  <!-- hole -->
+  <ellipse cx="256" cy="352" rx="158" ry="56" fill="#24120a"/>
+  <!-- ears -->
+  <circle cx="160" cy="172" r="28" fill="#6b4226"/><circle cx="160" cy="172" r="14" fill="#f4a3b5"/>
+  <circle cx="352" cy="172" r="28" fill="#6b4226"/><circle cx="352" cy="172" r="14" fill="#f4a3b5"/>
+  <!-- head -->
+  <ellipse cx="256" cy="256" rx="120" ry="110" fill="url(#fur)"/>
+  <ellipse cx="256" cy="298" rx="64" ry="46" fill="#dcb893"/>
+  <!-- eyes -->
+  <circle cx="204" cy="226" r="14" fill="#1b1008"/><circle cx="308" cy="226" r="14" fill="#1b1008"/>
+  <circle cx="209" cy="221" r="4.5" fill="#fff"/><circle cx="313" cy="221" r="4.5" fill="#fff"/>
+  <!-- nose -->
+  <ellipse cx="256" cy="268" rx="27" ry="19" fill="#ff7b98"/>
+  <ellipse cx="248" cy="262" rx="8" ry="4.5" fill="#ffc2d0"/>
+  <!-- mouth + teeth -->
+  <path d="M256 287 V300" stroke="#5a3216" stroke-width="4" stroke-linecap="round"/>
+  <path d="M232 304 Q256 322 280 304" stroke="#5a3216" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <rect x="241" y="308" width="15" height="26" rx="4" fill="#fff" stroke="#d9d2c6" stroke-width="2"/>
+  <rect x="257" y="308" width="15" height="26" rx="4" fill="#fff" stroke="#d9d2c6" stroke-width="2"/>
+  <!-- whiskers -->
+  <g stroke="#f3e3cf" stroke-width="3.5" stroke-linecap="round">
+    <path d="M196 290 L150 280"/><path d="M196 300 L148 306"/>
+    <path d="M316 290 L362 280"/><path d="M316 300 L364 306"/>
+  </g>
+  <!-- front dirt mound -->
+  <path d="M84 392 Q96 336 256 334 Q416 336 428 392 Q430 430 256 434 Q82 430 84 392 Z" fill="url(#mound)"/>
+  <path d="M110 372 Q140 346 200 344" stroke="#a8693a" stroke-width="6" fill="none" stroke-linecap="round" opacity=".7"/>
+  <!-- paws -->
+  <ellipse cx="172" cy="348" rx="38" ry="26" fill="#b4825a"/>
+  <ellipse cx="340" cy="348" rx="38" ry="26" fill="#b4825a"/>
+  <g fill="#f4ead8">
+    <ellipse cx="150" cy="328" rx="6" ry="11" transform="rotate(-15 150 328)"/><ellipse cx="172" cy="324" rx="6" ry="12"/><ellipse cx="194" cy="328" rx="6" ry="11" transform="rotate(15 194 328)"/>
+    <ellipse cx="318" cy="328" rx="6" ry="11" transform="rotate(-15 318 328)"/><ellipse cx="340" cy="324" rx="6" ry="12"/><ellipse cx="362" cy="328" rx="6" ry="11" transform="rotate(15 362 328)"/>
+  </g>
+  <!-- flying dirt + sparkle -->
+  <circle cx="112" cy="292" r="11" fill="#6b4226"/><circle cx="96" cy="320" r="7" fill="#6b4226"/>
+  <circle cx="402" cy="286" r="9" fill="#6b4226"/><circle cx="420" cy="312" r="6" fill="#6b4226"/>
+  <path d="M408 120 L416 146 L442 154 L416 162 L408 188 L400 162 L374 154 L400 146 Z" fill="#fff6a8"/>
+</svg>
