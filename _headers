@@ -16,3 +16,5 @@
 /basketball/manifest.webmanifest
   Content-Type: application/manifest+json
   Cache-Control: no-cache
+/basketball/teams.js
+  Cache-Control: no-cache

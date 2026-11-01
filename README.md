@@ -11,7 +11,7 @@
 ## משחקים
 
 - `mole/` תפוס את החפרפרת (PWA להתקנה, עם `manifest.webmanifest` ו-`sw.js`)
-- `basketball/` כדורסל 1 על 1 (PWA, מול המחשב / שני שחקנים / טורניר)
+- `basketball/` כדורסל 1 על 1 עם 20 קבוצות NBA ו-15 שחקנים בכל קבוצה (הנתונים ב-`basketball/teams.js`, אפשר לערוך שמות ודירוגים)
 
 ## Netlify
 

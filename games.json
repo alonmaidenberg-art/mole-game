@@ -10,7 +10,7 @@
   {
     "id": "basketball",
     "name": "כדורסל 1 על 1",
-    "description": "נגד המחשב, שני שחקנים או טורניר. זריקות, דאנקים, בלוקים וגניבות.",
+    "description": "20 קבוצות NBA, 15 שחקנים בכל קבוצה. נגד המחשב, שני שחקנים או טורניר.",
     "url": "basketball/",
     "icon": "basketball/icons/icon-192.png",
     "tag": "ספורט"
