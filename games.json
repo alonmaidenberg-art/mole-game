@@ -6,5 +6,13 @@
     "url": "mole/",
     "icon": "mole/icons/icon-192.png",
     "tag": "ארקייד"
+  },
+  {
+    "id": "basketball",
+    "name": "כדורסל 1 על 1",
+    "description": "נגד המחשב, שני שחקנים או טורניר. זריקות, דאנקים, בלוקים וגניבות.",
+    "url": "basketball/",
+    "icon": "basketball/icons/icon-192.png",
+    "tag": "ספורט"
   }
 ]

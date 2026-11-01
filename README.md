@@ -11,6 +11,7 @@
 ## משחקים
 
 - `mole/` תפוס את החפרפרת (PWA להתקנה, עם `manifest.webmanifest` ו-`sw.js`)
+- `basketball/` כדורסל 1 על 1 (PWA, מול המחשב / שני שחקנים / טורניר)
 
 ## Netlify
 

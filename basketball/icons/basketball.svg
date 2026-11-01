@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="30%" r="80%"><stop offset="0" stop-color="#3a2a8c"/><stop offset="1" stop-color="#150d3a"/></radialGradient>
+    <radialGradient id="ball" cx="38%" cy="32%" r="75%"><stop offset="0" stop-color="#ffb35c"/><stop offset=".6" stop-color="#f26a1b"/><stop offset="1" stop-color="#b8420a"/></radialGradient>
+    <linearGradient id="floor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c98a4a"/><stop offset="1" stop-color="#8a5526"/></linearGradient>
+  </defs><rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <rect x="0" y="388" width="512" height="124" fill="url(#floor)"/>
+  <path d="M0 388 H512" stroke="#f4d6a8" stroke-width="6" opacity=".6"/>
+  <!-- hoop -->
+  <rect x="318" y="70" width="14" height="116" rx="4" fill="#e8ecff"/>
+  <rect x="332" y="150" width="104" height="10" rx="5" fill="#ff4d4d"/>
+  <g stroke="#f1f3ff" stroke-width="4" opacity=".85" fill="none"><path d="M338 160 L352 214 M362 160 L368 214 M386 160 L386 214 M410 160 L404 214 M432 160 L420 214 M346 188 H426 M352 206 H420"/></g>
+  <!-- ball -->
+  <ellipse cx="236" cy="404" rx="86" ry="14" fill="#0004"/>
+  <circle cx="236" cy="296" r="108" fill="url(#ball)"/>
+  <g stroke="#2a1205" stroke-width="7" fill="none" stroke-linecap="round">
+    <path d="M128 296 H344"/><path d="M236 188 V404"/>
+    <path d="M160 214 Q214 296 160 378"/><path d="M312 214 Q258 296 312 378"/>
+  </g>
+  <path d="M170 236 Q200 200 244 192" stroke="#fff" stroke-width="8" stroke-linecap="round" opacity=".35" fill="none"/>
+  <!-- sparkle -->
+  <path d="M96 118 L104 146 L132 154 L104 162 L96 190 L88 162 L60 154 L88 146 Z" fill="#fff6a8"/>
+</svg>
