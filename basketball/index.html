@@ -35,6 +35,27 @@ canvas{display:block;border-radius:10px;box-shadow:0 0 40px rgba(0,0,0,.6)}
 .row{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin:7px 0}
 .chip{border:2px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;border-radius:999px;padding:7px 12px;font:inherit;font-size:14px;font-weight:700;cursor:pointer}
 .chip.on{background:#ff9f2e;color:#1b0f00;border-color:#fff}
+.wide{width:100%;max-width:1100px;margin:auto}
+.hd{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.hd h1,.hd h2{margin:0;font-size:clamp(22px,4vw,32px)}.sub{opacity:.8;font-size:14px;margin-top:2px}
+.pl1{opacity:.85;font-weight:700}
+.back{border:0;border-radius:12px;padding:9px 16px;font:inherit;font-size:16px;font-weight:800;background:#fff;color:#1b1340;cursor:pointer;box-shadow:0 3px 0 #bbb}
+.modes{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.mode,.last{border:0;border-radius:18px;background:#fff;color:#1b1340;font:inherit;padding:14px 10px;cursor:pointer;box-shadow:0 5px 0 #b9b2a6;text-align:center}
+.mode{display:flex;flex-direction:column;align-items:center;gap:4px}.mode .ic{font-size:40px}.mode b{font-size:clamp(18px,3vw,24px)}.mode small{opacity:.7;font-size:13px}
+.mode:active,.last:active,.card2:active{transform:translateY(3px);box-shadow:0 2px 0 #b9b2a6}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}
+.last{text-align:center}.last small{opacity:.6}.lastrow{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:6px;font-size:18px}
+.ab{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;color:#fff;font-weight:900;font-size:13px;border:3px solid #fff8;flex:none}
+.set{background:#fff;border-radius:18px;padding:10px;color:#1b1340;box-shadow:0 5px 0 #b9b2a6}.set .lbl{opacity:.6}
+.set .chip{background:#fff;color:#1b1340;border-color:#cfc8ba}.set .chip.on{background:#1b1340;color:#fff;border-color:#1b1340}
+.grid5{display:grid;grid-template-columns:repeat(5,1fr);gap:11px}
+.card2{border:0;border-radius:16px;background:#fff;color:#1b1340;font:inherit;padding:10px 12px;cursor:pointer;box-shadow:0 4px 0 #b9b2a6;display:flex;align-items:center;gap:10px;text-align:right;min-height:74px}
+.card2 .tx{flex:1;min-width:0}.card2 .n{font-weight:900;font-size:17px;line-height:1.15}.card2 .c{opacity:.6;font-size:13px}
+.card2 .dots{display:flex;align-items:center;gap:3px;font-size:11.5px;opacity:.85;margin-top:1px}.dots i{width:9px;height:9px;border-radius:50%;background:#dcd8d0;display:inline-block}.dots i.f{background:#f08a24}
+.dots span{width:42px}
+.card2 .rt{font-size:12px;color:#d9731a;font-weight:900}
+@media(max-width:900px){.grid5{grid-template-columns:repeat(3,1fr)}}@media(max-width:560px){.grid5{grid-template-columns:repeat(2,1fr)}.modes{grid-template-columns:1fr}.two{grid-template-columns:1fr}}
 select{width:100%;max-width:300px;font:inherit;font-size:16px;padding:8px;border-radius:10px;border:2px solid #fff4;background:#241a5a;color:#fff;margin:4px 0}
 .hint{font-size:12px;opacity:.75;margin-bottom:6px}
 .sw{width:34px;height:34px;border-radius:50%;border:3px solid rgba(255,255,255,.35);cursor:pointer;padding:0}
@@ -59,21 +80,29 @@ input[type=text]{width:100%;max-width:240px;padding:9px 12px;border-radius:12px;
   <div class="grp"><button id="tJ">⤒</button><button id="tS" class="big">🏀</button></div>
 </div>
 
-<div class="ov show" id="menu"><div class="card">
-  <h1>🏀 כדורסל 1 על 1</h1>
-  <p>זורקים, חוטפים, חוסמים ודוקרים. מי שמוביל בסוף הזמן מנצח!</p>
-  <div class="lbl">הקבוצה שלך</div>
-  <select id="teamSel" aria-label="קבוצה"></select>
-  <div class="lbl">השחקן שלך</div>
-  <select id="plSel" aria-label="שחקן"></select>
-  <div class="hint" id="plInfo"></div>
-  <div class="lbl">רמת קושי נגד המחשב</div>
-  <div class="row" id="diffRow"></div>
-  <button class="btn" id="cpuBtn">🤖 נגד המחשב</button>
-  <button class="btn blue" id="twoBtn">👥 שני שחקנים (מקלדת)</button>
-  <button class="btn green" id="tourBtn">🏆 טורניר – 4 סיבובים</button>
+<div class="ov show" id="menu"><div class="wide">
+  <div class="hd"><div><h1>🏀 כדורסל 1 על 1</h1><div class="sub">NBA · 20 קבוצות · 300 שחקנים · מד זריקה</div></div></div>
+  <div class="modes">
+    <button class="mode" id="cpuBtn"><span class="ic">🤖</span><b>נגד המחשב</b><small>1 על 1 · 3 רמות קושי</small></button>
+    <button class="mode" id="twoBtn"><span class="ic">👥</span><b>שני שחקנים</b><small>1 על 1 על אותה מקלדת</small></button>
+    <button class="mode" id="tourBtn"><span class="ic">🏆</span><b>טורניר</b><small>4 סיבובים, קושי עולה</small></button>
+  </div>
+  <div class="two">
+    <button class="last" id="lastCard"><small>הבחירה שלך (לחצו לשינוי)</small><div class="lastrow"><span class="ab" id="lastAb"></span><b id="lastTxt"></b></div></button>
+    <div class="set"><div class="lbl">רמת קושי נגד המחשב</div><div class="row" id="diffRow"></div></div>
+  </div>
   <button class="btn alt" id="installBtn">📲 התקן את המשחק</button>
-  <div class="keys">נגד המחשב: <b>A / D</b> או חצים לתנועה · <b>W</b> או ↑ קפיצה · <b>רווח</b> זריקה / גניבה<br>שני שחקנים: שחקן 1 <b>A / D / W</b> + <b>F</b> · שחקן 2 <b>חצים</b> + <b>L</b><br>בטלפון: כפתורים על המסך (סובבו לרוחב)<br>זריקה: <b>לחיצה ארוכה</b> על כפתור הזריקה והעזיבה כשהסמן על <b>הירוק</b> (בסוף המד) = זריקה מושלמת. קרוב לסל באוויר אפשר לדקור. 🏀</div>
+  <div class="keys">נגד המחשב: <b>A / D</b> או חצים לתנועה · <b>W</b> או ↑ קפיצה · <b>רווח</b> זריקה: <b>לחיצה ארוכה</b> ושחרור על <b>הירוק</b> בסוף המד = זריקה מושלמת, וליד הסל באוויר = דאנק. בלי כדור: גניבה.<br>שני שחקנים: שחקן 1 <b>A / D / W</b> + <b>F</b> · שחקן 2 <b>חצים</b> + <b>L</b> · בטלפון: כפתורים על המסך (סובבו לרוחב)<br>המגרש גדול: המצלמה עוקבת אחריך, זוזו ימינה ושמאלה כדי לראות אותו.</div>
+</div></div>
+
+<div class="ov" id="pickTeam"><div class="wide">
+  <div class="hd"><button class="back" id="ptBack">→ חזרה</button><div class="pl1" id="ptWho"></div><h2>בחרו קבוצה</h2></div>
+  <div class="grid5" id="teamGrid"></div>
+</div></div>
+
+<div class="ov" id="pickPl"><div class="wide">
+  <div class="hd"><button class="back" id="ppBack">→ חזרה</button><div class="pl1" id="ppWho"></div><h2 id="ppTitle">בחרו שחקן</h2></div>
+  <div class="grid5" id="plGrid"></div>
 </div></div>
 
 <div class="ov" id="pauseOv"><div class="card"><h2>⏸ הפסקה</h2>
@@ -101,9 +130,10 @@ function randn(){let u=0,v=0;while(!u)u=Math.random();while(!v)v=Math.random();r
 const store={get(k,d){try{const v=localStorage.getItem(k);return v===null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
 
 /* ---------- constants ---------- */
-const W=800,H=450,FLOOR=388;
+const W=800,H=450,FLOOR=388,WW=1360;   // W = screen view, WW = whole court
+let camX=280;
 const GB=0.42,GP=0.62,JUMP=-12.2,SPEED=3.1;
-const RIMY=212,HL=100,HR=700,RIMW=23,BBL=72,BBR=728,THREE=230;
+const RIMY=212,HL=100,HR=WW-100,RIMW=23,BBL=72,BBR=WW-72,THREE=230;
 const AID={
   easy:  {label:'קל',    spd:.78,err:9,steal:.45,block:.10,ft:.50,range:[170,260],time:90},
   medium:{label:'בינוני',spd:.92,err:5.4,steal:.9, block:.28,ft:.65,range:[150,240],time:90},
@@ -125,7 +155,7 @@ window.__stats=stats;
 
 const players=[0,1].map(team=>({team,x:0,y:FLOOR,vx:0,vy:0,face:team?-1:1,ctrl:{l:0,r:0,j:0,s:0},prevS:0,hasBall:false,cd:0,stun:0,
   anim:0,shootAnim:0,name:'',color:'#fff',skin:team?'#c68642':'#f2c7a0',num:team?23:7,human:false,charge:0,q:null,spdMul:1,shm:1,jump:JUMP,rating:80,aiWait:0,aiDist:200}));
-const ball={x:400,y:200,px:400,py:200,vx:0,vy:0,r:11,owner:null,inFlight:false,fr:0,shooter:null,scored:false,dist:0,dunk:false,ft:false,lock:0,rot:0,net:0};
+const ball={x:680,y:200,px:680,py:200,vx:0,vy:0,r:11,owner:null,inFlight:false,fr:0,shooter:null,scored:false,dist:0,dunk:false,ft:false,lock:0,rot:0,net:0};
 
 /* ---------- audio ---------- */
 let actx=null,muted=store.get('bb_muted','0')==='1';
@@ -197,12 +227,12 @@ function startMatch(m,opts={}){
   score=[0,0];otFlag=false;ft=null;pops=[];scoreTimer=0;looseT=0;shake=0;
   clock=(AID[diff].time||90)*60;
   Object.keys(stats).forEach(k=>stats[k]=0);
-  ['menu','pauseOv','overOv'].forEach(i=>$('#'+i).classList.remove('show'));
+  ['menu','pickTeam','pickPl','pauseOv','overOv'].forEach(i=>$('#'+i).classList.remove('show'));
   $('#top').style.display='flex';
   $('#touch').style.display=(matchMedia('(pointer:coarse)').matches&&m!=='2p')?'flex':'none';
   paused=false;$('#pauseBtn').textContent='⏸';
-  resetPossession(0);state='play';SFX.go();
-  popup(m==='tour'?'סיבוב '+(round+1)+' מתוך 4':'יאללה!',W/2,150,'#fff',90);
+  resetPossession(0);state='play';SFX.go();updateCam(true);
+  popup(m==='tour'?'סיבוב '+(round+1)+' מתוך 4':'יאללה!',camX+W/2,150,'#fff',90);
 }
 function resetPossession(team){
   const a=players[team],b=players[1-team];
@@ -307,7 +337,7 @@ function onScore(hoopTeam){ // hoopTeam = team that scores on this hoop
 }
 function endRegulation(){
   if(score[0]!==score[1]){endGame()}
-  else{otFlag=true;clock=0;SFX.buzzer();popup('הארכה! הסל הבא מנצח',W/2,150,'#ffd23f',120)}
+  else{otFlag=true;clock=0;SFX.buzzer();popup('הארכה! הסל הבא מנצח',camX+W/2,150,'#ffd23f',120)}
 }
 function endGame(){
   state='over';SFX.buzzer();
@@ -360,7 +390,7 @@ function updatePlayer(p){
   p.vx=dir*SPEED*p.spdMul;if(dir)p.face=dir;
   if(c.j&&p.y>=FLOOR&&live){p.vy=p.jump}
   p.vy+=GP;p.y+=p.vy;if(p.y>FLOOR){p.y=FLOOR;p.vy=0}
-  p.x=clamp(p.x+p.vx,22,W-22);
+  p.x=clamp(p.x+p.vx,22,WW-22);
   p.anim+=Math.abs(p.vx)*0.13;
   if(p.cd>0)p.cd--;if(p.stun>0)p.stun--;if(p.shootAnim>0)p.shootAnim--;
   if(!live||p.stun>0)p.charge=0;
@@ -386,7 +416,7 @@ function updateBall(){
   if(ball.y+r>FLOOR){ball.y=FLOOR-r;if(Math.abs(ball.vy)>1.4)SFX.bounce(Math.abs(ball.vy));ball.vy=-ball.vy*0.72;ball.vx*=0.985;if(Math.abs(ball.vy)<1.1)ball.vy=0;ball.inFlight=false}
   if(ball.y-r<0){ball.y=r;ball.vy=Math.abs(ball.vy)*0.5}
   if(ball.x-r<0){ball.x=r;ball.vx=Math.abs(ball.vx)*0.7}
-  if(ball.x+r>W){ball.x=W-r;ball.vx=-Math.abs(ball.vx)*0.7}
+  if(ball.x+r>WW){ball.x=WW-r;ball.vx=-Math.abs(ball.vx)*0.7}
   if(!ball.dunk){
     // backboards
     if(ball.y>150&&ball.y<238){
@@ -435,7 +465,7 @@ function step(){
     for(const p of players)updatePlayer(p);
     // soft body collision
     const a=players[0],b=players[1];
-    if(Math.abs(a.x-b.x)<26&&Math.abs(a.y-b.y)<60){const push=(26-Math.abs(a.x-b.x))/2;const s=a.x<b.x?-1:1;a.x=clamp(a.x+s*push,22,W-22);b.x=clamp(b.x-s*push,22,W-22)}
+    if(Math.abs(a.x-b.x)<26&&Math.abs(a.y-b.y)<60){const push=(26-Math.abs(a.x-b.x))/2;const s=a.x<b.x?-1:1;a.x=clamp(a.x+s*push,22,WW-22);b.x=clamp(b.x-s*push,22,WW-22)}
     updateBall();
     if(state==='play'){
       if(!otFlag){clock--;if(clock<=0)endRegulation()}
@@ -454,17 +484,17 @@ function humanCtrlFT(p){humanCtrl(p)}
 function drawCourt(){
   // arena
   const g=ctx.createLinearGradient(0,0,0,FLOOR);g.addColorStop(0,'#1b1050');g.addColorStop(1,'#3b2a8c');
-  ctx.fillStyle=g;ctx.fillRect(0,0,W,FLOOR);
+  ctx.fillStyle=g;ctx.fillRect(0,0,WW,FLOOR);
   // crowd
-  for(let i=0;i<110;i++){const x=(i*37)%W,y=70+((i*53)%90),h=(i*71)%360;ctx.fillStyle=`hsla(${h},60%,60%,.28)`;ctx.beginPath();ctx.arc(x,y,6,0,7);ctx.fill()}
-  ctx.fillStyle='rgba(0,0,0,.25)';ctx.fillRect(0,0,W,50);
+  for(let i=0;i<190;i++){const x=(i*37*1.7)%WW,y=70+((i*53)%90),h=(i*71)%360;ctx.fillStyle=`hsla(${h},60%,60%,.28)`;ctx.beginPath();ctx.arc(x,y,6,0,7);ctx.fill()}
+  ctx.fillStyle='rgba(0,0,0,.25)';ctx.fillRect(0,0,WW,50);
   // floor
   const f=ctx.createLinearGradient(0,FLOOR,0,H);f.addColorStop(0,'#d09a5a');f.addColorStop(1,'#93602c');
-  ctx.fillStyle=f;ctx.fillRect(0,FLOOR,W,H-FLOOR);
-  ctx.fillStyle='rgba(255,255,255,.14)';ctx.fillRect(0,FLOOR,W,3);
+  ctx.fillStyle=f;ctx.fillRect(0,FLOOR,WW,H-FLOOR);
+  ctx.fillStyle='rgba(255,255,255,.14)';ctx.fillRect(0,FLOOR,WW,3);
   ctx.strokeStyle='rgba(255,255,255,.35)';ctx.lineWidth=3;
   // center + 3pt + free throw marks on the floor
-  ctx.beginPath();ctx.moveTo(W/2,FLOOR);ctx.lineTo(W/2,H);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(WW/2,FLOOR);ctx.lineTo(WW/2,H);ctx.stroke();
   for(const x of [HL+THREE,HR-THREE]){ctx.beginPath();ctx.moveTo(x,FLOOR+4);ctx.lineTo(x,H);ctx.stroke()}
   for(const x of [HL+190,HR-190]){ctx.beginPath();ctx.moveTo(x,FLOOR+4);ctx.lineTo(x,FLOOR+26);ctx.stroke()}
   ctx.fillStyle='rgba(255,255,255,.18)';ctx.font='bold 22px system-ui';ctx.textAlign='center';
@@ -478,7 +508,7 @@ function drawHoop(hx){
   ctx.strokeStyle='#ff4d4d';ctx.lineWidth=5;ctx.lineCap='round';
   ctx.beginPath();ctx.moveTo(hx-RIMW,RIMY);ctx.lineTo(hx+RIMW,RIMY);ctx.stroke();
   // net
-  const sway=ball.net>0&&((left&&ball.x<W/2)||(!left&&ball.x>=W/2))?Math.sin(ball.net*.5)*5:0;
+  const sway=ball.net>0&&((left&&ball.x<WW/2)||(!left&&ball.x>=WW/2))?Math.sin(ball.net*.5)*5:0;
   ctx.strokeStyle='rgba(255,255,255,.75)';ctx.lineWidth=1.6;
   for(let i=-3;i<=3;i++){ctx.beginPath();ctx.moveTo(hx+i*(RIMW/3),RIMY+2);ctx.lineTo(hx+i*(RIMW/4.6)+sway,RIMY+34);ctx.stroke()}
   for(let j=1;j<=3;j++){const w=RIMW*(1-j*.16),y=RIMY+j*10;ctx.beginPath();ctx.moveTo(hx-w+sway*j/3,y);ctx.lineTo(hx+w+sway*j/3,y);ctx.stroke()}
@@ -562,19 +592,37 @@ function drawMeters(){
     ctx.fillRect(x+w*clamp(p.charge,0,1)-1.5,y-3,3,h+6);
   }
 }
+function updateCam(snap){
+  let t;
+  const p0=players[0],p1=players[1];
+  if(ball.inFlight&&!ball.dunk)t=ball.x*.6+(p0.x+p1.x)/2*.4;else t=(p0.x+p1.x)/2;
+  t=clamp(t-W/2,0,WW-W);
+  // always keep the human (player 1) comfortably in view
+  const m=170;t=clamp(t,p0.x-(W-m),p0.x-m);t=clamp(t,0,WW-W);
+  camX=snap?t:camX+(t-camX)*0.14;
+}
 function draw(){
+  if(state!=='menu')updateCam(false);
   ctx.save();
   if(shake>0)ctx.translate(rnd(-shake,shake)*.5,rnd(-shake,shake)*.5);
+  ctx.save();ctx.translate(-Math.round(camX),0);
   drawCourt();drawHoop(HL);drawHoop(HR);
   if(state!=='menu'){
     const order=[players[0],players[1]].sort((a,b)=>a.y-b.y);
-    order.forEach(drawPlayer);drawBall();drawMeters();drawHUD();drawFT();
+    order.forEach(drawPlayer);drawBall();drawMeters();
     for(const q of pops){const a=clamp(q.t/q.life*2,0,1),up=(q.life-q.t)*.7;ctx.globalAlpha=a;ctx.fillStyle=q.color;ctx.strokeStyle='#000';ctx.lineWidth=4;
       ctx.font='bold 28px system-ui';ctx.textAlign='center';ctx.strokeText(q.text,q.x,q.y-up);ctx.fillText(q.text,q.x,q.y-up);ctx.globalAlpha=1}
   }
   ctx.restore();
+  if(state!=='menu'){drawHUD();drawFT();drawArrows()}
+  ctx.restore();
 }
-
+function drawArrows(){ // small arrows showing where the hoops / opponent are when off screen
+  ctx.fillStyle='rgba(255,210,63,.9)';ctx.font='bold 22px system-ui';ctx.textAlign='center';
+  const o=players[1];
+  if(o.x<camX+10)ctx.fillText('◀',20,H/2);
+  else if(o.x>camX+W-10)ctx.fillText('▶',W-20,H/2);
+}
 /* ---------- loop ---------- */
 let last=performance.now(),acc=0;
 window.__ff=1;
@@ -586,27 +634,52 @@ function loop(t){
 requestAnimationFrame(loop);
 
 /* ---------- UI ---------- */
+function dotsFor(p){ // 1-5 dots for speed / jump / shooting, derived from the rating
+  let h=0;for(const ch of p[0])h=(h*31+ch.charCodeAt(0))%97;
+  const base=(p[1]-56)/8.8,f=v=>clamp(Math.round(v),1,5);
+  return [f(base+((h%3)-1)*.7),f(base+(((h>>2)%3)-1)*.7),f(base+(((h>>4)%3)-1)*.7)];
+}
+function mk(tag,cls,txt){const e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e}
+function abBadge(t,size){const e=mk('span','ab',t.abbr);e.style.background=t.color;if(size)e.style.cssText+=';width:'+size+'px;height:'+size+'px';return e}
+function paintLast(){const t=TEAMS[teamIdx],p=t.players[plIdx];const ab=$('#lastAb');ab.textContent=t.abbr;ab.style.background=t.color;$('#lastTxt').textContent=t.nick+' · '+p[0]}
+let pendingMode=null;
+function showOv(id){['menu','pickTeam','pickPl'].forEach(i=>$('#'+i).classList.toggle('show',i===id))}
+function openTeams(){
+  const g=$('#teamGrid');g.innerHTML='';$('#ptWho').textContent='שחקן 1';
+  TEAMS.forEach((t,i)=>{const b=mk('button','card2');b.appendChild(abBadge(t));const tx=mk('div','tx');tx.append(mk('div','n',t.nick),mk('div','c',t.city));b.appendChild(tx);
+    if(i===teamIdx)b.style.outline='3px solid #f08a24';
+    b.onclick=()=>{teamIdx=i;plIdx=0;store.set('bb_team',i);store.set('bb_pl',0);openPlayers()};g.appendChild(b)});
+  showOv('pickTeam');
+}
+function openPlayers(){
+  const t=TEAMS[teamIdx],g=$('#plGrid');g.innerHTML='';$('#ppWho').textContent='שחקן 1';$('#ppTitle').textContent='בחרו שחקן · '+t.nick;
+  t.players.map((p,i)=>({p,i})).sort((x,y)=>y.p[1]-x.p[1]).forEach(({p,i})=>{
+    const b=mk('button','card2');const av=mk('span','ab',p[1]);av.style.background=t.color;b.appendChild(av);
+    const tx=mk('div','tx');tx.append(mk('div','n',p[0]),mk('div','rt','דירוג '+p[1]));
+    const d=dotsFor(p);[['מהירות',d[0]],['קפיצה',d[1]],['קליעה',d[2]]].forEach(([n,v])=>{const r=mk('div','dots');r.appendChild(mk('span',null,n));for(let k=1;k<=5;k++)r.appendChild(mk('i',k<=v?'f':''));tx.appendChild(r)});
+    b.appendChild(tx);if(i===plIdx)b.style.outline='3px solid #f08a24';
+    b.onclick=()=>{plIdx=i;store.set('bb_pl',i);paintLast();store.set('bb_chosen','1');
+      if(pendingMode){const m=pendingMode;pendingMode=null;begin(m)}else showOv('menu')};g.appendChild(b)});
+  showOv('pickPl');
+}
+function begin(m){showOv('none');m==='tour'?startMatch('tour',{round:0}):startMatch(m)}
+function pickMode(m){if(store.get('bb_chosen','')){begin(m)}else{pendingMode=m;openTeams()}}
 function buildMenu(){
-  const ts=$('#teamSel'),ps=$('#plSel');ts.innerHTML='';
-  TEAMS.forEach((t,i)=>{const o=document.createElement('option');o.value=i;o.textContent=t.name;ts.appendChild(o)});
-  ts.value=teamIdx;
-  const fillPl=()=>{ps.innerHTML='';TEAMS[teamIdx].players.forEach((p,i)=>{const o=document.createElement('option');o.value=i;o.textContent=p[0]+' · '+p[1];ps.appendChild(o)});
-    ps.value=plIdx;$('#plInfo').textContent='דירוג '+TEAMS[teamIdx].players[plIdx][1]+': משפיע על מהירות, קפיצה ודיוק הזריקות.'};
-  ts.onchange=()=>{teamIdx=+ts.value;plIdx=0;store.set('bb_team',teamIdx);store.set('bb_pl',0);fillPl()};
-  ps.onchange=()=>{plIdx=+ps.value;store.set('bb_pl',plIdx);fillPl()};
-  fillPl();
+  paintLast();
   const dr=$('#diffRow');dr.innerHTML='';
   ['easy','medium','hard'].forEach(k=>{const b=document.createElement('button');b.className='chip'+(k===diff?' on':'');b.textContent=AID[k].label;
     b.onclick=()=>{diff=k;store.set('bb_diff',k);[...dr.children].forEach(c=>c.classList.remove('on'));b.classList.add('on')};dr.appendChild(b)});
 }
+$('#lastCard').onclick=()=>{pendingMode=null;openTeams()};
+$('#ptBack').onclick=()=>{pendingMode=null;showOv('menu')};$('#ppBack').onclick=()=>openTeams();
 function showMenu(){
-  state='menu';paused=false;['pauseOv','overOv'].forEach(i=>$('#'+i).classList.remove('show'));$('#menu').classList.add('show');
+  state='menu';paused=false;['pauseOv','overOv'].forEach(i=>$('#'+i).classList.remove('show'));showOv('menu');
   $('#top').style.display='none';$('#touch').style.display='none';
 }
 function saveName(){}
-$('#cpuBtn').onclick=()=>{saveName();startMatch('cpu')};
-$('#twoBtn').onclick=()=>{saveName();startMatch('2p')};
-$('#tourBtn').onclick=()=>{saveName();startMatch('tour',{round:0})};
+$('#cpuBtn').onclick=()=>pickMode('cpu');
+$('#twoBtn').onclick=()=>pickMode('2p');
+$('#tourBtn').onclick=()=>pickMode('tour');
 $('#againBtn').onclick=()=>{mode==='tour'?startMatch('tour',{round:0}):startMatch(mode)};
 $('#nextBtn').onclick=()=>startMatch('tour',{round:round+1});
 $('#menuBtn').onclick=showMenu;$('#menu2Btn').onclick=showMenu;$('#backBtn').onclick=showMenu;
