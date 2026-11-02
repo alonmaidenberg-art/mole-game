@@ -36,3 +36,9 @@
   Cache-Control: no-cache
 /chess/engine.js
   Cache-Control: no-cache
+/englishbot/sw.js
+  Cache-Control: no-cache
+/englishbot/index.html
+  Cache-Control: no-cache
+/englishbot/manifest.webmanifest
+  Cache-Control: no-cache

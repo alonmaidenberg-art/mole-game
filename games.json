@@ -30,5 +30,13 @@
     "url": "chess/",
     "icon": "chess/icons/icon-192.png",
     "tag": "אסטרטגיה"
+  },
+  {
+    "id": "englishbot",
+    "name": "EnglishBot",
+    "description": "משחקים ללימוד אנגלית: תרגום, הפכים, זיכרון, וורדל, איש תלוי ועוד. עם XP ורמות.",
+    "url": "englishbot/",
+    "icon": "englishbot/icons/icon-192.png",
+    "tag": "לימוד"
   }
 ]
