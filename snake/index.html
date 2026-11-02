@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>נחש – אלון מידנברג</title>
+<meta name="description" content="משחק הנחש הקלאסי עם תפוחים, מהירויות וקירות.">
+<meta name="theme-color" content="#1a1038">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;background:#1a1038;color:#fff;font-family:system-ui,-apple-system,"Segoe UI",Arial,"Noto Sans Hebrew",sans-serif}
+body{background:radial-gradient(700px 500px at 80% -10%,#5b36d6 0,transparent 60%),radial-gradient(600px 500px at 0% 110%,#0f6b6b 0,transparent 55%),#1a1038;min-height:100vh;min-height:100dvh;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+main{max-width:520px;margin:0 auto;padding:max(12px,env(safe-area-inset-top)) 14px 24px}
+h1{margin:6px 0;font-size:30px;text-align:center}
+.sub{text-align:center;opacity:.75;margin:0 0 10px}
+.box{background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.12);border-radius:22px;padding:14px;margin:12px 0}
+.lb{opacity:.8;font-size:15px;margin-bottom:8px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{flex:1;min-width:70px;padding:13px 6px;border-radius:16px;border:2px solid rgba(255,255,255,.18);background:#150a30;color:#fff;font:inherit;font-weight:800;font-size:17px;cursor:pointer}
+.chip.on{background:#ffd05a;color:#2a1c00;border-color:#fff}
+.btn{display:block;width:100%;border:0;border-radius:18px;padding:15px;margin-top:12px;font:inherit;font-size:21px;font-weight:900;color:#06322b;background:linear-gradient(180deg,#5ff7d6,#1fc9a6);box-shadow:0 6px 0 #0d7a66;cursor:pointer}
+.btn:active{transform:translateY(3px);box-shadow:0 3px 0 #0d7a66}
+.btn.alt{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.3);box-shadow:none;font-size:16px;padding:12px}
+.ib{min-width:46px;height:42px;padding:0 12px;border-radius:13px;border:2px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#fff;font:inherit;font-size:17px;font-weight:800;cursor:pointer}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.scr{display:none}.scr.show{display:block}
+.ov{position:fixed;inset:0;background:rgba(10,5,30,.82);display:none;align-items:center;justify-content:center;z-index:30;padding:16px}.ov.show{display:flex}
+.ovc{width:100%;max-width:380px;background:linear-gradient(160deg,#2c1b6a,#1a1038);border:2px solid rgba(255,255,255,.2);border-radius:26px;padding:22px;text-align:center}
+.ovc h2{margin:0 0 6px;font-size:30px}
+
+</style>
+</head>
+<body>
+<main>
+<div class="scr show" id="menu">
+  <div style="text-align:center;font-size:84px;line-height:1">🐍🍎</div>
+  <h1>נחש</h1><p class="sub">אוכלים תפוחים, גדלים, ולא נתקעים בעצמנו</p>
+  <div class="box"><div class="lb">מהירות</div><div class="chips" id="mSp"><button class="chip" data-v="1">איטי</button><button class="chip on" data-v="2">רגיל</button><button class="chip" data-v="3">מהיר</button></div></div>
+  <div class="box"><div class="lb">קירות</div><div class="chips" id="mW"><button class="chip on" data-v="wall">🧱 מתים בקיר</button><button class="chip" data-v="wrap">🌀 עוברים דרך</button></div></div>
+  <div class="box" style="text-align:center">🏆 שיא: <b id="best">0</b></div>
+  <button class="btn" id="go">▶ התחל</button>
+  <div class="sub" style="margin-top:10px;font-size:14px">חצים או WASD במחשב · החלקה על המסך בטלפון</div>
+</div>
+<div class="scr" id="game">
+  <div class="bar"><button class="ib" id="back">→</button><div style="font-weight:900;font-size:20px">🍎 <span id="sc">0</span> · 🏆 <span id="bs">0</span></div><button class="ib" id="pause">⏸</button></div>
+  <canvas id="cv" width="360" height="360" style="width:100%;max-width:440px;display:block;margin:8px auto;border-radius:18px;border:3px solid rgba(255,255,255,.2);touch-action:none"></canvas>
+  <div id="pad" style="display:grid;grid-template-columns:repeat(3,76px);grid-template-rows:repeat(2,64px);gap:8px;justify-content:center;margin-top:8px;direction:ltr">
+    <span></span><button class="ib" data-d="U" style="height:64px;font-size:26px">▲</button><span></span>
+    <button class="ib" data-d="L" style="height:64px;font-size:26px">◀</button><button class="ib" data-d="D" style="height:64px;font-size:26px">▼</button><button class="ib" data-d="R" style="height:64px;font-size:26px">▶</button></div>
+</div>
+<div class="ov" id="end"><div class="ovc"><h2 id="eT">נגמר!</h2><div id="eM" style="font-size:20px;margin-bottom:8px"></div><button class="btn" id="again">🔁 שוב</button><button class="btn alt" id="menuB">תפריט</button></div></div>
+</main>
+<script>
+'use strict';
+const $=s=>document.querySelector(s);
+const store={get(k,d){try{const v=localStorage.getItem(k);return v===null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+let _ac=null;function tone(f,d=.1,t='triangle',v=.07){try{_ac=_ac||new (window.AudioContext||window.webkitAudioContext)();const o=_ac.createOscillator(),g=_ac.createGain();o.type=t;o.frequency.value=f;g.gain.value=v;o.connect(g);g.connect(_ac.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,_ac.currentTime+d);o.stop(_ac.currentTime+d+.02)}catch(e){}}
+
+const N=18,CS=20;let sp=+store.get('s_sp',2),wm=store.get('s_w','wall'),best=+store.get('s_best',0);
+const cv=$('#cv'),ctx=cv.getContext('2d');cv.width=cv.height=N*CS;
+function opt(id,v){[...$(id).children].forEach(c=>c.classList.toggle('on',c.dataset.v===String(v)))}
+function chips(id,cb){[...$(id).children].forEach(c=>c.onclick=()=>{cb(c.dataset.v);opt(id,c.dataset.v)})}
+chips('#mSp',v=>{sp=+v;store.set('s_sp',v)});chips('#mW',v=>{wm=v;store.set('s_w',v)});opt('#mSp',sp);opt('#mW',wm);$('#best').textContent=$('#bs').textContent=best;
+function show(id){document.querySelectorAll('.scr').forEach(s=>s.classList.toggle('show',s.id===id))}
+let snake,dir,ndir,food,score,alive,timer,paused;
+const V={U:[0,-1],D:[0,1],L:[-1,0],R:[1,0]};
+function start(){snake=[[9,9],[8,9],[7,9]];dir=ndir='R';score=0;alive=true;paused=false;$('#pause').textContent='⏸';$('#sc').textContent=0;$('#end').classList.remove('show');place();clearInterval(timer);timer=setInterval(tick,[0,170,120,80][sp]);draw()}
+function place(){do{food=[Math.floor(Math.random()*N),Math.floor(Math.random()*N)]}while(snake.some(s=>s[0]===food[0]&&s[1]===food[1]))}
+function turn(d){const o={U:'D',D:'U',L:'R',R:'L'};if(d!==o[dir])ndir=d}
+function tick(){if(!alive||paused)return;dir=ndir;let [x,y]=snake[0];x+=V[dir][0];y+=V[dir][1];
+  if(wm==='wrap'){x=(x+N)%N;y=(y+N)%N}else if(x<0||y<0||x>=N||y>=N)return die();
+  const eat=x===food[0]&&y===food[1];const body=eat?snake:snake.slice(0,-1);
+  if(body.some(s=>s[0]===x&&s[1]===y))return die();
+  snake.unshift([x,y]);if(eat){score++;$('#sc').textContent=score;tone(660,.08);place();if(score>best){best=score;store.set('s_best',best);$('#bs').textContent=best}}else snake.pop();draw()}
+function die(){alive=false;clearInterval(timer);tone(150,.4,'sawtooth');draw();$('#eT').textContent=score>=best&&score>0?'שיא חדש! 🏆':'נגמר!';$('#eM').textContent='אכלת '+score+' תפוחים';setTimeout(()=>$('#end').classList.add('show'),400)}
+function draw(){ctx.fillStyle='#14102e';ctx.fillRect(0,0,N*CS,N*CS);
+  for(let i=0;i<N;i++)for(let j=0;j<N;j++)if((i+j)%2){ctx.fillStyle='rgba(255,255,255,.035)';ctx.fillRect(i*CS,j*CS,CS,CS)}
+  ctx.font=(CS-2)+'px serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('🍎',food[0]*CS+CS/2,food[1]*CS+CS/2+1);
+  snake.forEach((s,i)=>{ctx.fillStyle=i?`hsl(${150-i*3},70%,${52-Math.min(i,14)}%)`:'#5ff7d6';const r=i?4:7;const x=s[0]*CS+1,y=s[1]*CS+1,w=CS-2;ctx.beginPath();ctx.roundRect?ctx.roundRect(x,y,w,w,r):ctx.rect(x,y,w,w);ctx.fill()});
+  const h=snake[0];ctx.fillStyle='#10102a';[[-3,-3],[3,-3]].forEach(([dx,dy])=>{ctx.beginPath();ctx.arc(h[0]*CS+CS/2+dx,h[1]*CS+CS/2+dy,2,0,7);ctx.fill()})}
+addEventListener('keydown',e=>{const m={ArrowUp:'U',ArrowDown:'D',ArrowLeft:'L',ArrowRight:'R',w:'U',s:'D',a:'L',d:'R',W:'U',S:'D',A:'L',D:'R'}[e.key];if(m){turn(m);e.preventDefault()}else if(e.key===' ')$('#pause').click()});
+document.querySelectorAll('#pad button').forEach(b=>b.onclick=()=>turn(b.dataset.d));
+let t0=null;cv.addEventListener('touchstart',e=>{t0=[e.touches[0].clientX,e.touches[0].clientY]},{passive:true});
+cv.addEventListener('touchend',e=>{if(!t0)return;const t=e.changedTouches[0],dx=t.clientX-t0[0],dy=t.clientY-t0[1];if(Math.max(Math.abs(dx),Math.abs(dy))>18)turn(Math.abs(dx)>Math.abs(dy)?(dx>0?'R':'L'):(dy>0?'D':'U'));t0=null},{passive:true});
+$('#go').onclick=()=>{show('game');start()};$('#again').onclick=start;$('#menuB').onclick=()=>{$('#end').classList.remove('show');clearInterval(timer);show('menu')};$('#back').onclick=()=>{clearInterval(timer);show('menu')};
+$('#pause').onclick=()=>{if(!alive)return;paused=!paused;$('#pause').textContent=paused?'▶':'⏸'};
+
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+</script>
+</body>
+</html>

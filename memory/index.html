@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>זיכרון – אלון מידנברג</title>
+<meta name="description" content="משחק זיכרון עם קלפי אימוג׳י ושלושה גדלים.">
+<meta name="theme-color" content="#1a1038">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;background:#1a1038;color:#fff;font-family:system-ui,-apple-system,"Segoe UI",Arial,"Noto Sans Hebrew",sans-serif}
+body{background:radial-gradient(700px 500px at 80% -10%,#5b36d6 0,transparent 60%),radial-gradient(600px 500px at 0% 110%,#0f6b6b 0,transparent 55%),#1a1038;min-height:100vh;min-height:100dvh;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+main{max-width:520px;margin:0 auto;padding:max(12px,env(safe-area-inset-top)) 14px 24px}
+h1{margin:6px 0;font-size:30px;text-align:center}
+.sub{text-align:center;opacity:.75;margin:0 0 10px}
+.box{background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.12);border-radius:22px;padding:14px;margin:12px 0}
+.lb{opacity:.8;font-size:15px;margin-bottom:8px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{flex:1;min-width:70px;padding:13px 6px;border-radius:16px;border:2px solid rgba(255,255,255,.18);background:#150a30;color:#fff;font:inherit;font-weight:800;font-size:17px;cursor:pointer}
+.chip.on{background:#ffd05a;color:#2a1c00;border-color:#fff}
+.btn{display:block;width:100%;border:0;border-radius:18px;padding:15px;margin-top:12px;font:inherit;font-size:21px;font-weight:900;color:#06322b;background:linear-gradient(180deg,#5ff7d6,#1fc9a6);box-shadow:0 6px 0 #0d7a66;cursor:pointer}
+.btn:active{transform:translateY(3px);box-shadow:0 3px 0 #0d7a66}
+.btn.alt{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.3);box-shadow:none;font-size:16px;padding:12px}
+.ib{min-width:46px;height:42px;padding:0 12px;border-radius:13px;border:2px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#fff;font:inherit;font-size:17px;font-weight:800;cursor:pointer}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.scr{display:none}.scr.show{display:block}
+.ov{position:fixed;inset:0;background:rgba(10,5,30,.82);display:none;align-items:center;justify-content:center;z-index:30;padding:16px}.ov.show{display:flex}
+.ovc{width:100%;max-width:380px;background:linear-gradient(160deg,#2c1b6a,#1a1038);border:2px solid rgba(255,255,255,.2);border-radius:26px;padding:22px;text-align:center}
+.ovc h2{margin:0 0 6px;font-size:30px}
+#board{direction:ltr;display:grid;gap:9px;margin:10px auto;max-width:440px}
+.k{aspect-ratio:1;perspective:600px;cursor:pointer;border:0;background:none;padding:0}
+.in{position:relative;width:100%;height:100%;transition:transform .35s;transform-style:preserve-3d}.k.f .in{transform:rotateY(180deg)}
+.fa,.ba{position:absolute;inset:0;border-radius:16px;display:flex;align-items:center;justify-content:center;backface-visibility:hidden;-webkit-backface-visibility:hidden;font-size:min(11vw,48px)}
+.fa{background:linear-gradient(135deg,#6a45e0,#3c2494);border:2px solid rgba(255,255,255,.25);box-shadow:0 4px 0 rgba(0,0,0,.3);font-size:26px;color:#ffd05a}
+.ba{background:#fff;transform:rotateY(180deg);box-shadow:0 4px 0 rgba(0,0,0,.2)}
+.k.ok .ba{background:#aaf5de;animation:pp .4s}@keyframes pp{50%{transform:rotateY(180deg) scale(1.1)}}
+</style>
+</head>
+<body>
+<main>
+<div class="scr show" id="menu">
+  <div style="text-align:center;font-size:84px;line-height:1">🃏🧠</div>
+  <h1>זיכרון</h1><p class="sub">מוצאים זוגות של קלפים זהים</p>
+  <div class="box"><div class="lb">גודל</div><div class="chips" id="mSz"><button class="chip" data-v="6">קל · 12 קלפים</button><button class="chip on" data-v="8">בינוני · 16</button><button class="chip" data-v="12">קשה · 24</button></div></div>
+  <div class="box"><div class="lb">נושא</div><div class="chips" id="mTh"><button class="chip on" data-v="a">🐶 חיות</button><button class="chip" data-v="f">🍕 אוכל</button><button class="chip" data-v="s">⚽ ספורט</button><button class="chip" data-v="m">🚗 רכבים</button></div></div>
+  <button class="btn" id="go">▶ התחל</button>
+</div>
+<div class="scr" id="game">
+  <div class="bar"><button class="ib" id="back">→</button><div style="font-weight:800;font-size:17px">🔁 <span id="mv">0</span> · ⏱ <span id="tm">0</span> · 🏆 <span id="bst">-</span></div></div>
+  <div id="board"></div>
+</div>
+<div class="ov" id="end"><div class="ovc"><h2>כל הכבוד! 🎉</h2><div id="eM" style="font-size:19px;margin-bottom:6px"></div><button class="btn" id="again">🔁 שוב</button><button class="btn alt" id="menuB">תפריט</button></div></div>
+</main>
+<script>
+'use strict';
+const $=s=>document.querySelector(s);
+const store={get(k,d){try{const v=localStorage.getItem(k);return v===null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+let _ac=null;function tone(f,d=.1,t='triangle',v=.07){try{_ac=_ac||new (window.AudioContext||window.webkitAudioContext)();const o=_ac.createOscillator(),g=_ac.createGain();o.type=t;o.frequency.value=f;g.gain.value=v;o.connect(g);g.connect(_ac.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,_ac.currentTime+d);o.stop(_ac.currentTime+d+.02)}catch(e){}}
+
+const TH={a:['🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🐯','🦁','🐸'],f:['🍕','🍔','🍟','🌭','🍿','🍩','🍪','🍎','🍌','🍇','🍉','🍓'],s:['⚽','🏀','🏈','⚾','🎾','🏐','🏉','🎱','🏓','🥊','⛳','🏒'],m:['🚗','🚕','🚌','🚓','🚑','🚒','🚜','✈️','🚀','🚲','🚂','⛵']};
+let sz=+store.get('m_sz',8),th=store.get('m_th','a'),cards,open_,moves,matched,t0,tmr,lock;
+function opt(id,v){[...$(id).children].forEach(c=>c.classList.toggle('on',c.dataset.v===String(v)))}
+function chips(id,cb){[...$(id).children].forEach(c=>c.onclick=()=>{cb(c.dataset.v);opt(id,c.dataset.v)})}
+chips('#mSz',v=>{sz=+v;store.set('m_sz',v)});chips('#mTh',v=>{th=v;store.set('m_th',v)});opt('#mSz',sz);opt('#mTh',th);
+function show(id){document.querySelectorAll('.scr').forEach(s=>s.classList.toggle('show',s.id===id))}
+function start(){const e=TH[th].slice(0,sz);cards=[...e,...e].map((v,i)=>({v,id:i})).sort(()=>Math.random()-.5);open_=[];moves=0;matched=0;lock=false;t0=Date.now();clearInterval(tmr);
+  tmr=setInterval(()=>{$('#tm').textContent=Math.floor((Date.now()-t0)/1000)},500);$('#mv').textContent=0;$('#tm').textContent=0;
+  const b=store.get('m_best'+sz,'');$('#bst').textContent=b||'-';$('#end').classList.remove('show');
+  const bd=$('#board');bd.innerHTML='';bd.style.gridTemplateColumns='repeat('+(sz===12?4:4)+',1fr)';if(sz===6)bd.style.gridTemplateColumns='repeat(4,1fr)';
+  cards.forEach((c,i)=>{const k=document.createElement('button');k.className='k';k.innerHTML='<div class="in"><div class="fa">?</div><div class="ba">'+c.v+'</div></div>';k.onclick=()=>flip(i,k);c.el=k;bd.appendChild(k)})}
+function flip(i,k){if(lock||k.classList.contains('f'))return;k.classList.add('f');tone(500,.06);open_.push(i);
+  if(open_.length===2){moves++;$('#mv').textContent=moves;const [a,b]=open_;lock=true;
+    if(cards[a].v===cards[b].v){setTimeout(()=>{cards[a].el.classList.add('ok');cards[b].el.classList.add('ok');tone(800,.15);open_=[];lock=false;matched++;if(matched===sz)win()},350)}
+    else setTimeout(()=>{cards[a].el.classList.remove('f');cards[b].el.classList.remove('f');open_=[];lock=false},800)}}
+function win(){clearInterval(tmr);const t=Math.floor((Date.now()-t0)/1000);const key='m_best'+sz,old=+store.get(key,0);let msg=moves+' מהלכים · '+t+' שניות';
+  if(!old||moves<old){store.set(key,moves);msg+='\nשיא חדש! 🏆'}$('#eM').innerHTML=msg.replace('\n','<br>');setTimeout(()=>{tone(880,.4);$('#end').classList.add('show')},500)}
+$('#go').onclick=()=>{show('game');start()};$('#again').onclick=start;$('#menuB').onclick=()=>{clearInterval(tmr);$('#end').classList.remove('show');show('menu')};$('#back').onclick=()=>{clearInterval(tmr);show('menu')};
+
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+</script>
+</body>
+</html>

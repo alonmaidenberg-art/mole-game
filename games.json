@@ -38,5 +38,45 @@
     "url": "englishbot/",
     "icon": "englishbot/icons/icon-192.png",
     "tag": "לימוד"
+  },
+  {
+    "id": "tictactoe",
+    "name": "איקס עיגול",
+    "description": "נגד המחשב (גם בלתי מנוצח) או נגד חבר. ניקוד וסיבובים.",
+    "url": "tictactoe/",
+    "icon": "tictactoe/icons/icon-192.png",
+    "tag": "פשוט"
+  },
+  {
+    "id": "snake",
+    "name": "נחש",
+    "description": "אוכלים תפוחים וגדלים. שלוש מהירויות, קירות או מעבר דרך הקירות.",
+    "url": "snake/",
+    "icon": "snake/icons/icon-192.png",
+    "tag": "ארקייד"
+  },
+  {
+    "id": "game2048",
+    "name": "2048",
+    "description": "חברו אריחים זהים והגיעו ל-2048. החלקה, ביטול מהלך ושיא.",
+    "url": "game2048/",
+    "icon": "game2048/icons/icon-192.png",
+    "tag": "חשיבה"
+  },
+  {
+    "id": "memory",
+    "name": "זיכרון",
+    "description": "מוצאים זוגות. שלושה גדלים וארבעה נושאים.",
+    "url": "memory/",
+    "icon": "memory/icons/icon-192.png",
+    "tag": "חשיבה"
+  },
+  {
+    "id": "blocks",
+    "name": "בלוקים",
+    "description": "חפרו, בנו וחקרו עולם בלוקים משלכם. יצירתי או הישרדות, יום ולילה.",
+    "url": "blocks/",
+    "icon": "blocks/icons/icon-192.png",
+    "tag": "יצירה"
   }
 ]

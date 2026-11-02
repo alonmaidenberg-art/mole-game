@@ -1,4 +1,4 @@
-# אלון גיימס 🎮
+# המשחקים של אלון מידנברג 🎮
 
 אתר שמרכז את המשחקים של אלון. דף הבית (`index.html`) קורא את `games.json` ומציג כרטיס לכל משחק.
 
@@ -19,3 +19,4 @@
 ## Netlify
 
 Import from Git, Build command ריק, Publish directory `.`.
+- `tictactoe/` איקס עיגול · `snake/` נחש · `game2048/` 2048 · `memory/` זיכרון · `blocks/` בלוקים (עולם בלוקים)

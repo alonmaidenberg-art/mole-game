@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>2048 – אלון מידנברג</title>
+<meta name="description" content="חברו אריחים והגיעו ל-2048.">
+<meta name="theme-color" content="#1a1038">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;background:#1a1038;color:#fff;font-family:system-ui,-apple-system,"Segoe UI",Arial,"Noto Sans Hebrew",sans-serif}
+body{background:radial-gradient(700px 500px at 80% -10%,#5b36d6 0,transparent 60%),radial-gradient(600px 500px at 0% 110%,#0f6b6b 0,transparent 55%),#1a1038;min-height:100vh;min-height:100dvh;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+main{max-width:520px;margin:0 auto;padding:max(12px,env(safe-area-inset-top)) 14px 24px}
+h1{margin:6px 0;font-size:30px;text-align:center}
+.sub{text-align:center;opacity:.75;margin:0 0 10px}
+.box{background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.12);border-radius:22px;padding:14px;margin:12px 0}
+.lb{opacity:.8;font-size:15px;margin-bottom:8px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{flex:1;min-width:70px;padding:13px 6px;border-radius:16px;border:2px solid rgba(255,255,255,.18);background:#150a30;color:#fff;font:inherit;font-weight:800;font-size:17px;cursor:pointer}
+.chip.on{background:#ffd05a;color:#2a1c00;border-color:#fff}
+.btn{display:block;width:100%;border:0;border-radius:18px;padding:15px;margin-top:12px;font:inherit;font-size:21px;font-weight:900;color:#06322b;background:linear-gradient(180deg,#5ff7d6,#1fc9a6);box-shadow:0 6px 0 #0d7a66;cursor:pointer}
+.btn:active{transform:translateY(3px);box-shadow:0 3px 0 #0d7a66}
+.btn.alt{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.3);box-shadow:none;font-size:16px;padding:12px}
+.ib{min-width:46px;height:42px;padding:0 12px;border-radius:13px;border:2px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#fff;font:inherit;font-size:17px;font-weight:800;cursor:pointer}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.scr{display:none}.scr.show{display:block}
+.ov{position:fixed;inset:0;background:rgba(10,5,30,.82);display:none;align-items:center;justify-content:center;z-index:30;padding:16px}.ov.show{display:flex}
+.ovc{width:100%;max-width:380px;background:linear-gradient(160deg,#2c1b6a,#1a1038);border:2px solid rgba(255,255,255,.2);border-radius:26px;padding:22px;text-align:center}
+.ovc h2{margin:0 0 6px;font-size:30px}
+#board{position:relative;direction:ltr;aspect-ratio:1;background:#2b1d63;border-radius:18px;padding:10px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px;touch-action:none;max-width:440px;margin:0 auto}
+.t{border-radius:12px;background:rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:min(9vw,40px);color:#fff}
+.t.n{animation:pp .15s}@keyframes pp{from{transform:scale(.5)}to{transform:scale(1)}}
+.v2{background:#eee4da;color:#776e65}.v4{background:#ede0c8;color:#776e65}.v8{background:#f2b179}.v16{background:#f59563}.v32{background:#f67c5f}.v64{background:#f65e3b}.v128{background:#edcf72;font-size:min(8vw,34px)}.v256{background:#edcc61;font-size:min(8vw,34px)}.v512{background:#edc850;font-size:min(8vw,34px)}.v1024{background:#edc53f;font-size:min(6.5vw,28px)}.v2048{background:#edc22e;font-size:min(6.5vw,28px)}.vb{background:#3c3a32;font-size:min(6vw,26px)}
+</style>
+</head>
+<body>
+<main>
+  <div class="bar"><div style="font-size:34px;font-weight:900;color:#ffd05a">2048</div>
+    <div style="display:flex;gap:8px"><div class="box" style="margin:0;padding:6px 14px;text-align:center"><div style="font-size:12px;opacity:.7">ניקוד</div><b id="sc" style="font-size:20px">0</b></div>
+    <div class="box" style="margin:0;padding:6px 14px;text-align:center"><div style="font-size:12px;opacity:.7">שיא</div><b id="bs" style="font-size:20px">0</b></div></div></div>
+  <p class="sub" style="text-align:start">מחברים אריחים זהים ומגיעים ל-2048. החלק או חצים.</p>
+  <div id="board"></div>
+  <div style="display:flex;gap:8px;margin-top:12px"><button class="btn alt" id="undo" style="margin:0">↶ בטל</button><button class="btn" id="newG" style="margin:0;font-size:18px">🔁 משחק חדש</button></div>
+  <div class="ov" id="end"><div class="ovc"><h2 id="eT"></h2><div id="eM" style="margin-bottom:6px"></div><button class="btn" id="cont">המשך לשחק</button><button class="btn alt" id="again">משחק חדש</button></div></div>
+</main>
+<script>
+'use strict';
+const $=s=>document.querySelector(s);
+const store={get(k,d){try{const v=localStorage.getItem(k);return v===null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+let _ac=null;function tone(f,d=.1,t='triangle',v=.07){try{_ac=_ac||new (window.AudioContext||window.webkitAudioContext)();const o=_ac.createOscillator(),g=_ac.createGain();o.type=t;o.frequency.value=f;g.gain.value=v;o.connect(g);g.connect(_ac.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,_ac.currentTime+d);o.stop(_ac.currentTime+d+.02)}catch(e){}}
+
+let g,score=0,best=+store.get('g_best',0),prev=null,won=false,added=-1;$('#bs').textContent=best;
+function init(){g=Array(16).fill(0);score=0;prev=null;won=false;add();add();render();$('#end').classList.remove('show')}
+function add(){const e=g.map((v,i)=>v?-1:i).filter(i=>i>=0);if(!e.length)return;const i=e[Math.floor(Math.random()*e.length)];g[i]=Math.random()<.9?2:4;added=i}
+function render(){const bd=$('#board');bd.innerHTML='';g.forEach((v,i)=>{const t=document.createElement('div');t.className='t'+(v?' v'+(v>2048?'b':v):'')+(i===added?' n':'');t.textContent=v||'';bd.appendChild(t)});$('#sc').textContent=score;
+  if(score>best){best=score;store.set('g_best',best);$('#bs').textContent=best}}
+function line(a){const f=a.filter(x=>x);let s=0;for(let i=0;i<f.length-1;i++)if(f[i]===f[i+1]){f[i]*=2;s+=f[i];f.splice(i+1,1)}while(f.length<4)f.push(0);return [f,s]}
+function move(d){ // 0 left 1 right 2 up 3 down
+  const old=g.slice(),oldS=score;let gain=0;
+  for(let k=0;k<4;k++){const idx=[0,1,2,3].map(j=>d<2?k*4+j:j*4+k);if(d%2)idx.reverse();const [r,s]=line(idx.map(i=>g[i]));gain+=s;idx.forEach((i,j)=>g[i]=r[j])}
+  if(g.every((v,i)=>v===old[i])){return}
+  prev={g:old,s:oldS};score+=gain;added=-1;add();render();tone(300+Math.min(gain,400),.06);check()}
+function can(){if(g.includes(0))return true;for(let i=0;i<16;i++){const r=i%4,c=Math.floor(i/4);if(r<3&&g[i]===g[i+1])return true;if(c<3&&g[i]===g[i+4])return true}return false}
+function check(){if(!won&&g.includes(2048)){won=true;$('#eT').textContent='2048! 🎉';$('#eM').textContent='הגעת ליעד!';$('#cont').style.display='block';$('#end').classList.add('show')}
+  else if(!can()){$('#eT').textContent='נגמר המקום';$('#eM').textContent='ניקוד: '+score;$('#cont').style.display='none';$('#end').classList.add('show')}}
+addEventListener('keydown',e=>{const m={ArrowLeft:0,ArrowRight:1,ArrowUp:2,ArrowDown:3,a:0,d:1,w:2,s:3}[e.key];if(m!==undefined){e.preventDefault();move(m)}});
+let t0=null;const bd=$('#board');bd.addEventListener('touchstart',e=>{t0=[e.touches[0].clientX,e.touches[0].clientY]},{passive:true});
+bd.addEventListener('touchend',e=>{if(!t0)return;const t=e.changedTouches[0],dx=t.clientX-t0[0],dy=t.clientY-t0[1];if(Math.max(Math.abs(dx),Math.abs(dy))>22)move(Math.abs(dx)>Math.abs(dy)?(dx>0?1:0):(dy>0?3:2));t0=null},{passive:true});
+$('#undo').onclick=()=>{if(prev){g=prev.g;score=prev.s;prev=null;added=-1;render();$('#end').classList.remove('show')}};
+$('#newG').onclick=$('#again').onclick=init;$('#cont').onclick=()=>$('#end').classList.remove('show');
+window.__t={get g(){return g},set g(v){g=v},move,line,can};
+init();
+
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+</script>
+</body>
+</html>

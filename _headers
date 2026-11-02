@@ -42,3 +42,33 @@
   Cache-Control: no-cache
 /englishbot/manifest.webmanifest
   Cache-Control: no-cache
+/tictactoe/sw.js
+  Cache-Control: no-cache
+/tictactoe/index.html
+  Cache-Control: no-cache
+/tictactoe/manifest.webmanifest
+  Cache-Control: no-cache
+/snake/sw.js
+  Cache-Control: no-cache
+/snake/index.html
+  Cache-Control: no-cache
+/snake/manifest.webmanifest
+  Cache-Control: no-cache
+/game2048/sw.js
+  Cache-Control: no-cache
+/game2048/index.html
+  Cache-Control: no-cache
+/game2048/manifest.webmanifest
+  Cache-Control: no-cache
+/memory/sw.js
+  Cache-Control: no-cache
+/memory/index.html
+  Cache-Control: no-cache
+/memory/manifest.webmanifest
+  Cache-Control: no-cache
+/blocks/sw.js
+  Cache-Control: no-cache
+/blocks/index.html
+  Cache-Control: no-cache
+/blocks/manifest.webmanifest
+  Cache-Control: no-cache
