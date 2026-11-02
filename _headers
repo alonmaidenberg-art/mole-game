@@ -117,3 +117,6 @@
 
 /hangman/manifest.webmanifest
   Cache-Control: no-cache
+
+/hub.js
+  Cache-Control: no-cache

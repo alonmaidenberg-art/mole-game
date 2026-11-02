@@ -70,11 +70,20 @@ input[type=text]{width:100%;max-width:240px;padding:9px 12px;border-radius:12px;
 #installBtn{display:none}
 #rotate{position:fixed;inset:0;z-index:40;background:#0d0826;display:none;align-items:center;justify-content:center;text-align:center;font-size:24px;font-weight:800;padding:30px}
 @media (pointer:coarse) and (orientation:portrait){#rotate{display:flex}}
+#pw{position:fixed;z-index:12;top:52px;right:8px;display:none;flex-direction:column;gap:7px}
+#pw button{position:relative;width:46px;height:46px;border-radius:50%;border:2px solid rgba(255,255,255,.5);background:rgba(20,12,60,.65);color:#fff;font-size:22px;cursor:pointer;touch-action:none}
+#pw button i{position:absolute;right:-3px;bottom:-3px;min-width:18px;height:18px;border-radius:9px;background:#ff9f2e;color:#1b0f00;font-size:11px;font-style:normal;font-weight:900;line-height:18px}
+#pw button:disabled{opacity:.35}
+#top{padding-left:44px}
+.shop{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.08);border-radius:16px;padding:10px 12px;margin:8px 0;text-align:start}
+.shop .em{font-size:34px}.shop .nm{flex:1;line-height:1.35}.shop .nm small{opacity:.8}
+.shop button{border:0;border-radius:12px;padding:10px 14px;font:inherit;font-weight:900;background:#1fc9a6;color:#06322b;cursor:pointer}.shop button:disabled{opacity:.4}
 </style>
 </head>
 <body>
 <div id="stage"><canvas id="c" aria-label="מגרש כדורסל"></canvas></div>
 <div id="top"><div class="g"><button id="backBtn" aria-label="תפריט">←</button></div><div class="g"><button id="muteBtn" aria-label="צליל">🔊</button><button id="pauseBtn" aria-label="השהיה">⏸</button></div></div>
+<div id="pw"><button id="pwF" aria-label="הקפאה">❄️<i>0</i></button><button id="pwT" aria-label="טורבו">⚡<i>0</i></button><button id="pwP" aria-label="זריקה מושלמת">🎯<i>0</i></button></div>
 <div id="touch">
   <div class="grp"><button id="tL">◀</button><button id="tR">▶</button></div>
   <div class="grp"><button id="tJ">⤒</button><button id="tS" class="big">🏀</button></div>
@@ -91,6 +100,7 @@ input[type=text]{width:100%;max-width:240px;padding:9px 12px;border-radius:12px;
     <button class="last" id="lastCard"><small>הבחירה שלך (לחצו לשינוי)</small><div class="lastrow"><span class="ab" id="lastAb"></span><b id="lastTxt"></b></div></button>
     <div class="set"><div class="lbl">רמת קושי נגד המחשב</div><div class="row" id="diffRow"></div></div>
   </div>
+  <button class="btn alt" id="shopBtn">🛒 חנות כוחות (מטבעות ויהלומים)</button>
   <button class="btn alt" id="installBtn">📲 התקן את המשחק</button>
   <div class="keys">נגד המחשב: <b>A / D</b> או חצים לתנועה · <b>W</b> או ↑ קפיצה · <b>רווח</b> זריקה: <b>לחיצה ארוכה</b> ושחרור על <b>הירוק</b> בסוף המד = זריקה מושלמת, וליד הסל באוויר = דאנק. בלי כדור: גניבה.<br>שני שחקנים: שחקן 1 <b>A / D / W</b> + <b>F</b> · שחקן 2 <b>חצים</b> + <b>L</b> · בטלפון: כפתורים על המסך (סובבו לרוחב)<br>המגרש גדול: המצלמה עוקבת אחריך, זוזו ימינה ושמאלה כדי לראות אותו.</div>
 </div></div>
@@ -105,6 +115,7 @@ input[type=text]{width:100%;max-width:240px;padding:9px 12px;border-radius:12px;
   <div class="grid5" id="plGrid"></div>
 </div></div>
 
+<div class="ov" id="shopOv"><div class="card"><h2>🛒 חנות כוחות</h2><p>מרוויחים 🪙 ו-💎 בכל משחק נגד המחשב. בזמן משחק: <b>1</b> הקפאה · <b>2</b> טורבו · <b>3</b> זריקה מושלמת (או הכפתורים בצד).</p><div style="font-weight:900;font-size:20px;margin:6px 0">🪙 <span id="shC">0</span> &nbsp; 💎 <span id="shD">0</span></div><div id="shopList"></div><button class="btn alt" id="shopX">סגור</button></div></div>
 <div class="ov" id="pauseOv"><div class="card"><h2>⏸ הפסקה</h2>
   <button class="btn" id="resumeBtn">▶ המשך</button>
   <button class="btn blue" id="restartBtn">🔁 התחל מחדש</button>
@@ -230,7 +241,7 @@ function startMatch(m,opts={}){
   ['menu','pickTeam','pickPl','pauseOv','overOv'].forEach(i=>$('#'+i).classList.remove('show'));
   $('#top').style.display='flex';
   $('#touch').style.display=(matchMedia('(pointer:coarse)').matches&&m!=='2p')?'flex':'none';
-  paused=false;$('#pauseBtn').textContent='⏸';
+  paused=false;$('#pauseBtn').textContent='⏸';players[0].turbo=0;players[0].perfect=false;pwPaint();
   resetPossession(0);state='play';SFX.go();updateCam(true);
   popup(m==='tour'?'סיבוב '+(round+1)+' מתוך 4':'יאללה!',camX+VW/2,150,'#fff',90);
 }
@@ -268,7 +279,8 @@ function doShoot(p){
   const opp=players[1-p.team],od=Math.abs(opp.x-p.x);
   if(od<85)sd+=(opp.y<FLOOR-20?16:7);
   sd*=p.shm;
-  if(p.human&&mode!=='demo'&&p.q!=null){
+  if(p.perfect&&p.human){p.perfect=false;sd*=0.1;popup('🎯 מושלם!',p.x,p.y-118,'#2ecc71',50)}
+  else if(p.human&&mode!=='demo'&&p.q!=null){
     const d=Math.abs(p.q-GC),gw=greenW(p);
     if(d<=gw){sd*=0.12;popup('מושלם!',p.x,p.y-118,'#2ecc71',50)}
     else sd*=clamp(0.7+(d-gw)*26,0.7,4.5);
@@ -351,10 +363,35 @@ function endGame(){
       else{title='הודחת בסיבוב '+(round+1);msg='אפשר לנסות שוב מההתחלה'}
     }else if(mode==='demo'){title='דמו';msg='AI נגד AI'}
     else{title=w===0?'ניצחת! 🎉':'הפסדת הפעם';msg=w===0?'כל הכבוד '+players[0].name+'!':'עוד ניסיון ואתה שם אותם'}
-    $('#ovTitle').textContent=title;$('#ovScore').textContent=score[0]+' : '+score[1];$('#ovMsg').textContent=msg;
+    msg+=rewards();$('#ovTitle').textContent=title;$('#ovScore').textContent=score[0]+' : '+score[1];$('#ovMsg').textContent=msg;pwPaint();
     $('#nextBtn').style.display=showNext?'block':'none';$('#overOv').classList.add('show');$('#touch').style.display='none';
   },700);
 }
+
+
+/* ---------- coins, diamonds, power-ups ---------- */
+const PW={freeze:{em:'❄️',nm:'הקפאה',d:'מקפיא את היריב ל-4 שניות',c:40,d$:0},turbo:{em:'⚡',nm:'טורבו',d:'מהירות ×1.5 ל-6 שניות',c:30,d$:0},perfect:{em:'🎯',nm:'זריקה מושלמת',d:'הזריקה הבאה נכנסת כמעט בטוח',c:0,d$:2}};
+function pwGet(){try{const o=JSON.parse(store.get('bb_pw','{}'));return{freeze:o.freeze|0,turbo:o.turbo|0,perfect:o.perfect|0}}catch(e){return{freeze:0,turbo:0,perfect:0}}}
+function pwSet(o){store.set('bb_pw',JSON.stringify(o))}
+function pwPaint(){const o=pwGet(),on=(mode==='cpu'||mode==='tour')&&state!=='menu'&&state!=='over';$('#pw').style.display=on?'flex':'none';
+  [['#pwF','freeze'],['#pwT','turbo'],['#pwP','perfect']].forEach(([id,k])=>{const b=$(id);b.querySelector('i').textContent=o[k];b.disabled=!o[k]})}
+function usePw(k){if(!(mode==='cpu'||mode==='tour')||state!=='play'||paused)return;const o=pwGet();if(!o[k])return;const me=players[0],op=players[1];
+  if(k==='freeze'){op.stun=240;op.charge=0;popup('❄️ הקפאה!',op.x,op.y-120,'#9fe8ff',70)}
+  else if(k==='turbo'){me.turbo=360;popup('⚡ טורבו!',me.x,me.y-120,'#ffe27a',70)}
+  else if(k==='perfect'){if(me.perfect)return;me.perfect=true;popup('🎯 הזריקה הבאה מושלמת',me.x,me.y-120,'#7dff9a',80)}
+  o[k]--;pwSet(o);pwPaint();beep(700,.1)}
+$('#pwF').onclick=()=>usePw('freeze');$('#pwT').onclick=()=>usePw('turbo');$('#pwP').onclick=()=>usePw('perfect');
+addEventListener('keydown',e=>{if(e.code==='Digit1')usePw('freeze');else if(e.code==='Digit2')usePw('turbo');else if(e.code==='Digit3')usePw('perfect')});
+function shopPaint(){const o=pwGet();$('#shC').textContent=window.AG?AG.coins():0;$('#shD').textContent=window.AG?AG.diamonds():0;const L=$('#shopList');L.innerHTML='';
+  Object.keys(PW).forEach(k=>{const p=PW[k],r=document.createElement('div');r.className='shop';
+    r.innerHTML='<div class="em">'+p.em+'</div><div class="nm"><b>'+p.nm+'</b> · יש לך '+o[k]+'<br><small>'+p.d+'</small></div>';
+    const b=document.createElement('button');b.textContent=p.d$?p.d$+' 💎':p.c+' 🪙';b.disabled=!window.AG||AG.coins()<p.c||AG.diamonds()<p.d$;
+    b.onclick=()=>{if(AG.spend(p.c,p.d$)){const q=pwGet();q[k]++;pwSet(q);beep(800,.1);shopPaint()}};r.appendChild(b);L.appendChild(r)})}
+$('#shopBtn').onclick=()=>{shopPaint();$('#shopOv').classList.add('show')};$('#shopX').onclick=()=>$('#shopOv').classList.remove('show');
+function rewards(){if(!(mode==='cpu'||mode==='tour')||!window.AG)return '';const win=score[0]>score[1];
+  let c=10+stats.makes*3+(win?25:0)+(diff==='hard'?15:diff==='medium'?5:0),d=0;
+  if(win&&(diff==='hard'||mode==='tour'))d=1;if(mode==='tour'&&win&&round===3)d=3;
+  AG.add(c,d);return ' · קיבלת +'+c+' 🪙'+(d?' ו-+'+d+' 💎':'')}
 
 /* ---------- AI ---------- */
 function ai(a){
@@ -387,7 +424,8 @@ function updatePlayer(p){
   const live=(state==='play');
   if(!live||p.stun>0){c.l=c.r=c.j=0;if(!live)c.s=0}
   const dir=(c.r?1:0)-(c.l?1:0);
-  p.vx=dir*SPEED*p.spdMul;if(dir)p.face=dir;
+  if(p.turbo>0)p.turbo--;if(p.stun>40)c.s=0;
+  p.vx=dir*SPEED*p.spdMul*(p.turbo>0?1.5:1);if(dir)p.face=dir;
   if(c.j&&p.y>=FLOOR&&live){p.vy=p.jump}
   p.vy+=GP;p.y+=p.vy;if(p.y>FLOOR){p.y=FLOOR;p.vy=0}
   p.x=clamp(p.x+p.vx,22,WW-22);
@@ -609,7 +647,7 @@ function draw(){
   drawCourt();drawHoop(HL);drawHoop(HR);
   if(state!=='menu'){
     const order=[players[0],players[1]].sort((a,b)=>a.y-b.y);
-    order.forEach(drawPlayer);drawBall();drawMeters();
+    order.forEach(drawPlayer);order.forEach(p=>{if(p.stun>40){ctx.font='34px serif';ctx.textAlign='center';ctx.fillText('❄️',p.x,p.y-110)}});drawBall();drawMeters();
     for(const q of pops){const a=clamp(q.t/q.life*2,0,1),up=(q.life-q.t)*.7;ctx.globalAlpha=a;ctx.fillStyle=q.color;ctx.strokeStyle='#000';ctx.lineWidth=4;
       ctx.font='bold 28px system-ui';ctx.textAlign='center';ctx.strokeText(q.text,q.x,q.y-up);ctx.fillText(q.text,q.x,q.y-up);ctx.globalAlpha=1}
   }
@@ -674,7 +712,7 @@ $('#lastCard').onclick=()=>{pendingMode=null;openTeams()};
 $('#ptBack').onclick=()=>{pendingMode=null;showOv('menu')};$('#ppBack').onclick=()=>openTeams();
 function showMenu(){
   state='menu';paused=false;['pauseOv','overOv'].forEach(i=>$('#'+i).classList.remove('show'));showOv('menu');
-  $('#top').style.display='none';$('#touch').style.display='none';
+  $('#top').style.display='none';$('#touch').style.display='none';pwPaint();
 }
 function saveName(){}
 $('#cpuBtn').onclick=()=>pickMode('cpu');
@@ -705,5 +743,6 @@ buildMenu();
 /* developer/test hook: ?demo=1 plays AI vs AI automatically */
 if(new URLSearchParams(location.search).get('demo')){const q=new URLSearchParams(location.search);window.__ff=+q.get('ff')||1;startMatch('demo',{diff:q.get('diff')||'medium'})}
 </script>
+<script src="../hub.js"></script>
 </body>
 </html>

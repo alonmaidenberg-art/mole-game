@@ -218,5 +218,6 @@ function paintMute(){$('#muteBtn').textContent=muted?'🔇':'🔊'}
 $('#muteBtn').onclick=()=>{muted=!muted;store.set('im_mute',muted?'1':'0');paintMute();if(!muted)beep(600,.1)};paintMute();
 if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 </script>
+<script src="../hub.js"></script>
 </body>
 </html>

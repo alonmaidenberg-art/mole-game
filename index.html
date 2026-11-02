@@ -31,6 +31,16 @@ a.card img{width:72px;height:72px;border-radius:16px;flex:none;background:#0003}
 .tag{display:inline-block;margin-top:6px;font-size:12px;font-weight:700;color:#1a1238;background:#ffd23f;border-radius:999px;padding:2px 10px}
 .empty{text-align:center;opacity:.8;grid-column:1/-1}
 footer{text-align:center;margin-top:34px;opacity:.55;font-size:13px}
+.wal{display:flex;gap:8px;justify-content:center;margin-top:12px;font-weight:800}
+.wal span{background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.15);border-radius:999px;padding:5px 14px;font-size:16px}
+.key{background:none;border:0;color:#fff;opacity:.45;font-size:20px;cursor:pointer;padding:6px 10px}
+.mo{position:fixed;inset:0;background:rgba(10,5,30,.85);display:none;align-items:center;justify-content:center;z-index:50;padding:16px}.mo.show{display:flex}
+.mc{width:100%;max-width:360px;background:linear-gradient(160deg,#2c1b6a,#1a1038);border:2px solid rgba(255,255,255,.2);border-radius:24px;padding:20px;text-align:center}
+.mc h2{margin:0 0 8px}.mc p{opacity:.85;line-height:1.5;margin:6px 0}
+.mc input{width:100%;font:inherit;font-size:20px;padding:12px;border-radius:14px;border:2px solid rgba(255,255,255,.3);background:#150a30;color:#fff;text-align:center;letter-spacing:1px;direction:ltr}
+.mb{display:block;width:100%;margin-top:10px;border:0;border-radius:16px;padding:13px;font:inherit;font-size:18px;font-weight:900;color:#06322b;background:linear-gradient(180deg,#5ff7d6,#1fc9a6);cursor:pointer}
+.mb.alt{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.3);font-size:15px;padding:10px}
+.err{color:#ff9bb0;min-height:22px}
 </style>
 <link rel="canonical" href="https://alon-games.netlify.app/">
 <meta property="og:title" content="המשחקים של אלון מידנברג">
@@ -44,17 +54,25 @@ footer{text-align:center;margin-top:34px;opacity:.55;font-size:13px}
     <img src="assets/hub.svg" alt="" width="84" height="84">
     <h1>המשחקים של אלון מידנברג</h1>
     <p>בחרו משחק ותתחילו לשחק 🎮</p>
+    <div class="wal"><span>🪙 <b id="wc">0</b></span><span>💎 <b id="wd">0</b></span><button class="key" id="keyB" aria-label="קוד אדמין">🔑</button></div>
   </header>
   <section id="grid" aria-label="רשימת המשחקים"><p class="empty">טוען משחקים…</p></section>
   <noscript><p style="text-align:center"><a style="color:#ffd23f" href="mole/">🐹 תפוס את החפרפרת</a></p></noscript>
   <footer>המשחקים נוספים כאן אוטומטית</footer>
 </main>
+<div class="mo" id="noteM"><div class="mc"><h2 id="noteT"></h2><p id="noteP"></p><button class="mb" id="noteGo">המשך למשחק</button><button class="mb alt" id="noteX">חזרה</button></div></div>
+<div class="mo" id="admM"><div class="mc"><h2>🔑 קוד אדמין</h2>
+  <div id="admIn"><p>הכניסו את הקוד הסודי</p><input id="admC" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="AG-XXXX-XXXX-XXXX"><div class="err" id="admE"></div><button class="mb" id="admOk">אישור</button></div>
+  <div id="admPanel" style="display:none"><p>מצב אדמין פעיל ✅<br><small>במשחק הבלוקים יש כפתור ערכת אדמין בתיק.</small></p>
+    <button class="mb" id="a1">+10,000 🪙</button><button class="mb" id="a2">+500 💎</button><button class="mb alt" id="a3">אפס ארנק</button><button class="mb alt" id="a4">יציאה ממצב אדמין</button></div>
+  <button class="mb alt" id="admX">סגור</button></div></div>
+<script src="hub.js"></script>
 <script>
 fetch('games.json',{cache:'no-cache'}).then(r=>r.json()).then(list=>{
   const g=document.getElementById('grid');g.textContent='';
   if(!list.length){g.innerHTML='<p class="empty">עוד אין משחקים.</p>';return}
   list.forEach(x=>{
-    const a=document.createElement('a');a.className='card';a.href=x.url;
+    const a=document.createElement('a');a.className='card';a.href=x.url;if(x.note){a.addEventListener('click',function(e){e.preventDefault();showNote(x)})}
     const i=document.createElement('img');i.src=x.icon;i.alt='';i.width=72;i.height=72;i.loading='lazy';
     const b=document.createElement('div');
     const t=document.createElement('div');t.className='t';t.textContent=x.name;
@@ -64,6 +82,18 @@ fetch('games.json',{cache:'no-cache'}).then(r=>r.json()).then(list=>{
     a.append(i,b);g.append(a);
   });
 }).catch(()=>{document.getElementById('grid').innerHTML='<p class="empty">לא הצלחנו לטעון את הרשימה. <a style="color:#ffd23f" href="mole/">לחצו כאן למשחק החפרפרת</a></p>'});
+
+function showNote(x){$('noteT').textContent=x.noteTitle||x.name;$('noteP').textContent=x.note;$('noteM').classList.add('show');$('noteGo').onclick=function(){location.href=x.url};$('noteX').onclick=function(){$('noteM').classList.remove('show')}}
+function $(i){return document.getElementById(i)}
+function wal(){$('wc').textContent=AG.coins().toLocaleString('he-IL');$('wd').textContent=AG.diamonds().toLocaleString('he-IL')}
+wal();AG.onChange(wal);
+function admView(){var on=AG.isAdmin();$('admIn').style.display=on?'none':'block';$('admPanel').style.display=on?'block':'none'}
+$('keyB').onclick=function(){$('admE').textContent='';$('admC').value='';admView();$('admM').classList.add('show')};
+$('admX').onclick=function(){$('admM').classList.remove('show')};
+$('admOk').onclick=function(){AG.tryAdmin($('admC').value).then(function(ok){if(ok){admView()}else{$('admE').textContent='הקוד לא נכון'}})};
+$('a1').onclick=function(){AG.add(10000,0)};$('a2').onclick=function(){AG.add(0,500)};
+$('a3').onclick=function(){if(confirm('לאפס מטבעות ויהלומים?')){AG.spend(AG.coins(),AG.diamonds())}};
+$('a4').onclick=function(){AG.adminLogout();admView()};
 </script>
 </body>
 </html>
