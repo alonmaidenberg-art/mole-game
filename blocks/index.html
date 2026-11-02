@@ -80,14 +80,14 @@ const store={get(k,d){try{const v=localStorage.getItem(k);return v===null?d:v}ca
 let _ac=null;function tone(f,d=.1,t='triangle',v=.07){try{_ac=_ac||new (window.AudioContext||window.webkitAudioContext)();const o=_ac.createOscillator(),g=_ac.createGain();o.type=t;o.frequency.value=f;g.gain.value=v;o.connect(g);g.connect(_ac.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,_ac.currentTime+d);o.stop(_ac.currentTime+d+.02)}catch(e){}}
 
 const WW=140,HH=72,SEA=40;
-const B={AIR:0,GRASS:1,DIRT:2,STONE:3,SAND:4,WOOD:5,LEAF:6,PLANK:7,BRICK:8,GLASS:9,COAL:10,BED:11,GOLD:12,IRON:13,DIAM:14,TABLE:15};
-const NAME={1:'דשא',2:'אדמה',3:'אבן',4:'חול',5:'עץ',6:'עלים',7:'קרשים',8:'לבנים',9:'זכוכית',10:'פחם',11:'סלע',12:'זהב',13:'עפרת ברזל',14:'עפרת יהלום',15:'שולחן יצירה',100:'מקל',101:'חרב עץ',102:'חרב אבן',103:'חרב ברזל',104:'חרב יהלום',105:'מכוש עץ',106:'מכוש אבן',107:'מכוש ברזל',108:'מכוש יהלום',109:'מוט ברזל',110:'יהלום',111:'בשר רקוב',112:'תפוח'};
+const B={AIR:0,GRASS:1,DIRT:2,STONE:3,SAND:4,WOOD:5,LEAF:6,PLANK:7,BRICK:8,GLASS:9,COAL:10,BED:11,GOLD:12,IRON:13,DIAM:14,TABLE:15,TRK:16,LF:17};
+const NAME={1:'דשא',2:'אדמה',3:'אבן',4:'חול',5:'עץ',6:'עלים',7:'קרשים',8:'לבנים',9:'זכוכית',10:'פחם',11:'סלע',12:'זהב',13:'עפרת ברזל',14:'עפרת יהלום',15:'שולחן יצירה',16:'עץ',17:'עלים',100:'מקל',101:'חרב עץ',102:'חרב אבן',103:'חרב ברזל',104:'חרב יהלום',105:'מכוש עץ',106:'מכוש אבן',107:'מכוש ברזל',108:'מכוש יהלום',109:'מוט ברזל',110:'יהלום',111:'בשר רקוב',112:'תפוח'};
 const ICON={100:'🥢',101:'🗡️',102:'🗡️',103:'⚔️',104:'⚔️',105:'⛏️',106:'⛏️',107:'⛏️',108:'⛏️',109:'🔩',110:'💎',111:'🥩',112:'🍎'};
 const TCOL=['#fff','#b98b4e','#9c9ca0','#e8e8f0','#4fe3ff'];
 const SWORD=[101,102,103,104],PICK=[105,106,107,108],DMG=[1,3,4,6,8],SPD=[1,1.8,2.6,3.6,5];
 const REC=[{o:7,n:4,need:{5:1}},{o:100,n:4,need:{7:2}},{o:15,n:1,need:{7:4}},{o:101,n:1,need:{7:2,100:1},t:1},{o:102,n:1,need:{3:2,100:1},t:1},{o:103,n:1,need:{109:2,100:1},t:1},{o:104,n:1,need:{110:2,100:1},t:1},{o:105,n:1,need:{7:3,100:2},t:1},{o:106,n:1,need:{3:3,100:2},t:1},{o:107,n:1,need:{109:3,100:2},t:1},{o:108,n:1,need:{110:3,100:2},t:1},{o:8,n:2,need:{3:4}},{o:9,n:2,need:{4:2}}];
-const HARD={1:14,2:12,3:42,4:10,5:30,6:5,7:22,8:48,9:8,10:50,12:60,13:60,14:80,15:30};
-const PAL=[null,['#5aa83c','#4a9230','#6dbb4a'],['#8a5a36','#76492a','#9a6a42'],['#8a8a8e','#767679','#9c9ca0'],['#e6d69a','#d6c488','#f0e4b0'],['#6e4b25','#5a3c1c','#80592f'],['#3f8a2e','#357a26','#4e9c3a'],['#b98b4e','#a77a40','#c99b5c'],['#a8412f','#963a29','#b84e3a'],['#cfe9f2','#b4d8e6','#e6f6fb'],['#8a8a8e','#222','#767679'],['#3a3a3e','#2a2a2d','#48484d'],['#8a8a8e','#f2c93a','#767679'],['#8a8a8e','#c98a5a','#767679'],['#8a8a8e','#4fe3ff','#767679'],['#b98b4e','#a77a40','#c99b5c']];
+const HARD={1:14,2:12,3:42,4:10,5:30,6:5,7:22,8:48,9:8,10:50,12:60,13:60,14:80,15:30,16:30,17:5};
+const PAL=[null,['#5aa83c','#4a9230','#6dbb4a'],['#8a5a36','#76492a','#9a6a42'],['#8a8a8e','#767679','#9c9ca0'],['#e6d69a','#d6c488','#f0e4b0'],['#6e4b25','#5a3c1c','#80592f'],['#3f8a2e','#357a26','#4e9c3a'],['#b98b4e','#a77a40','#c99b5c'],['#a8412f','#963a29','#b84e3a'],['#cfe9f2','#b4d8e6','#e6f6fb'],['#8a8a8e','#222','#767679'],['#3a3a3e','#2a2a2d','#48484d'],['#8a8a8e','#f2c93a','#767679'],['#8a8a8e','#c98a5a','#767679'],['#8a8a8e','#4fe3ff','#767679'],['#b98b4e','#a77a40','#c99b5c'],['#6e4b25','#5a3c1c','#80592f'],['#3f8a2e','#357a26','#4e9c3a']];
 const TEX=[];
 function rng(seed){let s=seed>>>0;return()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296}}
 function mkTex(id){const c=document.createElement('canvas');c.width=c.height=16;const x=c.getContext('2d');if(!id)return c;const p=PAL[id],r=rng(id*977);
@@ -104,7 +104,8 @@ function mkTex(id){const c=document.createElement('canvas');c.width=c.height=16;
   if(id===15){x.fillStyle='#8f6a36';x.fillRect(0,0,16,4);x.fillStyle='#d9b27a';x.fillRect(1,1,14,2);x.fillStyle='#555';x.fillRect(3,6,3,6);x.fillStyle='#c33';x.fillRect(8,6,5,2);x.fillStyle='#4a3216';x.fillRect(0,14,16,2)}
   return c}
 for(let i=0;i<16;i++)TEX.push(mkTex(i));
-const ICOURL={};for(let i=1;i<16;i++)ICOURL[i]=TEX[i].toDataURL();
+for(const [id,src] of [[16,5],[17,6]]){const c=document.createElement('canvas');c.width=c.height=16;const x=c.getContext('2d');x.drawImage(TEX[src],0,0);x.fillStyle='rgba(8,14,30,.28)';x.fillRect(0,0,16,16);TEX.push(c)}
+const ICOURL={};for(let i=1;i<18;i++)ICOURL[i]=TEX[i].toDataURL();
 /* ---------- world ---------- */
 let hp=20,hot=[1,2,3,4,5,6,7,8,9],zs=[],spawnT=300,lastHit=-999,swing=0,ap=0,flash=0,lastDay=1,invTab='i';
 let world,seed,player,inv,creative=true,sel=1,mode='mine',time=0,mining=null,keys={},mouse={x:0,y:0,down:0,alt:0},cam={x:0,y:0},S=40,edits=[],dirty=false,running=false;
@@ -116,12 +117,12 @@ function gen(sd){seed=sd;world=new Uint8Array(WW*HH);const R=rng(sd*7919+3);
     if(b===B.STONE){const c=Math.sin(x*.21+y*.33+seed)*Math.sin(x*.13-y*.27+seed*3);if(y>h+8&&c>.62)b=0;else{const q=R();if(q<.035)b=B.COAL;else if(y>SEA+24&&q>.9975)b=B.DIAM;else if(y>SEA+22&&q>.992)b=B.GOLD;else if(y>SEA+9&&q>=.035&&q<.07)b=B.IRON}}
     world[y*WW+x]=b}}
   for(let x=4;x<WW-4;x+=1){const h=hgt(x);if(R()<.11&&world[h*WW+x]===B.GRASS&&world[h*WW+x-1]!==B.WOOD&&world[h*WW+x-2]!==B.WOOD&&world[h*WW+x-3]!==B.WOOD){const th=4+Math.floor(R()*2);
-    for(let k=1;k<=th;k++)set0(x,h-k,B.WOOD);for(let dx=-2;dx<=2;dx++)for(let dy=-2;dy<=1;dy++){if(Math.abs(dx)===2&&Math.abs(dy)===2)continue;if(!get(x+dx,h-th+dy))set0(x+dx,h-th+dy,B.LEAF)}}}
+    for(let k=1;k<=th;k++)set0(x,h-k,B.TRK);for(let dx=-2;dx<=2;dx++)for(let dy=-2;dy<=1;dy++){if(Math.abs(dx)===2&&Math.abs(dy)===2)continue;if(!get(x+dx,h-th+dy))set0(x+dx,h-th+dy,B.LF)}}}
 }
 function get(x,y){return x<0||y<0||x>=WW||y>=HH?B.BED:world[y*WW+x]}
 function set0(x,y,b){if(x>=0&&y>=0&&x<WW&&y<HH)world[y*WW+x]=b}
 function setB(x,y,b){if(x<0||y<0||x>=WW||y>=HH-1)return;world[y*WW+x]=b;edits=edits.filter(e=>!(e[0]===x&&e[1]===y));edits.push([x,y,b]);dirty=true}
-function newWorld(){gen(1+Math.floor(Math.random()*9000));edits=[];const x=Math.floor(WW/2);for(let dx=-4;dx<=4;dx++)for(let y=0;y<hgt(x+dx);y++){const q=get(x+dx,y);if(q===B.WOOD||q===B.LEAF)world[y*WW+x+dx]=0}player={x:x+.5,y:hgt(x)-2,vx:0,vy:0,face:1,ground:false};
+function newWorld(){gen(1+Math.floor(Math.random()*9000));edits=[];const x=Math.floor(WW/2);for(let dx=-4;dx<=4;dx++)for(let y=0;y<hgt(x+dx);y++){const q=get(x+dx,y);if(q===B.WOOD||q===B.LEAF||q===B.TRK||q===B.LF)world[y*WW+x+dx]=0}player={x:x+.5,y:hgt(x)-2,vx:0,vy:0,face:1,ground:false};
   inv={};for(let i=1;i<=15;i++)inv[i]=creative?999:0;if(!creative){inv[2]=20;inv[7]=10}hp=20;zs=[];hot=[1,2,3,4,5,6,7,8,9];sel=1;time=60*40;buildHot();save()}
 function save(){store.set('bl_save',JSON.stringify({seed,edits,player:{x:player.x,y:player.y},inv,creative,time,hp,hot}));dirty=false}
 function load(){try{const d=JSON.parse(store.get('bl_save',''));if(!d)return false;gen(d.seed);edits=d.edits;for(const [x,y,b] of edits)world[y*WW+x]=b;player=Object.assign({vx:0,vy:0,face:1,ground:false},d.player);inv=d.inv;creative=d.creative;time=d.time||0;hp=d.hp||20;hot=d.hot||[1,2,3,4,5,6,7,8,9];zs=[];sel=hot.includes(sel)?sel:hot[0];buildHot();return true}catch(e){return false}}
@@ -132,8 +133,9 @@ function updMode(){$('#modeB').textContent=mode==='mine'?'⛏':'🧱'}
 $('#modeB').onclick=()=>{mode=mode==='mine'?'build':'mine';updMode()};
 /* ---------- physics ---------- */
 const PW=.3,PH=1.8;
-function solid(x,y){const b=get(Math.floor(x),Math.floor(y));return b!==0}
-function collide(px,py){for(let x=Math.floor(px-PW);x<=Math.floor(px+PW-.001);x++)for(let y=Math.floor(py-PH);y<=Math.floor(py-.001);y++)if(get(x,y))return true;return false}
+function sol(x,y){const b=get(x,y);return b!==0&&b<16}
+function solid(x,y){return sol(Math.floor(x),Math.floor(y))}
+function collide(px,py){for(let x=Math.floor(px-PW);x<=Math.floor(px+PW-.001);x++)for(let y=Math.floor(py-PH);y<=Math.floor(py-.001);y++)if(sol(x,y))return true;return false}
 function stepPlayer(){const p=player;const dir=(keys.KeyD||keys.ArrowRight||tl.r?1:0)-(keys.KeyA||keys.ArrowLeft||tl.l?1:0);
   p.vx=dir*.11;if(dir)p.face=dir;
   if((keys.Space||keys.KeyW||keys.ArrowUp||tl.j)&&p.ground){p.vy=-.36;p.ground=false}
@@ -150,10 +152,10 @@ function tileAt(mx,my){return [Math.floor((mx+cam.x)/S),Math.floor((my+cam.y)/S)
 function tier(list){let t=0;list.forEach((id,i)=>{if(inv[id]>0)t=i+1});return t}
 function need(b){return b===B.IRON?2:b===B.DIAM?3:0}
 function breakTile(x,y){const b=get(x,y);if(!b||b===B.BED)return;setB(x,y,0);
-  if(!creative){let d=b===B.GRASS?B.DIRT:b===B.IRON?109:b===B.DIAM?110:b;if(b===B.LEAF&&Math.random()<.2)d=112;
+  if(!creative){let d=b===B.GRASS?B.DIRT:b===B.IRON?109:b===B.DIAM?110:b===B.TRK?B.WOOD:b===B.LF?B.LEAF:b;if((b===B.LEAF||b===B.LF)&&Math.random()<.2)d=112;
     inv[d]=(inv[d]||0)+1;if(b===B.GOLD&&window.AG)AG.add(5,0);if(b===B.DIAM&&window.AG)AG.add(0,1);buildHot()}tone(180,.08,'square',.05)}
 function toast(t){const e=$('#toast');e.textContent=t;e.style.display='block';clearTimeout(toast.h);toast.h=setTimeout(()=>e.style.display='none',2200)}
-function placeTile(x,y){if(get(x,y)||!reach(x,y))return;if(!creative&&!inv[sel])return;
+function placeTile(x,y){if(sol(x,y)||!reach(x,y))return;if(!creative&&!inv[sel])return;
   const old=world[y*WW+x];world[y*WW+x]=sel;const bad=collide(player.x,player.y);world[y*WW+x]=old;if(bad)return;
   const ok=[[1,0],[-1,0],[0,1],[0,-1]].some(([a,b])=>get(x+a,y+b));if(!ok)return;
   setB(x,y,sel);if(!creative){inv[sel]--;buildHot()}tone(300,.06,'triangle',.06)}
@@ -172,7 +174,7 @@ function attack(){if(creative||ap>0||!running)return;ap=18;swing=10;const p=play
 function dmgPlayer(n,from){if(creative)return;hp-=n;flash=12;lastHit=time;player.kx=(player.x>=from?1:-1)*.22;player.vy=-.2;tone(110,.15,'sawtooth',.08);if(hp<=0)die()}
 function die(){toast('💀 מתת! חוזרים להתחלה');hp=20;zs=[];const x=Math.floor(WW/2);player.x=x+.5;player.y=hgt(x)-2;player.vy=0;player.kx=0}
 function isNight(){return lastDay<.45}
-function trySpawn(){if(creative||!isNight()||zs.length>=4)return;const side=Math.random()<.5?-1:1;const x=Math.floor(player.x+side*(13+Math.random()*8));if(x<2||x>=WW-2)return;let y=0;while(y<HH&&!get(x,y))y++;if(y<=0||y>=HH-2)return;zs.push({x:x+.5,y:y,vy:0,kx:0,hp:20,face:-side,cd:0,hit:0,by:0,ground:false})}
+function trySpawn(){if(creative||!isNight()||zs.length>=4)return;const side=Math.random()<.5?-1:1;const x=Math.floor(player.x+side*(13+Math.random()*8));if(x<2||x>=WW-2)return;let y=0;while(y<HH&&!sol(x,y))y++;if(y<=0||y>=HH-2)return;zs.push({x:x+.5,y:y,vy:0,kx:0,hp:20,face:-side,cd:0,hit:0,by:0,ground:false})}
 function stepZ(z){const p=player,dx=p.x-z.x,dir=dx>=0?1:-1;z.face=dir;z.cd--;if(z.hit>0)z.hit--;
   const vx=Math.abs(dx)>.9?dir*.04:0;let nx=z.x+vx+z.kx;z.kx*=.85;if(!collide(nx,z.y))z.x=nx;else if(z.ground&&vx){z.vy=-.3;z.ground=false}
   z.vy=Math.min(z.vy+.026,.6);const ny=z.y+z.vy;if(!collide(z.x,ny)){z.y=ny;z.ground=false}else{if(z.vy>0){z.ground=true;z.y=Math.floor(z.y+z.vy+.0001);if(collide(z.x,z.y))z.y-=.001}else z.y=Math.ceil(ny-PH)+PH+.001;z.vy=0}
@@ -266,6 +268,7 @@ resize();requestAnimationFrame(loop);
 
 if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 </script>
+<script src="../hub.js"></script>
 <script src="../hub.js"></script>
 </body>
 </html>

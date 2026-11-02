@@ -120,3 +120,12 @@
 
 /hub.js
   Cache-Control: no-cache
+
+/superhoops/sw.js
+  Cache-Control: no-cache
+
+/superhoops/index.html
+  Cache-Control: no-cache
+
+/superhoops/manifest.webmanifest
+  Cache-Control: no-cache

@@ -120,5 +120,13 @@
     "url": "hangman/",
     "icon": "hangman/icons/icon-192.png",
     "tag": "מילים"
+  },
+  {
+    "id": "superhoops",
+    "name": "סופר בסקטבול",
+    "description": "כדורסל על: סלים ענקיים, עצים לטיפוס, דודג׳ים, סופרמן וכוחות על",
+    "url": "superhoops/",
+    "icon": "superhoops/icons/icon-192.png",
+    "tag": "אקשן"
   }
 ]
