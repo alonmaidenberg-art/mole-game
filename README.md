@@ -26,3 +26,5 @@ Import from Git, Build command ריק, Publish directory `.`.
 - `hub.js` ארנק משותף (מטבעות/יהלומים), קוד אדמין וכפתור 🏠 בכל משחק. בלוקים: מלאי, יצירה, זומבים. כדורסל: חנות כוחות.
 
 - `superhoops/` סופר בסקטבול
+
+- `superfootball/` סופר כדורגל 3D

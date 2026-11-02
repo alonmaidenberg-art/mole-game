@@ -128,5 +128,13 @@
     "url": "superhoops/",
     "icon": "superhoops/icons/icon-192.png",
     "tag": "אקשן"
+  },
+  {
+    "id": "superfootball",
+    "name": "סופר כדורגל 3D",
+    "description": "כדורגל תלת-ממדי: שערים ענקיים, קפיצות, דודג׳ים, סופרמן וכוחות על",
+    "url": "superfootball/",
+    "icon": "superfootball/icons/icon-192.png",
+    "tag": "אקשן"
   }
 ]

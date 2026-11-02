@@ -129,3 +129,12 @@
 
 /superhoops/manifest.webmanifest
   Cache-Control: no-cache
+
+/superfootball/sw.js
+  Cache-Control: no-cache
+
+/superfootball/index.html
+  Cache-Control: no-cache
+
+/superfootball/manifest.webmanifest
+  Cache-Control: no-cache

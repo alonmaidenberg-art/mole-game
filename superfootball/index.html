@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>סופר כדורגל 3D – אלון מידנברג</title>
+<meta name="description" content="סופר כדורגל בתלת-ממד: שערים ענקיים, קפיצות, דודג׳ים וכוחות על.">
+<meta name="theme-color" content="#2c7be0">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;background:#1a1038;color:#fff;font-family:system-ui,-apple-system,"Segoe UI",Arial,"Noto Sans Hebrew",sans-serif}
+body{background:radial-gradient(700px 500px at 80% -10%,#5b36d6 0,transparent 60%),radial-gradient(600px 500px at 0% 110%,#0f6b6b 0,transparent 55%),#1a1038;min-height:100vh;min-height:100dvh;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+main{max-width:520px;margin:0 auto;padding:max(12px,env(safe-area-inset-top)) 14px 24px}
+h1{margin:6px 0;font-size:30px;text-align:center}
+.sub{text-align:center;opacity:.75;margin:0 0 10px}
+.box{background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.12);border-radius:22px;padding:14px;margin:12px 0}
+.lb{opacity:.8;font-size:15px;margin-bottom:8px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{flex:1;min-width:70px;padding:13px 6px;border-radius:16px;border:2px solid rgba(255,255,255,.18);background:#150a30;color:#fff;font:inherit;font-weight:800;font-size:17px;cursor:pointer}
+.chip.on{background:#ffd05a;color:#2a1c00;border-color:#fff}
+.btn{display:block;width:100%;border:0;border-radius:18px;padding:15px;margin-top:12px;font:inherit;font-size:21px;font-weight:900;color:#06322b;background:linear-gradient(180deg,#5ff7d6,#1fc9a6);box-shadow:0 6px 0 #0d7a66;cursor:pointer}
+.btn:active{transform:translateY(3px);box-shadow:0 3px 0 #0d7a66}
+.btn.alt{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.3);box-shadow:none;font-size:16px;padding:12px}
+.ib{min-width:46px;height:42px;padding:0 12px;border-radius:13px;border:2px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#fff;font:inherit;font-size:17px;font-weight:800;cursor:pointer}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.scr{display:none}.scr.show{display:block}
+.ov{position:fixed;inset:0;background:rgba(10,5,30,.82);display:none;align-items:center;justify-content:center;z-index:30;padding:16px}.ov.show{display:flex}
+.ovc{width:100%;max-width:380px;background:linear-gradient(160deg,#2c1b6a,#1a1038);border:2px solid rgba(255,255,255,.2);border-radius:26px;padding:22px;text-align:center}
+.ovc h2{margin:0 0 6px;font-size:30px}
+body{overflow:hidden;position:fixed;inset:0;width:100%;background:#0d0826}
+#cv{position:fixed;left:0;top:0;display:block;touch-action:none}
+#hud{position:fixed;inset:0;pointer-events:none;z-index:8;display:none}
+#bar{position:absolute;top:max(8px,env(safe-area-inset-top));left:50%;transform:translateX(-50%);display:flex;gap:18px;align-items:center;background:rgba(10,6,30,.72);border-radius:14px;padding:6px 22px;font-weight:900;direction:ltr}
+#bar .sc{font-size:32px;min-width:34px;text-align:center}#tm{font-size:20px}
+.slot{position:absolute;top:max(8px,env(safe-area-inset-top));left:56px;background:rgba(10,6,30,.65);border-radius:12px;padding:5px 12px;font-weight:800;font-size:14px;min-width:110px}.slot.r{left:auto;right:64px}.slot b{font-size:26px;margin-inline-end:6px}
+#chg{position:absolute;left:50%;bottom:max(150px,26vh);transform:translateX(-50%);width:220px;height:14px;background:rgba(0,0,0,.6);border-radius:8px;display:none;overflow:hidden;border:2px solid #fff}#chg i{position:absolute;left:0;top:0;bottom:0;width:0;background:#ffd05a}#chg b{position:absolute;left:75%;width:20%;top:0;bottom:0;background:rgba(46,204,113,.85)}
+#rot{position:fixed;inset:0;background:#120a2c;z-index:50;display:none;align-items:center;justify-content:center;text-align:center;font-size:24px;font-weight:800;padding:20px}
+@media (orientation:portrait) and (pointer:coarse){#rot{display:flex}}
+.sw{width:38px;height:38px;border-radius:50%;border:3px solid rgba(255,255,255,.3);cursor:pointer}.sw.on{border-color:#fff;box-shadow:0 0 0 3px #ffd05a}
+</style>
+</head>
+<body>
+<canvas id="cv"></canvas>
+<div id="hud"><div id="bar"><span id="s0" class="sc">0</span><span id="tm">2:30</span><span id="s1" class="sc">0</span></div><div id="pw0" class="slot"></div><div id="pw1" class="slot r"></div><div id="chg"><i></i><b></b></div></div>
+<button class="ib" id="pauseB" style="position:fixed;top:max(8px,env(safe-area-inset-top));right:8px;z-index:12;display:none">⏸</button>
+<div id="rot">📱↔️<br>סובבו את הטלפון לרוחב</div>
+<div class="ov show" id="menu"><div class="ovc" style="max-width:440px">
+ <div style="font-size:64px;line-height:1">🦸⚽🥅</div><h2>סופר כדורגל 3D</h2>
+ <div style="opacity:.85;margin-bottom:8px;font-size:15px">מגרש תלת-ממדי, שערים ענקיים, קפיצות, דודג׳ים וכוחות על: סופרמן, כדור אש, הקפאה ועוד</div>
+ <div class="lb" style="text-align:start">מצב</div><div class="chips" id="cMode"><button class="chip on" data-v="cpu">🤖 נגד המחשב</button><button class="chip" data-v="2p">👥 שניים</button></div>
+ <div class="lb" style="text-align:start">רמה</div><div class="chips" id="cLv"><button class="chip" data-v="1">קל</button><button class="chip on" data-v="2">רגיל</button><button class="chip" data-v="3">קשה</button></div>
+ <div class="lb" style="text-align:start">הצבע שלך</div><div class="chips" id="cCol"></div>
+ <button class="btn" id="go">▶ שחק</button>
+ <div style="opacity:.75;font-size:12.5px;line-height:1.6;margin-top:10px"><b>WASD</b>/חצים: תנועה · <b>רווח</b>: קפיצה (נגיחה באוויר) · <b>F</b>: בעיטה (החזק ושחרר ב<span style="color:#7dff9a">ירוק</span> לבעיטה מדויקת וחזקה) · <b>Shift</b>: דודג׳ מהיר · <b>E</b>: כוח על. מגיעים לכדור וגוררים אותו<br>שניים: שחקן 2 עם חצים, J דודג׳, K קפיצה, L זריקה, U כוח. ראשון ל-5 שערים או מי שמוביל אחרי 3 דקות. אספו כדורי כוח ✨</div>
+</div></div>
+<div class="ov" id="pause"><div class="ovc"><h2>⏸ הפסקה</h2><button class="btn" id="resume">▶ המשך</button><button class="btn alt" id="toMenu">תפריט</button></div></div>
+<div class="ov" id="end"><div class="ovc"><h2 id="eT">סיום</h2><div style="font-size:48px;font-weight:900;color:#ffd05a" id="eS"></div><p id="eM"></p><button class="btn" id="again">🔁 שוב</button><button class="btn alt" id="menu2">תפריט</button></div></div>
+<script src="../lib/three.min.js"></script><script src="../lib/arena3d.js"></script>
+<script>
+'use strict';
+const $=s=>document.querySelector(s);
+const store={get(k,d){try{const v=localStorage.getItem(k);return v===null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+let _ac=null;function tone(f,d=.1,t='triangle',v=.07){try{_ac=_ac||new (window.AudioContext||window.webkitAudioContext)();const o=_ac.createOscillator(),g=_ac.createGain();o.type=t;o.frequency.value=f;g.gain.value=v;o.connect(g);g.connect(_ac.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,_ac.currentTime+d);o.stop(_ac.currentTime+d+.02)}catch(e){}}
+
+const FXL=30,FZ=16,GW0=4.6,GH=3.4,BR=.36,BG=-19,V3=THREE.Vector3;
+const gw=[GW0,GW0],gT=[0,0];
+const COLS=['#e8433f','#2f7bff','#27b36a','#f2b400','#a14bff','#ff7a1a'];
+const POW={super:{e:'🦸',n:'סופרמן'},fire:{e:'🔥',n:'בעיטת אש'},freeze:{e:'❄️',n:'הקפאה'},bolt:{e:'⚡',n:'ברק'},jump:{e:'🦘',n:'קפיצת על'},giant:{e:'🥅',n:'שער ענק'}};
+const PK=Object.keys(POW);
+const LVL={1:{sp:6.8,rng:15,err:.26,react:55},2:{sp:8.2,rng:17,err:.15,react:30},3:{sp:9.6,rng:19,err:.07,react:14}};
+const randn=()=>{let u=0,v=0;while(!u)u=Math.random();while(!v)v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)};
+const rnd=(a,b)=>a+Math.random()*(b-a),clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+let mode=store.get('f3_mode','cpu'),level=+store.get('f3_lv',2),myCol=+store.get('f3_col',0),state='menu',paused=false,over=false;
+let P=[],ball,score=[0,0],clock=0,orbs=[],shake=0,frame=0,scoreT=0,lastScorer=0,orbT=0,camFX=0,touchS=null;
+const keys={};
+const stage=A3.stage($('#cv'),{sky:['#2c7be0','#79b8f2','#d9efff'],fog:0xbfe0ff,fogNear:80,fogFar:260,fov:52});
+const sc=stage.sc,cam=stage.cam,FXP=A3.particles(sc,240);
+function pitchTex(){const c=document.createElement('canvas');c.width=1024,c.height=540;const g=c.getContext('2d');
+  for(let i=0;i<16;i++){g.fillStyle=i%2?'#2f9a46':'#37a84e';g.fillRect(i*64,0,64,540)}
+  g.strokeStyle='#fff';g.lineWidth=5;g.strokeRect(12,12,1000,516);g.beginPath();g.moveTo(512,12);g.lineTo(512,528);g.stroke();g.beginPath();g.arc(512,270,70,0,7);g.stroke();
+  g.strokeRect(12,150,130,240);g.strokeRect(882,150,130,240);g.strokeRect(12,205,55,130);g.strokeRect(957,205,55,130);g.fillStyle='#fff';g.beginPath();g.arc(512,270,5,0,7);g.fill();
+  const t=new THREE.CanvasTexture(c);t.anisotropy=4;return t}
+const pitch=new THREE.Mesh(new THREE.PlaneGeometry(60,32),new THREE.MeshLambertMaterial({map:pitchTex()}));pitch.rotation.x=-Math.PI/2;sc.add(pitch);
+const ground=new THREE.Mesh(new THREE.PlaneGeometry(700,700),A3.mat(0x2a7a46));ground.rotation.x=-Math.PI/2;ground.position.y=-.06;sc.add(ground);
+const sun=new THREE.Mesh(new THREE.SphereGeometry(14,20,14),A3.basic(0xfff2b0));sun.position.set(60,60,-170);sc.add(sun);
+for(let i=0;i<18;i++){const m=new THREE.Mesh(new THREE.IcosahedronGeometry(rnd(3,6),0),A3.basic(0xffffff,{transparent:true,opacity:.85}));m.scale.y=.5;m.position.set(rnd(-150,150),rnd(30,60),rnd(-150,-60));sc.add(m)}
+for(let i=0;i<10;i++){const h=rnd(30,60),m=new THREE.Mesh(new THREE.ConeGeometry(rnd(25,40),h,6),A3.mat(i%2?0x5a8a6a:0x4a7a5a));m.position.set(-170+i*38+rnd(-8,8),h/2-2,-150-rnd(0,30));sc.add(m)}
+// stands behind the far sideline & ends
+for(let row=0;row<3;row++)for(let i=0;i<34;i++){const m=new THREE.Mesh(new THREE.BoxGeometry(1.6,rnd(1.2,2),1.3),A3.mat(['#e8433f','#2f7bff','#f2b400','#fff','#27b36a'][(i+row)%5]));m.position.set(-36+i*2.2,.8+row*1.1,-19-row*1.5);sc.add(m)}
+for(let i=0;i<8;i++){const tx=-34+i*9.5,tr=new THREE.Mesh(new THREE.CylinderGeometry(.3,.4,3,8),A3.mat(0x6e4b25));tr.position.set(tx,1.5,-26);sc.add(tr);const l=new THREE.Mesh(new THREE.IcosahedronGeometry(2,1),A3.mat(0x2f8a3a));l.position.set(tx,4.2,-26);sc.add(l)}
+function goalMesh(sign,t){const g=new THREE.Group(),postM=A3.mat(0xffffff);const post=(z)=>{const p=new THREE.Mesh(new THREE.CylinderGeometry(.16,.16,GH,8),postM);p.position.set(0,GH/2,z);g.add(p)};post(-1);post(1);
+  const bar=new THREE.Mesh(new THREE.CylinderGeometry(.16,.16,2,8),postM);bar.rotation.x=Math.PI/2;bar.position.set(0,GH,0);g.add(bar);
+  const net=new THREE.Mesh(new THREE.BoxGeometry(2.2,1,2,6,3,6),new THREE.MeshBasicMaterial({color:0xffffff,wireframe:true,transparent:true,opacity:.45}));net.position.set(sign*1.1,GH/2,0);g.add(net);
+  g.position.x=sign*FXL;g.scale.set(1,1,GW0);g.net=net;sc.add(g);return g}
+const goals=[goalMesh(1,0),goalMesh(-1,1)];
+const ballMesh=(()=>{const c=document.createElement('canvas');c.width=128;c.height=64;const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,128,64);g.fillStyle='#222';for(let i=0;i<8;i++)for(let j=0;j<3;j++){g.beginPath();g.arc(8+i*16+(j%2)*8,10+j*22,6,0,7);g.fill()}
+  const m=new THREE.Mesh(new THREE.SphereGeometry(BR,16,12),new THREE.MeshLambertMaterial({map:new THREE.CanvasTexture(c)}));const f=new THREE.Mesh(new THREE.SphereGeometry(BR*1.9,12,10),new THREE.MeshBasicMaterial({color:0xff8a1a,transparent:true,opacity:.5}));f.visible=false;m.add(f);m.flame=f;sc.add(m);return m})();
+const ballSh=new THREE.Mesh(new THREE.CircleGeometry(.4,12),new THREE.MeshBasicMaterial({color:0,transparent:true,opacity:.4}));ballSh.rotation.x=-Math.PI/2;ballSh.position.y=.04;sc.add(ballSh);
+function chipsSet(id,val,cb){[...$(id).children].forEach(c=>{c.classList.toggle('on',c.dataset.v===String(val));c.onclick=()=>{cb(c.dataset.v);[...$(id).children].forEach(k=>k.classList.toggle('on',k===c))}})}
+chipsSet('#cMode',mode,v=>{mode=v;store.set('f3_mode',v)});chipsSet('#cLv',level,v=>{level=+v;store.set('f3_lv',v)});
+COLS.forEach((c,i)=>{const d=document.createElement('div');d.className='sw'+(i===myCol?' on':'');d.style.background=c;d.onclick=()=>{myCol=i;store.set('f3_col',i);[...$('#cCol').children].forEach(k=>k.classList.toggle('on',k===d))};$('#cCol').appendChild(d)});
+function mkP(t,x,col,human){const H=A3.human({col:new THREE.Color(col).getHex(),hair:t?0x1a1a1a:0x3a2210,cape:t?0x2b6cff:0xe0222a});sc.add(H.group);sc.add(H.shadow);
+  return{t,x,y:0,z:0,vx:0,vy:0,vz:0,face:t?Math.PI:0,ground:true,dash:0,dashCd:0,inv:0,stun:0,frz:0,charge:0,kickT:0,power:null,fly:0,mega:0,fire:false,sup:false,anim:0,col,human,H,c:{x:0,z:0,j:0,s:0,g:0,p:0},pc:{x:0,z:0,j:0,s:0,g:0,p:0},aiW:0,aiTarget:0,py:0}}
+function popup(text,x,y,z,col){A3.pop(stage,text,new V3(x,y,z),col)}
+function start(){score=[0,0];clock=180*60;over=false;frame=0;gw[0]=gw[1]=GW0;gT[0]=gT[1]=0;orbs.forEach(o=>sc.remove(o.m));orbs=[];
+  P.forEach(p=>{sc.remove(p.H.group);sc.remove(p.H.shadow)});const oc=COLS.map((_,i)=>i).filter(i=>i!==myCol)[Math.floor(Math.random()*5)];
+  P=[mkP(0,-10,COLS[myCol],true),mkP(1,10,COLS[oc],mode==='2p')];ball={x:0,y:BR,z:0,vx:0,vy:0,vz:0,lock:0,fire:false,last:null,scored:false};
+  state='play';paused=false;['menu','end','pause'].forEach(i=>$('#'+i).classList.remove('show'));$('#pauseB').style.display='block';$('#hud').style.display='block';
+  if(matchMedia('(pointer:coarse)').matches&&mode!=='2p'){if(!touchS){touchS=A3.touchUI([['j','⤒'],['g','💨'],['p','⭐'],['s','⚽','big']])}touchS.el.style.display='block'}else if(touchS)touchS.el.style.display='none';
+  camFX=0;popup('יאללה!',0,2,0,'#fff')}
+const KM=[{l:['KeyA'],r:['KeyD'],u:['KeyW'],d:['KeyS'],j:['Space'],s:['KeyF'],g:['ShiftLeft','KeyG'],p:['KeyE']},{l:['ArrowLeft'],r:['ArrowRight'],u:['ArrowUp'],d:['ArrowDown'],j:['KeyK'],s:['KeyL'],g:['KeyJ'],p:['KeyU']}];
+function readKeys(p){const c=p.c;Object.assign(p.pc,c);const maps=mode==='2p'?[KM[p.t]]:KM,h=k=>maps.some(m=>m[k].some(code=>keys[code]))?1:0;
+  c.x=h('r')-h('l');c.z=h('d')-h('u');c.j=h('j');c.s=h('s');c.g=h('g');c.p=h('p');
+  if(touchS&&mode!=='2p'){if(Math.abs(touchS.x)>.15||Math.abs(touchS.z)>.15){c.x=touchS.x;c.z=touchS.z}c.j|=touchS.j;c.s|=touchS.s;c.g|=touchS.g;c.p|=touchS.p}}
+addEventListener('keydown',e=>{keys[e.code]=1;if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();if(e.code==='Escape'||e.code==='KeyP')togglePause()});
+addEventListener('keyup',e=>{keys[e.code]=0});
+function moveTo(c,p,tx,tz,stop){const dx=tx-p.x,dz=tz-p.z,l=Math.hypot(dx,dz);if(l>(stop||.7)){c.x=dx/l;c.z=dz/l}}
+function ai(p){const o=P[1-p.t],c=p.c,L=LVL[level];Object.assign(p.pc,c);c.x=c.z=c.j=c.s=c.g=c.p=0;const hx=(p.t?-1:1)*FXL,sg=Math.sign(hx),db=Math.hypot(ball.x-p.x,ball.z-p.z),dg=Math.hypot(hx-ball.x,ball.z);
+  const own=Math.hypot(o.x-ball.x,o.z-ball.z)>db;
+  if(db>1.5||!own){ // go to a point behind the ball (so we push it toward the goal)
+    const tx=ball.x-sg*1.1,tz=ball.z*.9;moveTo(c,p,db>6?ball.x-sg*1.4:tx,db>6?ball.z:tz,.4)}
+  else{moveTo(c,p,hx,ball.z*.4+(p.z)*.3,.5);if(dg<L.rng+2){p.aiW++;if(p.aiW>L.react){if(!p.aiTarget)p.aiTarget=.85+(Math.random()*2-1)*L.err;c.s=p.charge<p.aiTarget?1:0}}}
+  if(db<2.5&&Math.hypot(o.x-p.x,o.z-p.z)<3&&Math.random()<.03)c.g=1;if(ball.y>1.5&&db<4&&Math.random()<.08)c.j=1;if(db>1.5)p.aiW=0;
+  if(p.power&&Math.random()<.02){const w=p.power,od=Math.hypot(o.x-p.x,o.z-p.z);if((w==='super'||w==='fire'||w==='giant')&&db<3)c.p=1;else if((w==='freeze'||w==='bolt')&&od<14)c.p=1;else if(w==='jump')c.p=1}}
+const DT=1/60;
+function stepP(p){const c=p.c,pc=p.pc,o=P[1-p.t];p.py=p.y;
+  if(p.stun>0){p.stun--;c.x=c.z=c.j=c.s=c.g=c.p=0}if(p.frz>0)p.frz--;if(p.inv>0)p.inv--;if(p.dashCd>0)p.dashCd--;if(p.kickT>0)p.kickT--;
+  const hx=(p.t?-1:1)*FXL;let dx=c.x,dz=c.z;const l=Math.hypot(dx,dz);if(l>1){dx/=l;dz/=l}
+  const spd=(p.human?9:LVL[level].sp)*(p.mega>0?1.15:1)*(p.fly>0?1.3:1)*(p.charge>0?.6:1);
+  if(c.g&&!pc.g&&p.dashCd<=0&&p.frz<=0){p.dash=11;p.dashCd=42;p.inv=20;FXP.burst(new V3(p.x,p.y+.8,p.z),0xe8ffd0,10,4);tone(500,.08,'sawtooth',.05);if(l>.1)p.face=Math.atan2(-dz,dx)}
+  if(p.dash>0){p.vx=Math.cos(p.face)*19;p.vz=-Math.sin(p.face)*19;p.dash--}
+  else{const k=p.frz>0?0:.35;p.vx+=(dx*spd-p.vx)*k;p.vz+=(dz*spd-p.vz)*k;if(l>.15){let t=Math.atan2(-dz,dx),d=t-p.face;while(d>Math.PI)d-=6.283;while(d<-Math.PI)d+=6.283;p.face+=d*.35}}
+  if(p.fly>0){p.fly--;p.vy=c.j?7.5:(c.g?-6:p.vy*.88);if(p.fly===0){popup('נגמר הכוח',p.x,p.y+2.4,p.z,'#fff');p.sup=false}if(Math.random()<.6)FXP.burst(new V3(p.x-Math.cos(p.face)*.4,p.y+1,p.z+Math.sin(p.face)*.4),p.t?0x7ad0ff:0xff5a4a,1,2,0)}
+  else{p.vy+=-24*DT;if(c.j&&p.ground&&!pc.j){p.vy=p.mega>0?15:10;p.ground=false;tone(380,.06)}}
+  if(p.mega>0)p.mega--;
+  p.x=clamp(p.x+p.vx*DT,-FXL-3,FXL+3);p.z=clamp(p.z+p.vz*DT,-FZ+.5,FZ-.5);p.y+=p.vy*DT;p.ground=false;if(p.y<=0){p.y=0;p.vy=0;p.ground=true}if(p.y>8){p.y=8;p.vy=0}
+  p.anim+=DT*(Math.hypot(p.vx,p.vz)/8);
+  if(c.p&&!pc.p&&p.power)usePow(p);
+  // ball interaction
+  const bd=Math.hypot(ball.x-p.x,ball.z-p.z),near=bd<1.7&&Math.abs(ball.y-(p.y+.5))<2;
+  if(c.s&&!pc.s&&near)p.charge=.001;
+  if(p.charge>0){if(c.s){p.charge+=.024;if(p.charge>=1.05)kick(p,p.charge)}else kick(p,p.charge)}
+  // dribble: touching the ball pushes it along
+  if(p.charge<=0&&ball.lock<=0&&bd<.95&&Math.abs(ball.y-(p.y+.45))<1.4&&p.stun<=0){const nx=(ball.x-p.x)/(bd||1),nz=(ball.z-p.z)/(bd||1),sp=Math.hypot(p.vx,p.vz);
+    const into=(p.vx*nx+p.vz*nz);if(into>-1){ball.vx=p.vx*1.18+nx*2.2;ball.vz=p.vz*1.18+nz*2.2;if(sp>14){ball.vx*=1.1;ball.vz*=1.1}ball.last=p;
+      if(!p.ground&&p.y>.6&&ball.y>1.0){ball.vx+=Math.cos(p.face)*7;ball.vz-=Math.sin(p.face)*7;ball.vy=Math.max(ball.vy,4);popup('נגיחה!',p.x,p.y+2.5,p.z,'#fff');tone(250,.08)}}}
+  if(p.dash>0&&bd<1.3&&Math.hypot(o.x-ball.x,o.z-ball.z)<2){ball.vx=Math.cos(p.face)*16;ball.vz=-Math.sin(p.face)*16;ball.last=p}}
+function kick(p,q){q=clamp(q,0,1.05);p.charge=0;p.aiTarget=0;p.aiW=0;p.kickT=16;const hx=(p.t?-1:1)*FXL,sg=Math.sign(hx);
+  const bd=Math.hypot(ball.x-p.x,ball.z-p.z);if(bd>2.1)return;
+  const fa=p.face;
+  // aim: toward goal if roughly facing it, else along facing direction
+  const gx=hx-ball.x,gz=-ball.z,gl=Math.hypot(gx,gz);let dirx=Math.cos(fa),dirz=-Math.sin(fa);const fdot=(dirx*gx+dirz*gz)/gl;if(fdot>.35){dirx=gx/gl;dirz=gz/gl}
+  const d=Math.abs(q-.85);let sd=.05+(.12*(1-q));if(d<.1){sd*=.2;popup('מושלם!',p.x,p.y+2.7,p.z,'#7dff9a')}else sd=sd*(1+(d-.1)*5);
+  let power=12+Math.min(q,1)*20;if(p.fire||p.sup){sd=0;power=36;ball.fire=!!p.fire;p.fire=false}
+  const a=Math.atan2(dirz,dirx)+randn()*sd;ball.vx=Math.cos(a)*power;ball.vz=Math.sin(a)*power;ball.vy=1.2+Math.min(q,1)*5.5+(p.y>.5?1:0);ball.last=p;ball.lock=10;tone(300,.1,'triangle',.07);FXP.burst(new V3(ball.x,ball.y,ball.z),0xffffff,6,3)}
+function usePow(p){const w=p.power,o=P[1-p.t];p.power=null;shake=.2;tone(700,.15,'square',.06);const pp=new V3(p.x,p.y+1,p.z);
+  if(w==='super'){p.fly=330;p.sup=true;popup('🦸 סופרמן!',p.x,p.y+2.6,p.z,'#ff5a4a');FXP.burst(pp,0xff5a4a,34,8)}
+  else if(w==='fire'){p.fire=true;popup('🔥 בעיטת אש',p.x,p.y+2.6,p.z,'#ffb03a');FXP.burst(pp,0xffa020,20,5)}
+  else if(w==='freeze'){o.stun=170;o.frz=170;popup('❄️ הקפאה!',o.x,o.y+2.6,o.z,'#9fe8ff');FXP.burst(new V3(o.x,o.y+1,o.z),0xbff2ff,30,6)}
+  else if(w==='bolt'){o.stun=70;popup('⚡ ברק!',o.x,o.y+2.6,o.z,'#ffe27a');FXP.burst(new V3(o.x,o.y+1,o.z),0xffe27a,30,9);shake=.5;ball.vx=(p.x-ball.x)*2;ball.vz=(p.z-ball.z)*2;ball.last=p}
+  else if(w==='jump'){p.mega=420;popup('🦘 קפיצת על',p.x,p.y+2.6,p.z,'#7dff9a')}
+  else if(w==='giant'){gT[p.t]=500;popup('🥅 שער ענק!',p.x,p.y+2.6,p.z,'#c58bff')}}
+function goal(t,fire){if(state!=='play')return;const pts=fire?2:1;score[t]+=pts;lastScorer=t;state='scored';scoreT=120;ball.scored=true;shake=.8;const gx=(t?-1:1)*FXL;
+  popup(fire?'גול אש! +2 🔥':'גוווול! ⚽',gx*.85,3,0,'#ffd05a');FXP.burst(new V3(gx,2,0),0xffd05a,60,10);for(const c of [0xff5a6e,0x5ff7d6,0xa78bff,0xffffff])FXP.burst(new V3(gx,3,0),c,26,8,-5);tone(660,.1);tone(880,.25)}
+function stepBall(){const b=ball;if(b.lock>0)b.lock--;b.vy+=BG*DT;b.x+=b.vx*DT;b.y+=b.vy*DT;b.z+=b.vz*DT;
+  if(b.fire&&frame%2===0)FXP.burst(new V3(b.x,b.y,b.z),0xff8a1a,1,1.5,0);
+  if(b.y<BR){b.y=BR;if(b.vy<-2){b.vy*=-.55}else b.vy=0;const f=1-1.1*DT;b.vx*=f;b.vz*=f;if(Math.hypot(b.vx,b.vz)>1&&b.fire&&Math.abs(b.vy)<2)b.fire=false}
+  const t=b.x>0?0:1,gx=(b.x>0?1:-1)*FXL,gwid=gw[t]*(gT[t]>0?1.0:1.0);
+  // goal line
+  if(Math.abs(b.x)>FXL&&Math.abs(b.z)<gw[t]&&b.y<GH&&!b.scored&&state==='play'){goal(t,!!b.fire)}
+  // back wall / side walls
+  if(Math.abs(b.x)>FXL+3){b.x=Math.sign(b.x)*(FXL+3);b.vx*=-.4}
+  if(Math.abs(b.z)>FZ){b.z=Math.sign(b.z)*FZ;b.vz*=-.6}
+  if(Math.abs(b.x)>FXL&&!b.scored&&(Math.abs(b.z)>=gw[t]||b.y>=GH)&&b.x*Math.sign(b.vx)>0){b.x=Math.sign(b.x)*FXL;b.vx*=-.5}
+  if(b.scored){b.vx*=.97;b.vz*=.97}}
+function step(){if(paused||state==='menu'||state==='over')return;frame++;
+  for(const p of P){if(p.human)readKeys(p);else ai(p)}
+  if(state==='scored')for(const p of P){const c=p.c;c.x=c.z=c.j=c.s=c.g=c.p=0}
+  for(const p of P)stepP(p);
+  const a=P[0],b=P[1],dd=Math.hypot(a.x-b.x,a.z-b.z);if(state==='play'&&dd<.9&&Math.abs(a.y-b.y)<1.5&&a.dash<=0&&b.dash<=0){const push=(.9-dd)/2,nx=(a.x-b.x)/(dd||1),nz=(a.z-b.z)/(dd||1);a.x+=nx*push;a.z+=nz*push;b.x-=nx*push;b.z-=nz*push}
+  stepBall();
+  if(state==='play'){clock--;if(clock<=0){if(score[0]!==score[1])finish();else{clock=1;popup('הארכה! הגול הבא מנצח',0,5,0,'#ffd05a')}}
+    if(score[0]>=5||score[1]>=5)finish();if(clock<=1&&score[0]!==score[1]&&frame%2===0)finish();
+    if(++orbT>480&&orbs.length<2){orbT=0;const m=new THREE.Mesh(new THREE.SphereGeometry(.45,14,10),A3.basic(0xfff3a8));m.add(new THREE.Mesh(new THREE.SphereGeometry(.8,12,8),A3.basic(0xffffff,{transparent:true,opacity:.25})));const o={x:rnd(-20,20),z:rnd(-11,11),y:1.2,t:0,m};m.position.set(o.x,o.y,o.z);sc.add(m);orbs.push(o)}
+    for(const p of P)for(let i=orbs.length-1;i>=0;i--){const o=orbs[i];if(!p.power&&Math.hypot(o.x-p.x,o.z-p.z)<1.5&&Math.abs(o.y-(p.y+1))<1.8){p.power=PK[Math.floor(Math.random()*PK.length)];sc.remove(o.m);orbs.splice(i,1);popup(POW[p.power].e+' '+POW[p.power].n,p.x,p.y+2.7,p.z,'#fff');tone(900,.1);FXP.burst(new V3(o.x,o.y,o.z),0xffffff,18,5)}}
+    for(let t=0;t<2;t++){if(gT[t]>0){gT[t]--;gw[t]=Math.min(GW0*1.8,gw[t]+.08)}else gw[t]=Math.max(GW0,gw[t]-.05)}
+  }else if(state==='scored'){if(--scoreT<=0&&!over){state='play';P.forEach((p,i)=>{p.x=i?10:-10;p.z=0;p.y=0;p.vx=p.vy=p.vz=0;p.stun=0;p.fly=0;p.charge=0;p.face=i?Math.PI:0});ball.x=ball.z=0;ball.y=BR;ball.vx=ball.vy=ball.vz=0;ball.scored=false;ball.fire=false;ball.lock=20}}
+  orbs.forEach(o=>{o.t++;o.m.position.y=o.y+Math.sin(o.t*.08)*.25;o.m.rotation.y+=.05})}
+function finish(){if(over)return;over=true;state='over';$('#pauseB').style.display='none';if(touchS)touchS.el.style.display='none';tone(300,.4,'sawtooth');
+  const w=score[0]>score[1]?0:1;setTimeout(()=>{let title,msg='';
+    if(mode==='2p'){title=(w?'שחקן 2':'שחקן 1')+' ניצח!'}else{title=w===0?'ניצחת! 🏆':'הפסדת הפעם';
+      if(window.AG){const c=15+score[0]*8+(w===0?30:0),d=w===0?(level===3?2:1):0;AG.add(c,d);msg='קיבלת +'+c+' 🪙'+(d?' ו-+'+d+' 💎':'')}}
+    $('#eT').textContent=title;$('#eS').textContent=score[0]+' : '+score[1];$('#eM').textContent=msg;$('#hud').style.display='none';$('#end').classList.add('show')},900)}
+function sync(){
+  for(const p of P){const H=p.H,g=H.group;g.position.set(p.x,p.y,p.z);g.rotation.y=p.face;
+    H.pose(p.anim,{run:clamp(Math.hypot(p.vx,p.vz)/8,0,1),air:!p.ground&&!(p.fly>0),carry:false,shoot:p.kickT>0,fly:p.fly>0,climb:false,dash:p.dash>0,stun:p.stun>25&&!p.frz,cape:false});
+    H.cape.visible=p.fly>0;H.ice.visible=p.frz>0;H.aura.visible=p.fly>0||p.fire||p.mega>0;if(H.aura.visible)H.aura.material.color.set(p.fly>0?0xffe27a:p.fire?0xff8a1a:0x7dff9a);
+    H.shadow.position.set(p.x,.03,p.z);H.shadow.scale.setScalar(Math.max(.4,1-p.y*.12))}
+  ballMesh.position.set(ball.x,ball.y,ball.z);ballMesh.rotation.x+=ball.vz*.03;ballMesh.rotation.z-=ball.vx*.03;ballMesh.flame.visible=!!ball.fire;ballSh.position.set(ball.x,.04,ball.z);ballSh.scale.setScalar(Math.max(.4,1-ball.y*.1));
+  goals.forEach((g,i)=>{const t=i;g.scale.z=gw[t]})
+  const f=mode==='2p'?(P[0].x+P[1].x)/2:(P[0].x*.4+ball.x*.6);camFX+=(clamp(f,-FXL+14,FXL-14)-camFX)*.07;
+  const sx=shake>0?(Math.random()-.5)*shake:0;shake=Math.max(0,shake-.02);cam.position.set(camFX+sx,8.2,15.5);cam.lookAt(camFX,1.2,0);
+  $('#s0').textContent=score[0];$('#s1').textContent=score[1];$('#s0').style.color=P[0].col;$('#s1').style.color=P[1].col;
+  const sec=Math.max(0,Math.ceil(clock/60));$('#tm').textContent=clock<=1?'הארכה':Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0');
+  for(let i=0;i<2;i++){const w=P[i].power,e=$('#pw'+i),h=w?'<b>'+POW[w].e+'</b>'+POW[w].n:'<b>—</b>אין כוח';if(e._h!==h){e.innerHTML=h;e._h=h}}
+  const c=P[0].charge>0&&P[0].human;$('#chg').style.display=c?'block':'none';if(c)$('#chg i').style.width=clamp(P[0].charge,0,1)*100+'%'}
+let last=performance.now(),acc=0;
+function loop(n){requestAnimationFrame(loop);acc+=Math.min(100,n-last);last=n;if(P.length&&state!=='menu'){while(acc>=1000/60){acc-=1000/60;step()}FXP.update(.016);sync()}else{acc=0;cam.position.set(0,8,15.5);cam.lookAt(0,1.2,0)}stage.render()}
+function togglePause(){if(state==='menu'||state==='over')return;paused=!paused;$('#pause').classList.toggle('show',paused)}
+$('#pauseB').onclick=togglePause;$('#resume').onclick=togglePause;
+function toMenu(){state='menu';paused=false;over=true;$('#pause').classList.remove('show');$('#end').classList.remove('show');$('#menu').classList.add('show');$('#pauseB').style.display='none';$('#hud').style.display='none';if(touchS)touchS.el.style.display='none'}
+$('#toMenu').onclick=toMenu;$('#menu2').onclick=toMenu;$('#go').onclick=start;$('#again').onclick=start;
+window.__s={start,get P(){return P},get ball(){return ball},get score(){return score},get state(){return state},usePow,kick,step,get orbs(){return orbs},sync};
+requestAnimationFrame(loop);
+
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+</script>
+<script src="../hub.js"></script>
+<script src="../hub.js"></script>
+</body>
+</html>
