@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>שחמט – אלון גיימס</title>
+<meta name="description" content="שחמט מלא: נגד המחשב ב-4 רמות, או שני שחקנים. הצרחה, אן-פסאן, המרה ותיקו.">
+<meta name="theme-color" content="#1d1636">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/svg+xml" href="icons/chess.svg">
+<link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;background:#17102e;color:#fff;font-family:system-ui,-apple-system,"Segoe UI",Arial,"Noto Sans Hebrew",sans-serif}
+body{background:radial-gradient(800px 500px at 80% -10%,#4b2fb3 0,transparent 60%),#17102e;min-height:100vh}
+main{max-width:640px;margin:0 auto;padding:max(10px,env(safe-area-inset-top)) 10px 18px;display:flex;flex-direction:column;gap:8px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.top h1{margin:0;font-size:20px}
+.tb{display:flex;gap:6px}
+.tb button,.chip,.btn{font:inherit;border:0;cursor:pointer}
+.tb button{width:42px;height:38px;border-radius:11px;background:rgba(255,255,255,.12);color:#fff;font-size:18px}
+.tb button:disabled{opacity:.35}
+.status{text-align:center;font-weight:800;font-size:18px;min-height:26px}
+.status.bad{color:#ff7b7b}.status.ok{color:#8affb0}
+.cap{min-height:26px;display:flex;align-items:center;gap:1px;font-size:20px;line-height:1;direction:ltr;flex-wrap:wrap}
+.cap .mat{font-size:13px;opacity:.8;margin-inline-start:6px;font-weight:800}
+.pl{display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;opacity:.9}
+.pl i{width:12px;height:12px;border-radius:50%;display:inline-block;border:2px solid #fff6}
+#boardWrap{width:100%;display:flex;justify-content:center}
+#board{direction:ltr;display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:repeat(8,1fr);width:min(100%,calc(100vh - 250px),620px);min-width:260px;aspect-ratio:1;border-radius:10px;overflow:hidden;box-shadow:0 8px 30px #0008;border:3px solid #3a2a78}
+.sq{position:relative;min-height:0;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:min(10.5vw,60px);line-height:1;cursor:pointer;user-select:none;touch-action:manipulation}
+@media(min-width:640px){.sq{font-size:58px}}
+.sq.l{background:#efd9b5}.sq.d{background:#b58863}
+.sq.last{background:#f2e07a!important}.sq.sel{background:#7fe08a!important}
+.sq.chk{background:radial-gradient(circle,#ff4d4d 0,#ff4d4d 40%,transparent 75%),var(--b)!important}
+.sq.l.chk{--b:#efd9b5}.sq.d.chk{--b:#b58863}
+.sq .dot{position:absolute;width:30%;height:30%;border-radius:50%;background:rgba(30,110,50,.45);pointer-events:none}
+.sq .ring{position:absolute;inset:4%;border-radius:50%;border:5px solid rgba(30,110,50,.55);pointer-events:none}
+.sq .co{position:absolute;font-size:10px;font-weight:800;opacity:.55;color:#000}
+.sq .co.r{top:2px;left:3px}.sq .co.f{bottom:1px;right:3px}
+.pc{font-family:"Segoe UI Symbol","Noto Sans Symbols 2","Noto Sans Symbols","DejaVu Sans","Apple Symbols",sans-serif;font-variant-emoji:text;pointer-events:none}
+.pc.w{color:#fff;text-shadow:0 0 2px #000,0 0 2px #000,0 1px 1px #000,1px 0 1px #000,-1px 0 1px #000}
+.pc.b{color:#16121f;text-shadow:0 0 1px #fff7}
+.moves{direction:ltr;display:flex;gap:10px;overflow-x:auto;padding:6px 4px;background:rgba(255,255,255,.07);border-radius:10px;font-size:14px;min-height:34px;white-space:nowrap}
+.moves span b{opacity:.55;margin-right:4px;font-weight:700}
+.ov{position:fixed;inset:0;background:rgba(10,6,28,.9);z-index:20;display:none;align-items:center;justify-content:center;padding:14px;overflow:auto}
+.ov.show{display:flex}
+.card{width:100%;max-width:420px;background:#2a1f55;border:2px solid rgba(255,255,255,.14);border-radius:22px;padding:18px;text-align:center}
+.card h2{margin:0 0 6px;font-size:28px}.card p{margin:6px 0;opacity:.85}
+.lbl{font-size:13px;opacity:.75;margin:12px 0 6px}
+.row{display:flex;flex-wrap:wrap;gap:7px;justify-content:center}
+.chip{border:2px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;border-radius:999px;padding:8px 14px;font-size:15px;font-weight:700}
+.chip.on{background:#ffb347;color:#1b0f00;border-color:#fff}
+.btn{display:block;width:100%;border-radius:15px;padding:13px;margin-top:10px;font-size:19px;font-weight:900;color:#1b0f00;background:linear-gradient(180deg,#ffc15a,#ff8a1f);box-shadow:0 5px 0 #a8500a}
+.btn:active{transform:translateY(3px);box-shadow:0 2px 0 #a8500a}
+.btn.alt{background:linear-gradient(180deg,#eee,#bbb);box-shadow:0 5px 0 #777;font-size:16px}
+.promo{display:flex;gap:10px;justify-content:center;margin-top:10px}
+.promo button{width:64px;height:64px;border-radius:14px;border:0;background:#efd9b5;font-size:44px;cursor:pointer}
+a.hub{color:#9fe8ff;font-size:14px;text-decoration:none}
+</style>
+</head>
+<body>
+<main>
+  <div class="top">
+    <h1>♟ שחמט</h1>
+    <div class="tb"><button id="undoBtn" title="בטל מהלך" aria-label="בטל מהלך">↶</button><button id="flipBtn" title="הפוך לוח" aria-label="הפוך לוח">⇅</button><button id="muteBtn" aria-label="צליל">🔊</button><button id="menuBtn" title="משחק חדש" aria-label="משחק חדש">☰</button></div>
+  </div>
+  <div class="pl" id="topPl"></div>
+  <div class="cap" id="capTop"></div>
+  <div id="boardWrap"><div id="board" role="grid" aria-label="לוח שחמט"></div></div>
+  <div class="cap" id="capBot"></div>
+  <div class="pl" id="botPl"></div>
+  <div class="status" id="status"></div>
+  <div class="moves" id="moves"></div>
+  <div style="text-align:center"><a class="hub" href="../">🎮 עוד משחקים</a></div>
+</main>
+
+<div class="ov show" id="menu"><div class="card">
+  <h2>♟ שחמט</h2>
+  <p>שחמט מלא עם כל הכללים: הצרחה, אן-פסאן והמרת רגלי.</p>
+  <div class="lbl">מצב משחק</div>
+  <div class="row" id="modeRow"></div>
+  <div id="cpuOpts">
+    <div class="lbl">אתה משחק עם</div><div class="row" id="colorRow"></div>
+    <div class="lbl">רמת המחשב</div><div class="row" id="lvlRow"></div>
+  </div>
+  <button class="btn" id="startBtn">▶ התחל משחק</button>
+  <button class="btn alt" id="installBtn" style="display:none">📲 התקן את המשחק</button>
+</div></div>
+
+<div class="ov" id="promoOv"><div class="card"><h2>המרת רגלי</h2><p>בחרו כלי:</p><div class="promo" id="promoRow"></div></div></div>
+
+<div class="ov" id="endOv"><div class="card"><h2 id="endTitle"></h2><p id="endMsg"></p>
+  <button class="btn" id="againBtn">🔁 שחק שוב</button><button class="btn alt" id="viewBtn">הצג את הלוח</button><button class="btn alt" id="endMenuBtn">תפריט</button></div></div>
+
+<script src="engine.js"></script>
+<script>
+'use strict';
+const $=s=>document.querySelector(s);
+const store={get(k,d){try{const v=localStorage.getItem(k);return v===null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+const {P,N,B,R,Q,K}=Chess;
+const GL={[P]:'♟︎',[N]:'♞',[B]:'♝',[R]:'♜',[Q]:'♛',[K]:'♚'};
+const NAMEHE={1:'לבן',[-1]:'שחור'};
+
+let mode=store.get('ch_mode','cpu'),myColor=store.get('ch_color','w'),level=+store.get('ch_lvl',2),muted=store.get('ch_mute','0')==='1';
+let st,hist,flipped=false,sel=-1,targets=[],gameOver=false,aiThinking=false,human=1,lastMove=null,reps={};
+
+/* ---------- audio ---------- */
+let AC=null;
+function beep(f,d,t='sine',v=.12){if(muted)return;try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain();o.type=t;o.frequency.value=f;g.gain.value=v;o.connect(g);g.connect(AC.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+d);o.stop(AC.currentTime+d)}catch(e){}}
+const SFX={move(){beep(420,.07,'triangle')},cap(){beep(240,.12,'square',.1)},chk(){beep(700,.15,'sawtooth',.08)},end(){beep(330,.3,'triangle',.15);setTimeout(()=>beep(220,.4,'triangle',.15),180)}};
+
+/* ---------- game ---------- */
+function newGame(){
+  st=Chess.initState();hist=[];sel=-1;targets=[];gameOver=false;aiThinking=false;lastMove=null;reps={};
+  reps[Chess.key(st)]=1;
+  human=mode==='cpu'?(myColor==='w'?1:myColor==='b'?-1:(Math.random()<.5?1:-1)):1;
+  flipped=mode==='cpu'?human===-1:false;
+  $('#menu').classList.remove('show');$('#endOv').classList.remove('show');
+  render();maybeAI();
+}
+function isAITurn(){return mode==='cpu'&&st.turn!==human}
+function maybeAI(){
+  if(gameOver||!isAITurn())return;
+  aiThinking=true;render();
+  setTimeout(()=>{
+    const m=Chess.bestMove(st,level);
+    aiThinking=false;
+    if(m)doMove(m);
+  },260);
+}
+const FILES='abcdefgh';
+function sqName(i){return FILES[i&7]+(8-(i>>3))}
+function san(s,m){
+  const p=Math.abs(s.b[m.f]);
+  let t;
+  if(m.cs)t=m.cs==='K'?'O-O':'O-O-O';
+  else{
+    const cap=s.b[m.t]||m.ep;
+    if(p===P){t=(cap?FILES[m.f&7]+'x':'')+sqName(m.t)}
+    else{
+      const L={[N]:'N',[B]:'B',[R]:'R',[Q]:'Q',[K]:'K'}[p];
+      let dis='';
+      const others=Chess.legal(s).filter(o=>o.f!==m.f&&o.t===m.t&&Math.abs(s.b[o.f])===p);
+      if(others.length){dis=others.every(o=>(o.f&7)!==(m.f&7))?FILES[m.f&7]:others.every(o=>(o.f>>3)!==(m.f>>3))?String(8-(m.f>>3)):sqName(m.f)}
+      t=L+dis+(cap?'x':'')+sqName(m.t);
+    }
+    if(p===P&&m.pr){t+='='+({[N]:'N',[B]:'B',[R]:'R',[Q]:'Q'}[m.pr])}
+  }
+  const n=Chess.make(s,m),stt=Chess.status(n);
+  return t+(stt==='mate'?'#':stt==='check'?'+':'');
+}
+function doMove(m){
+  const before=st,cap=before.b[m.t]||(m.ep?-before.turn*P:0);
+  const text=san(before,m);
+  hist.push({st:before,m,cap,text,last:lastMove,reps:{...reps}});
+  st=Chess.make(before,m);lastMove=m;sel=-1;targets=[];
+  const k=Chess.key(st);reps[k]=(reps[k]||0)+1;
+  const s=Chess.status(st);
+  let over=null;
+  if(s==='mate')over={t:'מט!',m:'ה'+NAMEHE[-st.turn]+' ניצח'};
+  else if(s==='stalemate')over={t:'פט – תיקו',m:'אין מהלך חוקי, אבל אין שח.'};
+  else if(s==='insufficient')over={t:'תיקו',m:'אין מספיק כלים כדי לתת מט.'};
+  else if(s==='draw50')over={t:'תיקו',m:'50 מהלכים בלי לכידה או מהלך רגלי.'};
+  else if(reps[k]>=3)over={t:'תיקו',m:'אותו מצב חזר 3 פעמים.'};
+  (s==='check'||s==='mate')?SFX.chk():cap?SFX.cap():SFX.move();
+  if(over)gameOver=true;
+  render();
+  if(over){gameOver=true;SFX.end();
+    let t=over.t,msg=over.m;
+    if(mode==='cpu'&&s==='mate')t=(-st.turn===human)?'ניצחת! 🎉':'המחשב ניצח';
+    setTimeout(()=>{$('#endTitle').textContent=t;$('#endMsg').textContent=msg;$('#endOv').classList.add('show')},600);
+    return;
+  }
+  maybeAI();
+}
+function undo(){
+  if(!hist.length||aiThinking)return;
+  const pop=()=>{const h=hist.pop();st=h.st;lastMove=h.last;reps=h.reps};
+  pop();
+  if(mode==='cpu'&&st.turn!==human&&hist.length)pop();
+  gameOver=false;sel=-1;targets=[];$('#endOv').classList.remove('show');render();maybeAI();
+}
+
+/* ---------- ui ---------- */
+function render(){
+  const bd=$('#board');bd.innerHTML='';
+  const chk=Chess.inCheck(st,st.turn)?st.b.indexOf(st.turn*K):-1;
+  for(let vr=0;vr<8;vr++)for(let vc=0;vc<8;vc++){
+    const r=flipped?7-vr:vr,c=flipped?7-vc:vc,i=r*8+c;
+    const d=document.createElement('div');
+    d.className='sq '+(((r+c)&1)?'d':'l')+(lastMove&&(lastMove.f===i||lastMove.t===i)?' last':'')+(i===sel?' sel':'')+(i===chk?' chk':'');
+    d.dataset.i=i;
+    if(vc===0){const e=document.createElement('span');e.className='co r';e.textContent=8-r;d.appendChild(e)}
+    if(vr===7){const e=document.createElement('span');e.className='co f';e.textContent=FILES[c];d.appendChild(e)}
+    const v=st.b[i];
+    if(v){const e=document.createElement('span');e.className='pc '+(v>0?'w':'b');e.textContent=GL[Math.abs(v)];d.appendChild(e)}
+    const tg=targets.find(m=>m.t===i);
+    if(tg){const e=document.createElement('span');e.className=v?'ring':'dot';d.appendChild(e)}
+    d.onclick=()=>onSq(i);
+    bd.appendChild(d);
+  }
+  // captured pieces + material
+  const capW=[],capB=[];let mat=0;
+  hist.forEach(h=>{if(h.cap){(h.cap>0?capW:capB).push(Math.abs(h.cap));mat+=(h.cap>0?-1:1)*Chess.VAL[Math.abs(h.cap)]}});
+  // capW = white pieces that were captured (shown next to black); capB = black pieces captured
+  const fmt=(arr,col,adv)=>{const e=document.createDocumentFragment();arr.sort((a,b)=>b-a).forEach(t=>{const s=document.createElement('span');s.className='pc '+col;s.textContent=GL[t];e.appendChild(s)});if(adv>0){const m=document.createElement('span');m.className='mat';m.textContent='+'+Math.round(adv/100);e.appendChild(m)}return e};
+  const topCol=flipped?'w':'b'; // colour sitting at the top
+  const topEl=$('#capTop'),botEl=$('#capBot');topEl.innerHTML='';botEl.innerHTML='';
+  // pieces the top player captured are the opposite colour
+  const capByWhite=capB,capByBlack=capW;
+  if(topCol==='b'){topEl.appendChild(fmt(capByBlack,'w',-mat));botEl.appendChild(fmt(capByWhite,'b',mat))}
+  else{topEl.appendChild(fmt(capByWhite,'b',mat));botEl.appendChild(fmt(capByBlack,'w',-mat))}
+  const label=(col)=>{const me=mode==='cpu'?(col===human?'אתה':'המחשב'):(col===1?'שחקן 1':'שחקן 2');return (col===1?'לבן':'שחור')+' · '+me+(mode==='cpu'&&col!==human?' ('+['','קל','בינוני','קשה','מקצוען'][level]+')':'')}
+  const topC=flipped?1:-1,botC=-topC;
+  const pl=(el,col)=>{el.innerHTML='<i style="background:'+(col===1?'#fff':'#16121f')+'"></i>'+label(col)};
+  pl($('#topPl'),topC);pl($('#botPl'),botC);
+  // status
+  const s=Chess.status(st),el=$('#status');el.className='status';
+  if(gameOver)el.textContent=s==='mate'?'מט! ה'+NAMEHE[-st.turn]+' ניצח':'המשחק נגמר בתיקו';
+  else if(aiThinking){el.textContent='המחשב חושב…'}
+  else{el.textContent='תור ה'+NAMEHE[st.turn]+(mode==='cpu'?(st.turn===human?' (אתה)':''):'')+(s==='check'?' – שח!':'');if(s==='check')el.classList.add('bad')}
+  // moves
+  const mv=$('#moves');mv.innerHTML='';
+  for(let i=0;i<hist.length;i+=2){const sp=document.createElement('span');sp.innerHTML='<b>'+(i/2+1)+'.</b>'+hist[i].text+(hist[i+1]?' '+hist[i+1].text:'');mv.appendChild(sp)}
+  if(!hist.length)mv.textContent='המהלכים יופיעו כאן';mv.scrollLeft=mv.scrollWidth;
+  $('#undoBtn').disabled=!hist.length||aiThinking;
+}
+function onSq(i){
+  if(gameOver||aiThinking||isAITurn())return;
+  const v=st.b[i];
+  const tg=targets.filter(m=>m.t===i);
+  if(sel>=0&&tg.length){
+    if(tg[0].pr){askPromo(tg)}else doMove(tg[0]);
+    return;
+  }
+  if(v&&(v>0?1:-1)===st.turn){
+    sel=i;targets=Chess.legal(st).filter(m=>m.f===i);
+  }else{sel=-1;targets=[]}
+  render();
+}
+function askPromo(list){
+  const row=$('#promoRow');row.innerHTML='';
+  const col=st.turn===1?'w':'b';
+  [Q,R,B,N].forEach(t=>{const b=document.createElement('button');b.innerHTML='<span class="pc '+col+'">'+GL[t]+'</span>';b.onclick=()=>{$('#promoOv').classList.remove('show');doMove(list.find(m=>m.pr===t))};row.appendChild(b)});
+  $('#promoOv').classList.add('show');
+}
+
+/* ---------- menu ---------- */
+function chips(id,items,cur,cb){
+  const row=$(id);row.innerHTML='';
+  items.forEach(([v,t])=>{const b=document.createElement('button');b.className='chip'+(String(v)===String(cur)?' on':'');b.textContent=t;
+    b.onclick=()=>{cb(v);[...row.children].forEach(c=>c.classList.remove('on'));b.classList.add('on')};row.appendChild(b)});
+}
+function buildMenu(){
+  chips('#modeRow',[['cpu','🤖 נגד המחשב'],['2p','👥 שני שחקנים']],mode,v=>{mode=v;store.set('ch_mode',v);$('#cpuOpts').style.display=v==='cpu'?'block':'none'});
+  chips('#colorRow',[['w','⚪ לבן'],['b','⚫ שחור'],['r','🎲 אקראי']],myColor,v=>{myColor=v;store.set('ch_color',v)});
+  chips('#lvlRow',[[1,'קל'],[2,'בינוני'],[3,'קשה'],[4,'מקצוען']],level,v=>{level=+v;store.set('ch_lvl',v)});
+  $('#cpuOpts').style.display=mode==='cpu'?'block':'none';
+}
+$('#startBtn').onclick=newGame;$('#againBtn').onclick=newGame;
+$('#menuBtn').onclick=()=>$('#menu').classList.add('show');$('#endMenuBtn').onclick=()=>{$('#endOv').classList.remove('show');$('#menu').classList.add('show')};
+$('#viewBtn').onclick=()=>$('#endOv').classList.remove('show');
+$('#undoBtn').onclick=undo;$('#flipBtn').onclick=()=>{flipped=!flipped;render()};
+function paintMute(){$('#muteBtn').textContent=muted?'🔇':'🔊'}
+$('#muteBtn').onclick=()=>{muted=!muted;store.set('ch_mute',muted?'1':'0');paintMute();if(!muted)beep(600,.1)};paintMute();
+
+let deferredInstall=null;
+addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstall=e;$('#installBtn').style.display='block'});
+$('#installBtn').onclick=async()=>{if(!deferredInstall)return;deferredInstall.prompt();await deferredInstall.userChoice;deferredInstall=null;$('#installBtn').style.display='none'};
+addEventListener('appinstalled',()=>{$('#installBtn').style.display='none'});
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+
+st=Chess.initState();hist=[];buildMenu();render();
+</script>
+</body>
+</html>

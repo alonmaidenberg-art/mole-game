@@ -14,5 +14,21 @@
     "url": "basketball/",
     "icon": "basketball/icons/icon-192.png",
     "tag": "ספורט"
+  },
+  {
+    "id": "impostor",
+    "name": "אימפוסטר",
+    "description": "משחק חברה לטלפון אחד: כולם מקבלים אותה מילה חוץ מהאימפוסטר. מי מסתתר בינינו?",
+    "url": "impostor/",
+    "icon": "impostor/icons/icon-192.png",
+    "tag": "חברה"
+  },
+  {
+    "id": "chess",
+    "name": "שחמט",
+    "description": "שחמט מלא נגד המחשב ב-4 רמות או שני שחקנים. הצרחה, אן-פסאן והמרה.",
+    "url": "chess/",
+    "icon": "chess/icons/icon-192.png",
+    "tag": "אסטרטגיה"
   }
 ]
