@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>4 בשורה – אלון מידנברג</title>
+<meta name="description" content="4 בשורה נגד המחשב בשלוש רמות או נגד חבר.">
+<meta name="theme-color" content="#1a1038">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;background:#1a1038;color:#fff;font-family:system-ui,-apple-system,"Segoe UI",Arial,"Noto Sans Hebrew",sans-serif}
+body{background:radial-gradient(700px 500px at 80% -10%,#5b36d6 0,transparent 60%),radial-gradient(600px 500px at 0% 110%,#0f6b6b 0,transparent 55%),#1a1038;min-height:100vh;min-height:100dvh;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+main{max-width:520px;margin:0 auto;padding:max(12px,env(safe-area-inset-top)) 14px 24px}
+h1{margin:6px 0;font-size:30px;text-align:center}
+.sub{text-align:center;opacity:.75;margin:0 0 10px}
+.box{background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.12);border-radius:22px;padding:14px;margin:12px 0}
+.lb{opacity:.8;font-size:15px;margin-bottom:8px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{flex:1;min-width:70px;padding:13px 6px;border-radius:16px;border:2px solid rgba(255,255,255,.18);background:#150a30;color:#fff;font:inherit;font-weight:800;font-size:17px;cursor:pointer}
+.chip.on{background:#ffd05a;color:#2a1c00;border-color:#fff}
+.btn{display:block;width:100%;border:0;border-radius:18px;padding:15px;margin-top:12px;font:inherit;font-size:21px;font-weight:900;color:#06322b;background:linear-gradient(180deg,#5ff7d6,#1fc9a6);box-shadow:0 6px 0 #0d7a66;cursor:pointer}
+.btn:active{transform:translateY(3px);box-shadow:0 3px 0 #0d7a66}
+.btn.alt{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.3);box-shadow:none;font-size:16px;padding:12px}
+.ib{min-width:46px;height:42px;padding:0 12px;border-radius:13px;border:2px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#fff;font:inherit;font-size:17px;font-weight:800;cursor:pointer}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.scr{display:none}.scr.show{display:block}
+.ov{position:fixed;inset:0;background:rgba(10,5,30,.82);display:none;align-items:center;justify-content:center;z-index:30;padding:16px}.ov.show{display:flex}
+.ovc{width:100%;max-width:380px;background:linear-gradient(160deg,#2c1b6a,#1a1038);border:2px solid rgba(255,255,255,.2);border-radius:26px;padding:22px;text-align:center}
+.ovc h2{margin:0 0 6px;font-size:30px}
+#board{direction:ltr;display:grid;grid-template-columns:repeat(7,1fr);gap:6px;background:#2a5bd7;padding:10px;border-radius:20px;max-width:460px;margin:10px auto;box-shadow:0 8px 0 #1a3a94}
+.col{display:grid;grid-template-rows:repeat(6,1fr);gap:6px;cursor:pointer;border-radius:12px}.col:hover{background:rgba(255,255,255,.12)}
+.d{aspect-ratio:1;border-radius:50%;background:#14102e;box-shadow:inset 0 4px 8px #0008}.d.r{background:radial-gradient(circle at 35% 30%,#ff8a8a,#e02b3c)}.d.y{background:radial-gradient(circle at 35% 30%,#fff3a0,#f0b400)}
+.d.w{animation:bl .6s infinite alternate;outline:4px solid #fff}@keyframes bl{to{transform:scale(1.1)}}.d.drop{animation:dr .35s ease-in}@keyframes dr{from{transform:translateY(-200%)}}
+</style>
+</head>
+<body>
+<main>
+<div class="scr show" id="menu">
+  <div style="text-align:center;font-size:84px;line-height:1">🔴🟡</div>
+  <h1>4 בשורה</h1><p class="sub">מחברים ארבעה דיסקים באותו צבע</p>
+  <div class="box"><div class="lb">נגד מי?</div><div class="chips" id="mMode"><button class="chip on" data-v="cpu">🤖 מחשב</button><button class="chip" data-v="2p">👥 חבר</button></div></div>
+  <div class="box" id="lvlBox"><div class="lb">רמת קושי</div><div class="chips" id="mLvl"><button class="chip" data-v="1">קל</button><button class="chip on" data-v="3">בינוני</button><button class="chip" data-v="5">קשה</button></div></div>
+  <button class="btn" id="go">▶ התחל</button>
+</div>
+<div class="scr" id="game">
+  <div class="bar"><button class="ib" id="back">→</button><div id="score" style="font-weight:800;font-size:17px"></div><span style="width:46px"></span></div>
+  <div id="turn" style="text-align:center;font-size:21px;font-weight:900;min-height:32px;margin:4px 0"></div>
+  <div id="board"></div>
+  <button class="btn" id="again" style="display:none">🔁 עוד סיבוב</button>
+</div></main>
+<script>
+'use strict';
+const $=s=>document.querySelector(s);
+const store={get(k,d){try{const v=localStorage.getItem(k);return v===null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+let _ac=null;function tone(f,d=.1,t='triangle',v=.07){try{_ac=_ac||new (window.AudioContext||window.webkitAudioContext)();const o=_ac.createOscillator(),g=_ac.createGain();o.type=t;o.frequency.value=f;g.gain.value=v;o.connect(g);g.connect(_ac.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,_ac.currentTime+d);o.stop(_ac.currentTime+d+.02)}catch(e){}}
+
+const R=6,C=7;let mode=store.get('c_mode','cpu'),lvl=+store.get('c_lvl',3),g,turn,over,sc={r:0,y:0,d:0},starter='r',lastDrop=null;
+function opt(id,v){[...$(id).children].forEach(c=>c.classList.toggle('on',c.dataset.v===String(v)))}
+function chips(id,cb){[...$(id).children].forEach(c=>c.onclick=()=>{cb(c.dataset.v);opt(id,c.dataset.v)})}
+chips('#mMode',v=>{mode=v;store.set('c_mode',v);vis()});chips('#mLvl',v=>{lvl=+v;store.set('c_lvl',v)});opt('#mMode',mode);opt('#mLvl',lvl);
+function vis(){$('#lvlBox').style.display=mode==='cpu'?'block':'none'}vis();
+function show(id){document.querySelectorAll('.scr').forEach(s=>s.classList.toggle('show',s.id===id))}
+const at=(g,r,c)=>r<0||c<0||r>=R||c>=C?null:g[r*C+c];
+function win(g,p){const D=[[0,1],[1,0],[1,1],[1,-1]];for(let r=0;r<R;r++)for(let c=0;c<C;c++)for(const [dr,dc] of D){const l=[];for(let k=0;k<4;k++){if(at(g,r+dr*k,c+dc*k)!==p)break;l.push([r+dr*k,c+dc*k])}if(l.length===4)return l}return null}
+function drop(g,c,p){for(let r=R-1;r>=0;r--)if(!g[r*C+c]){g[r*C+c]=p;return r}return -1}
+function undo(g,r,c){g[r*C+c]=null}
+function score(g,p){const o=p==='r'?'y':'r';let s=0;const D=[[0,1],[1,0],[1,1],[1,-1]];
+  for(let r=0;r<R;r++)for(let c=0;c<C;c++)for(const [dr,dc] of D){let a=0,b=0,e=0;for(let k=0;k<4;k++){const v=at(g,r+dr*k,c+dc*k);if(v===undefined||v===null&&(r+dr*k<0||r+dr*k>=R||c+dc*k<0||c+dc*k>=C)){a=-9;break}if(v===p)a++;else if(v===o)b++;else e++}
+    if(a<0)continue;if(a&&!b)s+=a===4?1000:a===3?6:a===2?2:0;if(b&&!a)s-=b===4?1000:b===3?8:b===2?2:0}
+  for(let r=0;r<R;r++)if(g[r*C+3]===p)s+=3;return s}
+function search(g,d,a,b,p,me){const o=p==='r'?'y':'r';
+  if(win(g,me))return 100000+d;if(win(g,me==='r'?'y':'r'))return -100000-d;if(d===0||g.every(x=>x))return score(g,me);
+  const order=[3,2,4,1,5,0,6];let best=p===me?-1e9:1e9;
+  for(const c of order){if(g[c])continue;const r=drop(g,c,p);const s=search(g,d-1,a,b,o,me);undo(g,r,c);
+    if(p===me){best=Math.max(best,s);a=Math.max(a,s)}else{best=Math.min(best,s);b=Math.min(b,s)}if(b<=a)break}return best}
+function aiCol(){const me=turn;const cols=[...Array(C).keys()].filter(c=>!g[c]);
+  if(lvl===1&&Math.random()<.5)return cols[Math.floor(Math.random()*cols.length)];
+  let best=-1e9,m=[];const o=me==='r'?'y':'r';
+  for(const c of [3,2,4,1,5,0,6]){if(g[c])continue;const r=drop(g,c,me);const s=search(g,lvl,-1e9,1e9,o,me)+Math.random()*(lvl<5?6:0);undo(g,r,c);if(s>best){best=s;m=[c]}else if(s===best)m.push(c)}
+  return m[Math.floor(Math.random()*m.length)]}
+function newRound(){g=Array(R*C).fill(null);turn=starter;over=false;lastDrop=null;$('#again').style.display='none';draw();hdr();if(mode==='cpu'&&turn==='y')setTimeout(cpu,500)}
+function hdr(){$('#score').textContent='🔴 '+sc.r+' · תיקו '+sc.d+' · 🟡 '+sc.y;if(!over)$('#turn').textContent=mode==='cpu'?(turn==='r'?'התור שלך 🔴':'המחשב חושב… 🟡'):'תור '+(turn==='r'?'🔴':'🟡')}
+function draw(w){const bd=$('#board');bd.innerHTML='';for(let c=0;c<C;c++){const col=document.createElement('div');col.className='col';col.onclick=()=>play(c);
+  for(let r=0;r<R;r++){const d=document.createElement('div');const v=g[r*C+c];d.className='d'+(v?' '+v:'')+(w&&w.some(x=>x[0]===r&&x[1]===c)?' w':'')+(lastDrop&&lastDrop[0]===r&&lastDrop[1]===c?' drop':'');col.appendChild(d)}bd.appendChild(col)}}
+function play(c){if(over||g[c])return;if(mode==='cpu'&&turn!=='r')return;put(c)}
+function put(c){const r=drop(g,c,turn);lastDrop=[r,c];tone(300+r*40,.1);const w=win(g,turn);
+  if(w){over=true;sc[turn]++;draw(w);$('#turn').textContent=mode==='cpu'?(turn==='r'?'ניצחת! 🎉':'המחשב ניצח 🤖'):(turn==='r'?'🔴 ניצח! 🎉':'🟡 ניצח! 🎉');tone(880,.4);fin()}
+  else if(g.every(x=>x)){over=true;sc.d++;draw();$('#turn').textContent='תיקו 🤝';fin()}
+  else{turn=turn==='r'?'y':'r';draw();hdr();if(mode==='cpu'&&turn==='y')setTimeout(cpu,500)}}
+function cpu(){if(over)return;put(aiCol())}
+function fin(){$('#again').style.display='block';starter=starter==='r'?'y':'r';hdr()}
+$('#go').onclick=()=>{sc={r:0,y:0,d:0};starter='r';show('game');newRound()};$('#again').onclick=newRound;$('#back').onclick=()=>show('menu');
+window.__c4={get g(){return g},set g(v){g=v},win,aiCol,set turn(v){turn=v},set lvl(v){lvl=v}};
+
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+</script>
+</body>
+</html>

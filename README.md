@@ -20,3 +20,5 @@
 
 Import from Git, Build command ריק, Publish directory `.`.
 - `tictactoe/` איקס עיגול · `snake/` נחש · `game2048/` 2048 · `memory/` זיכרון · `blocks/` בלוקים (עולם בלוקים)
+
+- `connect4/` 4 בשורה · `minesweeper/` שולה מוקשים · `fallingblocks/` בלוקים נופלים · `flappy/` ציפור מעופפת · `hangman/` איש תלוי

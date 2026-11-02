@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>איש תלוי – אלון מידנברג</title>
+<meta name="description" content="איש תלוי בעברית: מנחשים מילה אות אחרי אות.">
+<meta name="theme-color" content="#1a1038">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;background:#1a1038;color:#fff;font-family:system-ui,-apple-system,"Segoe UI",Arial,"Noto Sans Hebrew",sans-serif}
+body{background:radial-gradient(700px 500px at 80% -10%,#5b36d6 0,transparent 60%),radial-gradient(600px 500px at 0% 110%,#0f6b6b 0,transparent 55%),#1a1038;min-height:100vh;min-height:100dvh;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+main{max-width:520px;margin:0 auto;padding:max(12px,env(safe-area-inset-top)) 14px 24px}
+h1{margin:6px 0;font-size:30px;text-align:center}
+.sub{text-align:center;opacity:.75;margin:0 0 10px}
+.box{background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.12);border-radius:22px;padding:14px;margin:12px 0}
+.lb{opacity:.8;font-size:15px;margin-bottom:8px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{flex:1;min-width:70px;padding:13px 6px;border-radius:16px;border:2px solid rgba(255,255,255,.18);background:#150a30;color:#fff;font:inherit;font-weight:800;font-size:17px;cursor:pointer}
+.chip.on{background:#ffd05a;color:#2a1c00;border-color:#fff}
+.btn{display:block;width:100%;border:0;border-radius:18px;padding:15px;margin-top:12px;font:inherit;font-size:21px;font-weight:900;color:#06322b;background:linear-gradient(180deg,#5ff7d6,#1fc9a6);box-shadow:0 6px 0 #0d7a66;cursor:pointer}
+.btn:active{transform:translateY(3px);box-shadow:0 3px 0 #0d7a66}
+.btn.alt{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.3);box-shadow:none;font-size:16px;padding:12px}
+.ib{min-width:46px;height:42px;padding:0 12px;border-radius:13px;border:2px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#fff;font:inherit;font-size:17px;font-weight:800;cursor:pointer}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.scr{display:none}.scr.show{display:block}
+.ov{position:fixed;inset:0;background:rgba(10,5,30,.82);display:none;align-items:center;justify-content:center;z-index:30;padding:16px}.ov.show{display:flex}
+.ovc{width:100%;max-width:380px;background:linear-gradient(160deg,#2c1b6a,#1a1038);border:2px solid rgba(255,255,255,.2);border-radius:26px;padding:22px;text-align:center}
+.ovc h2{margin:0 0 6px;font-size:30px}
+#word{direction:rtl;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:8px 0}
+.L{width:38px;height:50px;border-bottom:4px solid #ffd05a;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:900}.L.sp{border:0;width:16px}
+#kb{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;direction:rtl;max-width:480px;margin:0 auto}
+.k{width:44px;height:48px;border-radius:12px;border:2px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:#fff;font:inherit;font-size:20px;font-weight:900;cursor:pointer;box-shadow:0 4px 0 rgba(0,0,0,.3)}
+.k.ok{background:#1fc9a6;color:#06322b}.k.no{background:#5a2438;opacity:.5}.k:disabled{pointer-events:none}
+</style>
+</head>
+<body>
+<main>
+<div class="scr show" id="menu">
+  <div style="text-align:center;font-size:84px;line-height:1">🔤🪢</div>
+  <h1>איש תלוי</h1><p class="sub">מנחשים את המילה אות אחרי אות</p>
+  <div class="box"><div class="lb">נושא</div><div class="chips" id="mTh"></div></div>
+  <div class="box"><div class="lb">מצב</div><div class="chips" id="mMd"><button class="chip on" data-v="1">🤖 מילה אקראית</button><button class="chip" data-v="2">👥 חבר מכניס מילה</button></div></div>
+  <button class="btn" id="go">▶ התחל</button>
+</div>
+<div class="scr" id="game">
+  <div class="bar"><button class="ib" id="back">→</button><div style="font-weight:900">ניצחונות <span id="wins">0</span> · הפסדים <span id="loss">0</span></div><span style="width:46px"></span></div>
+  <div style="text-align:center;opacity:.8" id="cat"></div>
+  <svg id="fig" viewBox="0 0 200 190" style="display:block;margin:4px auto;max-width:210px;width:60%"></svg>
+  <div id="word"></div>
+  <div id="msg" style="text-align:center;min-height:30px;font-weight:900;font-size:20px;margin:6px 0"></div>
+  <div id="kb"></div>
+  <button class="btn" id="again" style="display:none">🔁 מילה חדשה</button>
+</div>
+<div class="ov" id="secret"><div class="ovc"><h2>מילה סודית</h2><div style="opacity:.8;margin-bottom:8px">חבר, הכנס מילה בעברית (שהשני לא רואה)</div><input id="sec" type="password" style="width:100%;font:inherit;font-size:22px;padding:12px;border-radius:14px;border:2px solid rgba(255,255,255,.3);background:#150a30;color:#fff;text-align:center" autocomplete="off"><button class="btn" id="secOk">אישור</button></div></div>
+</main>
+<script>
+'use strict';
+const $=s=>document.querySelector(s);
+const store={get(k,d){try{const v=localStorage.getItem(k);return v===null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+let _ac=null;function tone(f,d=.1,t='triangle',v=.07){try{_ac=_ac||new (window.AudioContext||window.webkitAudioContext)();const o=_ac.createOscillator(),g=_ac.createGain();o.type=t;o.frequency.value=f;g.gain.value=v;o.connect(g);g.connect(_ac.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,_ac.currentTime+d);o.stop(_ac.currentTime+d+.02)}catch(e){}}
+
+const TOP={'חיות':'חתול כלב סוס פרה כבשה ארנב דובי נמר אריה פיל ג׳ירפה קוף דולפין כריש צב תנין נחש עכבר ינשוף נשר פינגווין זברה עז תרנגול דג'.split(' '),
+'אוכל':'פיצה המבורגר שניצל פלאפל חומוס שקשוקה גלידה שוקולד עוגה לחם גבינה ביצה תפוח בננה אבטיח ענבים עגבנייה מלפפון פסטה אורז סלט חלווה בורקס'.split(' '),
+'מקומות':'ירושלים חיפה תלאביב אילת ים הר מדבר גן כנרת בית ספר חוף עיר כפר שוק נמל מגדל גשר'.split(' '),
+'חפצים':'שולחן כיסא מחשב טלפון מנעול מפתח מטריה מזוודה שעון מראה מנורה כרית שמיכה עט עיפרון מחברת תיק נעל כובע משקפיים'.split(' '),
+'ספורט':'כדורגל כדורסל טניס שחייה ריצה אופניים התעמלות יודו כדורעף גולף בוקס סקי חץ וקשת'.split(' ')};
+let th=store.get('h_th','חיות'),md=store.get('h_md','1'),word,got,miss,over,wins=0,loss=0;
+const FIN={'ך':'כ','ם':'מ','ן':'נ','ף':'פ','ץ':'צ'},norm=ch=>FIN[ch]||ch,HEB='אבגדהוזחטיכלמנסעפצקרשת'.split('');
+function opt(id,v){[...$(id).children].forEach(c=>c.classList.toggle('on',c.dataset.v===String(v)))}
+const ch=$('#mTh');Object.keys(TOP).forEach(k=>{const b=document.createElement('button');b.className='chip'+(k===th?' on':'');b.dataset.v=k;b.textContent=k;b.onclick=()=>{th=k;store.set('h_th',k);opt('#mTh',k)};ch.appendChild(b)});
+[...$('#mMd').children].forEach(c=>c.onclick=()=>{md=c.dataset.v;store.set('h_md',md);opt('#mMd',md)});opt('#mMd',md);
+function show(id){document.querySelectorAll('.scr').forEach(s=>s.classList.toggle('show',s.id===id))}
+function newWord(){if(md==='2'){$('#sec').value='';$('#secret').classList.add('show');setTimeout(()=>$('#sec').focus(),100);return}
+  begin(TOP[th][Math.floor(Math.random()*TOP[th].length)],th)}
+$('#secOk').onclick=()=>{const w=$('#sec').value.trim().replace(/[^א-ת ]/g,'');if(w.length<2)return;$('#secret').classList.remove('show');begin(w,'מילה מחבר')};
+function begin(w,cat){word=w;got=new Set();miss=0;over=false;$('#again').style.display='none';$('#msg').textContent='';$('#cat').textContent='נושא: '+cat;render()}
+function render(){const wd=$('#word');wd.innerHTML='';[...word].forEach(c=>{const d=document.createElement('div');if(c===' '){d.className='L sp'}else{d.className='L';d.textContent=got.has(norm(c))||over&&miss>=7?c:''}wd.appendChild(d)});
+  const kb=$('#kb');kb.innerHTML='';HEB.forEach(l=>{const b=document.createElement('button');b.className='k';b.textContent=l;const used=got.has(l)||(window._u&&0);
+    b.disabled=over||!!b._d;b.onclick=()=>guess(l,b);if(guessed.has(l)){b.disabled=true;b.classList.add(word.split('').some(c=>norm(c)===l)?'ok':'no')}kb.appendChild(b)});fig()}
+let guessed=new Set();
+function guess(l){if(over||guessed.has(l))return;guessed.add(l);const hit=[...word].some(c=>norm(c)===l);if(hit){got.add(l);tone(700,.08)}else{miss++;tone(180,.15,'square')}
+  const done=[...word].every(c=>c===' '||got.has(norm(c)));
+  if(done){over=true;wins++;$('#msg').textContent='ניצחת! 🎉';tone(900,.4);fin()}else if(miss>=7){over=true;loss++;$('#msg').textContent='נתלה! המילה: '+word;tone(110,.5,'sawtooth');fin()}
+  render()}
+function fin(){$('#again').style.display='block';$('#wins').textContent=wins;$('#loss').textContent=loss}
+function fig(){const p=['<path d="M20 180H100M60 180V15H140V35" stroke="#e9e4ff" stroke-width="6" fill="none" stroke-linecap="round"/>','<circle cx="140" cy="52" r="17" stroke="#ffd05a" stroke-width="5" fill="none"/>','<path d="M140 69V118" stroke="#ffd05a" stroke-width="5"/>','<path d="M140 78L118 100" stroke="#ffd05a" stroke-width="5" stroke-linecap="round"/>','<path d="M140 78L162 100" stroke="#ffd05a" stroke-width="5" stroke-linecap="round"/>','<path d="M140 118L121 150" stroke="#ffd05a" stroke-width="5" stroke-linecap="round"/>','<path d="M140 118L159 150" stroke="#ffd05a" stroke-width="5" stroke-linecap="round"/>'];
+  $('#fig').innerHTML=p[0]+p.slice(1,1+miss).join('')+(miss>=7?'<path d="M133 46l8 8m0-8l-8 8m17-8l8 8m0-8l-8 8" stroke="#ff7b95" stroke-width="3"/>':'')}
+$('#go').onclick=()=>{wins=loss=0;$('#wins').textContent=0;$('#loss').textContent=0;show('game');guessed=new Set();newWord()};
+$('#again').onclick=()=>{guessed=new Set();newWord()};$('#back').onclick=()=>show('menu');
+const _b=begin;begin=function(w,c){guessed=new Set();_b(w,c)};
+window.__h={begin:w=>begin(w,'בדיקה'),guess,get over(){return over},get miss(){return miss}};
+
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+</script>
+</body>
+</html>

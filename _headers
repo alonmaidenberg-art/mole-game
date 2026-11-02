@@ -72,3 +72,48 @@
   Cache-Control: no-cache
 /blocks/manifest.webmanifest
   Cache-Control: no-cache
+
+/connect4/sw.js
+  Cache-Control: no-cache
+
+/connect4/index.html
+  Cache-Control: no-cache
+
+/connect4/manifest.webmanifest
+  Cache-Control: no-cache
+
+/minesweeper/sw.js
+  Cache-Control: no-cache
+
+/minesweeper/index.html
+  Cache-Control: no-cache
+
+/minesweeper/manifest.webmanifest
+  Cache-Control: no-cache
+
+/fallingblocks/sw.js
+  Cache-Control: no-cache
+
+/fallingblocks/index.html
+  Cache-Control: no-cache
+
+/fallingblocks/manifest.webmanifest
+  Cache-Control: no-cache
+
+/flappy/sw.js
+  Cache-Control: no-cache
+
+/flappy/index.html
+  Cache-Control: no-cache
+
+/flappy/manifest.webmanifest
+  Cache-Control: no-cache
+
+/hangman/sw.js
+  Cache-Control: no-cache
+
+/hangman/index.html
+  Cache-Control: no-cache
+
+/hangman/manifest.webmanifest
+  Cache-Control: no-cache

@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>שולה מוקשים – אלון מידנברג</title>
+<meta name="description" content="שולה מוקשים בשלוש רמות עם דגלים ושיאי זמן.">
+<meta name="theme-color" content="#1a1038">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;background:#1a1038;color:#fff;font-family:system-ui,-apple-system,"Segoe UI",Arial,"Noto Sans Hebrew",sans-serif}
+body{background:radial-gradient(700px 500px at 80% -10%,#5b36d6 0,transparent 60%),radial-gradient(600px 500px at 0% 110%,#0f6b6b 0,transparent 55%),#1a1038;min-height:100vh;min-height:100dvh;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+main{max-width:520px;margin:0 auto;padding:max(12px,env(safe-area-inset-top)) 14px 24px}
+h1{margin:6px 0;font-size:30px;text-align:center}
+.sub{text-align:center;opacity:.75;margin:0 0 10px}
+.box{background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.12);border-radius:22px;padding:14px;margin:12px 0}
+.lb{opacity:.8;font-size:15px;margin-bottom:8px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{flex:1;min-width:70px;padding:13px 6px;border-radius:16px;border:2px solid rgba(255,255,255,.18);background:#150a30;color:#fff;font:inherit;font-weight:800;font-size:17px;cursor:pointer}
+.chip.on{background:#ffd05a;color:#2a1c00;border-color:#fff}
+.btn{display:block;width:100%;border:0;border-radius:18px;padding:15px;margin-top:12px;font:inherit;font-size:21px;font-weight:900;color:#06322b;background:linear-gradient(180deg,#5ff7d6,#1fc9a6);box-shadow:0 6px 0 #0d7a66;cursor:pointer}
+.btn:active{transform:translateY(3px);box-shadow:0 3px 0 #0d7a66}
+.btn.alt{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.3);box-shadow:none;font-size:16px;padding:12px}
+.ib{min-width:46px;height:42px;padding:0 12px;border-radius:13px;border:2px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#fff;font:inherit;font-size:17px;font-weight:800;cursor:pointer}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.scr{display:none}.scr.show{display:block}
+.ov{position:fixed;inset:0;background:rgba(10,5,30,.82);display:none;align-items:center;justify-content:center;z-index:30;padding:16px}.ov.show{display:flex}
+.ovc{width:100%;max-width:380px;background:linear-gradient(160deg,#2c1b6a,#1a1038);border:2px solid rgba(255,255,255,.2);border-radius:26px;padding:22px;text-align:center}
+.ovc h2{margin:0 0 6px;font-size:30px}
+#board{direction:ltr;display:grid;gap:3px;margin:10px auto;max-width:470px;touch-action:manipulation}
+.m{aspect-ratio:1;border-radius:7px;border:0;background:linear-gradient(180deg,#8f6bff,#6a45e0);box-shadow:0 3px 0 #3c2494;font:inherit;font-weight:900;font-size:min(5.5vw,24px);color:#fff;padding:0;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.m.o{background:#e9e4ff;box-shadow:none;cursor:default}.m.b{background:#ff7b95}
+.n1{color:#2a6ad0}.n2{color:#1c9a5a}.n3{color:#e0364a}.n4{color:#5a2fb0}.n5{color:#a8601a}.n6{color:#0a9aa0}.n7{color:#222}.n8{color:#777}
+</style>
+</head>
+<body>
+<main>
+<div class="scr show" id="menu">
+  <div style="text-align:center;font-size:84px;line-height:1">💣🚩</div>
+  <h1>שולה מוקשים</h1><p class="sub">פותחים משבצות ומתחמקים ממוקשים</p>
+  <div class="box"><div class="lb">רמה</div><div class="chips" id="mLv"><button class="chip" data-v="e">קל 8×8</button><button class="chip on" data-v="m">בינוני 10×10</button><button class="chip" data-v="h">קשה 12×14</button></div></div>
+  <div class="box" style="text-align:center">🏆 שיאים (שניות): <span id="bests"></span></div>
+  <button class="btn" id="go">▶ התחל</button>
+  <p class="sub" style="font-size:14px;margin-top:10px">לחיצה = פתיחה · לחיצה ארוכה / ימנית = דגל · כפתור 🚩 מחליף מצב</p>
+</div>
+<div class="scr" id="game">
+  <div class="bar"><button class="ib" id="back">→</button><div style="font-weight:900;font-size:19px">💣 <span id="left">0</span> · ⏱ <span id="tm">0</span></div><button class="ib" id="flagB">⛏</button></div>
+  <div id="board"></div>
+</div>
+<div class="ov" id="end"><div class="ovc"><h2 id="eT"></h2><div id="eM" style="margin-bottom:6px;font-size:19px"></div><button class="btn" id="again">🔁 שוב</button><button class="btn alt" id="menuB">תפריט</button></div></div>
+</main>
+<script>
+'use strict';
+const $=s=>document.querySelector(s);
+const store={get(k,d){try{const v=localStorage.getItem(k);return v===null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+let _ac=null;function tone(f,d=.1,t='triangle',v=.07){try{_ac=_ac||new (window.AudioContext||window.webkitAudioContext)();const o=_ac.createOscillator(),g=_ac.createGain();o.type=t;o.frequency.value=f;g.gain.value=v;o.connect(g);g.connect(_ac.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,_ac.currentTime+d);o.stop(_ac.currentTime+d+.02)}catch(e){}}
+
+const LV={e:[8,8,10],m:[10,10,18],h:[14,12,32]};let lv=store.get('x_lv','m'),W,H,M,cells,first,over,flagMode=false,timer,t0,opened;
+function opt(id,v){[...$(id).children].forEach(c=>c.classList.toggle('on',c.dataset.v===String(v)))}
+[...$('#mLv').children].forEach(c=>c.onclick=()=>{lv=c.dataset.v;store.set('x_lv',lv);opt('#mLv',lv)});opt('#mLv',lv);
+function bests(){$('#bests').textContent=['e','m','h'].map(k=>({e:'קל',m:'בינוני',h:'קשה'}[k]+' '+store.get('x_b'+k,'-'))).join(' · ')}bests();
+function show(id){document.querySelectorAll('.scr').forEach(s=>s.classList.toggle('show',s.id===id))}
+function nb(i){const r=Math.floor(i/W),c=i%W,o=[];for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){if(!dr&&!dc)continue;const rr=r+dr,cc=c+dc;if(rr>=0&&cc>=0&&rr<H&&cc<W)o.push(rr*W+cc)}return o}
+function start(){[H,W,M]=LV[lv];cells=Array.from({length:W*H},()=>({m:0,o:0,f:0,n:0}));first=true;over=false;opened=0;flagMode=false;$('#flagB').textContent='⛏';$('#end').classList.remove('show');clearInterval(timer);$('#tm').textContent=0;$('#left').textContent=M;
+  const bd=$('#board');bd.style.gridTemplateColumns='repeat('+W+',1fr)';render()}
+function plant(safe){const ban=new Set([safe,...nb(safe)]);let n=0;while(n<M){const i=Math.floor(Math.random()*W*H);if(cells[i].m||ban.has(i))continue;cells[i].m=1;n++}cells.forEach((c,i)=>c.n=nb(i).filter(j=>cells[j].m).length)}
+function render(){const bd=$('#board');bd.innerHTML='';cells.forEach((c,i)=>{const b=document.createElement('button');b.className='m'+(c.o?' o':'')+(c.o&&c.m?' b':'');
+  b.textContent=c.f&&!c.o?'🚩':c.o?(c.m?'💣':c.n||''):'';if(c.o&&!c.m&&c.n)b.classList.add('n'+c.n);
+  let pt=null;b.onpointerdown=()=>{pt=setTimeout(()=>{pt=null;flag(i)},420)};b.onpointerup=()=>{if(pt){clearTimeout(pt);pt=null;click(i)}};b.onpointerleave=()=>{if(pt){clearTimeout(pt);pt=null}};b.oncontextmenu=e=>{e.preventDefault();flag(i)};bd.appendChild(b)});
+  $('#left').textContent=M-cells.filter(c=>c.f).length}
+function flag(i){if(over||cells[i].o)return;cells[i].f^=1;tone(400,.05);render()}
+function click(i){if(over)return;const c=cells[i];if(flagMode){flag(i);return}if(c.f)return;
+  if(first){first=false;plant(i);t0=Date.now();timer=setInterval(()=>$('#tm').textContent=Math.floor((Date.now()-t0)/1000),500)}
+  if(c.o){const f=nb(i).filter(j=>cells[j].f).length;if(f===c.n&&c.n)nb(i).forEach(j=>{if(!cells[j].f&&!cells[j].o)openC(j)});check();render();return}
+  openC(i);check();render()}
+function openC(i){const st=[i];while(st.length){const j=st.pop(),c=cells[j];if(c.o||c.f)continue;c.o=1;opened++;if(c.m){boom();return}if(!c.n)nb(j).forEach(k=>{if(!cells[k].o)st.push(k)})}tone(500,.04)}
+function boom(){over=true;clearInterval(timer);cells.forEach(c=>{if(c.m)c.o=1});tone(120,.5,'sawtooth');render();$('#eT').textContent='בום! 💥';$('#eM').textContent='דרכת על מוקש';setTimeout(()=>$('#end').classList.add('show'),700)}
+function check(){if(over)return;if(opened===W*H-M){over=true;clearInterval(timer);const t=Math.floor((Date.now()-t0)/1000);const k='x_b'+lv,old=+store.get(k,0);let m='זמן: '+t+' שניות';if(!old||t<old){store.set(k,t);m+=' · שיא חדש! 🏆';bests()}$('#eT').textContent='ניצחת! 🎉';$('#eM').textContent=m;tone(880,.4);setTimeout(()=>$('#end').classList.add('show'),500)}}
+$('#flagB').onclick=()=>{flagMode=!flagMode;$('#flagB').textContent=flagMode?'🚩':'⛏'};
+$('#go').onclick=()=>{show('game');start()};$('#again').onclick=start;$('#menuB').onclick=()=>{clearInterval(timer);$('#end').classList.remove('show');show('menu')};$('#back').onclick=()=>{clearInterval(timer);show('menu')};
+window.__mn={start,click,get cells(){return cells},get over(){return over},nb,set lv(v){lv=v}};
+
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+</script>
+</body>
+</html>

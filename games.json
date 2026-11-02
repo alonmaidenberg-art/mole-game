@@ -78,5 +78,45 @@
     "url": "blocks/",
     "icon": "blocks/icons/icon-192.png",
     "tag": "יצירה"
+  },
+  {
+    "id": "connect4",
+    "name": "4 בשורה",
+    "description": "מלכדים 4 בשורה מול המחשב או חבר",
+    "url": "connect4/",
+    "icon": "connect4/icons/icon-192.png",
+    "tag": "משחק לשניים"
+  },
+  {
+    "id": "minesweeper",
+    "name": "שולה מוקשים",
+    "description": "מוצאים את כל המוקשים בלי להתפוצץ",
+    "url": "minesweeper/",
+    "icon": "minesweeper/icons/icon-192.png",
+    "tag": "חשיבה"
+  },
+  {
+    "id": "fallingblocks",
+    "name": "בלוקים נופלים",
+    "description": "מסדרים צורות ומנקים שורות",
+    "url": "fallingblocks/",
+    "icon": "fallingblocks/icons/icon-192.png",
+    "tag": "קלאסי"
+  },
+  {
+    "id": "flappy",
+    "name": "ציפור מעופפת",
+    "description": "מעופפים בין הצינורות",
+    "url": "flappy/",
+    "icon": "flappy/icons/icon-192.png",
+    "tag": "רפלקסים"
+  },
+  {
+    "id": "hangman",
+    "name": "איש תלוי",
+    "description": "מנחשים מילה בעברית אות אחרי אות",
+    "url": "hangman/",
+    "icon": "hangman/icons/icon-192.png",
+    "tag": "מילים"
   }
 ]
