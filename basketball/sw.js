@@ -1,7 +1,7 @@
 // Service worker: lets the browser offer real "Install app", and keeps the game working offline.
 // Network-first: when online you always get the newest version (so updates arrive by themselves);
 // when offline it falls back to the saved copy.
-const CACHE = 'basketball-v3';
+const CACHE = 'basketball-v4';
 const FILES = ['./', './index.html', './teams.js', './manifest.webmanifest', './icons/basketball.svg',
   './icons/icon-192.png', './icons/icon-512.png', './icons/maskable-512.png', './icons/apple-touch-icon.png', './icons/favicon-64.png'];
 
