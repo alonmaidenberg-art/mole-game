@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>כדורגל – אלון מידנברג</title>
+<meta name="description" content="כדורגל 1 על 1: 20 נבחרות, 160 שחקנים, חנות כוחות.">
+<meta name="theme-color" content="#2c7be0">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;background:#1a1038;color:#fff;font-family:system-ui,-apple-system,"Segoe UI",Arial,"Noto Sans Hebrew",sans-serif}
+body{background:radial-gradient(700px 500px at 80% -10%,#5b36d6 0,transparent 60%),radial-gradient(600px 500px at 0% 110%,#0f6b6b 0,transparent 55%),#1a1038;min-height:100vh;min-height:100dvh;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+main{max-width:520px;margin:0 auto;padding:max(12px,env(safe-area-inset-top)) 14px 24px}
+h1{margin:6px 0;font-size:30px;text-align:center}
+.sub{text-align:center;opacity:.75;margin:0 0 10px}
+.box{background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.12);border-radius:22px;padding:14px;margin:12px 0}
+.lb{opacity:.8;font-size:15px;margin-bottom:8px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{flex:1;min-width:70px;padding:13px 6px;border-radius:16px;border:2px solid rgba(255,255,255,.18);background:#150a30;color:#fff;font:inherit;font-weight:800;font-size:17px;cursor:pointer}
+.chip.on{background:#ffd05a;color:#2a1c00;border-color:#fff}
+.btn{display:block;width:100%;border:0;border-radius:18px;padding:15px;margin-top:12px;font:inherit;font-size:21px;font-weight:900;color:#06322b;background:linear-gradient(180deg,#5ff7d6,#1fc9a6);box-shadow:0 6px 0 #0d7a66;cursor:pointer}
+.btn:active{transform:translateY(3px);box-shadow:0 3px 0 #0d7a66}
+.btn.alt{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.3);box-shadow:none;font-size:16px;padding:12px}
+.ib{min-width:46px;height:42px;padding:0 12px;border-radius:13px;border:2px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#fff;font:inherit;font-size:17px;font-weight:800;cursor:pointer}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.scr{display:none}.scr.show{display:block}
+.ov{position:fixed;inset:0;background:rgba(10,5,30,.82);display:none;align-items:center;justify-content:center;z-index:30;padding:16px}.ov.show{display:flex}
+.ovc{width:100%;max-width:380px;background:linear-gradient(160deg,#2c1b6a,#1a1038);border:2px solid rgba(255,255,255,.2);border-radius:26px;padding:22px;text-align:center}
+.ovc h2{margin:0 0 6px;font-size:30px}
+body{overflow:hidden;position:fixed;inset:0;width:100%;background:#0d0826}
+#cv{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);display:block;touch-action:none}
+#hud{position:fixed;left:0;right:0;top:0;pointer-events:none;z-index:8;display:none}
+#bar{margin:max(8px,env(safe-area-inset-top)) auto 0;width:max-content;display:flex;gap:14px;align-items:center;background:rgba(10,6,30,.72);border-radius:14px;padding:6px 18px;font-weight:900;direction:ltr}
+#bar .sc{font-size:30px;min-width:30px;text-align:center}#tm{font-size:19px}#n0,#n1{font-size:13px;max-width:110px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+#pw{position:fixed;z-index:11;top:60px;right:8px;display:none;flex-direction:column;gap:7px}
+#pw button{position:relative;width:46px;height:46px;border-radius:50%;border:2px solid rgba(255,255,255,.5);background:rgba(20,12,60,.65);color:#fff;font-size:22px;touch-action:none}
+#pw button i{position:absolute;right:-3px;bottom:-3px;min-width:18px;height:18px;border-radius:9px;background:#ff9f2e;color:#1b0f00;font-size:11px;font-style:normal;font-weight:900;line-height:18px}#pw button:disabled{opacity:.35}
+#tp{position:fixed;left:0;right:0;bottom:max(8px,env(safe-area-inset-bottom));display:none;justify-content:space-between;align-items:flex-end;padding:0 12px;z-index:5;pointer-events:none;direction:ltr}
+#tp .g{display:flex;gap:8px;align-items:flex-end}#tp button{pointer-events:auto;width:64px;height:64px;border-radius:50%;border:3px solid rgba(255,255,255,.5);background:rgba(20,12,60,.55);color:#fff;font-size:24px;font-weight:900;touch-action:none}
+#tp button.big{width:82px;height:82px;background:rgba(242,106,27,.6);font-size:32px}#tp button.on{background:rgba(255,160,40,.85)}
+#rot{position:fixed;inset:0;background:#120a2c;z-index:50;display:none;align-items:center;justify-content:center;text-align:center;font-size:24px;font-weight:800;padding:20px}
+@media (orientation:portrait) and (pointer:coarse){#rot{display:flex}}
+.ov{overflow:auto;align-items:flex-start}.ovc{margin:auto}
+.g5{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;text-align:center}
+.tc{border:2px solid rgba(255,255,255,.2);border-radius:14px;padding:8px 4px;background:rgba(255,255,255,.07);color:#fff;font:inherit;cursor:pointer}.tc .fl{font-size:30px;line-height:1.1}.tc b{display:block;font-size:14px}.tc small{opacity:.8;font-size:11px}
+.pc{border:2px solid rgba(255,255,255,.2);border-radius:14px;padding:8px 6px;background:rgba(255,255,255,.07);color:#fff;font:inherit;cursor:pointer;text-align:center}.pc b{display:block;font-size:14px}.pc small{display:block;opacity:.85;font-size:12px;margin-top:3px}
+.shopr{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.08);border-radius:16px;padding:10px 12px;margin:8px 0;text-align:start}.shopr .em{font-size:32px}.shopr .nm{flex:1;line-height:1.35}.shopr .nm small{opacity:.8}
+.shopr button{border:0;border-radius:12px;padding:10px 14px;font:inherit;font-weight:900;background:#1fc9a6;color:#06322b;cursor:pointer}.shopr button:disabled{opacity:.4}
+</style>
+</head>
+<body>
+<canvas id="cv"></canvas>
+<div id="hud"><div id="bar"><span id="n0"></span><span id="s0" class="sc">0</span><span id="tm">1:30</span><span id="s1" class="sc">0</span><span id="n1"></span></div></div>
+<button class="ib" id="pauseB" style="position:fixed;top:max(8px,env(safe-area-inset-top));right:8px;z-index:12;display:none">⏸</button>
+<div id="pw"><button id="pF">❄️<i>0</i></button><button id="pK">🔥<i>0</i></button><button id="pT">⚡<i>0</i></button><button id="pG">🥅<i>0</i></button></div>
+<div id="tp"><div class="g"><button id="tL">◀</button><button id="tR">▶</button></div><div class="g"><button id="tJ">⤒</button><button id="tK" class="big">⚽</button></div></div>
+<div id="rot">📱↔️<br>סובבו את הטלפון לרוחב</div>
+<div class="ov show" id="menu"><div class="ovc" style="max-width:460px">
+ <div style="font-size:60px;line-height:1">⚽🏟️</div><h2>כדורגל</h2><div style="opacity:.85;margin-bottom:8px;font-size:15px">20 נבחרות · 160 שחקנים · חנות כוחות · 1 על 1</div>
+ <button class="btn" id="go">🤖 נגד המחשב</button><button class="btn alt" id="go2">👥 שני שחקנים</button>
+ <div class="lb" style="text-align:start">הבחירה שלך</div><button class="chip" id="last" style="width:100%;font-size:17px"></button>
+ <div class="lb" style="text-align:start">רמה</div><div class="chips" id="cLv"><button class="chip" data-v="1">קל</button><button class="chip on" data-v="2">רגיל</button><button class="chip" data-v="3">קשה</button></div>
+ <button class="btn alt" id="shopB">🛒 חנות כוחות</button>
+ <div style="opacity:.75;font-size:12.5px;line-height:1.6;margin-top:8px"><b>A/D</b> או חצים: תנועה · <b>W</b>/↑/רווח: קפיצה · <b>F</b>: בעיטה · <b>1-4</b>: כוחות מהחנות<br>שניים: שחקן 2 עם חצים ו-L לבעיטה</div>
+</div></div>
+<div class="ov" id="teams"><div class="ovc" style="max-width:720px"><div style="display:flex;gap:8px;align-items:center;margin-bottom:8px"><button class="ib" id="tBack">→</button><h2 style="margin:0">בחרו נבחרת</h2></div><div id="tGrid" class="g5"></div></div></div>
+<div class="ov" id="players"><div class="ovc" style="max-width:640px"><div style="display:flex;gap:8px;align-items:center;margin-bottom:8px"><button class="ib" id="pBack">→</button><h2 style="margin:0" id="pTitle">בחרו שחקן</h2></div><div id="pGrid" class="g5 p"></div></div></div>
+<div class="ov" id="shop"><div class="ovc"><h2>🛒 חנות כוחות</h2><p style="font-size:14px;opacity:.85">מרוויחים 🪙 ו-💎 בכל משחק. בזמן משחק: <b>1</b> הקפאה · <b>2</b> בעיטת אש · <b>3</b> טורבו · <b>4</b> שער ענק</p><div style="font-weight:900;font-size:20px;margin:6px 0">🪙 <span id="shC">0</span> &nbsp; 💎 <span id="shD">0</span></div><div id="shopList"></div><button class="btn alt" id="shopX">סגור</button></div></div>
+<div class="ov" id="pause"><div class="ovc"><h2>⏸ הפסקה</h2><button class="btn" id="resume">▶ המשך</button><button class="btn alt" id="toMenu">תפריט</button></div></div>
+<div class="ov" id="end"><div class="ovc"><h2 id="eT">סיום</h2><div style="font-size:48px;font-weight:900;color:#ffd05a" id="eS"></div><p id="eM"></p><button class="btn" id="again">🔁 שוב</button><button class="btn alt" id="menu2">תפריט</button></div></div>
+<script>
+'use strict';
+const $=s=>document.querySelector(s);
+const store={get(k,d){try{const v=localStorage.getItem(k);return v===null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+let _ac=null;function tone(f,d=.1,t='triangle',v=.07){try{_ac=_ac||new (window.AudioContext||window.webkitAudioContext)();const o=_ac.createOscillator(),g=_ac.createGain();o.type=t;o.frequency.value=f;g.gain.value=v;o.connect(g);g.connect(_ac.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,_ac.currentTime+d);o.stop(_ac.currentTime+d+.02)}catch(e){}}
+
+const TEAMS=[
+['ארגנטינה','🇦🇷','#6cb4e8',[['ליאו מסי',94,'חלוץ'],['חוליאן אלברס',82,'חלוץ'],['לאוטרו מרטינס',85,'חלוץ'],['אנסו פרננדס',82,'קשר'],['אלכסיס מק אליסטר',83,'קשר'],['אמיליאנו מרטינס',87,'שוער'],['אנחל די מריה',84,'כנף'],['רודריגו דה פול',81,'קשר']]],
+['ברזיל','🇧🇷','#f2c500',[['וויניסיוס ג׳וניור',90,'כנף'],['ניימאר',87,'חלוץ'],['רודריגו',83,'חלוץ'],['רפיניה',84,'כנף'],['קזמירו',80,'קשר'],['מרקיניוס',84,'בלם'],['אליסון',88,'שוער'],['אנדריק',77,'חלוץ']]],
+['צרפת','🇫🇷','#1c3fa8',[['קיליאן אמבפה',93,'חלוץ'],['אנטואן גריזמן',87,'חלוץ'],['אוסמן דמבלה',85,'כנף'],['אורליין צ׳ואמני',84,'קשר'],['אדוארדו קמבינגה',83,'קשר'],['וויליאם סאליבה',86,'בלם'],['מייק מנייאן',87,'שוער'],['מרקוס תוראם',82,'חלוץ']]],
+['אנגליה','🏴󠁧󠁢󠁥󠁮󠁧󠁿','#f4f4f4',[['הארי קין',90,'חלוץ'],['ג׳וד בלינגהאם',89,'קשר'],['בוקאיו סאקה',86,'כנף'],['פיל פודן',87,'קשר'],['דקלן רייס',86,'קשר'],['קייל ווקר',82,'מגן'],['ג׳ורדן פיקפורד',82,'שוער'],['קול פאלמר',85,'קשר']]],
+['ספרד','🇪🇸','#d62c2c',[['לאמין ימאל',88,'כנף'],['פדרי',87,'קשר'],['רודרי',91,'קשר'],['ניקו וויליאמס',84,'כנף'],['אלברו מורטה',80,'חלוץ'],['גאבי',82,'קשר'],['דני קרבחאל',85,'מגן'],['אונאי סימון',84,'שוער']]],
+['גרמניה','🇩🇪','#e8e8e8',[['ג׳מאל מוסיאלה',87,'קשר'],['פלוריאן וירץ',88,'קשר'],['קאי האברץ',83,'חלוץ'],['טוני קרוס',87,'קשר'],['אילקאי גינדואן',83,'קשר'],['מנואל נוייר',86,'שוער'],['אנטוניו רודיגר',84,'בלם'],['לרוי סאנה',83,'כנף']]],
+['פורטוגל','🇵🇹','#b3123a',[['כריסטיאנו רונאלדו',88,'חלוץ'],['ברונו פרננדש',87,'קשר'],['ברנרדו סילבה',87,'קשר'],['רפאל לאאו',85,'כנף'],['ז׳ואאו פליקס',82,'חלוץ'],['רובן דיאש',87,'בלם'],['דיוגו קוסטה',84,'שוער'],['ויטיניה',84,'קשר']]],
+['הולנד','🇳🇱','#ff7a1a',[['וירג׳יל ואן דייק',88,'בלם'],['פרנקי דה יונג',85,'קשר'],['קודי גקפו',83,'כנף'],['ממפיס דפאי',79,'חלוץ'],['שאבי סימונס',82,'קשר'],['דנזל דומפריס',80,'מגן'],['טיין קופמיינרס',81,'קשר'],['ריינדרס',81,'קשר']]],
+['איטליה','🇮🇹','#2a6fd6',[['ג׳אנלואיג׳י דונארומה',88,'שוער'],['ניקולו ברלה',85,'קשר'],['פדריקו קיאזה',80,'כנף'],['מאטאו רטגי',77,'חלוץ'],['אלסנדרו בסטוני',85,'בלם'],['מנואל לוקאטלי',80,'קשר'],['סנדרו טונאלי',82,'קשר'],['פדריקו דימארקו',82,'מגן']]],
+['בלגיה','🇧🇪','#d62828',[['קווין דה בראונה',90,'קשר'],['רומלו לוקאקו',83,'חלוץ'],['טיבו קורטואה',89,'שוער'],['ז׳רמי דוקו',82,'כנף'],['יורי טילמנס',82,'קשר'],['לאנדרו טרוסארד',82,'כנף'],['אנדרה אונאנה',80,'קשר'],['לואיס אופנדה',80,'חלוץ']]],
+['קרואטיה','🇭🇷','#d62828',[['לוקה מודריץ׳',86,'קשר'],['מטאו קובאצ׳יץ׳',83,'קשר'],['יושקו גוורדיול',84,'בלם'],['איבן פריצ׳יץ׳',80,'כנף'],['אנדריי קרמריץ׳',78,'חלוץ'],['דומיניק ליבקוביץ׳',80,'שוער'],['מרצלו ברוזוביץ׳',79,'קשר'],['מריו פשאליץ׳',78,'קשר']]],
+['אורוגוואי','🇺🇾','#6cb4e8',[['פדריקו ולברדה',88,'קשר'],['דרווין נוניס',82,'חלוץ'],['רונלד אראוחו',84,'בלם'],['רודריגו בנטנקור',81,'קשר'],['לואיס סוארס',80,'חלוץ'],['ז׳ורז׳יאן דה ארסקאייטה',81,'קשר'],['חוסה חימנס',83,'בלם'],['סרחיו רושט',78,'שוער']]],
+['מרוקו','🇲🇦','#c1272d',[['אשרף חכימי',85,'מגן'],['חכים זיאש',80,'כנף'],['יוסף אן-נסירי',79,'חלוץ'],['סופיאן אמרבאט',80,'קשר'],['יאסין בונו',83,'שוער'],['בראהים דיאס',82,'כנף'],['עזדין אונאחי',78,'קשר'],['נוסייר מזראווי',79,'מגן']]],
+['יפן','🇯🇵','#2a4fbf',[['טאקפוסה קובו',82,'כנף'],['קאורו מיטומה',80,'כנף'],['טאקומי מינאמינו',79,'כנף'],['טאקהירו טומיאסו',80,'בלם'],['ואטארו אנדו',79,'קשר'],['ריצו דואן',78,'קשר'],['דייצ׳י קמאדה',78,'קשר'],['זיון סוזוקי',76,'שוער']]],
+['דרום קוריאה','🇰🇷','#d62828',[['סון הונג-מין',87,'כנף'],['לי קאנג-אין',80,'קשר'],['קים מין-ג׳ה',85,'בלם'],['הוואנג הי-צ׳אן',80,'חלוץ'],['צ׳ו גיו-סונג',76,'חלוץ'],['הוואנג אין-בום',78,'קשר'],['לי ג׳ה-סונג',78,'קשר'],['קים סונג-ג׳יו',77,'שוער']]],
+['נורווגיה','🇳🇴','#c8102e',[['ארלינג האלנד',92,'חלוץ'],['מרטין אודגור',88,'קשר'],['אלכסנדר סורלות׳',80,'חלוץ'],['אנטוניו נוסה',77,'כנף'],['סנדר ברגה',80,'קשר'],['ג׳וליאן ריירסון',77,'מגן'],['קריסטיאן אסגורד',74,'בלם'],['לאו סקירי אוסטיגורד',75,'בלם']]],
+['מצרים','🇪🇬','#c8102e',[['מוחמד סלאח',89,'כנף'],['עומר מרמוש',82,'חלוץ'],['מחמוד טרזגה',77,'כנף'],['מוחמד אלנני',75,'קשר'],['מוסטפא מוחמד',74,'חלוץ'],['מוחמד שנאווי',76,'שוער'],['אחמד חגאזי',74,'בלם'],['זיזו',77,'כנף']]],
+['ניגריה','🇳🇬','#1b9a4a',[['ויקטור אוסימהן',87,'חלוץ'],['אדמולה לוקמן',84,'כנף'],['אלכס איווובי',79,'כנף'],['ווילפרד נדידי',81,'קשר'],['סמואל צ׳וקוזה',78,'כנף'],['קלמנטס בוניפייס',78,'חלוץ'],['ויליאם טרוסט-אקונג',78,'בלם'],['סטנלי נוואבאלי',76,'שוער']]],
+['ארצות הברית','🇺🇸','#2a3f8f',[['כריסטיאן פוליסיץ׳',82,'כנף'],['וסטון מקני',79,'קשר'],['טים וויה',76,'חלוץ'],['טיילר אדמס',77,'קשר'],['ג׳ובאני ריינה',78,'קשר'],['מאט טרנר',76,'שוער'],['סרחיניו דסט',76,'מגן'],['פולארין באלוגון',76,'חלוץ']]],
+['ישראל','🇮🇱','#2f7bff',[['מנור סולומון',76,'כנף'],['ערן זהבי',74,'חלוץ'],['דור פרץ',72,'קשר'],['אוסקר גלוך',74,'קשר'],['מוחמד אבו פאני',72,'קשר'],['ליאל אבדה',72,'כנף'],['עומרי גלייזר',70,'שוער'],['דולב חזיזה',70,'קשר']]]];
+const COLS=['#e8433f','#2f7bff','#27b36a','#f2b400'];
+const PW={freeze:{e:'❄️',n:'הקפאה',d:'מקפיא את היריב ל-2.5 שניות',c:40,d$:0,k:'pF'},fire:{e:'🔥',n:'בעיטת אש',d:'הבעיטה הבאה חזקה בהרבה',c:40,d$:0,k:'pK'},turbo:{e:'⚡',n:'טורבו',d:'מהירות ×1.5 ל-6 שניות',c:30,d$:0,k:'pT'},giant:{e:'🥅',n:'שער ענק',d:'מגדיל את השער של היריב ל-8 שניות',c:0,d$:2,k:'pG'}};
+const LV={1:{sp:.72,react:18,jump:.5},2:{sp:.88,react:10,jump:.75},3:{sp:1.02,react:4,jump:1}};
+const W=800,H=450,GY=392,RB=15,GW=52,CROSS=GY-150;
+const cv=$('#cv'),ctx=cv.getContext('2d');
+let level=+store.get('fb_lv',2),teamIdx=+store.get('fb_team',0),plIdx=+store.get('fb_pl',0),mode='cpu',state='menu',paused=false,over=false;
+let P=[],ball,score=[0,0],clock=0,frame=0,scoreT=0,lastScorer=0,flashT=0,shakeT=0,pops=[],parts=[],tinfo=[],camx=0,goalH=[150,150],gT=[0,0],touchOn=false;
+const keys={},touch={l:0,r:0,j:0,k:0};
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),rnd=(a,b)=>a+Math.random()*(b-a);
+function resize(){const s=Math.min(innerWidth/W,innerHeight/H),d=Math.min(devicePixelRatio||1,2);cv.style.width=Math.floor(W*s)+'px';cv.style.height=Math.floor(H*s)+'px';cv.width=Math.floor(W*s*d);cv.height=Math.floor(H*s*d);ctx.setTransform(s*d,0,0,s*d,0,0)}
+addEventListener('resize',resize);resize();
+/* ---------- menus ---------- */
+function mk(t,c,x){const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
+function stats(r,pos){const base=(r-70)/30;const spd=clamp(.92+base*.2+(pos==='כנף'?.05:0),.8,1.2),shot=clamp(.9+base*.3+(pos==='חלוץ'?.08:0),.8,1.25),jmp=clamp(.95+base*.12+(pos==='שוער'||pos==='בלם'?.08:0),.85,1.2);return{spd,shot,jmp}}
+function dots(v,lo,hi){const n=Math.max(1,Math.min(5,Math.round((v-lo)/(hi-lo)*4)+1));return '●'.repeat(n)+'○'.repeat(5-n)}
+function paintLast(){const t=TEAMS[teamIdx],p=t[3][plIdx];$('#last').textContent=t[1]+' '+t[0]+' · '+p[0]}
+function openTeams(){const g=$('#tGrid');g.innerHTML='';TEAMS.forEach((t,i)=>{const b=mk('button','tc');b.style.borderColor=t[2];b.append(mk('div','fl',t[1]),mk('b','',t[0]));b.onclick=()=>{teamIdx=i;openPlayers()};g.appendChild(b)});$('#menu').classList.remove('show');$('#players').classList.remove('show');$('#teams').classList.add('show')}
+function openPlayers(){const t=TEAMS[teamIdx];$('#pTitle').textContent=t[1]+' '+t[0];const g=$('#pGrid');g.innerHTML='';t[3].forEach((p,i)=>{const s=stats(p[1],p[2]),b=mk('button','pc');b.append(mk('b','',p[0]),mk('small','',p[2]),mk('small','','⚡ '+dots(s.spd,.8,1.2)),mk('small','','🎯 '+dots(s.shot,.8,1.25)),mk('small','','🦘 '+dots(s.jmp,.85,1.2)));
+  b.onclick=()=>{plIdx=i;store.set('fb_team',teamIdx);store.set('fb_pl',i);paintLast();$('#players').classList.remove('show');$('#menu').classList.add('show')};g.appendChild(b)});$('#teams').classList.remove('show');$('#players').classList.add('show')}
+$('#last').onclick=openTeams;$('#tBack').onclick=()=>{$('#teams').classList.remove('show');$('#menu').classList.add('show')};$('#pBack').onclick=openTeams;paintLast();
+[...$('#cLv').children].forEach(c=>{c.classList.toggle('on',+c.dataset.v===level);c.onclick=()=>{level=+c.dataset.v;store.set('fb_lv',level);[...$('#cLv').children].forEach(k=>k.classList.toggle('on',k===c))}});
+function pwGet(){try{const o=JSON.parse(store.get('fb_pw','{}'));return{freeze:o.freeze|0,fire:o.fire|0,turbo:o.turbo|0,giant:o.giant|0}}catch(e){return{freeze:0,fire:0,turbo:0,giant:0}}}
+function pwSet(o){store.set('fb_pw',JSON.stringify(o))}
+function shopPaint(){const o=pwGet();$('#shC').textContent=window.AG?AG.coins():0;$('#shD').textContent=window.AG?AG.diamonds():0;const L=$('#shopList');L.innerHTML='';
+  Object.keys(PW).forEach(k=>{const p=PW[k],r=mk('div','shopr');r.innerHTML='<div class="em">'+p.e+'</div><div class="nm"><b>'+p.n+'</b> · יש לך '+o[k]+'<br><small>'+p.d+'</small></div>';
+    const b=mk('button','',p.d$?p.d$+' 💎':p.c+' 🪙');b.disabled=!window.AG||AG.coins()<p.c||AG.diamonds()<p.d$;b.onclick=()=>{if(AG.spend(p.c,p.d$)){const q=pwGet();q[k]++;pwSet(q);tone(800,.1);shopPaint()}};r.appendChild(b);L.appendChild(r)})}
+$('#shopB').onclick=()=>{shopPaint();$('#shop').classList.add('show')};$('#shopX').onclick=()=>$('#shop').classList.remove('show');
+function pwPaint(){const o=pwGet(),on=mode==='cpu'&&state==='play'||mode==='cpu'&&state==='scored';$('#pw').style.display=on?'flex':'none';for(const k in PW){const b=$('#'+PW[k].k);b.querySelector('i').textContent=o[k];b.disabled=!o[k]}}
+/* ---------- game ---------- */
+function mkP(t,x,info,hum,col){const s=stats(info[1],info[2]);return{t,x,y:GY,vx:0,vy:0,face:t?-1:1,hum,name:info[0],spd:s.spd,shot:s.shot,jmp:s.jmp,kick:0,hit:false,frz:0,turbo:0,fire:false,anim:0,col,skin:['#f0c8a0','#d9a577','#a86f45','#7a4a2a'][Math.floor(Math.random()*4)],hair:['#2a1a10','#111','#6a4a20','#d8b050'][Math.floor(Math.random()*4)],c:{l:0,r:0,j:0,k:0},pc:{l:0,r:0,j:0,k:0},aiT:0}}
+function begin(m){mode=m;['menu','teams','players','end','pause','shop'].forEach(i=>$('#'+i).classList.remove('show'));
+  const me=TEAMS[teamIdx],others=TEAMS.map((_,i)=>i).filter(i=>i!==teamIdx),oi=others[Math.floor(Math.random()*others.length)],ot=TEAMS[oi];
+  const top=ot[3].slice().sort((a,b)=>b[1]-a[1]).slice(0,level===3?2:5),oppInfo=top[Math.floor(Math.random()*top.length)];
+  tinfo=[me,ot];P=[mkP(0,170,me[3][plIdx],true,me[2]),mkP(1,630,oppInfo,m==='2p',ot[2]===me[2]?'#222':ot[2])];
+  ball={x:W/2,y:200,vx:0,vy:0,fire:false};score=[0,0];clock=90*60;over=false;frame=0;goalH=[150,150];gT=[0,0];pops=[];parts=[];
+  state='play';paused=false;$('#hud').style.display='block';$('#n0').textContent=me[1]+' '+P[0].name;$('#n1').textContent=ot[1]+' '+P[1].name;$('#pauseB').style.display='block';
+  touchOn=matchMedia('(pointer:coarse)').matches&&m==='cpu';$('#tp').style.display=touchOn?'flex':'none';pwPaint();pop('יאללה!',W/2,150,'#fff',80)}
+$('#go').onclick=()=>begin('cpu');$('#go2').onclick=()=>begin('2p');$('#again').onclick=()=>begin(mode);
+function pop(text,x,y,c='#fff',life=60){pops.push({text,x,y,t:life,life,c})}
+function burst(x,y,col,n=18,sp=6){for(let i=0;i<n;i++){const a=Math.random()*7,s=rnd(1,sp);parts.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-2,life:rnd(25,55),t:0,col,sz:rnd(2,5)})}}
+const KM=[{l:['KeyA'],r:['KeyD'],j:['KeyW','Space'],k:['KeyF']},{l:['ArrowLeft'],r:['ArrowRight'],j:['ArrowUp'],k:['KeyL']}];
+function readKeys(p){Object.assign(p.pc,p.c);const maps=mode==='2p'?[KM[p.t]]:KM,h=k=>maps.some(m=>m[k].some(c=>keys[c]))?1:0;p.c.l=h('l')|(mode==='cpu'&&touch.l);p.c.r=h('r')|(mode==='cpu'&&touch.r);p.c.j=h('j')|(mode==='cpu'&&touch.j);p.c.k=h('k')|(mode==='cpu'&&touch.k)}
+addEventListener('keydown',e=>{keys[e.code]=1;if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();if(e.code==='Escape'||e.code==='KeyP')togglePause();if(mode==='cpu'&&state==='play'){if(e.code==='Digit1')usePw('freeze');if(e.code==='Digit2')usePw('fire');if(e.code==='Digit3')usePw('turbo');if(e.code==='Digit4')usePw('giant')}});
+addEventListener('keyup',e=>{keys[e.code]=0});
+for(const [id,k] of [['#tL','l'],['#tR','r'],['#tJ','j'],['#tK','k']]){const b=$(id),on=e=>{e.preventDefault();touch[k]=1;b.classList.add('on')},off=e=>{e.preventDefault();touch[k]=0;b.classList.remove('on')};b.addEventListener('pointerdown',on);b.addEventListener('pointerup',off);b.addEventListener('pointerleave',off);b.addEventListener('pointercancel',off)}
+for(const k in PW){$('#'+PW[k].k).onclick=()=>usePw(k)}
+function usePw(k){if(mode!=='cpu'||state!=='play'||paused)return;const o=pwGet();if(!o[k])return;const me=P[0],op=P[1];
+  if(k==='freeze'){op.frz=150;pop('❄️ הקפאה!',op.x,op.y-120,'#9fe8ff',70);burst(op.x,op.y-60,'#bff2ff',24)}
+  else if(k==='fire'){me.fire=true;pop('🔥 בעיטת אש',me.x,me.y-120,'#ffb03a',70)}
+  else if(k==='turbo'){me.turbo=360;pop('⚡ טורבו!',me.x,me.y-120,'#ffe27a',70)}
+  else if(k==='giant'){gT[1]=480;pop('🥅 שער ענק!',W-160,200,'#c58bff',80)}
+  o[k]--;pwSet(o);pwPaint();tone(700,.1)}
+function ai(p){const o=P[1-p.t],c=p.c,L=LV[level];Object.assign(p.pc,c);c.l=c.r=c.j=c.k=0;const own=p.t?W:0,tg=p.t?0:W,fwd=p.t?-1:1;
+  const bAhead=(ball.x-p.x)*fwd>-10;
+  let tx=bAhead?ball.x-fwd*34:own+fwd*(p.t?-150:150)*-1;
+  if(!bAhead||Math.abs(ball.x-own)<220&&Math.abs(ball.vx)>3)tx=clamp(ball.x,own>W/2?W-200:70,own>W/2?W-70:200);
+  const dx=tx-p.x;if(Math.abs(dx)>12){if(dx>0)c.r=1;else c.l=1}
+  const fx=p.x+p.face*46,fy=p.y-20;if(Math.hypot(ball.x-fx,ball.y-fy)<62&&p.aiT<=0&&bAhead){c.k=1;p.aiT=L.react+12}
+  if(p.aiT>0)p.aiT--;
+  if(ball.y<p.y-110&&Math.abs(ball.x-p.x)<90&&Math.random()<.25*L.jump*3)c.j=1;
+  if(Math.abs(ball.x-p.x)<60&&ball.y>p.y-60&&Math.random()<.02*L.jump)c.j=1}
+function stepP(p){const c=p.c,pc=p.pc,L=p.hum?{sp:1}:LV[level];if(p.frz>0){p.frz--;c.l=c.r=c.j=c.k=0}if(p.turbo>0)p.turbo--;
+  const sp=(p.hum?5.2:4.6*L.sp)*p.spd*(p.turbo>0?1.5:1);const dir=(c.r?1:0)-(c.l?1:0);if(dir)p.face=dir;p.vx+=(dir*sp-p.vx)*.3;
+  if(c.j&&p.y>=GY){p.vy=-11.6*p.jmp;tone(380,.05)}p.vy+=.55;p.x=clamp(p.x+p.vx,30,W-30);p.y+=p.vy;if(p.y>=GY){p.y=GY;p.vy=0}
+  p.anim+=Math.abs(p.vx)*.05;
+  if(c.k&&!pc.k&&p.kick<=0){p.kick=15;p.hit=false}if(p.kick>0){p.kick--;const fx=p.x+p.face*46,fy=p.y-20,d=Math.hypot(ball.x-fx,ball.y-fy);if(!p.hit&&d<RB+30){p.hit=true;let pw=13*p.shot,vy=-8.5;if(p.fire){pw=26;vy=-5;ball.fire=true;p.fire=false;shakeT=8}ball.vx=p.face*pw+p.vx*.4;ball.vy=vy-(p.y<GY?2:0);tone(260,.1,'triangle',.08);burst(ball.x,ball.y,'#fff',8,4)}}
+  // body vs ball
+  const bx=p.x,by=p.y-58,R=36,dx=ball.x-bx,dy=ball.y-by,d=Math.hypot(dx,dy);if(d<R+RB&&d>.01){const nx=dx/d,ny=dy/d;ball.x=bx+nx*(R+RB);ball.y=by+ny*(R+RB);const rv=(ball.vx-p.vx)*nx+(ball.vy-p.vy)*ny;if(rv<0){ball.vx-=1.8*rv*nx;ball.vy-=1.8*rv*ny;ball.vx+=p.vx*.3;tone(200,.04,'sine',.05)}}}
+function goalAt(t){if(state!=='play')return;score[t]++;lastScorer=t;state='scored';scoreT=110;flashT=8;shakeT=14;const gx=t?30:W-30;pop(ball.fire?'גול אש! 🔥':'גוווול!',W/2,170,'#ffd05a',90);burst(gx,CROSS+60,'#ffd05a',50,9);for(let i=0;i<40;i++)parts.push({x:W/2,y:100,vx:rnd(-6,6),vy:rnd(-3,5),life:70,t:0,col:['#ff5a6e','#ffd05a','#5ff7d6','#a78bff'][i%4],sz:rnd(3,6)});tone(660,.12);tone(880,.25)}
+function stepBall(){const b=ball;b.vy+=.34;b.vx*=.9985;b.x+=b.vx;b.y+=b.vy;if(b.fire&&frame%2===0)burst(b.x,b.y,'#ff8a1a',1,1.5);
+  if(b.y>GY-RB){b.y=GY-RB;if(b.vy>2.2)b.vy*=-.72;else b.vy=0;b.vx*=.97;if(Math.abs(b.vy)<1&&Math.abs(b.vx)<6)b.fire=false}
+  if(b.y<RB){b.y=RB;b.vy=Math.abs(b.vy)*.6}
+  const h0=goalH[0],h1=goalH[1],top0=GY-h0,top1=GY-h1;
+  // goals
+  if(b.x<GW-RB&&b.y>top0&&state==='play'){goalAt(1)}if(b.x>W-GW+RB&&b.y>top1&&state==='play'){goalAt(0)}
+  // crossbar (left/right)
+  for(const [side,top] of [[0,top0],[1,top1]]){const inx=side?b.x>W-GW-RB:b.x<GW+RB;if(inx&&Math.abs(b.y-top)<RB+6&&state==='play'){if(b.y<top){b.y=top-RB-6;b.vy=-Math.abs(b.vy)*.6}else{b.y=top+RB+6;b.vy=Math.abs(b.vy)*.5}tone(220,.05,'square',.06)}}
+  if(b.x<RB){b.x=RB;b.vx=Math.abs(b.vx)*.6}if(b.x>W-RB){b.x=W-RB;b.vx=-Math.abs(b.vx)*.6}
+  if(Math.abs(b.vx)<.05&&b.y>=GY-RB-1&&frame%300===0)b.vx+=rnd(-.3,.3)}
+function step(){if(paused||state==='menu'||state==='over')return;frame++;
+  for(const p of P){if(p.hum)readKeys(p);else ai(p)}
+  if(state==='scored')for(const p of P){p.c.l=p.c.r=p.c.j=p.c.k=0}
+  for(const p of P)stepP(p);
+  const a=P[0],b=P[1];if(Math.abs(a.x-b.x)<50&&Math.abs(a.y-b.y)<80){const push=(50-Math.abs(a.x-b.x))/2,s=a.x<b.x?-1:1;a.x=clamp(a.x+s*push,30,W-30);b.x=clamp(b.x-s*push,30,W-30)}
+  stepBall();
+  if(state==='play'){clock--;if(clock<=0){if(score[0]!==score[1])finish();else{clock=1;pop('הארכה! הגול הבא מנצח',W/2,150,'#ffd05a',100)}}if(clock<=1&&score[0]!==score[1]&&frame%2===0)finish();
+    for(let t=0;t<2;t++){if(gT[t]>0){gT[t]--;goalH[t]=Math.min(260,goalH[t]+3)}else goalH[t]=Math.max(150,goalH[t]-2)}}
+  else if(state==='scored'){if(--scoreT<=0&&!over){state='play';P[0].x=170;P[1].x=630;P.forEach(p=>{p.y=GY;p.vx=p.vy=0;p.kick=0});ball.x=W/2;ball.y=180;ball.vx=lastScorer?-1:1;ball.vy=0;ball.fire=false}}
+  for(const q of parts){q.t++;q.x+=q.vx;q.y+=q.vy;q.vy+=.2}parts=parts.filter(q=>q.t<q.life);for(const q of pops)q.t--;pops=pops.filter(q=>q.t>0);if(shakeT>0)shakeT--;if(flashT>0)flashT--}
+function finish(){if(over)return;over=true;state='over';$('#pauseB').style.display='none';$('#tp').style.display='none';$('#pw').style.display='none';tone(300,.4,'sawtooth');const w=score[0]>score[1]?0:1;
+  setTimeout(()=>{let title,msg='';if(mode==='2p'){title=(w?'שחקן 2':'שחקן 1')+' ניצח!'}else{title=w===0?'ניצחת! 🏆':'הפסדת הפעם';if(window.AG){const c=10+score[0]*6+(w===0?25:0),d=w===0&&level===3?1:0;AG.add(c,d);msg='קיבלת +'+c+' 🪙'+(d?' ו-+1 💎':'')}}
+    $('#eT').textContent=title;$('#eS').textContent=score[0]+' : '+score[1];$('#eM').textContent=msg;$('#hud').style.display='none';$('#end').classList.add('show')},900)}
+/* ---------- drawing ---------- */
+function drawGoal(side,h){const x=side?W-GW:0,top=GY-h;ctx.fillStyle='rgba(255,255,255,.12)';ctx.fillRect(x,top,GW,h);ctx.strokeStyle='rgba(255,255,255,.55)';ctx.lineWidth=1;for(let i=0;i<=GW;i+=9){ctx.beginPath();ctx.moveTo(x+i,top);ctx.lineTo(x+i,GY);ctx.stroke()}for(let y=top;y<GY;y+=12){ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+GW,y);ctx.stroke()}
+  ctx.fillStyle='#fff';ctx.fillRect(side?W-GW:0,top-5,GW,7);ctx.fillRect(side?W-GW-4:GW-2,top-5,6,h+5)}
+function drawP(p){const x=p.x,y=p.y,f=p.face;ctx.save();ctx.translate(x,y);
+  ctx.fillStyle='rgba(0,0,0,.25)';ctx.beginPath();ctx.ellipse(0,2,26,6,0,0,7);ctx.fill();
+  const run=Math.abs(p.vx)>.5&&p.y>=GY,sw=run?Math.sin(p.anim*3)*12:0,air=p.y<GY;ctx.scale(f,1);
+  ctx.lineCap='round';ctx.strokeStyle='#222';ctx.lineWidth=8;ctx.beginPath();ctx.moveTo(-8,-24);ctx.lineTo(-8+sw,-4-(air?8:0));ctx.moveTo(8,-24);ctx.lineTo(8-sw,-4);
+  // kicking leg
+  if(p.kick>0){const k=1-p.kick/15,a=-1.2+Math.sin(k*Math.PI)*1.6;ctx.moveTo(8,-24);ctx.lineTo(8+Math.cos(a)*34,-24-Math.sin(a)*22*-1+8)}ctx.stroke();
+  ctx.fillStyle='#fff';ctx.fillRect(-14+sw,-8,16,7);ctx.fillRect(0-sw,-8,16,7);
+  ctx.fillStyle=p.col;ctx.beginPath();ctx.roundRect?ctx.roundRect(-18,-60,36,40,10):ctx.rect(-18,-60,36,40);ctx.fill();ctx.fillStyle='rgba(255,255,255,.85)';ctx.fillRect(-4,-52,8,12);
+  ctx.fillStyle=p.skin;ctx.beginPath();ctx.arc(2,-78,24,0,7);ctx.fill();ctx.fillStyle=p.hair;ctx.beginPath();ctx.arc(0,-82,24,Math.PI*1.05,Math.PI*1.95);ctx.fill();ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(11,-80,6,0,7);ctx.fill();ctx.fillStyle='#111';ctx.beginPath();ctx.arc(13,-80,3,0,7);ctx.fill();ctx.fillStyle='#b5523a';ctx.fillRect(10,-68,9,3);
+  if(p.frz>0){ctx.fillStyle='rgba(150,230,255,.55)';ctx.fillRect(-28,-106,56,112);ctx.strokeStyle='#e8fbff';ctx.lineWidth=2;ctx.strokeRect(-28,-106,56,112)}
+  if(p.fire||p.turbo>0){ctx.globalAlpha=.3;ctx.fillStyle=p.fire?'#ff8a1a':'#ffe27a';ctx.beginPath();ctx.arc(0,-50,44,0,7);ctx.fill();ctx.globalAlpha=1}
+  ctx.restore()}
+function draw(){const sx=shakeT>0?rnd(-shakeT,shakeT)*.4:0;ctx.save();ctx.translate(sx,0);
+  const g=ctx.createLinearGradient(0,0,0,GY);g.addColorStop(0,'#2c7be0');g.addColorStop(1,'#bfe3ff');ctx.fillStyle=g;ctx.fillRect(-10,0,W+20,H);
+  ctx.fillStyle='#ffe9a8';ctx.beginPath();ctx.arc(660,70,34,0,7);ctx.fill();ctx.fillStyle='rgba(255,255,255,.75)';for(let i=0;i<5;i++){const x=((i*210-frame*.12)%(W+260)+W+260)%(W+260)-130;ctx.beginPath();ctx.ellipse(x,60+i*18%70,56,15,0,0,7);ctx.ellipse(x+28,50+i*18%70,36,12,0,0,7);ctx.fill()}
+  // stands
+  ctx.fillStyle='#3a3f6b';ctx.fillRect(-10,200,W+20,GY-200);for(let r=0;r<4;r++){for(let i=0;i<40;i++){ctx.fillStyle=['#e8433f','#2f7bff','#f2b400','#fff','#27b36a'][(i+r*2)%5];ctx.globalAlpha=.85;ctx.fillRect(i*21+(r%2)*8,210+r*40+Math.sin(frame*.05+i)*(i%3===0?2:0),14,16);ctx.beginPath();ctx.arc(i*21+(r%2)*8+7,204+r*40,6,0,7);ctx.fill()}}ctx.globalAlpha=1;
+  // pitch
+  ctx.fillStyle='#37a84e';ctx.fillRect(-10,GY,W+20,H-GY);for(let i=0;i<18;i++){if(i%2){ctx.fillStyle='#2f9a46';ctx.fillRect(i*48-10,GY,48,H-GY)}}ctx.fillStyle='#fff';ctx.fillRect(-10,GY,W+20,3);ctx.fillRect(W/2-2,GY,4,H-GY);
+  drawGoal(0,goalH[0]);drawGoal(1,goalH[1]);
+  [...P].sort((a,b)=>a.y-b.y).forEach(drawP);
+  // ball
+  if(ball.fire){ctx.fillStyle='rgba(255,140,20,.5)';ctx.beginPath();ctx.arc(ball.x,ball.y,26,0,7);ctx.fill()}
+  ctx.fillStyle='rgba(0,0,0,.25)';ctx.beginPath();ctx.ellipse(ball.x,GY+4,RB*(1-Math.min(.6,(GY-ball.y)/400)),4,0,0,7);ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(ball.x,ball.y,RB,0,7);ctx.fill();ctx.strokeStyle='#222';ctx.lineWidth=1.5;ctx.stroke();ctx.fillStyle='#222';for(let i=0;i<5;i++){const a=i*1.2566+ball.x*.05;ctx.beginPath();ctx.arc(ball.x+Math.cos(a)*7,ball.y+Math.sin(a)*7,2.6,0,7);ctx.fill()}ctx.beginPath();ctx.arc(ball.x,ball.y,3.4,0,7);ctx.fill();
+  for(const q of parts){ctx.globalAlpha=1-q.t/q.life;ctx.fillStyle=q.col;ctx.fillRect(q.x,q.y,q.sz,q.sz)}ctx.globalAlpha=1;
+  for(const q of pops){ctx.globalAlpha=clamp(q.t/q.life*2,0,1);ctx.fillStyle=q.c;ctx.strokeStyle='#000';ctx.lineWidth=4;ctx.font='bold 28px system-ui';ctx.textAlign='center';const yy=q.y-(q.life-q.t)*.7;ctx.strokeText(q.text,q.x,yy);ctx.fillText(q.text,q.x,yy)}ctx.globalAlpha=1;
+  if(flashT>0){ctx.fillStyle='rgba(255,255,255,'+flashT/16+')';ctx.fillRect(0,0,W,H)}ctx.restore()}
+function hud(){$('#s0').textContent=score[0];$('#s1').textContent=score[1];const sec=Math.max(0,Math.ceil(clock/60));$('#tm').textContent=clock<=1?'הארכה':Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0')}
+let last=performance.now(),acc=0;function loop(n){requestAnimationFrame(loop);acc+=Math.min(100,n-last);last=n;if(state!=='menu'){while(acc>=1000/60){acc-=1000/60;step()}hud()}else acc=0;if(P.length)draw();else{ctx.fillStyle='#2c7be0';ctx.fillRect(0,0,W,H)}}
+function togglePause(){if(state==='menu'||state==='over')return;paused=!paused;$('#pause').classList.toggle('show',paused)}
+$('#pauseB').onclick=togglePause;$('#resume').onclick=togglePause;
+function toMenu(){state='menu';paused=false;over=true;P=[];$('#pause').classList.remove('show');$('#end').classList.remove('show');$('#menu').classList.add('show');$('#pauseB').style.display='none';$('#hud').style.display='none';$('#tp').style.display='none';$('#pw').style.display='none'}
+$('#toMenu').onclick=toMenu;$('#menu2').onclick=toMenu;
+window.__f={begin,step,get P(){return P},get ball(){return ball},get score(){return score},get state(){return state},TEAMS};
+requestAnimationFrame(loop);
+
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+</script>
+<script src="../hub.js"></script>
+</body>
+</html>

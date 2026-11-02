@@ -28,3 +28,5 @@ Import from Git, Build command ריק, Publish directory `.`.
 - `superhoops/` סופר בסקטבול
 
 - `superfootball/` סופר כדורגל 3D
+
+- `football/` כדורגל

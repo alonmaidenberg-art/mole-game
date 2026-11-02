@@ -136,5 +136,13 @@
     "url": "superfootball/",
     "icon": "superfootball/icons/icon-192.png",
     "tag": "אקשן"
+  },
+  {
+    "id": "football",
+    "name": "כדורגל",
+    "description": "20 נבחרות, 160 שחקנים, חנות כוחות ומטבעות",
+    "url": "football/",
+    "icon": "football/icons/icon-192.png",
+    "tag": "ספורט"
   }
 ]

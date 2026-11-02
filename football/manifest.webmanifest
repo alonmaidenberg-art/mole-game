@@ -1,0 +1,37 @@
+{
+  "name": "כדורגל",
+  "short_name": "כדורגל",
+  "description": "כדורגל 1 על 1 עם 20 נבחרות וחנות כוחות",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "landscape",
+  "lang": "he",
+  "dir": "rtl",
+  "background_color": "#37a84e",
+  "theme_color": "#37a84e",
+  "categories": [
+    "games"
+  ],
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

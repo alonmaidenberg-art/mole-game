@@ -138,3 +138,12 @@
 
 /superfootball/manifest.webmanifest
   Cache-Control: no-cache
+
+/football/sw.js
+  Cache-Control: no-cache
+
+/football/index.html
+  Cache-Control: no-cache
+
+/football/manifest.webmanifest
+  Cache-Control: no-cache
