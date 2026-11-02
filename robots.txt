@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://reliable-banoffee-4ee310.netlify.app/sitemap.xml
+Sitemap: https://alon-games.netlify.app/sitemap.xml
