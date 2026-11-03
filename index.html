@@ -44,6 +44,20 @@ footer{text-align:center;margin-top:34px;opacity:.55;font-size:13px}
 .mb{display:block;width:100%;margin-top:10px;border:0;border-radius:16px;padding:13px;font:inherit;font-size:18px;font-weight:900;color:#06322b;background:linear-gradient(180deg,#5ff7d6,#1fc9a6);cursor:pointer}
 .mb.alt{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.3);font-size:15px;padding:10px}
 .err{color:#ff9bb0;min-height:22px}
+
+.tools{max-width:560px;margin:18px auto 6px}
+.sr{width:100%;font:inherit;font-size:17px;padding:12px 16px;border-radius:16px;border:2px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#fff;outline:none}
+.sr:focus{border-color:#ffd23f}.sr::placeholder{color:#fff;opacity:.55}
+#chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:12px 0 18px}
+#chips button{font:inherit;font-weight:800;font-size:14px;padding:7px 14px;border-radius:999px;border:2px solid rgba(255,255,255,.2);background:rgba(255,255,255,.07);color:#fff;cursor:pointer}
+#chips button.on{background:#ffd23f;color:#1a1238;border-color:#fff}
+.daily{margin-top:12px}#dailyB{font:inherit;font-weight:900;font-size:16px;padding:10px 20px;border-radius:999px;border:0;background:linear-gradient(180deg,#ffe27a,#ffb02e);color:#3a2400;cursor:pointer;box-shadow:0 4px 0 #b57400}
+#dailyB:disabled{background:rgba(255,255,255,.12);color:#fff;box-shadow:none;opacity:.7;cursor:default}
+.sec{grid-column:1/-1;font-size:18px;font-weight:900;margin:10px 4px 0;opacity:.9}
+.cw{position:relative}.cw a.card{height:100%}
+.fav{position:absolute;top:8px;left:10px;background:none;border:0;font-size:22px;cursor:pointer;color:#fff;opacity:.35;z-index:2;padding:4px}.fav.on{opacity:1;color:#ffd23f}
+.new{position:absolute;top:-6px;right:-4px;background:#ff3d71;color:#fff;font-size:11px;font-weight:900;border-radius:999px;padding:3px 9px;z-index:2;box-shadow:0 2px 6px #0006}
+.stat{opacity:.7;font-size:14px;margin-top:6px}
 </style>
 <link rel="canonical" href="https://alon-games.netlify.app/">
 <meta property="og:title" content="המשחקים של אלון מידנברג">
@@ -56,8 +70,11 @@ footer{text-align:center;margin-top:34px;opacity:.55;font-size:13px}
   <header>
     <img src="assets/hub.svg" alt="" width="84" height="84">
     <h1>המשחקים של אלון מידנברג</h1>
-    <p>בחרו משחק ותתחילו לשחק 🎮</p>
+    <p>בחרו משחק ותתחילו לשחק 🎮</p><div class="stat" id="stat"></div>
     <div class="wal"><span>🪙 <b id="wc">0</b></span><span>💎 <b id="wd">0</b></span><button class="key" id="keyB" aria-label="קוד אדמין">🔑</button></div>
+  <div class="daily"><button id="dailyB">🎁 מתנה יומית</button></div>
+    <div class="tools"><input class="sr" id="sr" type="search" placeholder="🔍 חיפוש משחק…" autocomplete="off"></div>
+    <div id="chips"></div>
   </header>
   <section id="grid" aria-label="רשימת המשחקים"><p class="empty">טוען משחקים…</p></section>
   <noscript><p style="text-align:center"><a style="color:#ffd23f" href="mole/">🐹 תפוס את החפרפרת</a></p></noscript>
@@ -71,20 +88,49 @@ footer{text-align:center;margin-top:34px;opacity:.55;font-size:13px}
   <button class="mb alt" id="admX">סגור</button></div></div>
 <script src="hub.js"></script>
 <script>
-fetch('games.json',{cache:'no-cache'}).then(r=>r.json()).then(list=>{
-  const g=document.getElementById('grid');g.textContent='';
-  if(!list.length){g.innerHTML='<p class="empty">עוד אין משחקים.</p>';return}
-  list.forEach(x=>{
-    const a=document.createElement('a');a.className='card';a.href=x.url;if(x.note){a.addEventListener('click',function(e){e.preventDefault();showNote(x)})}
-    const i=document.createElement('img');i.src=x.icon;i.alt='';i.width=72;i.height=72;i.loading='lazy';
-    const b=document.createElement('div');
-    const t=document.createElement('div');t.className='t';t.textContent=x.name;
-    const d=document.createElement('div');d.className='d';d.textContent=x.description||'';
-    b.append(t,d);
-    if(x.tag){const s=document.createElement('span');s.className='tag';s.textContent=x.tag;b.append(s)}
-    a.append(i,b);g.append(a);
-  });
-}).catch(()=>{document.getElementById('grid').innerHTML='<p class="empty">לא הצלחנו לטעון את הרשימה. <a style="color:#ffd23f" href="mole/">לחצו כאן למשחק החפרפרת</a></p>'});
+var LIST=[],cat='הכל',q='';
+var FAV=ld('ag_fav',[]),RECENT=ld('ag_recent',[]);
+function ld(k,d){try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}}
+function sv(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+function card(x,isNew){
+  var w=document.createElement('div');w.className='cw';
+  var a=document.createElement('a');a.className='card';a.href=x.url;
+  a.addEventListener('click',function(e){RECENT=[x.id].concat(RECENT.filter(function(i){return i!==x.id})).slice(0,4);sv('ag_recent',RECENT);if(x.note){e.preventDefault();showNote(x)}});
+  var i=document.createElement('img');i.src=x.icon;i.alt='';i.width=72;i.height=72;i.loading='lazy';
+  var b=document.createElement('div');var t=document.createElement('div');t.className='t';t.textContent=x.name;
+  var d=document.createElement('div');d.className='d';d.textContent=x.description||'';b.append(t,d);
+  if(x.tag){var s=document.createElement('span');s.className='tag';s.textContent=x.tag;b.append(s)}
+  a.append(i,b);w.append(a);
+  var f=document.createElement('button');f.className='fav'+(FAV.indexOf(x.id)>-1?' on':'');f.textContent='★';f.setAttribute('aria-label','מועדף');
+  f.onclick=function(e){e.preventDefault();e.stopPropagation();var k=FAV.indexOf(x.id);if(k>-1)FAV.splice(k,1);else FAV.push(x.id);sv('ag_fav',FAV);render()};w.append(f);
+  if(isNew){var n=document.createElement('span');n.className='new';n.textContent='חדש';w.append(n)}
+  return w}
+function render(){
+  var g=$('grid');g.textContent='';
+  var newIds=LIST.slice(-6).map(function(x){return x.id});
+  var shown=LIST.filter(function(x){return (cat==='הכל'||x.tag===cat||(cat==='⭐ מועדפים'&&FAV.indexOf(x.id)>-1))&&(!q||(x.name+' '+(x.description||'')+' '+(x.tag||'')).toLowerCase().indexOf(q)>-1)});
+  if(!shown.length){g.innerHTML='<p class="empty">לא נמצאו משחקים.</p>';return}
+  function sec(t){var h=document.createElement('div');h.className='sec';h.textContent=t;g.append(h)}
+  if(cat==='הכל'&&!q){
+    var rc=RECENT.map(function(id){return LIST.find(function(x){return x.id===id})}).filter(Boolean);
+    if(rc.length){sec('▶ המשך לשחק');rc.slice(0,3).forEach(function(x){g.append(card(x,false))})}
+    var fv=LIST.filter(function(x){return FAV.indexOf(x.id)>-1});
+    if(fv.length){sec('★ המועדפים שלי');fv.forEach(function(x){g.append(card(x,false))})}
+    sec('🎮 כל המשחקים')}
+  shown.forEach(function(x){g.append(card(x,newIds.indexOf(x.id)>-1))})}
+function chips(){
+  var c=$('chips');c.textContent='';var tags=['הכל'];LIST.forEach(function(x){if(x.tag&&tags.indexOf(x.tag)<0)tags.push(x.tag)});if(FAV.length)tags.push('⭐ מועדפים');
+  tags.forEach(function(t){var b=document.createElement('button');b.textContent=t;if(t===cat)b.className='on';b.onclick=function(){cat=t;chips();render()};c.append(b)})}
+$('sr').addEventListener('input',function(){q=this.value.trim().toLowerCase();render()});
+fetch('games.json',{cache:'no-cache'}).then(function(r){return r.json()}).then(function(list){
+  LIST=list;$('stat').textContent=list.length+' משחקים · משחקים חדשים מתווספים כל הזמן';chips();render()
+}).catch(function(){$('grid').innerHTML='<p class="empty">לא הצלחנו לטעון את הרשימה. <a style="color:#ffd23f" href="mole/">לחצו כאן למשחק החפרפרת</a></p>'});
+/* daily gift */
+(function(){var K='ag_daily',b=$('dailyB');function today(){return new Date().toISOString().slice(0,10)}
+  function st(){return ld(K,{d:'',s:0})}
+  function paint(){var o=st();if(o.d===today()){b.disabled=true;b.textContent='🎁 קיבלת היום · רצף '+o.s+' ימים'}else{b.disabled=false;b.textContent='🎁 מתנה יומית'}}
+  b.onclick=function(){var o=st(),t=today();if(o.d===t)return;var y=new Date(Date.now()-864e5).toISOString().slice(0,10);var s=o.d===y?o.s+1:1;var c=30+Math.min(s,7)*10,dm=s%7===0?1:0;AG.add(c,dm);sv(K,{d:t,s:s});alert('קיבלת '+c+' 🪙'+(dm?' ו-💎 1':'')+'\nרצף: '+s+' ימים');paint()};
+  paint()})();
 
 function showNote(x){$('noteT').textContent=x.noteTitle||x.name;$('noteP').textContent=x.note;$('noteM').classList.add('show');$('noteGo').onclick=function(){location.href=x.url};$('noteX').onclick=function(){$('noteM').classList.remove('show')}}
 function $(i){return document.getElementById(i)}
