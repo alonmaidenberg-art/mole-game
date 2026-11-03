@@ -93,3 +93,33 @@ Import from Git, Build command ריק, Publish directory `.`.
 - `dodge/` התחמקות
 
 - `boss/` שלבי בוס: הגליץ׳
+
+- `fruit/` חותך פירות
+
+- `invaders/` פולשים מהחלל
+
+- `missile/` הגנת ערים
+
+- `cannon/` תותח
+
+- `balloons/` פוצצו בלונים
+
+- `pachinko/` פלינקו
+
+- `fishing/` דיג
+
+- `rhythm/` קצב
+
+- `sort/` מיון צבעים
+
+- `zigzag/` זיגזג
+
+- `orbit/` מסלול
+
+- `pendulum/` נדנדה
+
+- `math/` מהר חשבון
+
+- `colorswitch/` קפיצת צבעים
+
+- `balance/` איזון

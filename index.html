@@ -79,7 +79,7 @@ a.card:hover{box-shadow:0 8px 26px rgba(255,210,63,.25)}
     <h1>המשחקים של אלון מידנברג</h1>
     <p>בחרו משחק ותתחילו לשחק 🎮</p><div class="stat" id="stat"></div>
     <div class="wal"><span>🪙 <b id="wc">0</b></span><span>💎 <b id="wd">0</b></span><button class="key" id="keyB" aria-label="קוד אדמין">🔑</button></div>
-  <div class="daily"><button id="dailyB">🎁 מתנה יומית</button> <button id="lbB" style="font:inherit;font-weight:900;font-size:16px;padding:10px 20px;border-radius:999px;border:2px solid rgba(255,255,255,.3);background:rgba(255,255,255,.08);color:#fff;cursor:pointer">🏆 השיאים שלי</button> <button id="gbB" style="font:inherit;font-weight:900;font-size:16px;padding:10px 20px;border-radius:999px;border:2px solid rgba(255,255,255,.3);background:rgba(255,255,255,.08);color:#fff;cursor:pointer">🌍 לוח תוצאות</button></div>
+  <div class="daily"><button id="dailyB">🎁 מתנה יומית</button> <button id="lbB" style="font:inherit;font-weight:900;font-size:16px;padding:10px 20px;border-radius:999px;border:2px solid rgba(255,255,255,.3);background:rgba(255,255,255,.08);color:#fff;cursor:pointer">🏆 השיאים שלי</button> <button id="gbB" style="font:inherit;font-weight:900;font-size:16px;padding:10px 20px;border-radius:999px;border:2px solid rgba(255,255,255,.3);background:rgba(255,255,255,.08);color:#fff;cursor:pointer">🌍 לוח תוצאות</button> <button id="achB" style="font:inherit;font-weight:900;font-size:16px;padding:10px 20px;border-radius:999px;border:2px solid rgba(255,255,255,.3);background:rgba(255,255,255,.08);color:#fff;cursor:pointer">🏅 הישגים</button></div>
     <div class="tools"><input class="sr" id="sr" type="search" placeholder="🔍 חיפוש משחק…" autocomplete="off"></div>
     <div id="chips"></div>
   <a class="bossb" id="bossB" href="boss/"><span class="em">👾</span><span style="flex:1"><b>שלבי הבוס: הגליץ׳</b><small id="bossT"></small><div class="bar"><i id="bossBar"></i></div></span></a>
@@ -88,6 +88,7 @@ a.card:hover{box-shadow:0 8px 26px rgba(255,210,63,.25)}
   <noscript><p style="text-align:center"><a style="color:#ffd23f" href="mole/">🐹 תפוס את החפרפרת</a></p></noscript>
   <footer>© 2026 אלון מידנברג · כל הזכויות שמורות · אסור להעתיק בלי רשות</footer>
 </main>
+<div class="mo" id="achM"><div class="mc" style="max-height:88vh;overflow:auto"><h2>🏅 הישגים</h2><div id="achList"></div><button class="mb alt" id="achX">סגור</button></div></div>
 <div class="mo" id="gbM"><div class="mc" style="max-height:88vh;overflow:auto"><h2 id="gbH">🌍 לוח תוצאות</h2>
 <input id="gbName" maxlength="14" placeholder="הכינוי שלך" style="width:100%;font:inherit;font-size:18px;padding:10px;border-radius:12px;border:2px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;text-align:center;margin:6px 0">
 <button class="mb" id="gbSend" style="margin-top:4px">📤 שלח את השיאים שלי</button>
@@ -157,6 +158,36 @@ function lbOpen(){var L=$('lbList');L.textContent='';var n=0;
   if(!n){L.innerHTML='<p>עוד אין שיאים. שחקו כמה משחקים וחזרו!</p>'}
   $('lbM').classList.add('show')}
 $('lbB').onclick=lbOpen;
+
+/* achievements */
+(function(){
+  var EN=window.AG_LANG==='en',T=function(h,e){return EN?e:h},K='ag_ach';
+  function rd(k,d){try{var v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}}
+  function stats(){var bests=0;LIST.forEach(function(x){var k=BK[x.id]||(x.id+'_best'),v=null;try{v=localStorage.getItem(k)}catch(e){}if(v&&+v>0)bests++});
+    var t=rd('ag_time',{}),sec=0;for(var k in t)sec+=t[k];var d=rd('ag_daily',{s:0});return{played:AG.played(),bests:bests,min:Math.floor(sec/60),streak:d.s||0}}
+  var A=[
+    ['p5',T('מתחילים','Getting started'),T('שחקו ב-5 משחקים שונים','Play 5 different games'),'played',5,[30,0]],
+    ['p15',T('סקרנים','Curious'),T('שחקו ב-15 משחקים שונים','Play 15 different games'),'played',15,[80,1]],
+    ['p30',T('חוקרי משחקים','Game explorer'),T('שחקו ב-30 משחקים שונים','Play 30 different games'),'played',30,[200,3]],
+    ['p50',T('אלוף האתר','Site champion'),T('שחקו ב-50 משחקים שונים','Play 50 different games'),'played',50,[500,8]],
+    ['b5',T('שוברי שיאים','Record breaker'),T('קבעו שיא ב-5 משחקים','Set a record in 5 games'),'bests',5,[40,0]],
+    ['b15',T('אוסף שיאים','Record collector'),T('קבעו שיא ב-15 משחקים','Set a record in 15 games'),'bests',15,[150,2]],
+    ['b30',T('מלך השיאים','King of records'),T('קבעו שיא ב-30 משחקים','Set a record in 30 games'),'bests',30,[400,6]],
+    ['t10',T('חם על זה','On fire'),T('שחקו 10 דקות','Play for 10 minutes'),'min',10,[30,0]],
+    ['t60',T('מכורים','Hooked'),T('שחקו שעה שלמה','Play for a full hour'),'min',60,[200,3]],
+    ['s3',T('חוזרים כל יום','Daily visitor'),T('רצף של 3 ימים','3-day streak'),'streak',3,[40,1]],
+    ['s7',T('שבוע שלם','A whole week'),T('רצף של 7 ימים','7-day streak'),'streak',7,[150,3]]];
+  function open(){var L=$('achList');L.textContent='';var st=stats(),got=rd(K,[]);
+    A.forEach(function(a){var have=st[a[3]],ok=have>=a[4],claimed=got.indexOf(a[0])>=0;
+      var r=document.createElement('div');r.style.cssText='display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.08);border-radius:14px;padding:8px 10px;margin:6px 0;text-align:start';
+      var i=document.createElement('div');i.style.fontSize='26px';i.textContent=claimed?'🏅':ok?'🎁':'🔒';
+      var m=document.createElement('div');m.style.flex='1';var n=document.createElement('div');n.style.fontWeight='900';n.textContent=a[1];var d=document.createElement('div');d.style.cssText='font-size:13px;opacity:.8';d.textContent=a[2]+' ('+Math.min(have,a[4])+'/'+a[4]+')';m.append(n,d);
+      r.append(i,m);
+      if(ok&&!claimed){var b=document.createElement('button');b.textContent='+'+a[5][0]+'🪙'+(a[5][1]?' +'+a[5][1]+'💎':'');b.style.cssText='border:0;border-radius:12px;padding:8px 10px;font:900 13px system-ui;background:#ffd23f;color:#222;cursor:pointer';
+        b.onclick=function(){var g=rd(K,[]);if(g.indexOf(a[0])<0){g.push(a[0]);localStorage.setItem(K,JSON.stringify(g));AG.add(a[5][0],a[5][1])}open()};r.append(b)}
+      L.append(r)});$('achM').classList.add('show')}
+  $('achB').onclick=open;$('achX').onclick=function(){$('achM').classList.remove('show')};
+})();
 /* shared leaderboard */
 (function(){
   var EN=window.AG_LANG==='en',T=function(h,e){return EN?e:h};

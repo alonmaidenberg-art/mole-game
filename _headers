@@ -426,3 +426,138 @@
 
 /boss/manifest.webmanifest
   Cache-Control: no-cache
+
+/fruit/sw.js
+  Cache-Control: no-cache
+
+/fruit/index.html
+  Cache-Control: no-cache
+
+/fruit/manifest.webmanifest
+  Cache-Control: no-cache
+
+/invaders/sw.js
+  Cache-Control: no-cache
+
+/invaders/index.html
+  Cache-Control: no-cache
+
+/invaders/manifest.webmanifest
+  Cache-Control: no-cache
+
+/missile/sw.js
+  Cache-Control: no-cache
+
+/missile/index.html
+  Cache-Control: no-cache
+
+/missile/manifest.webmanifest
+  Cache-Control: no-cache
+
+/cannon/sw.js
+  Cache-Control: no-cache
+
+/cannon/index.html
+  Cache-Control: no-cache
+
+/cannon/manifest.webmanifest
+  Cache-Control: no-cache
+
+/balloons/sw.js
+  Cache-Control: no-cache
+
+/balloons/index.html
+  Cache-Control: no-cache
+
+/balloons/manifest.webmanifest
+  Cache-Control: no-cache
+
+/pachinko/sw.js
+  Cache-Control: no-cache
+
+/pachinko/index.html
+  Cache-Control: no-cache
+
+/pachinko/manifest.webmanifest
+  Cache-Control: no-cache
+
+/fishing/sw.js
+  Cache-Control: no-cache
+
+/fishing/index.html
+  Cache-Control: no-cache
+
+/fishing/manifest.webmanifest
+  Cache-Control: no-cache
+
+/rhythm/sw.js
+  Cache-Control: no-cache
+
+/rhythm/index.html
+  Cache-Control: no-cache
+
+/rhythm/manifest.webmanifest
+  Cache-Control: no-cache
+
+/sort/sw.js
+  Cache-Control: no-cache
+
+/sort/index.html
+  Cache-Control: no-cache
+
+/sort/manifest.webmanifest
+  Cache-Control: no-cache
+
+/zigzag/sw.js
+  Cache-Control: no-cache
+
+/zigzag/index.html
+  Cache-Control: no-cache
+
+/zigzag/manifest.webmanifest
+  Cache-Control: no-cache
+
+/orbit/sw.js
+  Cache-Control: no-cache
+
+/orbit/index.html
+  Cache-Control: no-cache
+
+/orbit/manifest.webmanifest
+  Cache-Control: no-cache
+
+/pendulum/sw.js
+  Cache-Control: no-cache
+
+/pendulum/index.html
+  Cache-Control: no-cache
+
+/pendulum/manifest.webmanifest
+  Cache-Control: no-cache
+
+/math/sw.js
+  Cache-Control: no-cache
+
+/math/index.html
+  Cache-Control: no-cache
+
+/math/manifest.webmanifest
+  Cache-Control: no-cache
+
+/colorswitch/sw.js
+  Cache-Control: no-cache
+
+/colorswitch/index.html
+  Cache-Control: no-cache
+
+/colorswitch/manifest.webmanifest
+  Cache-Control: no-cache
+
+/balance/sw.js
+  Cache-Control: no-cache
+
+/balance/index.html
+  Cache-Control: no-cache
+
+/balance/manifest.webmanifest
+  Cache-Control: no-cache

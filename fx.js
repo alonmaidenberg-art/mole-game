@@ -1,0 +1,84 @@
+/* Shared extras for every game: new-best celebration, fun modes, admin panel, play-time stats.
+   (c) Alon Maidenberg 2026 - please do not copy. */
+(function(){
+  'use strict';
+  var EN=window.AG_LANG==='en',T=function(h,e){return EN?e:h};
+  var ID=location.pathname.replace(/\/index\.html$/,'').replace(/\/+$/,'').split('/').pop()||'hub';
+  var BK={flappy:'b_best',fallingblocks:'f_best',game2048:'g_best',snake:'s_best'};
+  var KEY=BK[ID]||(ID+'_best');
+  function ls(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){}return null}
+  function ss(k,v){try{if(v===undefined)return sessionStorage.getItem(k);sessionStorage.setItem(k,v)}catch(e){}return null}
+
+  /* ---------- time scale (slow / fast) ---------- */
+  var scale=+ss('ag_scale')||1,vt=null,lr=null,raf=window.requestAnimationFrame.bind(window);
+  window.requestAnimationFrame=function(cb){return raf(function(ts){
+    if(vt===null){if(scale===1)return cb(ts);vt=ts;lr=ts}
+    var d=Math.min(100,ts-lr);lr=ts;vt+=d*scale;cb(vt)})};
+  function setScale(s){scale=s;ss('ag_scale',String(s))}
+
+  /* ---------- visual modes ---------- */
+  var st=document.createElement('style');
+  st.textContent='html[data-m~=invert]{filter:invert(1) hue-rotate(180deg)}html[data-m~=gray]{filter:grayscale(1)}html[data-m~=blur]{filter:blur(1.2px)}'
+   +'html[data-m~=rainbow]{animation:agr 6s linear infinite}@keyframes agr{to{filter:hue-rotate(360deg)}}html[data-m~=mirror] canvas{scale:-1 1}'
+   +'#ag-panel{position:fixed;z-index:2147483600;left:8px;right:8px;top:48px;max-width:340px;max-height:80vh;overflow:auto;background:rgba(20,12,50,.96);color:#fff;border:2px solid rgba(255,255,255,.25);border-radius:18px;padding:12px;font:600 14px system-ui,Arial,sans-serif;display:none}'
+   +'#ag-panel.show{display:block}#ag-panel h3{margin:4px 0 8px;font-size:16px}#ag-panel button,#ag-panel input{font:inherit;border-radius:12px;border:2px solid rgba(255,255,255,.25);background:rgba(255,255,255,.1);color:#fff;padding:7px 10px;margin:3px;cursor:pointer}'
+   +'#ag-panel button.on{background:#ffd23f;color:#222;border-color:#ffd23f}#ag-panel input{width:90px;cursor:text}#ag-toast{position:fixed;z-index:2147483600;left:50%;top:14%;transform:translateX(-50%);background:linear-gradient(135deg,#ffd23f,#ff8a3d);color:#222;font:900 22px system-ui,Arial,sans-serif;padding:10px 22px;border-radius:999px;box-shadow:0 6px 24px #0008;pointer-events:none;animation:agt 2.2s ease forwards}'
+   +'@keyframes agt{0%{opacity:0;transform:translate(-50%,-20px) scale(.7)}15%{opacity:1;transform:translate(-50%,0) scale(1.05)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,-10px)}}';
+  (document.head||document.documentElement).appendChild(st);
+  var modes=(ss('ag_modes')||'').split(',').filter(Boolean);
+  function applyModes(){document.documentElement.setAttribute('data-m',modes.join(' '));ss('ag_modes',modes.join(','))}
+  applyModes();
+
+  /* ---------- new best: confetti + toast + small reward ---------- */
+  function confetti(){
+    var c=document.createElement('canvas');c.style.cssText='position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:2147483500';
+    c.width=innerWidth;c.height=innerHeight;document.body.appendChild(c);var x=c.getContext('2d'),P=[],cols=['#ff5a6a','#ffd23f','#3ddc97','#4da8ff','#c07bff'];
+    for(var i=0;i<90;i++)P.push({x:c.width/2,y:c.height*.35,vx:(Math.random()-.5)*14,vy:-Math.random()*13-3,c:cols[i%5],s:5+Math.random()*6,r:Math.random()*6});
+    var n=0;(function f(){x.clearRect(0,0,c.width,c.height);P.forEach(function(p){p.x+=p.vx;p.y+=p.vy;p.vy+=.35;p.r+=.2;x.fillStyle=p.c;x.save();x.translate(p.x,p.y);x.rotate(p.r);x.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);x.restore()});
+      if(++n<100)raf(f);else c.remove()})();
+  }
+  function toast(t){var d=document.createElement('div');d.id='ag-toast';d.textContent=t;document.body.appendChild(d);setTimeout(function(){d.remove()},2300)}
+  var lastCel=0;
+  try{
+    var so=Storage.prototype.setItem;
+    Storage.prototype.setItem=function(k,v){
+      try{if(this===localStorage&&/best/i.test(k)&&!/^ag_/.test(k)){var old=+localStorage.getItem(k)||0,nv=+v;
+        if(isFinite(nv)&&old>0&&nv>old&&Date.now()-lastCel>4000&&document.body){lastCel=Date.now();confetti();toast(T('🏆 שיא חדש!','🏆 New best!'));
+          if(window.AG)AG.add(5,0)}}}catch(e){}
+      return so.apply(this,arguments)};
+  }catch(e){}
+
+  /* ---------- play time ---------- */
+  setInterval(function(){if(document.visibilityState!=='visible'||ID==='hub')return;try{var o=JSON.parse(ls('ag_time')||'{}');o[ID]=(o[ID]||0)+5;ls('ag_time',JSON.stringify(o))}catch(e){}},5000);
+
+  /* ---------- buttons + panels ---------- */
+  var BOT=/\/(chess|englishbot|impostor|game2048)\//.test(location.pathname);
+  function mkBtn(txt,left,fn,label){var b=document.createElement('button');b.type='button';b.textContent=txt;b.setAttribute('aria-label',label);
+    b.style.cssText='position:fixed;z-index:2147483000;'+(BOT?'bottom:max(8px,env(safe-area-inset-bottom));':'top:max(6px,env(safe-area-inset-top));')+'left:'+left+'px;width:34px;height:34px;border-radius:50%;border:0;font-size:17px;background:rgba(0,0,0,.45);color:#fff;cursor:pointer;-webkit-tap-highlight-color:transparent';
+    b.onclick=fn;document.body.appendChild(b);return b}
+  var panel;
+  function ensurePanel(){if(panel)return panel;panel=document.createElement('div');panel.id='ag-panel';if(BOT){panel.style.top='auto';panel.style.bottom='52px'}document.body.appendChild(panel);return panel}
+  function btn(txt,on,fn){var b=document.createElement('button');b.textContent=txt;if(on)b.className='on';b.onclick=fn;return b}
+  function head(t){var h=document.createElement('h3');h.textContent=t;return h}
+  function funPanel(){var p=ensurePanel();if(p.dataset.k==='fun'&&p.classList.contains('show')){p.classList.remove('show');return}p.dataset.k='fun';p.classList.add('show');draw();
+    function draw(){p.textContent='';p.append(head(T('⚡ מצבים מצחיקים','⚡ Fun modes')));
+      [['slow',T('🐢 איטי','🐢 Slow'),.6],['norm',T('🙂 רגיל','🙂 Normal'),1],['fast',T('🐇 מהיר','🐇 Fast'),1.5],['crazy',T('⚡ מטורף','⚡ Crazy'),2]].forEach(function(m){p.append(btn(m[1],scale===m[2],function(){setScale(m[2]);draw()}))});
+      p.append(document.createElement('br'));
+      [['mirror',T('🪞 עולם הפוך','🪞 Mirror world')],['invert',T('🎨 צבעים הפוכים','🎨 Inverted')],['rainbow',T('🌈 קשת','🌈 Rainbow')],['gray',T('⚫ שחור לבן','⚫ Black & white')],['blur',T('🔍 מטושטש','🔍 Blurry')]].forEach(function(m){
+        var on=modes.indexOf(m[0])>=0;p.append(btn(m[1],on,function(){var i=modes.indexOf(m[0]);if(i>=0)modes.splice(i,1);else modes.push(m[0]);applyModes();draw()}))});
+      var n=document.createElement('div');n.style.cssText='opacity:.7;font-size:12px;margin-top:6px';n.textContent=T('חלק מהמצבים מתאימים רק למשחקי קנבס. הם מתאפסים כשסוגרים את הדף.','Some modes only suit canvas games. They reset when you close the page.');p.append(n)}}
+  function adminPanel(){var p=ensurePanel();if(p.dataset.k==='adm'&&p.classList.contains('show')){p.classList.remove('show');return}p.dataset.k='adm';p.classList.add('show');draw();
+    function draw(){p.textContent='';p.append(head(T('⚙️ פאנל אדמין – ','⚙️ Admin panel – ')+ID));
+      var w=document.createElement('div');w.textContent='🪙 '+AG.coins()+'   💎 '+AG.diamonds();p.append(w);
+      p.append(btn('+100 🪙',0,function(){AG.add(100,0);draw()}),btn('+1000 🪙',0,function(){AG.add(1000,0);draw()}),btn('+10 💎',0,function(){AG.add(0,10);draw()}),document.createElement('br'));
+      var inp=document.createElement('input');inp.type='number';inp.placeholder=T('שיא','best');inp.value=ls(KEY)||'';
+      p.append(document.createTextNode(T('שיא במשחק: ','Game best: ')),inp,btn(T('שמור','Save'),0,function(){var v=Math.max(0,Math.floor(+inp.value||0));ls(KEY,String(v));draw()}),btn(T('אפס','Reset'),0,function(){try{localStorage.removeItem(KEY)}catch(e){}draw()}),document.createElement('br'));
+      var sl=document.createElement('input');sl.type='range';sl.min='.25';sl.max='3';sl.step='.25';sl.value=scale;sl.style.cssText='width:150px;vertical-align:middle';var lab=document.createElement('span');lab.textContent=' ×'+scale;
+      sl.oninput=function(){setScale(+sl.value);lab.textContent=' ×'+scale};p.append(document.createTextNode(T('מהירות: ','Speed: ')),sl,lab,document.createElement('br'));
+      p.append(btn(T('🔓 פתח את שלבי הבוס','🔓 Unlock boss levels'),0,function(){fetch(AG.root+'games.json').then(function(r){return r.json()}).then(function(l){ls('ag_played',JSON.stringify(l.map(function(g){return g.id}).filter(function(i){return i!=='boss'})));draw()})}),
+        btn(T('🚪 יציאה מאדמין','🚪 Log out'),0,function(){AG.adminLogout();location.reload()}))}}
+  function init(){if(ID==='hub'||!document.body)return;
+    var left=EN?92:92;mkBtn('⚡',left,funPanel,'fun modes');
+    if(window.AG&&AG.isAdmin())mkBtn('⚙️',left+40,adminPanel,'admin')}
+  if(document.body)init();else addEventListener('DOMContentLoaded',init);
+})();

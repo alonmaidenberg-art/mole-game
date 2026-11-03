@@ -392,5 +392,125 @@
     "url": "boss/",
     "icon": "boss/icons/icon-192.png",
     "tag": "בוס"
+  },
+  {
+    "id": "fruit",
+    "name": "חותך פירות",
+    "description": "החליקו על המסך וחתכו פירות. אל תיגעו בפצצות!",
+    "url": "fruit/",
+    "icon": "fruit/icons/icon-192.png",
+    "tag": "רפלקסים"
+  },
+  {
+    "id": "invaders",
+    "name": "פולשים מהחלל",
+    "description": "הגנו על כדור הארץ מגלי חייזרים.",
+    "url": "invaders/",
+    "icon": "invaders/icons/icon-192.png",
+    "tag": "ירי"
+  },
+  {
+    "id": "missile",
+    "name": "הגנת ערים",
+    "description": "יירטו טילים לפני שיפגעו בערים.",
+    "url": "missile/",
+    "icon": "missile/icons/icon-192.png",
+    "tag": "אסטרטגיה"
+  },
+  {
+    "id": "cannon",
+    "name": "תותח",
+    "description": "כוונו את התותח והפילו את כל המטרות.",
+    "url": "cannon/",
+    "icon": "cannon/icons/icon-192.png",
+    "tag": "חשיבה"
+  },
+  {
+    "id": "balloons",
+    "name": "פוצצו בלונים",
+    "description": "פוצצו בלונים וקבלו בונוסים.",
+    "url": "balloons/",
+    "icon": "balloons/icons/icon-192.png",
+    "tag": "פשוט"
+  },
+  {
+    "id": "pachinko",
+    "name": "פלינקו",
+    "description": "הפילו כדורים בין הנעצים ופגעו בניקוד הגבוה.",
+    "url": "pachinko/",
+    "icon": "pachinko/icons/icon-192.png",
+    "tag": "ארקייד"
+  },
+  {
+    "id": "fishing",
+    "name": "דיג",
+    "description": "הורידו חכה ותפסו דגים עמוקים.",
+    "url": "fishing/",
+    "icon": "fishing/icons/icon-192.png",
+    "tag": "פשוט"
+  },
+  {
+    "id": "rhythm",
+    "name": "קצב",
+    "description": "לחצו על הנוטות בקצב הנכון וצברו קומבו.",
+    "url": "rhythm/",
+    "icon": "rhythm/icons/icon-192.png",
+    "tag": "רפלקסים"
+  },
+  {
+    "id": "sort",
+    "name": "מיון צבעים",
+    "description": "מיינו כדורים נופלים לתא בצבע הנכון.",
+    "url": "sort/",
+    "icon": "sort/icons/icon-192.png",
+    "tag": "רפלקסים"
+  },
+  {
+    "id": "zigzag",
+    "name": "זיגזג",
+    "description": "הכדור נע באלכסון, החליפו כיוון בזמן.",
+    "url": "zigzag/",
+    "icon": "zigzag/icons/icon-192.png",
+    "tag": "רפלקסים"
+  },
+  {
+    "id": "orbit",
+    "name": "מסלול",
+    "description": "שחררו את החללית ותפסו את כוכב הלכת הבא.",
+    "url": "orbit/",
+    "icon": "orbit/icons/icon-192.png",
+    "tag": "חשיבה"
+  },
+  {
+    "id": "pendulum",
+    "name": "נדנדה",
+    "description": "התנדנדו בחבל ועברו כמה שיותר רחוק.",
+    "url": "pendulum/",
+    "icon": "pendulum/icons/icon-192.png",
+    "tag": "אקשן"
+  },
+  {
+    "id": "math",
+    "name": "מהר חשבון",
+    "description": "פתרו כמה שיותר תרגילי חשבון בזמן.",
+    "url": "math/",
+    "icon": "math/icons/icon-192.png",
+    "tag": "לימוד"
+  },
+  {
+    "id": "colorswitch",
+    "name": "קפיצת צבעים",
+    "description": "קפצו דרך טבעות והתאימו צבע.",
+    "url": "colorswitch/",
+    "icon": "colorswitch/icons/icon-192.png",
+    "tag": "רפלקסים"
+  },
+  {
+    "id": "balance",
+    "name": "איזון",
+    "description": "הטו את הקרש ושמרו על הכדור.",
+    "url": "balance/",
+    "icon": "balance/icons/icon-192.png",
+    "tag": "חשיבה"
   }
 ]
