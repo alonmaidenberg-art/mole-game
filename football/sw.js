@@ -1,7 +1,7 @@
 // Service worker: lets the browser offer real "Install app", and keeps the game working offline.
 // Network-first: when online you always get the newest version (so updates arrive by themselves);
 // when offline it falls back to the saved copy.
-const CACHE = 'football-v1';
+const CACHE = 'football-v2';
 const FILES = ["./", "./index.html", "./manifest.webmanifest", "./icons/icon-192.png", "./icons/icon-512.png", "./icons/apple-touch-icon.png", "./icons/favicon-64.png"];
 
 self.addEventListener('install', e => {

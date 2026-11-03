@@ -1,0 +1,5 @@
+Copyright (c) 2026 Alon Maidenberg (אלון מידנברג). All rights reserved.
+
+These games and their code may be played freely, but may not be copied,
+republished, sold or modified without written permission from the author.
+Authorship is recorded with timestamps in the project's GitHub history.
