@@ -37,4 +37,4 @@ Disallow: /
 User-agent: *
 Allow: /
 
-Sitemap: https://alon-games.netlify.app/sitemap.xml
+Sitemap: https://alon-maidenberg.pages.dev/sitemap.xml

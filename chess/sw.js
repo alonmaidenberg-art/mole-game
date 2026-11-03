@@ -1,7 +1,7 @@
 // Service worker: lets the browser offer real "Install app", and keeps the game working offline.
 // Network-first: when online you always get the newest version (so updates arrive by themselves);
 // when offline it falls back to the saved copy.
-const CACHE = 'chess-v1';
+const CACHE = 'chess-v2';
 const FILES = ['./', './index.html', './engine.js', './manifest.webmanifest', './icons/chess.svg',
   './icons/icon-192.png', './icons/icon-512.png', './icons/maskable-512.png', './icons/apple-touch-icon.png', './icons/favicon-64.png'];
 

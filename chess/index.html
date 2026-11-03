@@ -109,6 +109,9 @@ const GL={[P]:'♟︎',[N]:'♞',[B]:'♝',[R]:'♜',[Q]:'♛',[K]:'♚'};
 const NAMEHE={1:'לבן',[-1]:'שחור'};
 
 let mode=store.get('ch_mode','cpu'),myColor=store.get('ch_color','w'),level=+store.get('ch_lvl',2),muted=store.get('ch_mute','0')==='1';
+const FREE=()=>mode==='2f';
+const LEG=s=>FREE()?Chess.pseudoAll(s):Chess.legal(s);
+const STAT=s=>{if(!FREE())return Chess.status(s);const wk=s.b.indexOf(K),bk=s.b.indexOf(-K);return wk<0||bk<0?'mate':'play'};
 let st,hist,flipped=false,sel=-1,targets=[],gameOver=false,aiThinking=false,human=1,lastMove=null,reps={};
 
 /* ---------- audio ---------- */
@@ -147,13 +150,13 @@ function san(s,m){
     else{
       const L={[N]:'N',[B]:'B',[R]:'R',[Q]:'Q',[K]:'K'}[p];
       let dis='';
-      const others=Chess.legal(s).filter(o=>o.f!==m.f&&o.t===m.t&&Math.abs(s.b[o.f])===p);
+      const others=LEG(s).filter(o=>o.f!==m.f&&o.t===m.t&&Math.abs(s.b[o.f])===p);
       if(others.length){dis=others.every(o=>(o.f&7)!==(m.f&7))?FILES[m.f&7]:others.every(o=>(o.f>>3)!==(m.f>>3))?String(8-(m.f>>3)):sqName(m.f)}
       t=L+dis+(cap?'x':'')+sqName(m.t);
     }
     if(p===P&&m.pr){t+='='+({[N]:'N',[B]:'B',[R]:'R',[Q]:'Q'}[m.pr])}
   }
-  const n=Chess.make(s,m),stt=Chess.status(n);
+  const n=Chess.make(s,m),stt=STAT(n);
   return t+(stt==='mate'?'#':stt==='check'?'+':'');
 }
 function doMove(m){
@@ -162,9 +165,9 @@ function doMove(m){
   hist.push({st:before,m,cap,text,last:lastMove,reps:{...reps}});
   st=Chess.make(before,m);lastMove=m;sel=-1;targets=[];
   const k=Chess.key(st);reps[k]=(reps[k]||0)+1;
-  const s=Chess.status(st);
+  const s=STAT(st);
   let over=null;
-  if(s==='mate')over={t:'מט!',m:'ה'+NAMEHE[-st.turn]+' ניצח'};
+  if(s==='mate')over=FREE()?{t:'המלך נאכל!',m:'ה'+NAMEHE[-st.turn]+' ניצח'}:{t:'מט!',m:'ה'+NAMEHE[-st.turn]+' ניצח'};
   else if(s==='stalemate')over={t:'פט – תיקו',m:'אין מהלך חוקי, אבל אין שח.'};
   else if(s==='insufficient')over={t:'תיקו',m:'אין מספיק כלים כדי לתת מט.'};
   else if(s==='draw50')over={t:'תיקו',m:'50 מהלכים בלי לכידה או מהלך רגלי.'};
@@ -191,7 +194,7 @@ function undo(){
 /* ---------- ui ---------- */
 function render(){
   const bd=$('#board');bd.innerHTML='';
-  const chk=Chess.inCheck(st,st.turn)?st.b.indexOf(st.turn*K):-1;
+  const chk=(!FREE()&&Chess.inCheck(st,st.turn))?st.b.indexOf(st.turn*K):-1;
   for(let vr=0;vr<8;vr++)for(let vc=0;vc<8;vc++){
     const r=flipped?7-vr:vr,c=flipped?7-vc:vc,i=r*8+c;
     const d=document.createElement('div');
@@ -222,7 +225,7 @@ function render(){
   const pl=(el,col)=>{el.innerHTML='<i style="background:'+(col===1?'#fff':'#16121f')+'"></i>'+label(col)};
   pl($('#topPl'),topC);pl($('#botPl'),botC);
   // status
-  const s=Chess.status(st),el=$('#status');el.className='status';
+  const s=STAT(st),el=$('#status');el.className='status';
   if(gameOver)el.textContent=s==='mate'?'מט! ה'+NAMEHE[-st.turn]+' ניצח':'המשחק נגמר בתיקו';
   else if(aiThinking){el.textContent='המחשב חושב…'}
   else{el.textContent='תור ה'+NAMEHE[st.turn]+(mode==='cpu'?(st.turn===human?' (אתה)':''):'')+(s==='check'?' – שח!':'');if(s==='check')el.classList.add('bad')}
@@ -241,7 +244,7 @@ function onSq(i){
     return;
   }
   if(v&&(v>0?1:-1)===st.turn){
-    sel=i;targets=Chess.legal(st).filter(m=>m.f===i);
+    sel=i;targets=LEG(st).filter(m=>m.f===i);
   }else{sel=-1;targets=[]}
   render();
 }
@@ -259,7 +262,7 @@ function chips(id,items,cur,cb){
     b.onclick=()=>{cb(v);[...row.children].forEach(c=>c.classList.remove('on'));b.classList.add('on')};row.appendChild(b)});
 }
 function buildMenu(){
-  chips('#modeRow',[['cpu','🤖 נגד המחשב'],['2p','👥 שני שחקנים']],mode,v=>{mode=v;store.set('ch_mode',v);$('#cpuOpts').style.display=v==='cpu'?'block':'none'});
+  chips('#modeRow',[['cpu','🤖 נגד המחשב'],['2p','👥 שני שחקנים'],['2f','🔥 שני שחקנים – חופשי (בלי שח)']],mode,v=>{mode=v;store.set('ch_mode',v);$('#cpuOpts').style.display=v==='cpu'?'block':'none'});
   chips('#colorRow',[['w','⚪ לבן'],['b','⚫ שחור'],['r','🎲 אקראי']],myColor,v=>{myColor=v;store.set('ch_color',v)});
   chips('#lvlRow',[[1,'קל'],[2,'בינוני'],[3,'קשה'],[4,'מקצוען']],level,v=>{level=+v;store.set('ch_lvl',v)});
   $('#cpuOpts').style.display=mode==='cpu'?'block':'none';

@@ -165,6 +165,6 @@ function bestMove(s,level){ // level 1 easy, 2 medium, 3 hard
   if(level===1&&Math.random()<.18)return scored[Math.floor(Math.random()*Math.min(4,scored.length))].m;
   return scored[0].m;
 }
-return {P,N,B,R,Q,K,initState,fromFEN,legal,make,inCheck,status,perft,key,bestMove,attacked,evaluate:evaluate2,VAL};
+return {pseudoAll:function(s){return pseudo(s,false)},P,N,B,R,Q,K,initState,fromFEN,legal,make,inCheck,status,perft,key,bestMove,attacked,evaluate:evaluate2,VAL};
 })();
 if(typeof module!=='undefined')module.exports=Chess;
