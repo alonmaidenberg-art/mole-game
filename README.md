@@ -51,3 +51,13 @@ Import from Git, Build command ריק, Publish directory `.`.
 - `snooker/` סנוקר
 
 - `bubbles/` פופ בועות
+
+- `race3d/` מירוץ 3D
+
+- `flight3d/` טיסה 3D
+
+- `parkour3d/` פארקור 3D
+
+- `golf3d/` מיני גולף 3D
+
+- `bowling3d/` באולינג 3D

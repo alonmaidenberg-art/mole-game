@@ -237,3 +237,48 @@
 
 /bubbles/manifest.webmanifest
   Cache-Control: no-cache
+
+/race3d/sw.js
+  Cache-Control: no-cache
+
+/race3d/index.html
+  Cache-Control: no-cache
+
+/race3d/manifest.webmanifest
+  Cache-Control: no-cache
+
+/flight3d/sw.js
+  Cache-Control: no-cache
+
+/flight3d/index.html
+  Cache-Control: no-cache
+
+/flight3d/manifest.webmanifest
+  Cache-Control: no-cache
+
+/parkour3d/sw.js
+  Cache-Control: no-cache
+
+/parkour3d/index.html
+  Cache-Control: no-cache
+
+/parkour3d/manifest.webmanifest
+  Cache-Control: no-cache
+
+/golf3d/sw.js
+  Cache-Control: no-cache
+
+/golf3d/index.html
+  Cache-Control: no-cache
+
+/golf3d/manifest.webmanifest
+  Cache-Control: no-cache
+
+/bowling3d/sw.js
+  Cache-Control: no-cache
+
+/bowling3d/index.html
+  Cache-Control: no-cache
+
+/bowling3d/manifest.webmanifest
+  Cache-Control: no-cache

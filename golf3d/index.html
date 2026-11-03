@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta name="author" content="Alon Maidenberg - אלון מידנברג"><meta name="copyright" content="© 2026 אלון מידנברג. כל הזכויות שמורות.">
+<!-- © 2026 Alon Maidenberg (אלון מידנברג). All rights reserved. Copying, republishing or modifying this game without written permission is not allowed. -->
+<meta name="robots" content="noai, noimageai">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>מיני גולף 3D – אלון מידנברג</title>
+<meta name="description" content="מיני גולף תלת-ממדי עם 6 מסלולים.">
+<meta name="theme-color" content="#7ac05a">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;background:#1a1038;color:#fff;font-family:system-ui,-apple-system,"Segoe UI",Arial,"Noto Sans Hebrew",sans-serif}
+body{background:radial-gradient(700px 500px at 80% -10%,#5b36d6 0,transparent 60%),radial-gradient(600px 500px at 0% 110%,#0f6b6b 0,transparent 55%),#1a1038;min-height:100vh;min-height:100dvh;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+main{max-width:520px;margin:0 auto;padding:max(12px,env(safe-area-inset-top)) 14px 24px}
+h1{margin:6px 0;font-size:30px;text-align:center}
+.sub{text-align:center;opacity:.75;margin:0 0 10px}
+.box{background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.12);border-radius:22px;padding:14px;margin:12px 0}
+.lb{opacity:.8;font-size:15px;margin-bottom:8px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{flex:1;min-width:70px;padding:13px 6px;border-radius:16px;border:2px solid rgba(255,255,255,.18);background:#150a30;color:#fff;font:inherit;font-weight:800;font-size:17px;cursor:pointer}
+.chip.on{background:#ffd05a;color:#2a1c00;border-color:#fff}
+.btn{display:block;width:100%;border:0;border-radius:18px;padding:15px;margin-top:12px;font:inherit;font-size:21px;font-weight:900;color:#06322b;background:linear-gradient(180deg,#5ff7d6,#1fc9a6);box-shadow:0 6px 0 #0d7a66;cursor:pointer}
+.btn:active{transform:translateY(3px);box-shadow:0 3px 0 #0d7a66}
+.btn.alt{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.3);box-shadow:none;font-size:16px;padding:12px}
+.ib{min-width:46px;height:42px;padding:0 12px;border-radius:13px;border:2px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#fff;font:inherit;font-size:17px;font-weight:800;cursor:pointer}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.scr{display:none}.scr.show{display:block}
+.ov{position:fixed;inset:0;background:rgba(10,5,30,.82);display:none;align-items:center;justify-content:center;z-index:30;padding:16px}.ov.show{display:flex}
+.ovc{width:100%;max-width:380px;background:linear-gradient(160deg,#2c1b6a,#1a1038);border:2px solid rgba(255,255,255,.2);border-radius:26px;padding:22px;text-align:center}
+.ovc h2{margin:0 0 6px;font-size:30px}
+body{overflow:hidden;position:fixed;inset:0;width:100%;background:#0d0826}
+#cv{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);display:block;touch-action:none}
+.ov{overflow:auto}.ovc{margin:auto}
+#hud{position:fixed;left:0;right:0;top:0;text-align:center;font-weight:900;font-size:22px;pointer-events:none;z-index:8;padding-top:max(8px,env(safe-area-inset-top));direction:ltr;text-shadow:0 2px 4px #000}
+.tb{position:fixed;bottom:max(10px,env(safe-area-inset-bottom));z-index:6;width:74px;height:74px;border-radius:50%;border:3px solid rgba(255,255,255,.5);background:rgba(20,12,60,.55);color:#fff;font-size:26px;font-weight:900;touch-action:none;display:none}
+.tb.on{background:rgba(255,160,40,.85)}
+#rot{position:fixed;inset:0;background:#120a2c;z-index:50;display:none;align-items:center;justify-content:center;text-align:center;font-size:24px;font-weight:800;padding:20px}#cv{left:0;top:0;width:100%;height:100%;transform:none}#hud{font-size:20px}
+</style>
+</head>
+<body>
+<script src="../lib/three.min.js"></script><canvas id="cv"></canvas><div id="hud"></div>
+<div class="ov show" id="menu"><div class="ovc" style="max-width:440px"><div style="font-size:56px">⛳</div><h2>מיני גולף 3D</h2><div class="lb">6 מסלולים. כמה שפחות מכות!</div><div style="opacity:.75;font-size:12.5px;margin-top:8px">גררו אחורה (כמו בקלע) ושחררו כדי לחבוט<br>ככל שגוררים יותר, החבטה חזקה יותר</div><button class="btn" id="go">▶ שחק</button><div style="opacity:.8;margin-top:10px;font-size:15px">שיא: <b id="best">0</b></div></div></div>
+<div class="ov" id="end"><div class="ovc"><h2 id="eT">נגמר</h2><div style="font-size:48px;font-weight:900;color:#ffd05a" id="eS"></div><p id="eM"></p><button class="btn" id="again">🔁 שוב</button><button class="btn alt" id="menu2">תפריט</button></div></div>
+<script>
+'use strict';
+const $=s=>document.querySelector(s);
+const store={get(k,d){try{const v=localStorage.getItem(k);return v===null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+let _ac=null;function tone(f,d=.1,t='triangle',v=.07){try{_ac=_ac||new (window.AudioContext||window.webkitAudioContext)();const o=_ac.createOscillator(),g=_ac.createGain();o.type=t;o.frequency.value=f;g.gain.value=v;o.connect(g);g.connect(_ac.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,_ac.currentTime+d);o.stop(_ac.currentTime+d+.02)}catch(e){}}
+const keys={};const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),rnd=(a,b)=>a+Math.random()*(b-a);
+const cv=$('#cv'),R=new THREE.WebGLRenderer({canvas:cv,antialias:true});R.setPixelRatio(Math.min(devicePixelRatio||1,2));const scene=new THREE.Scene(),cam=new THREE.PerspectiveCamera(60,1,.1,300);
+function resize(){R.setSize(innerWidth,innerHeight,false);cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix()}addEventListener('resize',resize);resize();
+addEventListener('keydown',e=>{keys[e.code]=1;if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault()});addEventListener('keyup',e=>{keys[e.code]=0});
+function onSwipe(fn,tap){let s=null;cv.addEventListener('pointerdown',e=>{s={x:e.clientX,y:e.clientY}});cv.addEventListener('pointerup',e=>{if(!s)return;const dx=e.clientX-s.x,dy=e.clientY-s.y;s=null;if(Math.hypot(dx,dy)<20){tap&&tap()}else if(Math.abs(dx)>Math.abs(dy))fn(dx>0?'r':'l');else fn(dy<0?'u':'d')})}
+const BK='golf3d'+'_best';let best=+store.get(BK,0);$('#best').textContent=best;
+function endGame(title,score,msg,coins,dia){$('#eT').textContent=title;$('#eS').textContent=score;let m=msg||'';if(window.AG&&coins>0){AG.add(coins,dia||0);m+=' +'+coins+' 🪙'+(dia?' +'+dia+' 💎':'')}$('#eM').textContent=m;$('#end').classList.add('show')}
+function saveBest(s){if(s>best){best=s;store.set(BK,s);$('#best').textContent=s}}
+function runLoop(stepFn,active){let last=performance.now(),acc=0;function l(n){requestAnimationFrame(l);acc+=Math.min(100,n-last);last=n;while(acc>=1000/60){acc-=1000/60;if(active())stepFn()}R.render(scene,cam)}requestAnimationFrame(l)}
+
+scene.background=new THREE.Color(0x9ad8ff);scene.fog=new THREE.Fog(0x9ad8ff,50,140);scene.add(new THREE.HemisphereLight(0xffffff,0x77aa66,.95));const dl=new THREE.DirectionalLight(0xffffff,.7);dl.position.set(10,30,10);scene.add(dl);
+const M=c=>new THREE.MeshLambertMaterial({color:c});
+const gr=new THREE.Mesh(new THREE.PlaneGeometry(400,400),M(0x7ac05a));gr.rotation.x=-Math.PI/2;gr.position.y=-.4;scene.add(gr);
+const HOLES=[
+{f:[[0,0,4,16]],s:[0,6],h:[0,-6],par:2,o:[]},
+{f:[[0,0,4,16]],s:[0,6],h:[0,-6],par:3,o:[[0,0,2,1]]},
+{f:[[0,5,4,10],[5,-2,14,4]],s:[0,8],h:[10,-2],par:3,o:[]},
+{f:[[0,4,4,8],[4,-2,12,4],[8,-8,4,8]],s:[0,6],h:[8,-10],par:4,o:[]},
+{f:[[0,0,10,14]],s:[0,6],h:[0,-6],par:3,o:[[-2.5,1,1,1],[2.5,-2,1,1],[0,-4,1,1],[-2.5,-4,1,1]]},
+{f:[[0,0,4,18]],s:[0,7],h:[0,-7],par:3,o:[],mv:[0,0,2.6,.7]}];
+let hi=0,walls,floors,ball,hole,strokes,total,state='menu',objs=[],moving=null,drag=null,aim,mvm,ray=new THREE.Raycaster(),pt=new THREE.Vector2(),plane=new THREE.Plane(new THREE.Vector3(0,1,0),0),frame=0,card=[];
+function clearObjs(){for(const o of objs)scene.remove(o);objs=[]}
+function add(m){scene.add(m);objs.push(m);return m}
+function build(){clearObjs();const H=HOLES[hi];floors=H.f;const cells=new Set();
+  for(const [cx,cz,w,d] of H.f)for(let x=Math.round(cx-w/2);x<cx+w/2;x++)for(let z=Math.round(cz-d/2);z<cz+d/2;z++)cells.add(x+','+z);
+  walls=[];for(const k of cells){const [x,z]=k.split(',').map(Number);const n=[[0,-1],[0,1],[-1,0],[1,0]];for(const [dx,dz] of n)if(!cells.has((x+dx)+','+(z+dz))){walls.push(dx?[x+.5+dx*.5+dx*.2,z+.5,.4,1.4]:[x+.5,z+.5+dz*.5+dz*.2,1.4,.4])}}
+  for(const o of H.o)walls.push(o.slice());
+  for(const k of cells){const [x,z]=k.split(',').map(Number);const m=new THREE.Mesh(new THREE.BoxGeometry(1,.4,1),M((x+z)%2?0x3fa84a:0x45b351));m.position.set(x+.5,-.2,z+.5);add(m)}
+  for(const w of walls){const m=new THREE.Mesh(new THREE.BoxGeometry(w[2],.6,w[3]),M(0x8a5a30));m.position.set(w[0],.3,w[1]);add(m)}
+  for(const o of H.o){const m=new THREE.Mesh(new THREE.BoxGeometry(o[2],.6,o[3]),M(0xe8433f));m.position.set(o[0],.3,o[1]);add(m)}
+  moving=null;if(H.mv){const m=new THREE.Mesh(new THREE.BoxGeometry(H.mv[2],.6,H.mv[3]),M(0x5a6aff));m.position.set(0,.3,0);add(m);moving={m,w:H.mv[2],d:H.mv[3]}}
+  hole={x:H.h[0],z:H.h[1]};const hm=new THREE.Mesh(new THREE.CylinderGeometry(.34,.34,.02,20),M(0x111));hm.position.set(hole.x,.01,hole.z);add(hm);const fp=new THREE.Mesh(new THREE.CylinderGeometry(.03,.03,2),M(0xffffff));fp.position.set(hole.x,1,hole.z);add(fp);const fl=new THREE.Mesh(new THREE.BoxGeometry(.7,.45,.03),M(0xe8433f));fl.position.set(hole.x+.35,1.75,hole.z);add(fl);
+  ball.x=H.s[0];ball.z=H.s[1];ball.vx=ball.vz=0;ball.in=false;strokes=0;state='aim';
+  let minx=1e9,maxx=-1e9,minz=1e9,maxz=-1e9;for(const [cx,cz,w,d] of H.f){minx=Math.min(minx,cx-w/2);maxx=Math.max(maxx,cx+w/2);minz=Math.min(minz,cz-d/2);maxz=Math.max(maxz,cz+d/2)}
+  const cx=(minx+maxx)/2,cz=(minz+maxz)/2,hh=Math.max((maxz-minz)*.85,(maxx-minx)*.65)+6;cam.position.set(cx,hh,cz+hh*.45);cam.lookAt(cx,0,cz)}
+const bm=new THREE.Mesh(new THREE.SphereGeometry(.18,14,10),M(0xffffff));scene.add(bm);ball={x:0,z:0,vx:0,vz:0,in:false};
+aim=new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(),new THREE.Vector3()]),new THREE.LineBasicMaterial({color:0xffd05a}));aim.visible=false;scene.add(aim);
+function reset(){hi=0;total=0;card=[];build()}
+function gp(e){const r=cv.getBoundingClientRect();pt.set((e.clientX-r.left)/r.width*2-1,-((e.clientY-r.top)/r.height)*2+1);ray.setFromCamera(pt,cam);const v=new THREE.Vector3();return ray.ray.intersectPlane(plane,v)}
+cv.addEventListener('pointerdown',e=>{if(state!=='aim')return;const p=gp(e);if(p)drag={x:p.x,z:p.z}});cv.addEventListener('pointermove',e=>{if(!drag)return;const p=gp(e);if(!p)return;const dx=drag.x-p.x,dz=drag.z-p.z,l=Math.min(3.2,Math.hypot(dx,dz));if(l<.1){aim.visible=false;return}aim.visible=true;const a=Math.atan2(dz,dx);aim.geometry.setFromPoints([new THREE.Vector3(ball.x,.3,ball.z),new THREE.Vector3(ball.x+Math.cos(a)*l,.3,ball.z+Math.sin(a)*l)]);drag.l=l;drag.a=a});
+addEventListener('pointerup',()=>{if(!drag)return;aim.visible=false;if(drag.l>.25&&state==='aim'){const sp=drag.l*.17;ball.vx=Math.cos(drag.a)*sp;ball.vz=Math.sin(drag.a)*sp;strokes++;state='roll';tone(300,.08,'square',.08)}drag=null});
+function hitWall(w,fx,fz){const nx=clamp(ball.x,w[0]-w[2]/2,w[0]+w[2]/2),nz=clamp(ball.z,w[1]-w[3]/2,w[1]+w[3]/2),dx=ball.x-nx,dz=ball.z-nz,d=Math.hypot(dx,dz);if(d<.18&&d>0.0001){const ux=dx/d,uz=dz/d;ball.x=nx+ux*.18;ball.z=nz+uz*.18;const dp=ball.vx*ux+ball.vz*uz;if(dp<0){ball.vx-=1.85*dp*ux;ball.vz-=1.85*dp*uz;tone(220,.04,'square',.04)}}else if(d<=.0001){ball.z+=.2}}
+function step(){frame++;if(moving){const x=Math.sin(frame*.025)*1.2;moving.m.position.x=x;moving.rect=[x,0,moving.w,moving.d]}
+  if(state==='roll'){for(let s=0;s<4;s++){ball.x+=ball.vx/4;ball.z+=ball.vz/4;for(const w of walls)hitWall(w);if(moving)hitWall(moving.rect)}
+    ball.vx*=.986;ball.vz*=.986;const sp=Math.hypot(ball.vx,ball.vz);const dh=Math.hypot(ball.x-hole.x,ball.z-hole.z);
+    if(dh<.32&&sp<.28){sink();return}if(dh<1&&sp<.3){ball.vx+=(hole.x-ball.x)*.012;ball.vz+=(hole.z-ball.z)*.012}
+    if(sp<.01){ball.vx=ball.vz=0;state='aim'}if(strokes>=9&&state==='aim'){sink(true)}}
+  bm.position.set(ball.x,.18,ball.z);
+  $('#hud').textContent='מסלול '+(hi+1)+'/'+HOLES.length+' · פאר '+HOLES[hi].par+' · מכות '+strokes+' · סך '+total}
+function sink(fail){state='sunk';ball.vx=ball.vz=0;if(!fail)tone(900,.25);const par=HOLES[hi].par,sc=fail?10:strokes;total+=sc;card.push(sc-par);$('#hud').textContent=fail?'לא נכנס…':(sc===1?'🎉 חור בנגיחה!':sc<par?'מעולה! ('+(sc-par)+')':sc===par?'פאר! ✔':'+'+(sc-par));setTimeout(()=>{hi++;if(hi>=HOLES.length){state='over';const par=HOLES.reduce((a,h)=>a+h.par,0),diff=total-par;saveBest(Math.max(1,100-diff*5));endGame('סיימת! ⛳',total+' מכות','פאר '+par+' · '+(diff<=0?'מתחת לפאר!':'+'+diff),Math.max(5,40-diff*3),diff<=0?1:0)}else build()},1200)}
+$('#go').onclick=()=>{$('#menu').classList.remove('show');reset()};$('#again').onclick=()=>{$('#end').classList.remove('show');reset()};$('#menu2').onclick=()=>{state='menu';$('#end').classList.remove('show');$('#menu').classList.add('show');$('#hud').textContent=''};
+window.__s={reset,step,get state(){return state},get ball(){return ball},get hole(){return hole},get hi(){return hi},get total(){return total},go(i){hi=i;build()},shoot(a,sp){ball.vx=Math.cos(a)*sp;ball.vz=Math.sin(a)*sp;strokes++;state='roll'}};
+build();runLoop(step,()=>state!=='menu'&&state!=='over');
+
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+</script>
+<script src="../hub.js"></script>
+</body>
+</html>

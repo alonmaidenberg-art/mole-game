@@ -224,5 +224,45 @@
     "url": "bubbles/",
     "icon": "bubbles/icons/icon-192.png",
     "tag": "פאזל"
+  },
+  {
+    "id": "race3d",
+    "name": "מירוץ 3D",
+    "description": "מירוץ מכוניות תלת-ממדי מול 3 יריבים",
+    "url": "race3d/",
+    "icon": "race3d/icons/icon-192.png",
+    "tag": "3D"
+  },
+  {
+    "id": "flight3d",
+    "name": "טיסה 3D",
+    "description": "טיסה דרך טבעות זהב והרים",
+    "url": "flight3d/",
+    "icon": "flight3d/icons/icon-192.png",
+    "tag": "3D"
+  },
+  {
+    "id": "parkour3d",
+    "name": "פארקור 3D",
+    "description": "קפיצות בין פלטפורמות עם קפיצה כפולה",
+    "url": "parkour3d/",
+    "icon": "parkour3d/icons/icon-192.png",
+    "tag": "3D"
+  },
+  {
+    "id": "golf3d",
+    "name": "מיני גולף 3D",
+    "description": "מיני גולף עם 6 מסלולים",
+    "url": "golf3d/",
+    "icon": "golf3d/icons/icon-192.png",
+    "tag": "3D"
+  },
+  {
+    "id": "bowling3d",
+    "name": "באולינג 3D",
+    "description": "באולינג עם 10 סיבובים וסטרייקים",
+    "url": "bowling3d/",
+    "icon": "bowling3d/icons/icon-192.png",
+    "tag": "3D"
   }
 ]
