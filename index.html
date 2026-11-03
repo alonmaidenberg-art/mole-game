@@ -72,7 +72,7 @@ footer{text-align:center;margin-top:34px;opacity:.55;font-size:13px}
     <h1>המשחקים של אלון מידנברג</h1>
     <p>בחרו משחק ותתחילו לשחק 🎮</p><div class="stat" id="stat"></div>
     <div class="wal"><span>🪙 <b id="wc">0</b></span><span>💎 <b id="wd">0</b></span><button class="key" id="keyB" aria-label="קוד אדמין">🔑</button></div>
-  <div class="daily"><button id="dailyB">🎁 מתנה יומית</button></div>
+  <div class="daily"><button id="dailyB">🎁 מתנה יומית</button> <button id="lbB" style="font:inherit;font-weight:900;font-size:16px;padding:10px 20px;border-radius:999px;border:2px solid rgba(255,255,255,.3);background:rgba(255,255,255,.08);color:#fff;cursor:pointer">🏆 השיאים שלי</button></div>
     <div class="tools"><input class="sr" id="sr" type="search" placeholder="🔍 חיפוש משחק…" autocomplete="off"></div>
     <div id="chips"></div>
   </header>
@@ -80,6 +80,7 @@ footer{text-align:center;margin-top:34px;opacity:.55;font-size:13px}
   <noscript><p style="text-align:center"><a style="color:#ffd23f" href="mole/">🐹 תפוס את החפרפרת</a></p></noscript>
   <footer>© 2026 אלון מידנברג · כל הזכויות שמורות · אסור להעתיק בלי רשות</footer>
 </main>
+<div class="mo" id="lbM"><div class="mc" style="max-height:85vh;overflow:auto"><h2>🏆 השיאים שלי</h2><div id="lbList"></div><button class="mb alt" id="lbX">סגור</button></div></div>
 <div class="mo" id="noteM"><div class="mc"><h2 id="noteT"></h2><p id="noteP"></p><button class="mb" id="noteGo">המשך למשחק</button><button class="mb alt" id="noteX">חזרה</button></div></div>
 <div class="mo" id="admM"><div class="mc"><h2>🔑 קוד אדמין</h2>
   <div id="admIn"><p>הכניסו את הקוד הסודי</p><input id="admC" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="AG-XXXX-XXXX-XXXX"><div class="err" id="admE"></div><button class="mb" id="admOk">אישור</button></div>
@@ -132,6 +133,16 @@ fetch('games.json',{cache:'no-cache'}).then(function(r){return r.json()}).then(f
   b.onclick=function(){var o=st(),t=today();if(o.d===t)return;var y=new Date(Date.now()-864e5).toISOString().slice(0,10);var s=o.d===y?o.s+1:1;var c=30+Math.min(s,7)*10,dm=s%7===0?1:0;AG.add(c,dm);sv(K,{d:t,s:s});alert('קיבלת '+c+' 🪙'+(dm?' ו-💎 1':'')+'\nרצף: '+s+' ימים');paint()};
   paint()})();
 
+
+/* personal bests */
+var BK={flappy:'b_best',fallingblocks:'f_best',game2048:'g_best',snake:'s_best'};
+function lbOpen(){var L=$('lbList');L.textContent='';var n=0;
+  LIST.forEach(function(x){var k=BK[x.id]||(x.id+'_best'),v=null;try{v=localStorage.getItem(k)}catch(e){}if(v===null||v===''||v==='0'||isNaN(+v))return;n++;
+    var r=document.createElement('div');r.style.cssText='display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.08);border-radius:14px;padding:8px 10px;margin:6px 0;text-align:start';
+    var i=document.createElement('img');i.src=x.icon;i.width=40;i.height=40;i.style.borderRadius='10px';var t=document.createElement('div');t.style.flex='1';t.style.fontWeight='800';t.textContent=x.name;var s=document.createElement('div');s.style.cssText='font-weight:900;font-size:20px;color:#ffd23f';s.textContent=(+v).toLocaleString('he-IL');r.append(i,t,s);L.append(r)});
+  if(!n){L.innerHTML='<p>עוד אין שיאים. שחקו כמה משחקים וחזרו!</p>'}
+  $('lbM').classList.add('show')}
+$('lbB').onclick=lbOpen;$('lbX').onclick=function(){$('lbM').classList.remove('show')};
 function showNote(x){$('noteT').textContent=x.noteTitle||x.name;$('noteP').textContent=x.note;$('noteM').classList.add('show');$('noteGo').onclick=function(){location.href=x.url};$('noteX').onclick=function(){$('noteM').classList.remove('show')}}
 function $(i){return document.getElementById(i)}
 function wal(){$('wc').textContent=AG.coins().toLocaleString('he-IL');$('wd').textContent=AG.diamonds().toLocaleString('he-IL')}
