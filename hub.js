@@ -4,11 +4,16 @@
   var HASH='a28e690a3b6d041970a632d16ad8d54a2ae463d1319f7990a490a5ffd8431884';
   var script=document.currentScript;
   var ROOT=new URL('./',script&&script.src?script.src:location.href).href;
+
+  /* record which games were opened (for Boss mode unlock) */
+  try{var rel=location.href.slice(ROOT.length).split(/[?#]/)[0].replace(/index\.html$/,'').replace(/\/$/,'');
+    if(rel&&rel.indexOf('/')<0&&rel!=='boss'&&rel!=='lib'&&rel!=='assets'){var pl=JSON.parse(localStorage.getItem('ag_played')||'[]');if(pl.indexOf(rel)<0){pl.push(rel);localStorage.setItem('ag_played',JSON.stringify(pl))}}}catch(e){}
   var K='ag_wallet',KA='ag_admin',subs=[];
   function rd(){try{var w=JSON.parse(localStorage.getItem(K)||'{}');return{c:Math.max(0,+w.c||0),d:Math.max(0,+w.d||0)}}catch(e){return{c:0,d:0}}}
   function wr(w){try{localStorage.setItem(K,JSON.stringify(w))}catch(e){}subs.forEach(function(f){try{f(w)}catch(e){}})}
   var AG={
     root:ROOT,
+    played:function(){try{return JSON.parse(localStorage.getItem('ag_played')||'[]').length}catch(e){return 0}},
     coins:function(){return rd().c},
     diamonds:function(){return rd().d},
     add:function(c,d){var w=rd();w.c+=c||0;w.d+=d||0;wr(w)},

@@ -58,6 +58,13 @@ footer{text-align:center;margin-top:34px;opacity:.55;font-size:13px}
 .fav{position:absolute;top:8px;left:10px;background:none;border:0;font-size:22px;cursor:pointer;color:#fff;opacity:.35;z-index:2;padding:4px}.fav.on{opacity:1;color:#ffd23f}
 .new{position:absolute;top:-6px;right:-4px;background:#ff3d71;color:#fff;font-size:11px;font-weight:900;border-radius:999px;padding:3px 9px;z-index:2;box-shadow:0 2px 6px #0006}
 .stat{opacity:.7;font-size:14px;margin-top:6px}
+
+h1{background:linear-gradient(90deg,#ffe27a,#ff9fd6,#7ae0ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+a.card{background:linear-gradient(160deg,rgba(255,255,255,.12),rgba(255,255,255,.04));backdrop-filter:blur(6px)}
+a.card:hover{box-shadow:0 8px 26px rgba(255,210,63,.25)}
+.bossb{display:flex;align-items:center;gap:14px;text-decoration:none;color:#fff;margin:6px 0 18px;padding:16px 18px;border-radius:22px;background:linear-gradient(120deg,#5a1aa8,#c2307a);border:2px solid rgba(255,255,255,.3);box-shadow:0 8px 28px rgba(194,48,122,.35)}
+.bossb .em{font-size:48px}.bossb b{display:block;font-size:20px}.bossb small{opacity:.9;font-size:14px}
+.bossb .bar{height:8px;background:rgba(0,0,0,.3);border-radius:4px;margin-top:8px;overflow:hidden}.bossb .bar i{display:block;height:100%;background:#ffd23f;border-radius:4px}
 </style>
 <link rel="canonical" href="https://alon-games.netlify.app/">
 <meta property="og:title" content="המשחקים של אלון מידנברג">
@@ -75,6 +82,7 @@ footer{text-align:center;margin-top:34px;opacity:.55;font-size:13px}
   <div class="daily"><button id="dailyB">🎁 מתנה יומית</button> <button id="lbB" style="font:inherit;font-weight:900;font-size:16px;padding:10px 20px;border-radius:999px;border:2px solid rgba(255,255,255,.3);background:rgba(255,255,255,.08);color:#fff;cursor:pointer">🏆 השיאים שלי</button></div>
     <div class="tools"><input class="sr" id="sr" type="search" placeholder="🔍 חיפוש משחק…" autocomplete="off"></div>
     <div id="chips"></div>
+  <a class="bossb" id="bossB" href="boss/"><span class="em">👾</span><span style="flex:1"><b>שלבי הבוס: הגליץ׳</b><small id="bossT"></small><div class="bar"><i id="bossBar"></i></div></span></a>
   </header>
   <section id="grid" aria-label="רשימת המשחקים"><p class="empty">טוען משחקים…</p></section>
   <noscript><p style="text-align:center"><a style="color:#ffd23f" href="mole/">🐹 תפוס את החפרפרת</a></p></noscript>
@@ -143,6 +151,7 @@ function lbOpen(){var L=$('lbList');L.textContent='';var n=0;
   if(!n){L.innerHTML='<p>עוד אין שיאים. שחקו כמה משחקים וחזרו!</p>'}
   $('lbM').classList.add('show')}
 $('lbB').onclick=lbOpen;$('lbX').onclick=function(){$('lbM').classList.remove('show')};
+(function(){var n=AG.played(),ok=n>=20||AG.isAdmin();$('bossT').textContent=ok?'נפתח! 20 שלבים ארוכים נגד הגליץ׳':'שחקו ב-20 משחקים שונים כדי לפתוח ('+Math.min(n,20)+'/20)';$('bossBar').style.width=Math.min(100,n/20*100)+'%'})();
 function showNote(x){$('noteT').textContent=x.noteTitle||x.name;$('noteP').textContent=x.note;$('noteM').classList.add('show');$('noteGo').onclick=function(){location.href=x.url};$('noteX').onclick=function(){$('noteM').classList.remove('show')}}
 function $(i){return document.getElementById(i)}
 function wal(){$('wc').textContent=AG.coins().toLocaleString('he-IL');$('wd').textContent=AG.diamonds().toLocaleString('he-IL')}

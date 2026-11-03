@@ -417,3 +417,12 @@
 
 /dodge/manifest.webmanifest
   Cache-Control: no-cache
+
+/boss/sw.js
+  Cache-Control: no-cache
+
+/boss/index.html
+  Cache-Control: no-cache
+
+/boss/manifest.webmanifest
+  Cache-Control: no-cache

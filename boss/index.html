@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta name="author" content="Alon Maidenberg - אלון מידנברג"><meta name="copyright" content="© 2026 אלון מידנברג. כל הזכויות שמורות.">
+<!-- © 2026 Alon Maidenberg. All rights reserved. -->
+<meta name="robots" content="noai, noimageai">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>שלבי בוס: הגליץ׳ – אלון מידנברג</title>
+<meta name="description" content="20 שלבי בוס שבהם מצילים את המשחקים מגליץ׳.">
+<meta name="theme-color" content="#0b0b1e">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;background:#1a1038;color:#fff;font-family:system-ui,-apple-system,"Segoe UI",Arial,"Noto Sans Hebrew",sans-serif}
+body{background:radial-gradient(700px 500px at 80% -10%,#5b36d6 0,transparent 60%),radial-gradient(600px 500px at 0% 110%,#0f6b6b 0,transparent 55%),#1a1038;min-height:100vh;min-height:100dvh;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+main{max-width:520px;margin:0 auto;padding:max(12px,env(safe-area-inset-top)) 14px 24px}
+h1{margin:6px 0;font-size:30px;text-align:center}
+.sub{text-align:center;opacity:.75;margin:0 0 10px}
+.box{background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.12);border-radius:22px;padding:14px;margin:12px 0}
+.lb{opacity:.8;font-size:15px;margin-bottom:8px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{flex:1;min-width:70px;padding:13px 6px;border-radius:16px;border:2px solid rgba(255,255,255,.18);background:#150a30;color:#fff;font:inherit;font-weight:800;font-size:17px;cursor:pointer}
+.chip.on{background:#ffd05a;color:#2a1c00;border-color:#fff}
+.btn{display:block;width:100%;border:0;border-radius:18px;padding:15px;margin-top:12px;font:inherit;font-size:21px;font-weight:900;color:#06322b;background:linear-gradient(180deg,#5ff7d6,#1fc9a6);box-shadow:0 6px 0 #0d7a66;cursor:pointer}
+.btn:active{transform:translateY(3px);box-shadow:0 3px 0 #0d7a66}
+.btn.alt{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.3);box-shadow:none;font-size:16px;padding:12px}
+.ib{min-width:46px;height:42px;padding:0 12px;border-radius:13px;border:2px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#fff;font:inherit;font-size:17px;font-weight:800;cursor:pointer}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.scr{display:none}.scr.show{display:block}
+.ov{position:fixed;inset:0;background:rgba(10,5,30,.82);display:none;align-items:center;justify-content:center;z-index:30;padding:16px}.ov.show{display:flex}
+.ovc{width:100%;max-width:380px;background:linear-gradient(160deg,#2c1b6a,#1a1038);border:2px solid rgba(255,255,255,.2);border-radius:26px;padding:22px;text-align:center}
+.ovc h2{margin:0 0 6px;font-size:30px}
+body{overflow:hidden;position:fixed;inset:0;width:100%;background:#0d0826}
+#cv{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);display:block;touch-action:none}
+.ov{overflow:auto}.ovc{margin:auto}
+#hud{position:fixed;left:0;right:0;top:0;text-align:center;font-weight:900;font-size:22px;pointer-events:none;z-index:8;padding-top:max(8px,env(safe-area-inset-top));direction:ltr;text-shadow:0 2px 4px #000}
+.tb{position:fixed;bottom:max(10px,env(safe-area-inset-bottom));z-index:6;width:74px;height:74px;border-radius:50%;border:3px solid rgba(255,255,255,.5);background:rgba(20,12,60,.55);color:#fff;font-size:26px;font-weight:900;touch-action:none;display:none}
+.tb.on{background:rgba(255,160,40,.85)}
+#rot{position:fixed;inset:0;background:#120a2c;z-index:50;display:none;align-items:center;justify-content:center;text-align:center;font-size:24px;font-weight:800;padding:20px}@media (orientation:portrait) and (pointer:coarse){#rot{display:flex}}
+</style>
+</head>
+<body>
+<canvas id="cv"></canvas><div id="hud"></div>
+<div id="rot">📱↔️<br>סובבו את הטלפון לרוחב</div>
+<div class="ov show" id="menu"><div class="ovc" style="max-width:440px"><div style="font-size:56px">👾</div><h2>שלבי הבוס: הגליץ׳</h2><div class="lb" id="bmsg">גליץ׳ מסתורי פורץ לכל המשחקים! רק מי ששיחק בהרבה משחקים יכול לעצור אותו. 20 שלבי בוס ארוכים, כמה משחקים בו זמנית, והעולם תלוי בך.</div><div id="bprog" style="font-weight:900;margin:8px 0;color:#ffd05a"></div><button class="btn" id="go">▶ שחק</button><div style="opacity:.8;margin-top:10px;font-size:15px">שיא: <b id="best">0</b></div></div></div>
+<div class="ov" id="end"><div class="ovc"><h2 id="eT">נגמר</h2><div style="font-size:48px;font-weight:900;color:#ffd05a" id="eS"></div><p id="eM"></p><button class="btn" id="again">🔁 שוב</button><button class="btn alt" id="menu2">תפריט</button></div></div>
+<script>
+'use strict';
+const $=s=>document.querySelector(s);
+const store={get(k,d){try{const v=localStorage.getItem(k);return v===null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+let _ac=null;function tone(f,d=.1,t='triangle',v=.07){try{_ac=_ac||new (window.AudioContext||window.webkitAudioContext)();const o=_ac.createOscillator(),g=_ac.createGain();o.type=t;o.frequency.value=f;g.gain.value=v;o.connect(g);g.connect(_ac.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,_ac.currentTime+d);o.stop(_ac.currentTime+d+.02)}catch(e){}}
+const W=800,H=450;const cv=$('#cv'),ctx=cv.getContext('2d');const keys={};const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),rnd=(a,b)=>a+Math.random()*(b-a);
+function resize(){const s=Math.min(innerWidth/W,innerHeight/H),d=Math.min(devicePixelRatio||1,2);cv.style.width=Math.floor(W*s)+'px';cv.style.height=Math.floor(H*s)+'px';cv.width=Math.floor(W*s*d);cv.height=Math.floor(H*s*d);ctx.setTransform(s*d,0,0,s*d,0,0)}
+addEventListener('resize',resize);resize();
+addEventListener('keydown',e=>{keys[e.code]=1;if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault()});addEventListener('keyup',e=>{keys[e.code]=0});
+function cpos(e){const r=cv.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width*W,y:(e.clientY-r.top)/r.height*H}}
+function holdBtn(id,fn){const b=$(id);b.addEventListener('pointerdown',e=>{e.preventDefault();fn(1);b.classList.add('on')});for(const t of['pointerup','pointerleave','pointercancel'])b.addEventListener(t,e=>{fn(0);b.classList.remove('on')})}
+const BK='boss'+'_best';let best=+store.get(BK,0);$('#best').textContent=best;
+function endGame(title,score,msg,coins,dia){$('#eT').textContent=title;$('#eS').textContent=score;let m=msg||'';if(window.AG&&coins>0){AG.add(coins,dia||0);m+=' +'+coins+' 🪙'+(dia?' +'+dia+' 💎':'')}$('#eM').textContent=m;$('#end').classList.add('show')}
+function saveBest(s){if(s>best){best=s;store.set(BK,s);$('#best').textContent=s}}
+
+let hits=[],on=false;
+function rr(x,y,w,h,r){ctx.beginPath();ctx.roundRect?ctx.roundRect(x,y,w,h,r):ctx.rect(x,y,w,h)}
+function B(x,y,w,h,col,txt,fn,fs=22,tc='#fff'){ctx.fillStyle=col;rr(x,y,w,h,12);ctx.fill();if(txt!=null){ctx.fillStyle=tc;ctx.font='bold '+fs+'px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(txt,x+w/2,y+h/2+1)}if(fn)hits.push({x,y,w,h,fn})}
+function T(t,x,y,fs=22,c='#fff',al='center'){ctx.fillStyle=c;ctx.font='bold '+fs+'px system-ui';ctx.textAlign=al;ctx.textBaseline='middle';ctx.fillText(t,x,y)}
+cv.addEventListener('pointerdown',e=>{const p=cpos(e);for(let i=hits.length-1;i>=0;i--){const h=hits[i];if(p.x>=h.x&&p.x<=h.x+h.w&&p.y>=h.y&&p.y<=h.y+h.h){h.fn(p);break}}});
+function run(upd,drw,bg){let last=performance.now(),acc=0;function l(n){requestAnimationFrame(l);acc+=Math.min(100,n-last);last=n;while(acc>=1000/60){acc-=1000/60;if(on)upd()}hits=[];ctx.fillStyle=bg||'#111';ctx.fillRect(0,0,W,H);if(on||window.__show)drw()}requestAnimationFrame(l)}
+function wire(start){$('#go').onclick=()=>{$('#menu').classList.remove('show');start();on=true};$('#again').onclick=()=>{$('#end').classList.remove('show');start();on=true};$('#menu2').onclick=()=>{on=false;$('#end').classList.remove('show');$('#menu').classList.add('show')}}
+function over(title,score,msg,coins,dia,delay=600){on=false;window.__show=true;saveBest(score);setTimeout(()=>endGame(title,score,msg,coins,dia),delay)}
+
+const NAMES=['באג זעיר','גליץ׳ קטן','פיקסל שבור','קוד אדום','חולד נתונים','תולעת סיביות','ויירוס ירוק','שגיאה 404','לולאה אינסופית','זיכרון דולף','צל דיגיטלי','מסך כחול','האקר רוחני','מעבד מתפרע','ענן שחור','מלך הבאגים','קריסת מערכת','אל הגליץ׳','הסופר-ויירוס','הגליץ׳ הראשון'];
+const GAMES=['🏓 פונג','🧱 שוברי לבנים','🦖 דינוזאור','🐸 קפצן','👻 בולעים','🔴 סיימון','⚡ תגובה','🧠 מאסטרמיינד','💡 אורות','🔢 פאזל','🎨 צבעים','🪙 קליקר','☄️ אסטרואידים','🎯 קליעה','🏃 התחמקות','🏎️ מירוץ','🎳 באולינג','⛳ גולף'];
+const CN=['אדום','כחול','ירוק','צהוב'],CC=['#ff5a6e','#4a8aff','#3fe08a','#ffd05a'],SC=['#ff5a6e','#ffd05a','#5ff7d6','#7a9bff'],SF=[262,330,392,523];
+const played=()=>window.AG?AG.played():0,need=20,admin=()=>window.AG&&AG.isAdmin();
+const unlocked=()=>played()>=need||admin();
+let maxLv=+store.get('boss_lv',1),state='select',lvl=1,P=[],frame=0,prog=0,target=0,solved=0,cfg,lastWon=false,shake=0,flash=0;
+function paintMenu(){const ok=unlocked();$('#bprog').textContent=ok?'נפתח! שלב מקסימלי: '+maxLv+'/20':'שיחקת '+Math.min(played(),need)+'/'+need+' משחקים שונים. עוד '+Math.max(0,need-played())+' כדי לפתוח';$('#go').disabled=!ok;$('#go').style.opacity=ok?1:.4}
+function mkCfg(n){return{n,P:[2,2,3,3,3,4,4,4,4,5,5,5,5,6,6,6,6,6,6,6][n-1],L:80+n*9,gap:Math.max(55,190-n*7),exp:Math.max(300,720-n*20),types:['bug','color'].concat(n>=3?['math']:[],n>=5?['react']:[],n>=7?['simon']:[])}}
+function layout(){const c=cfg.P<=3?cfg.P:cfg.P<=4?2:3,r=Math.ceil(cfg.P/c),cw=(780-(c-1)*8)/c,ch=(384-(r-1)*8)/r;P.forEach((p,i)=>{p.x=10+(i%c)*(cw+8);p.y=58+Math.floor(i/c)*(ch+8);p.w=cw;p.h=ch})}
+function startLevel(n){lvl=n;cfg=mkCfg(n);frame=0;prog=0;solved=0;target=cfg.L*60;shake=0;const g=GAMES.slice().sort(()=>Math.random()-.5);P=[];for(let i=0;i<cfg.P;i++)P.push({g:g[i],hp:100,inc:null,bx:rnd(.2,.8),by:rnd(.3,.8),vx:rnd(.004,.009)*(Math.random()<.5?-1:1),vy:rnd(.004,.009)*(Math.random()<.5?-1:1),dead:false});layout();state='play'}
+function spawn(p){const t=cfg.types[Math.floor(Math.random()*cfg.types.length)],i={type:t,t:cfg.exp,max:cfg.exp,d:{}},n=cfg.n;
+  if(t==='bug'){i.d.b=Array.from({length:3+Math.floor(n/4)},()=>({x:rnd(.12,.88),y:rnd(.3,.82)}))}
+  else if(t==='color'){const c=Math.floor(Math.random()*4),w=(c+1+Math.floor(Math.random()*3))%4;i.d={c,w}}
+  else if(t==='math'){const m=5+Math.floor(n*1.2),a=1+Math.floor(Math.random()*m),b=1+Math.floor(Math.random()*m),ans=a+b,o=[ans,ans+1+Math.floor(Math.random()*3),Math.max(0,ans-1-Math.floor(Math.random()*3))].sort(()=>Math.random()-.5);i.d={a,b,ans,o}}
+  else if(t==='react'){i.d={wait:40+Math.floor(Math.random()*90),fl:0,seen:false}}
+  else if(t==='simon'){const L=2+Math.floor(n/6);i.d={seq:Array.from({length:L},()=>Math.floor(Math.random()*4)),ph:'show',k:0,tm:40,lit:-1,in:0}}
+  p.inc=i;tone(180,.15,'sawtooth',.05)}
+function solve(p){if(!p.inc)return;p.inc=null;p.hp=Math.min(100,p.hp+8);solved++;prog+=30;tone(700+Math.random()*200,.08)}
+function pen(p,f=70){if(p.inc)p.inc.t-=f;tone(120,.12,'square',.05);shake=6}
+function upd(){if(state!=='play')return;frame++;prog++;
+  if(frame%cfg.gap===0){const idle=P.filter(p=>!p.inc&&!p.dead);if(idle.length)spawn(idle[Math.floor(Math.random()*idle.length)])}
+  if(cfg.n>=6&&frame%2700===0){for(const p of P)if(!p.inc)spawn(p);flash=20;tone(100,.5,'sawtooth',.08)}
+  for(const p of P){p.bx+=p.vx;p.by+=p.vy;if(p.bx<.1||p.bx>.9)p.vx*=-1;if(p.by<.25||p.by>.85)p.vy*=-1;
+    const i=p.inc;if(!i){p.hp=Math.min(100,p.hp+.012);continue}
+    i.t--;if(i.type==='react'){const d=i.d;if(d.fl>0){d.fl--;if(d.fl===0){d.wait=40+Math.floor(Math.random()*90)}}else if(d.wait>0){d.wait--;if(d.wait===0)d.fl=45}}
+    if(i.type==='simon'){const d=i.d;if(d.ph==='show'){if(--d.tm<=0){if(d.lit>=0){d.lit=-1;d.tm=10;if(d.k>=d.seq.length){d.ph='in';d.in=0}}else if(d.k<d.seq.length){d.lit=d.seq[d.k];d.k++;d.tm=28;tone(SF[d.lit],.15,'sine',.08)}}}else if(d.lit>=0&&--d.tm<=0)d.lit=-1}
+    if(i.t<=0){p.hp-=30;p.inc=null;shake=10;tone(90,.3,'sawtooth',.08);if(p.hp<=0){lose();return}}}
+  if(prog>=target)win();if(shake>0)shake--;if(flash>0)flash--}
+function lose(){state='over';lastWon=false;over('הגליץ׳ ניצח הפעם',Math.floor(prog/60)+' שניות','משחק אחד הושמד. נסו שוב!',Math.floor(solved/2),0,500);$('#again').textContent='🔁 נסו שוב'}
+function win(){state='over';lastWon=true;if(lvl>=maxLv&&lvl<20){maxLv=lvl+1;store.set('boss_lv',maxLv)}const c=30+lvl*12,d=lvl%5===0?3:0;over(lvl===20?'הצלת את העולם! 🌍🏆':'הבוס הובס! 🎉',lvl===20?'20/20':'שלב '+lvl,lvl===20?'הגליץ׳ הראשון הושמד. כל המשחקים בטוחים בזכותך!':'פתרת '+solved+' תקלות',c+(lvl===20?300:0),d+(lvl===20?10:0),600);$('#again').textContent=lvl<20?'➡️ לשלב הבא':'🔁 שוב'}
+function bk(x,y,w,h,fn){hits.push({x,y,w,h,fn})}
+function drawInc(p){const i=p.inc,d=i.d,s=Math.min(p.w,p.h);const g=ctx;
+  g.fillStyle='rgba(255,40,70,.18)';g.fillRect(p.x,p.y,p.w,p.h);for(let k=0;k<4;k++){g.fillStyle='rgba(255,60,90,.35)';g.fillRect(p.x+Math.random()*p.w*.7,p.y+Math.random()*p.h,p.w*.3,2+Math.random()*3)}
+  g.fillStyle='#ffffff22';g.fillRect(p.x,p.y+p.h-6,p.w,4);g.fillStyle=i.t<120?'#ff5a5a':'#ffd05a';g.fillRect(p.x,p.y+p.h-6,p.w*clamp(i.t/i.max,0,1),4);
+  if(i.type==='bug'){d.b.forEach((b,k)=>{const bx=p.x+b.x*p.w,by=p.y+b.y*p.h,sz=s*.17;g.font=sz+'px serif';g.textAlign='center';g.textBaseline='middle';g.fillStyle='#fff';g.fillText('🐛',bx,by);bk(bx-sz*.7,by-sz*.7,sz*1.4,sz*1.4,()=>{d.b.splice(k,1);tone(900,.04);if(!d.b.length)solve(p)})});T('תפסו את כל הבאגים!',p.x+p.w/2,p.y+p.h*.17,Math.max(11,s*.08),'#ffd05a')}
+  else if(i.type==='color'){T(CN[d.w],p.x+p.w/2,p.y+p.h*.36,s*.26,CC[d.c]);T('באיזה צבע הכתוב?',p.x+p.w/2,p.y+p.h*.14,Math.max(11,s*.08),'#ffd05a');const bw=p.w/3-6;[0,1,2,3].filter(k=>k!==(d.c+2)%4||k===d.c).slice(0,3).sort((a,b)=>a-b);const opts=d.o||(d.o=[d.c].concat([0,1,2,3].filter(k=>k!==d.c).sort(()=>Math.random()-.5).slice(0,2)).sort(()=>Math.random()-.5));opts.forEach((k,j)=>{B(p.x+3+j*(bw+6),p.y+p.h*.58,bw,p.h*.28,'#3a3a5a',CN[k],()=>{if(k===d.c)solve(p);else pen(p)},Math.max(11,s*.1))})}
+  else if(i.type==='math'){T('\u202A'+d.a+' + '+d.b+' = ?\u202C',p.x+p.w/2,p.y+p.h*.34,s*.22,'#fff');const bw=p.w/3-6;d.o.forEach((v,j)=>B(p.x+3+j*(bw+6),p.y+p.h*.58,bw,p.h*.28,'#3a3a5a',v,()=>{if(v===d.ans)solve(p);else pen(p)},Math.max(12,s*.12)))}
+  else if(i.type==='react'){const on=d.fl>0;g.fillStyle=on?'#1fc96a':'#5a2a3a';g.fillRect(p.x+4,p.y+4,p.w-8,p.h-14);T(on?'עכשיו!':'חכו לירוק…',p.x+p.w/2,p.y+p.h/2,Math.max(14,s*.15));bk(p.x,p.y,p.w,p.h,()=>{if(d.fl>0)solve(p);else{pen(p);d.wait+=30}})}
+  else if(i.type==='simon'){T(d.ph==='show'?'זכרו…':'חזרו על הרצף',p.x+p.w/2,p.y+p.h*.13,Math.max(11,s*.08),'#ffd05a');const ps=Math.min(p.w*.42,p.h*.34);for(let k=0;k<4;k++){const x=p.x+p.w/2-ps-3+(k%2)*(ps+6),y=p.y+p.h*.22+Math.floor(k/2)*(ps+6);B(x,y,ps,ps,d.lit===k?'#fff':SC[k]+'88',null,()=>{if(d.ph!=='in')return;d.lit=k;d.tm=10;tone(SF[k],.15,'sine',.08);if(d.seq[d.in]===k){d.in++;if(d.in>=d.seq.length)solve(p)}else{pen(p,40);d.ph='show';d.k=0;d.tm=40;d.lit=-1}})}}}
+function drw(){ctx.save();if(shake>0)ctx.translate(rnd(-shake,shake)*.5,rnd(-shake,shake)*.5);
+  if(state==='select'){T('בחרו שלב בוס',W/2,34,30);T(played()+'/'+need+' משחקים שונים · שלב מקסימלי '+maxLv,W/2,66,16,'#ffffffaa');
+    for(let n=1;n<=20;n++){const x=40+((n-1)%5)*148,y=96+Math.floor((n-1)/5)*84,ok=n<=maxLv&&unlocked();B(x,y,136,72,ok?(n<maxLv?'#2a8a5a':'#6a3ac0'):'#2a2a3a',ok?n:'🔒',ok?()=>startLevel(n):null,28);if(ok)T(NAMES[n-1],x+68,y+58,11,'#ffffffcc')}
+    B(W/2-70,H-40,140,34,'#444','חזרה',()=>{location.href=(window.AG?AG.root:'../')},16)}
+  else{
+    const bossHp=1-clamp(prog/target,0,1);ctx.fillStyle='#ffffff10';ctx.fillRect(0,0,W,52);T('👾 '+NAMES[lvl-1]+' · שלב '+lvl+'/20',W/2,15,16);ctx.fillStyle='#0008';ctx.fillRect(100,28,600,14);ctx.fillStyle='hsl('+(lvl*17)+',80%,55%)';ctx.fillRect(100,28,600*bossHp,14);T('תקלות שנפתרו: '+solved,W-90,15,12,'#ffffffbb');
+    for(const p of P){ctx.fillStyle='#14142e';rr(p.x,p.y,p.w,p.h,10);ctx.fill();ctx.save();rr(p.x,p.y,p.w,p.h,10);ctx.clip();
+      ctx.globalAlpha=.55;ctx.font=Math.min(p.w,p.h)*.28+'px serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#fff';ctx.fillText(p.g.split(' ')[0],p.x+p.bx*p.w,p.y+p.by*p.h);ctx.globalAlpha=1;
+      if(p.inc)drawInc(p);ctx.restore();
+      T(p.g.split(' ')[1],p.x+p.w/2,p.y+12,Math.max(11,Math.min(p.w,p.h)*.07),'#ffffffaa');ctx.fillStyle='#0008';ctx.fillRect(p.x+6,p.y+p.h-14,p.w-12,5);ctx.fillStyle=p.hp>50?'#3fe08a':p.hp>25?'#ffd05a':'#ff5a5a';ctx.fillRect(p.x+6,p.y+p.h-14,(p.w-12)*clamp(p.hp/100,0,1),5);
+      if(p.inc){ctx.strokeStyle='#ff4060';ctx.lineWidth=3;rr(p.x,p.y,p.w,p.h,10);ctx.stroke()}}
+    if(flash>0){ctx.fillStyle='rgba(255,40,70,'+flash/50+')';ctx.fillRect(0,0,W,H);T('גל גליץ׳!',W/2,H/2,48,'#fff')}}
+  ctx.restore()}
+function start(){paintMenu();state='select';$('#again').textContent='🔁 שוב'}
+$('#go').onclick=()=>{$('#menu').classList.remove('show');state='select';on=true;window.__show=true};
+$('#again').onclick=()=>{$('#end').classList.remove('show');const n=lastWon&&lvl<20?lvl+1:lvl;on=true;startLevel(n)};
+$('#menu2').onclick=()=>{$('#end').classList.remove('show');state='select';on=true;paintMenu()};
+paintMenu();addEventListener('load',paintMenu);run(upd,drw,'#0b0b1e');
+window.__s={step:upd,startLevel,get on(){return on},get state(){return state},get P(){return P},get cfg(){return cfg},solve,get lvl(){return lvl},get maxLv(){return maxLv},get prog(){return prog},get target(){return target},spawn,set on(v){on=v}};
+
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+</script>
+<script src="../hub.js"></script>
+</body>
+</html>

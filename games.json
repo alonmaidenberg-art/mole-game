@@ -384,5 +384,13 @@
     "url": "dodge/",
     "icon": "dodge/icons/icon-192.png",
     "tag": "ארקייד"
+  },
+  {
+    "id": "boss",
+    "name": "שלבי בוס: הגליץ׳",
+    "description": "20 שלבי בוס: מצילים את המשחקים מגליץ׳ (נפתח אחרי 20 משחקים)",
+    "url": "boss/",
+    "icon": "boss/icons/icon-192.png",
+    "tag": "בוס"
   }
 ]

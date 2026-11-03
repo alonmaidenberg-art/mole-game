@@ -91,3 +91,5 @@ Import from Git, Build command ריק, Publish directory `.`.
 - `gallery/` קליעה למטרה
 
 - `dodge/` התחמקות
+
+- `boss/` שלבי בוס: הגליץ׳
