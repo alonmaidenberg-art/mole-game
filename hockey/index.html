@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>הוקי אוויר – אלון מידנברג</title>
+<meta name="description" content="הוקי אוויר נגד מחשב או חבר.">
+<meta name="theme-color" content="#2a6fd6">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;background:#1a1038;color:#fff;font-family:system-ui,-apple-system,"Segoe UI",Arial,"Noto Sans Hebrew",sans-serif}
+body{background:radial-gradient(700px 500px at 80% -10%,#5b36d6 0,transparent 60%),radial-gradient(600px 500px at 0% 110%,#0f6b6b 0,transparent 55%),#1a1038;min-height:100vh;min-height:100dvh;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+main{max-width:520px;margin:0 auto;padding:max(12px,env(safe-area-inset-top)) 14px 24px}
+h1{margin:6px 0;font-size:30px;text-align:center}
+.sub{text-align:center;opacity:.75;margin:0 0 10px}
+.box{background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.12);border-radius:22px;padding:14px;margin:12px 0}
+.lb{opacity:.8;font-size:15px;margin-bottom:8px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{flex:1;min-width:70px;padding:13px 6px;border-radius:16px;border:2px solid rgba(255,255,255,.18);background:#150a30;color:#fff;font:inherit;font-weight:800;font-size:17px;cursor:pointer}
+.chip.on{background:#ffd05a;color:#2a1c00;border-color:#fff}
+.btn{display:block;width:100%;border:0;border-radius:18px;padding:15px;margin-top:12px;font:inherit;font-size:21px;font-weight:900;color:#06322b;background:linear-gradient(180deg,#5ff7d6,#1fc9a6);box-shadow:0 6px 0 #0d7a66;cursor:pointer}
+.btn:active{transform:translateY(3px);box-shadow:0 3px 0 #0d7a66}
+.btn.alt{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.3);box-shadow:none;font-size:16px;padding:12px}
+.ib{min-width:46px;height:42px;padding:0 12px;border-radius:13px;border:2px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#fff;font:inherit;font-size:17px;font-weight:800;cursor:pointer}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.scr{display:none}.scr.show{display:block}
+.ov{position:fixed;inset:0;background:rgba(10,5,30,.82);display:none;align-items:center;justify-content:center;z-index:30;padding:16px}.ov.show{display:flex}
+.ovc{width:100%;max-width:380px;background:linear-gradient(160deg,#2c1b6a,#1a1038);border:2px solid rgba(255,255,255,.2);border-radius:26px;padding:22px;text-align:center}
+.ovc h2{margin:0 0 6px;font-size:30px}
+body{overflow:hidden;position:fixed;inset:0;width:100%;background:#0d0826}
+#cv{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);display:block;touch-action:none}
+.ov{overflow:auto}.ovc{margin:auto}
+#hud{position:fixed;left:0;right:0;top:0;text-align:center;font-weight:900;font-size:22px;pointer-events:none;z-index:8;padding-top:max(8px,env(safe-area-inset-top));direction:ltr;text-shadow:0 2px 4px #000}
+.tb{position:fixed;bottom:max(10px,env(safe-area-inset-bottom));z-index:6;width:74px;height:74px;border-radius:50%;border:3px solid rgba(255,255,255,.5);background:rgba(20,12,60,.55);color:#fff;font-size:26px;font-weight:900;touch-action:none;display:none}
+.tb.on{background:rgba(255,160,40,.85)}
+#rot{position:fixed;inset:0;background:#120a2c;z-index:50;display:none;align-items:center;justify-content:center;text-align:center;font-size:24px;font-weight:800;padding:20px}@media (orientation:portrait) and (pointer:coarse){#rot{display:flex}}
+</style>
+</head>
+<body>
+<canvas id="cv"></canvas><div id="hud"></div>
+<div id="rot">📱↔️<br>סובבו את הטלפון לרוחב</div>
+<div class="ov show" id="menu"><div class="ovc" style="max-width:440px"><div style="font-size:56px">🏒</div><h2>הוקי אוויר</h2><div class="lb">הבקיעו 7 שערים ראשונים</div><div class="chips" id="lv"><button class="chip" data-v="1">קל</button><button class="chip on" data-v="2">רגיל</button><button class="chip" data-v="3">קשה</button></div><div class="chips" style="margin-top:8px" id="md"><button class="chip on" data-v="cpu">נגד מחשב</button><button class="chip" data-v="2p">שניים</button></div><div style="opacity:.75;font-size:12.5px;margin-top:8px">גררו את המחבט באצבע/עכבר. שניים: שחקן 2 עם WASD</div><button class="btn" id="go">▶ שחק</button><div style="opacity:.8;margin-top:10px;font-size:15px">שיא: <b id="best">0</b></div></div></div>
+<div class="ov" id="end"><div class="ovc"><h2 id="eT">נגמר</h2><div style="font-size:48px;font-weight:900;color:#ffd05a" id="eS"></div><p id="eM"></p><button class="btn" id="again">🔁 שוב</button><button class="btn alt" id="menu2">תפריט</button></div></div>
+<script>
+'use strict';
+const $=s=>document.querySelector(s);
+const store={get(k,d){try{const v=localStorage.getItem(k);return v===null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+let _ac=null;function tone(f,d=.1,t='triangle',v=.07){try{_ac=_ac||new (window.AudioContext||window.webkitAudioContext)();const o=_ac.createOscillator(),g=_ac.createGain();o.type=t;o.frequency.value=f;g.gain.value=v;o.connect(g);g.connect(_ac.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,_ac.currentTime+d);o.stop(_ac.currentTime+d+.02)}catch(e){}}
+const W=800,H=450;const cv=$('#cv'),ctx=cv.getContext('2d');const keys={};const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),rnd=(a,b)=>a+Math.random()*(b-a);
+function resize(){const s=Math.min(innerWidth/W,innerHeight/H),d=Math.min(devicePixelRatio||1,2);cv.style.width=Math.floor(W*s)+'px';cv.style.height=Math.floor(H*s)+'px';cv.width=Math.floor(W*s*d);cv.height=Math.floor(H*s*d);ctx.setTransform(s*d,0,0,s*d,0,0)}
+addEventListener('resize',resize);resize();
+addEventListener('keydown',e=>{keys[e.code]=1;if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault()});addEventListener('keyup',e=>{keys[e.code]=0});
+function cpos(e){const r=cv.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width*W,y:(e.clientY-r.top)/r.height*H}}
+function holdBtn(id,fn){const b=$(id);b.addEventListener('pointerdown',e=>{e.preventDefault();fn(1);b.classList.add('on')});for(const t of['pointerup','pointerleave','pointercancel'])b.addEventListener(t,e=>{fn(0);b.classList.remove('on')})}
+const BK='hockey'+'_best';let best=+store.get(BK,0);$('#best').textContent=best;
+function endGame(title,score,msg,coins,dia){$('#eT').textContent=title;$('#eS').textContent=score;let m=msg||'';if(window.AG&&coins>0){AG.add(coins,dia||0);m+=' +'+coins+' 🪙'+(dia?' +'+dia+' 💎':'')}$('#eM').textContent=m;$('#end').classList.add('show')}
+function saveBest(s){if(s>best){best=s;store.set(BK,s);$('#best').textContent=s}}
+
+let lvl=2,mode='cpu';for(const id of['lv','md'])[...$('#'+id).children].forEach(b=>b.onclick=()=>{[...$('#'+id).children].forEach(k=>k.classList.toggle('on',k===b));if(id==='md')mode=b.dataset.v;else lvl=+b.dataset.v});
+const TW=360,TH=W*0+450,GWD=130,PR=30,BR=20;/* table drawn rotated: width = H(450) horizontally? use horizontal table W x H */
+let state='menu',pk,pa,pb,sc,msgT,trail;const tx0=30,tx1=W-30,ty0=30,ty1=H-30;
+function reset(){sc=[0,0];serve(1);state='play';trail=[]}
+function serve(d){pk={x:W/2,y:H/2,vx:d*3,vy:rnd(-2,2)};pa={x:120,y:H/2,vx:0,vy:0};pb={x:W-120,y:H/2,vx:0,vy:0};msgT=0}
+let mouse=null;cv.addEventListener('pointermove',e=>{mouse=cpos(e)});cv.addEventListener('pointerdown',e=>{mouse=cpos(e)});
+function mallet(m,tx,ty,xmin,xmax,sp){const dx=tx-m.x,dy=ty-m.y,d=Math.hypot(dx,dy)||1,s=Math.min(d,sp);const nx=m.x+dx/d*s,ny=m.y+dy/d*s;m.vx=nx-m.x;m.vy=ny-m.y;m.x=clamp(nx,xmin,xmax);m.y=clamp(ny,ty0+PR,ty1-PR)}
+function step(){if(state!=='play')return;
+  let tx=mouse?mouse.x:pa.x,ty=mouse?mouse.y:pa.y;if(mode==='2p'){tx=pa.x+((keys.KeyD?1:0)-(keys.KeyA?1:0))*9;ty=pa.y+((keys.KeyS?1:0)-(keys.KeyW?1:0))*9}mallet(pa,tx,ty,tx0+PR,W/2-PR,16);
+  if(mode==='2p'){mallet(pb,pb.x+((keys.ArrowRight?1:0)-(keys.ArrowLeft?1:0))*9,pb.y+((keys.ArrowDown?1:0)-(keys.ArrowUp?1:0))*9,W/2+PR,tx1-PR,16)}
+  else{const sp=[0,4,6.2,8.5][lvl];let gx=W-90,gy=H/2;if(pk.x>W/2||pk.vx>1){gx=pk.x+30;gy=pk.y+pk.vy*3}if(pk.x>W/2&&pk.x<pb.x-15){gx=pk.x+40;gy=pk.y}if(pk.x>pb.x+5&&pk.x>W/2){gx=pk.x+60}mallet(pb,gx,gy,W/2+PR,tx1-PR,sp)}
+  for(let k=0;k<2;k++){pk.x+=pk.vx/2;pk.y+=pk.vy/2;
+    for(const m of[pa,pb]){const dx=pk.x-m.x,dy=pk.y-m.y,d=Math.hypot(dx,dy);if(d<PR+BR&&d>.01){const nx=dx/d,ny=dy/d;pk.x=m.x+nx*(PR+BR);pk.y=m.y+ny*(PR+BR);const rv=(pk.vx-m.vx)*nx+(pk.vy-m.vy)*ny;if(rv<0){pk.vx-=2*rv*nx;pk.vy-=2*rv*ny;pk.vx+=m.vx*.5;pk.vy+=m.vy*.5;tone(300,.05,'square',.06)}}}
+    if(pk.y<ty0+BR){pk.y=ty0+BR;pk.vy=Math.abs(pk.vy)}if(pk.y>ty1-BR){pk.y=ty1-BR;pk.vy=-Math.abs(pk.vy)}
+    const inG=Math.abs(pk.y-H/2)<GWD/2;if(pk.x<tx0+BR){if(inG&&pk.x<tx0){goal(1);return}pk.x=tx0+BR;pk.vx=Math.abs(pk.vx)}if(pk.x>tx1-BR){if(inG&&pk.x>tx1){goal(0);return}pk.x=tx1-BR;pk.vx=-Math.abs(pk.vx)}}
+  const s=Math.hypot(pk.vx,pk.vy);pk.vx*=.997;pk.vy*=.997;if(s>16){pk.vx*=16/s;pk.vy*=16/s}if(s<1.2){pk.vx+=pk.x<W/2?.05:-.05}
+  trail.push({x:pk.x,y:pk.y});if(trail.length>10)trail.shift();if(msgT>0)msgT--}
+function goal(w){sc[w]++;tone(700,.3);if(sc[w]>=7){state='over';const win=w===0;saveBest(sc[0]);setTimeout(()=>endGame(mode==='2p'?(win?'שחקן 1 ניצח!':'שחקן 2 ניצח!'):(win?'ניצחת! 🏆':'הפסדת הפעם'),sc[0]+' : '+sc[1],'',mode==='cpu'&&win?15+lvl*10:mode==='cpu'?4:0,mode==='cpu'&&win&&lvl===3?1:0),500)}else{serve(w?-1:1);msgT=50}}
+function draw(){const g=ctx.createLinearGradient(0,0,W,0);g.addColorStop(0,'#1c4fa8');g.addColorStop(.5,'#2a6fd6');g.addColorStop(1,'#1c4fa8');ctx.fillStyle='#0d0826';ctx.fillRect(0,0,W,H);ctx.fillStyle=g;ctx.beginPath();ctx.roundRect?ctx.roundRect(tx0-10,ty0-10,tx1-tx0+20,ty1-ty0+20,26):ctx.rect(tx0,ty0,tx1-tx0,ty1-ty0);ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,.5)';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(W/2,ty0);ctx.lineTo(W/2,ty1);ctx.stroke();ctx.beginPath();ctx.arc(W/2,H/2,60,0,7);ctx.stroke();
+  ctx.fillStyle='#0d0826';ctx.fillRect(tx0-12,H/2-GWD/2,14,GWD);ctx.fillRect(tx1-2,H/2-GWD/2,14,GWD);ctx.strokeStyle='#ff5a6e';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(tx0,H/2-GWD/2);ctx.lineTo(tx0,H/2+GWD/2);ctx.stroke();ctx.strokeStyle='#5ff7d6';ctx.beginPath();ctx.moveTo(tx1,H/2-GWD/2);ctx.lineTo(tx1,H/2+GWD/2);ctx.stroke();
+  for(let i=0;i<trail.length;i++){ctx.globalAlpha=i/trail.length*.4;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(trail[i].x,trail[i].y,BR*(i/trail.length),0,7);ctx.fill()}ctx.globalAlpha=1;
+  for(const [m,c] of[[pa,'#ff5a6e'],[pb,'#5ff7d6']]){ctx.fillStyle='rgba(0,0,0,.3)';ctx.beginPath();ctx.arc(m.x+3,m.y+4,PR,0,7);ctx.fill();ctx.fillStyle=c;ctx.beginPath();ctx.arc(m.x,m.y,PR,0,7);ctx.fill();ctx.fillStyle='rgba(255,255,255,.35)';ctx.beginPath();ctx.arc(m.x,m.y,PR*.55,0,7);ctx.fill()}
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(pk.x,pk.y,BR,0,7);ctx.fill();ctx.fillStyle='#222';ctx.beginPath();ctx.arc(pk.x,pk.y,BR*.55,0,7);ctx.fill();
+  ctx.font='bold 54px system-ui';ctx.textAlign='center';ctx.fillStyle='rgba(255,255,255,.35)';ctx.fillText(sc[0],W/2-60,H/2+18);ctx.fillText(sc[1],W/2+60,H/2+18)}
+let last=performance.now(),acc=0;function loop(n){requestAnimationFrame(loop);acc+=Math.min(100,n-last);last=n;while(acc>=1000/60){acc-=1000/60;step()}if(state!=='menu')draw();else{ctx.fillStyle='#0d0826';ctx.fillRect(0,0,W,H)}}
+$('#go').onclick=()=>{$('#menu').classList.remove('show');reset()};$('#again').onclick=()=>{$('#end').classList.remove('show');reset()};$('#menu2').onclick=()=>{state='menu';$('#end').classList.remove('show');$('#menu').classList.add('show')};
+window.__s={reset,step,get state(){return state},get sc(){return sc},get pk(){return pk}};requestAnimationFrame(loop);
+
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+</script>
+<script src="../hub.js"></script>
+</body>
+</html>

@@ -30,3 +30,13 @@ Import from Git, Build command ריק, Publish directory `.`.
 - `superfootball/` סופר כדורגל 3D
 
 - `football/` כדורגל
+
+- `fighter/` קרב רחוב
+
+- `crossy/` חוצה כבישים
+
+- `racer/` מירוץ כביש
+
+- `hockey/` הוקי אוויר
+
+- `space/` קרב בחלל

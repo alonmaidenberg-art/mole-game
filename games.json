@@ -144,5 +144,45 @@
     "url": "football/",
     "icon": "football/icons/icon-192.png",
     "tag": "ספורט"
+  },
+  {
+    "id": "fighter",
+    "name": "קרב רחוב",
+    "description": "4 דמויות, מהלך מיוחד, נגד מחשב או שניים",
+    "url": "fighter/",
+    "icon": "fighter/icons/icon-192.png",
+    "tag": "לחימה"
+  },
+  {
+    "id": "crossy",
+    "name": "חוצה כבישים",
+    "description": "חצו כבישים, נהרות ומסילות בלי להיפגע",
+    "url": "crossy/",
+    "icon": "crossy/icons/icon-192.png",
+    "tag": "הרפתקה"
+  },
+  {
+    "id": "racer",
+    "name": "מירוץ כביש",
+    "description": "מירוץ שמאיץ לאט לאט, אספו מטבעות",
+    "url": "racer/",
+    "icon": "racer/icons/icon-192.png",
+    "tag": "מירוץ"
+  },
+  {
+    "id": "hockey",
+    "name": "הוקי אוויר",
+    "description": "הוקי אוויר נגד מחשב או חבר",
+    "url": "hockey/",
+    "icon": "hockey/icons/icon-192.png",
+    "tag": "ספורט"
+  },
+  {
+    "id": "space",
+    "name": "קרב בחלל",
+    "description": "ירו באויבים, אספו כוחות ונצחו בוסים",
+    "url": "space/",
+    "icon": "space/icons/icon-192.png",
+    "tag": "ירי"
   }
 ]

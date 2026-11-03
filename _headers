@@ -147,3 +147,48 @@
 
 /football/manifest.webmanifest
   Cache-Control: no-cache
+
+/fighter/sw.js
+  Cache-Control: no-cache
+
+/fighter/index.html
+  Cache-Control: no-cache
+
+/fighter/manifest.webmanifest
+  Cache-Control: no-cache
+
+/crossy/sw.js
+  Cache-Control: no-cache
+
+/crossy/index.html
+  Cache-Control: no-cache
+
+/crossy/manifest.webmanifest
+  Cache-Control: no-cache
+
+/racer/sw.js
+  Cache-Control: no-cache
+
+/racer/index.html
+  Cache-Control: no-cache
+
+/racer/manifest.webmanifest
+  Cache-Control: no-cache
+
+/hockey/sw.js
+  Cache-Control: no-cache
+
+/hockey/index.html
+  Cache-Control: no-cache
+
+/hockey/manifest.webmanifest
+  Cache-Control: no-cache
+
+/space/sw.js
+  Cache-Control: no-cache
+
+/space/index.html
+  Cache-Control: no-cache
+
+/space/manifest.webmanifest
+  Cache-Control: no-cache
