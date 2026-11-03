@@ -282,3 +282,138 @@
 
 /bowling3d/manifest.webmanifest
   Cache-Control: no-cache
+
+/pong/sw.js
+  Cache-Control: no-cache
+
+/pong/index.html
+  Cache-Control: no-cache
+
+/pong/manifest.webmanifest
+  Cache-Control: no-cache
+
+/breakout/sw.js
+  Cache-Control: no-cache
+
+/breakout/index.html
+  Cache-Control: no-cache
+
+/breakout/manifest.webmanifest
+  Cache-Control: no-cache
+
+/dino/sw.js
+  Cache-Control: no-cache
+
+/dino/index.html
+  Cache-Control: no-cache
+
+/dino/manifest.webmanifest
+  Cache-Control: no-cache
+
+/jumper/sw.js
+  Cache-Control: no-cache
+
+/jumper/index.html
+  Cache-Control: no-cache
+
+/jumper/manifest.webmanifest
+  Cache-Control: no-cache
+
+/maze/sw.js
+  Cache-Control: no-cache
+
+/maze/index.html
+  Cache-Control: no-cache
+
+/maze/manifest.webmanifest
+  Cache-Control: no-cache
+
+/simon/sw.js
+  Cache-Control: no-cache
+
+/simon/index.html
+  Cache-Control: no-cache
+
+/simon/manifest.webmanifest
+  Cache-Control: no-cache
+
+/reaction/sw.js
+  Cache-Control: no-cache
+
+/reaction/index.html
+  Cache-Control: no-cache
+
+/reaction/manifest.webmanifest
+  Cache-Control: no-cache
+
+/mastermind/sw.js
+  Cache-Control: no-cache
+
+/mastermind/index.html
+  Cache-Control: no-cache
+
+/mastermind/manifest.webmanifest
+  Cache-Control: no-cache
+
+/lights/sw.js
+  Cache-Control: no-cache
+
+/lights/index.html
+  Cache-Control: no-cache
+
+/lights/manifest.webmanifest
+  Cache-Control: no-cache
+
+/slide/sw.js
+  Cache-Control: no-cache
+
+/slide/index.html
+  Cache-Control: no-cache
+
+/slide/manifest.webmanifest
+  Cache-Control: no-cache
+
+/colors/sw.js
+  Cache-Control: no-cache
+
+/colors/index.html
+  Cache-Control: no-cache
+
+/colors/manifest.webmanifest
+  Cache-Control: no-cache
+
+/clicker/sw.js
+  Cache-Control: no-cache
+
+/clicker/index.html
+  Cache-Control: no-cache
+
+/clicker/manifest.webmanifest
+  Cache-Control: no-cache
+
+/asteroids/sw.js
+  Cache-Control: no-cache
+
+/asteroids/index.html
+  Cache-Control: no-cache
+
+/asteroids/manifest.webmanifest
+  Cache-Control: no-cache
+
+/gallery/sw.js
+  Cache-Control: no-cache
+
+/gallery/index.html
+  Cache-Control: no-cache
+
+/gallery/manifest.webmanifest
+  Cache-Control: no-cache
+
+/dodge/sw.js
+  Cache-Control: no-cache
+
+/dodge/index.html
+  Cache-Control: no-cache
+
+/dodge/manifest.webmanifest
+  Cache-Control: no-cache

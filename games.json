@@ -264,5 +264,125 @@
     "url": "bowling3d/",
     "icon": "bowling3d/icons/icon-192.png",
     "tag": "3D"
+  },
+  {
+    "id": "pong",
+    "name": "פונג",
+    "description": "פונג נגד המחשב עד 7 נקודות",
+    "url": "pong/",
+    "icon": "pong/icons/icon-192.png",
+    "tag": "ארקייד"
+  },
+  {
+    "id": "breakout",
+    "name": "שוברי לבנים",
+    "description": "שברו את כל הלבנים",
+    "url": "breakout/",
+    "icon": "breakout/icons/icon-192.png",
+    "tag": "ארקייד"
+  },
+  {
+    "id": "dino",
+    "name": "ריצת דינוזאור",
+    "description": "קפצו מעל קקטוסים והתכופפו מתחת לציפורים",
+    "url": "dino/",
+    "icon": "dino/icons/icon-192.png",
+    "tag": "ארקייד"
+  },
+  {
+    "id": "jumper",
+    "name": "קפצן",
+    "description": "קפצו כמה שיותר גבוה",
+    "url": "jumper/",
+    "icon": "jumper/icons/icon-192.png",
+    "tag": "ארקייד"
+  },
+  {
+    "id": "maze",
+    "name": "בולעים",
+    "description": "אכלו את כל הנקודות והתחמקו מרוחות",
+    "url": "maze/",
+    "icon": "maze/icons/icon-192.png",
+    "tag": "ארקייד"
+  },
+  {
+    "id": "simon",
+    "name": "סיימון",
+    "description": "זכרו את רצף הצבעים",
+    "url": "simon/",
+    "icon": "simon/icons/icon-192.png",
+    "tag": "זיכרון"
+  },
+  {
+    "id": "reaction",
+    "name": "מהירות תגובה",
+    "description": "לחצו כשהמסך הופך לירוק",
+    "url": "reaction/",
+    "icon": "reaction/icons/icon-192.png",
+    "tag": "רפלקסים"
+  },
+  {
+    "id": "mastermind",
+    "name": "מאסטרמיינד",
+    "description": "נחשו את קוד הצבעים",
+    "url": "mastermind/",
+    "icon": "mastermind/icons/icon-192.png",
+    "tag": "חשיבה"
+  },
+  {
+    "id": "lights",
+    "name": "כבו את האורות",
+    "description": "כבו את כל האורות",
+    "url": "lights/",
+    "icon": "lights/icons/icon-192.png",
+    "tag": "חשיבה"
+  },
+  {
+    "id": "slide",
+    "name": "פאזל מספרים",
+    "description": "סדרו את המספרים לפי הסדר",
+    "url": "slide/",
+    "icon": "slide/icons/icon-192.png",
+    "tag": "חשיבה"
+  },
+  {
+    "id": "colors",
+    "name": "צבע או מילה",
+    "description": "לחצו על הצבע שבו המילה כתובה",
+    "url": "colors/",
+    "icon": "colors/icons/icon-192.png",
+    "tag": "רפלקסים"
+  },
+  {
+    "id": "clicker",
+    "name": "קליקר מטבעות",
+    "description": "לחצו, שדרגו והרוויחו מטבעות",
+    "url": "clicker/",
+    "icon": "clicker/icons/icon-192.png",
+    "tag": "ארקייד"
+  },
+  {
+    "id": "asteroids",
+    "name": "אסטרואידים",
+    "description": "שברו אסטרואידים בחלל",
+    "url": "asteroids/",
+    "icon": "asteroids/icons/icon-192.png",
+    "tag": "ירי"
+  },
+  {
+    "id": "gallery",
+    "name": "קליעה למטרה",
+    "description": "פגעו במטרות והימנעו מפצצות",
+    "url": "gallery/",
+    "icon": "gallery/icons/icon-192.png",
+    "tag": "רפלקסים"
+  },
+  {
+    "id": "dodge",
+    "name": "התחמקות",
+    "description": "התחמקו מחפצים נופלים ואספו מטבעות",
+    "url": "dodge/",
+    "icon": "dodge/icons/icon-192.png",
+    "tag": "ארקייד"
   }
 ]

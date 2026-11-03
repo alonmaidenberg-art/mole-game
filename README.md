@@ -61,3 +61,33 @@ Import from Git, Build command ריק, Publish directory `.`.
 - `golf3d/` מיני גולף 3D
 
 - `bowling3d/` באולינג 3D
+
+- `pong/` פונג
+
+- `breakout/` שוברי לבנים
+
+- `dino/` ריצת דינוזאור
+
+- `jumper/` קפצן
+
+- `maze/` בולעים
+
+- `simon/` סיימון
+
+- `reaction/` מהירות תגובה
+
+- `mastermind/` מאסטרמיינד
+
+- `lights/` כבו את האורות
+
+- `slide/` פאזל מספרים
+
+- `colors/` צבע או מילה
+
+- `clicker/` קליקר מטבעות
+
+- `asteroids/` אסטרואידים
+
+- `gallery/` קליעה למטרה
+
+- `dodge/` התחמקות
