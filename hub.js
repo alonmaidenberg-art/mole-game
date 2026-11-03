@@ -53,3 +53,21 @@
   }
   if(document.body)sig();else addEventListener('DOMContentLoaded',sig);
 })();
+
+/* language switch (Hebrew <-> English) */
+(function(){
+  var LANG='he';try{LANG=localStorage.getItem('ag_lang')==='en'?'en':'he'}catch(e){}
+  window.AG_LANG=LANG;
+  var sc=document.currentScript;var base=new URL('./',sc&&sc.src?sc.src:location.href).href;
+  if(LANG==='en'){var s=document.createElement('script');s.src=base+'i18n.js';(document.head||document.documentElement).appendChild(s)}
+  var isHub=(location.pathname.replace(/index\.html$/,'')===new URL(base).pathname);
+  function btn(){
+    var b=document.createElement('button');b.id='ag-lang';b.type='button';
+    b.textContent=LANG==='en'?'עב':'EN';b.setAttribute('aria-label',LANG==='en'?'עברית':'English');
+    var BOT=/\/(chess|englishbot|impostor|game2048)\//.test(location.pathname);
+    b.style.cssText='position:fixed;z-index:2147483000;'+(isHub?'top:8px;left:8px;':(BOT?'bottom:max(8px,env(safe-area-inset-bottom));':'top:max(6px,env(safe-area-inset-top));')+'left:46px;')+'height:34px;min-width:34px;padding:0 9px;border-radius:17px;border:0;font:700 13px system-ui,Arial,sans-serif;color:#fff;background:rgba(0,0,0,.45);cursor:pointer;-webkit-tap-highlight-color:transparent';
+    b.onclick=function(){try{localStorage.setItem('ag_lang',LANG==='en'?'he':'en')}catch(e){}location.reload()};
+    document.body.appendChild(b);
+  }
+  if(document.body)btn();else addEventListener('DOMContentLoaded',btn);
+})();

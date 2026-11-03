@@ -73,15 +73,21 @@ const TOP={'חיות':'חתול כלב סוס פרה כבשה ארנב דובי 
 'מקומות':'ירושלים חיפה תלאביב אילת ים הר מדבר גן כנרת בית ספר חוף עיר כפר שוק נמל מגדל גשר'.split(' '),
 'חפצים':'שולחן כיסא מחשב טלפון מנעול מפתח מטריה מזוודה שעון מראה מנורה כרית שמיכה עט עיפרון מחברת תיק נעל כובע משקפיים'.split(' '),
 'ספורט':'כדורגל כדורסל טניס שחייה ריצה אופניים התעמלות יודו כדורעף גולף בוקס סקי חץ וקשת'.split(' ')};
+const EN=(function(){try{return localStorage.getItem('ag_lang')==='en'}catch(e){return false}})();
+const TOP_EN={'חיות':'cat dog horse cow sheep rabbit bear tiger lion elephant giraffe monkey dolphin shark turtle crocodile snake mouse owl eagle penguin zebra goat rooster fish'.split(' '),
+'אוכל':'pizza hamburger schnitzel falafel hummus shakshuka icecream chocolate cake bread cheese egg apple banana watermelon grapes tomato cucumber pasta rice salad halva burekas'.split(' '),
+'מקומות':'jerusalem haifa telaviv eilat sea mountain desert garden kinneret school beach city village market port tower bridge'.split(' '),
+'חפצים':'table chair computer phone lock key umbrella suitcase clock mirror lamp pillow blanket pen pencil notebook bag shoe hat glasses'.split(' '),
+'ספורט':'football basketball tennis swimming running cycling gymnastics judo volleyball golf boxing skiing archery'.split(' ')};
 let th=store.get('h_th','חיות'),md=store.get('h_md','1'),word,got,miss,over,wins=0,loss=0;
-const FIN={'ך':'כ','ם':'מ','ן':'נ','ף':'פ','ץ':'צ'},norm=ch=>FIN[ch]||ch,HEB='אבגדהוזחטיכלמנסעפצקרשת'.split('');
+const FIN={'ך':'כ','ם':'מ','ן':'נ','ף':'פ','ץ':'צ'},norm=ch=>FIN[ch]||ch,HEB=(EN?'abcdefghijklmnopqrstuvwxyz':'אבגדהוזחטיכלמנסעפצקרשת').split('');
 function opt(id,v){[...$(id).children].forEach(c=>c.classList.toggle('on',c.dataset.v===String(v)))}
 const ch=$('#mTh');Object.keys(TOP).forEach(k=>{const b=document.createElement('button');b.className='chip'+(k===th?' on':'');b.dataset.v=k;b.textContent=k;b.onclick=()=>{th=k;store.set('h_th',k);opt('#mTh',k)};ch.appendChild(b)});
 [...$('#mMd').children].forEach(c=>c.onclick=()=>{md=c.dataset.v;store.set('h_md',md);opt('#mMd',md)});opt('#mMd',md);
 function show(id){document.querySelectorAll('.scr').forEach(s=>s.classList.toggle('show',s.id===id))}
 function newWord(){if(md==='2'){$('#sec').value='';$('#secret').classList.add('show');setTimeout(()=>$('#sec').focus(),100);return}
-  begin(TOP[th][Math.floor(Math.random()*TOP[th].length)],th)}
-$('#secOk').onclick=()=>{const w=$('#sec').value.trim().replace(/[^א-ת ]/g,'');if(w.length<2)return;$('#secret').classList.remove('show');begin(w,'מילה מחבר')};
+  {const L=(EN?TOP_EN:TOP)[th];begin(L[Math.floor(Math.random()*L.length)],th)}}
+$('#secOk').onclick=()=>{const w=(EN?$('#sec').value.toLowerCase():$('#sec').value).trim().replace(EN?/[^a-z ]/g:/[^א-ת ]/g,'');if(w.length<2)return;$('#secret').classList.remove('show');begin(w,'מילה מחבר')};
 function begin(w,cat){word=w;got=new Set();miss=0;over=false;$('#again').style.display='none';$('#msg').textContent='';$('#cat').textContent='נושא: '+cat;render()}
 function render(){const wd=$('#word');wd.innerHTML='';[...word].forEach(c=>{const d=document.createElement('div');if(c===' '){d.className='L sp'}else{d.className='L';d.textContent=got.has(norm(c))||over&&miss>=7?c:''}wd.appendChild(d)});
   const kb=$('#kb');kb.innerHTML='';HEB.forEach(l=>{const b=document.createElement('button');b.className='k';b.textContent=l;const used=got.has(l)||(window._u&&0);
