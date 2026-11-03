@@ -696,3 +696,12 @@
 
 /colormemory/manifest.webmanifest
   Cache-Control: no-cache
+
+/sneakylevels/sw.js
+  Cache-Control: no-cache
+
+/sneakylevels/index.html
+  Cache-Control: no-cache
+
+/sneakylevels/manifest.webmanifest
+  Cache-Control: no-cache

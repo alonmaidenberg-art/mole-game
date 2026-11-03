@@ -157,3 +157,5 @@ Import from Git, Build command ריק, Publish directory `.`.
 - `tabletennis/` טניס שולחן
 
 - `colormemory/` זיכרון צבעים
+
+- `sneakylevels/` מסדרון הפתעות

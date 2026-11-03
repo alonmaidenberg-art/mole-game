@@ -632,5 +632,13 @@
     "url": "colormemory/",
     "icon": "colormemory/icons/icon-192.png",
     "tag": "זיכרון"
+  },
+  {
+    "id": "sneakylevels",
+    "name": "מסדרון הפתעות",
+    "description": "פלטפורמה ערמומית – שום דבר הוא לא מה שהוא נראה.",
+    "url": "sneakylevels/",
+    "icon": "sneakylevels/icons/icon-192.png",
+    "tag": "אקשן"
   }
 ]
