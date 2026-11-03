@@ -123,3 +123,37 @@ Import from Git, Build command ריק, Publish directory `.`.
 - `colorswitch/` קפיצת צבעים
 
 - `balance/` איזון
+
+- `mergefruit/` איחוד פירות
+
+- `blackhole/` חור שחור
+
+- `tubesort/` מיון צינורות
+
+- `roundabout/` כיכר התנועה
+
+- `redgreen/` אור אדום, אור ירוק
+
+- `stackup/` מגדל גבוה
+
+- `meteors/` גשם מטאורים
+
+- `cookies/` מפעל עוגיות
+
+- `lanes/` שלושה נתיבים
+
+
+
+
+
+- `whack/` פוגעים בבועות
+
+- `agar/` אכלו ותגדלו
+
+- `bricksmash/` שובר לבנים
+
+- `froghop/` צפרדע קופצת
+
+- `tabletennis/` טניס שולחן
+
+- `colormemory/` זיכרון צבעים

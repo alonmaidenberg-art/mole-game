@@ -561,3 +561,138 @@
 
 /balance/manifest.webmanifest
   Cache-Control: no-cache
+
+/mergefruit/sw.js
+  Cache-Control: no-cache
+
+/mergefruit/index.html
+  Cache-Control: no-cache
+
+/mergefruit/manifest.webmanifest
+  Cache-Control: no-cache
+
+/blackhole/sw.js
+  Cache-Control: no-cache
+
+/blackhole/index.html
+  Cache-Control: no-cache
+
+/blackhole/manifest.webmanifest
+  Cache-Control: no-cache
+
+/tubesort/sw.js
+  Cache-Control: no-cache
+
+/tubesort/index.html
+  Cache-Control: no-cache
+
+/tubesort/manifest.webmanifest
+  Cache-Control: no-cache
+
+/roundabout/sw.js
+  Cache-Control: no-cache
+
+/roundabout/index.html
+  Cache-Control: no-cache
+
+/roundabout/manifest.webmanifest
+  Cache-Control: no-cache
+
+/redgreen/sw.js
+  Cache-Control: no-cache
+
+/redgreen/index.html
+  Cache-Control: no-cache
+
+/redgreen/manifest.webmanifest
+  Cache-Control: no-cache
+
+/stackup/sw.js
+  Cache-Control: no-cache
+
+/stackup/index.html
+  Cache-Control: no-cache
+
+/stackup/manifest.webmanifest
+  Cache-Control: no-cache
+
+/meteors/sw.js
+  Cache-Control: no-cache
+
+/meteors/index.html
+  Cache-Control: no-cache
+
+/meteors/manifest.webmanifest
+  Cache-Control: no-cache
+
+/cookies/sw.js
+  Cache-Control: no-cache
+
+/cookies/index.html
+  Cache-Control: no-cache
+
+/cookies/manifest.webmanifest
+  Cache-Control: no-cache
+
+/lanes/sw.js
+  Cache-Control: no-cache
+
+/lanes/index.html
+  Cache-Control: no-cache
+
+/lanes/manifest.webmanifest
+  Cache-Control: no-cache
+
+/whack/sw.js
+  Cache-Control: no-cache
+
+/whack/index.html
+  Cache-Control: no-cache
+
+/whack/manifest.webmanifest
+  Cache-Control: no-cache
+
+/agar/sw.js
+  Cache-Control: no-cache
+
+/agar/index.html
+  Cache-Control: no-cache
+
+/agar/manifest.webmanifest
+  Cache-Control: no-cache
+
+/bricksmash/sw.js
+  Cache-Control: no-cache
+
+/bricksmash/index.html
+  Cache-Control: no-cache
+
+/bricksmash/manifest.webmanifest
+  Cache-Control: no-cache
+
+/froghop/sw.js
+  Cache-Control: no-cache
+
+/froghop/index.html
+  Cache-Control: no-cache
+
+/froghop/manifest.webmanifest
+  Cache-Control: no-cache
+
+/tabletennis/sw.js
+  Cache-Control: no-cache
+
+/tabletennis/index.html
+  Cache-Control: no-cache
+
+/tabletennis/manifest.webmanifest
+  Cache-Control: no-cache
+
+/colormemory/sw.js
+  Cache-Control: no-cache
+
+/colormemory/index.html
+  Cache-Control: no-cache
+
+/colormemory/manifest.webmanifest
+  Cache-Control: no-cache

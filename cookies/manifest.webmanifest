@@ -1,0 +1,37 @@
+{
+  "name": "מפעל עוגיות",
+  "short_name": "עוגיות",
+  "description": "אספו עוגיות ושדרגו",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "landscape",
+  "lang": "he",
+  "dir": "rtl",
+  "background_color": "#3a2210",
+  "theme_color": "#3a2210",
+  "categories": [
+    "games"
+  ],
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

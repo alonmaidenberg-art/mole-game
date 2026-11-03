@@ -1,0 +1,37 @@
+{
+  "name": "מגדל גבוה",
+  "short_name": "מגדל",
+  "description": "בנו מגדל בדיוק מושלם",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "landscape",
+  "lang": "he",
+  "dir": "rtl",
+  "background_color": "#0e1a3a",
+  "theme_color": "#0e1a3a",
+  "categories": [
+    "games"
+  ],
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

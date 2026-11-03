@@ -512,5 +512,125 @@
     "url": "balance/",
     "icon": "balance/icons/icon-192.png",
     "tag": "חשיבה"
+  },
+  {
+    "id": "mergefruit",
+    "name": "איחוד פירות",
+    "description": "הפילו פירות ואחדו זוגות זהים עד שתגיעו לאבטיח.",
+    "url": "mergefruit/",
+    "icon": "mergefruit/icons/icon-192.png",
+    "tag": "פאזל"
+  },
+  {
+    "id": "blackhole",
+    "name": "חור שחור",
+    "description": "בלעו כל מה שקטן מכם – וגדלו!",
+    "url": "blackhole/",
+    "icon": "blackhole/icons/icon-192.png",
+    "tag": "ארקייד"
+  },
+  {
+    "id": "tubesort",
+    "name": "מיון צינורות",
+    "description": "סדרו את הצבעים כך שכל צינור יהיה בצבע אחד.",
+    "url": "tubesort/",
+    "icon": "tubesort/icons/icon-192.png",
+    "tag": "חשיבה"
+  },
+  {
+    "id": "roundabout",
+    "name": "כיכר התנועה",
+    "description": "שלחו מכוניות לכיכר בזמן הנכון ואל תתנגשו.",
+    "url": "roundabout/",
+    "icon": "roundabout/icons/icon-192.png",
+    "tag": "חשיבה"
+  },
+  {
+    "id": "redgreen",
+    "name": "אור אדום, אור ירוק",
+    "description": "רוצו כשהאור ירוק – ועצרו כשהוא אדום.",
+    "url": "redgreen/",
+    "icon": "redgreen/icons/icon-192.png",
+    "tag": "רפלקסים"
+  },
+  {
+    "id": "stackup",
+    "name": "מגדל גבוה",
+    "description": "עצרו כל קרש מעל הקודם ובנו מגדל גבוה.",
+    "url": "stackup/",
+    "icon": "stackup/icons/icon-192.png",
+    "tag": "רפלקסים"
+  },
+  {
+    "id": "meteors",
+    "name": "גשם מטאורים",
+    "description": "התחמקו מהסלעים ואספו כוכבים.",
+    "url": "meteors/",
+    "icon": "meteors/icons/icon-192.png",
+    "tag": "ארקייד"
+  },
+  {
+    "id": "cookies",
+    "name": "מפעל עוגיות",
+    "description": "לחצו על העוגייה, קנו שדרוגים ואספו כמה שיותר.",
+    "url": "cookies/",
+    "icon": "cookies/icons/icon-192.png",
+    "tag": "פשוט"
+  },
+  {
+    "id": "lanes",
+    "name": "שלושה נתיבים",
+    "description": "רוצו בין שלושה נתיבים והתחמקו ממכשולים.",
+    "url": "lanes/",
+    "icon": "lanes/icons/icon-192.png",
+    "tag": "ארקייד"
+  },
+  {
+    "id": "whack",
+    "name": "פוגעים בבועות",
+    "description": "לחצו על המטרות לפני שהן נעלמות.",
+    "url": "whack/",
+    "icon": "whack/icons/icon-192.png",
+    "tag": "רפלקסים"
+  },
+  {
+    "id": "agar",
+    "name": "אכלו ותגדלו",
+    "description": "אכלו נקודות ועיגולים קטנים וברחו מהגדולים.",
+    "url": "agar/",
+    "icon": "agar/icons/icon-192.png",
+    "tag": "אסטרטגיה"
+  },
+  {
+    "id": "bricksmash",
+    "name": "שובר לבנים",
+    "description": "שברו את כל הלבנים עם הכדור.",
+    "url": "bricksmash/",
+    "icon": "bricksmash/icons/icon-192.png",
+    "tag": "קלאסי"
+  },
+  {
+    "id": "froghop",
+    "name": "צפרדע קופצת",
+    "description": "הצפרדע קופצת מפלטפורמה לפלטפורמה – כמה גבוה תגיעו?",
+    "url": "froghop/",
+    "icon": "froghop/icons/icon-192.png",
+    "tag": "ארקייד"
+  },
+  {
+    "id": "tabletennis",
+    "name": "טניס שולחן",
+    "description": "נצחו את המחשב בטניס שולחן.",
+    "url": "tabletennis/",
+    "icon": "tabletennis/icons/icon-192.png",
+    "tag": "קלאסי"
+  },
+  {
+    "id": "colormemory",
+    "name": "זיכרון צבעים",
+    "description": "חזרו על רצף האורות שהמשחק מציג.",
+    "url": "colormemory/",
+    "icon": "colormemory/icons/icon-192.png",
+    "tag": "זיכרון"
   }
 ]
