@@ -1,9 +1,6 @@
 <!doctype html>
 <html lang="he" dir="rtl">
 <head>
-<meta name="robots" content="noai, noimageai">
-<meta name="author" content="Alon Maidenberg - אלון מידנברג"><meta name="copyright" content="© 2026 אלון מידנברג. כל הזכויות שמורות.">
-<!-- © 2026 Alon Maidenberg (אלון מידנברג). All rights reserved. Copying, republishing or modifying this game without written permission is not allowed. -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>כדורגל – אלון מידנברג</title>
@@ -157,8 +154,8 @@ function usePw(k){if(mode!=='cpu'||state!=='play'||paused)return;const o=pwGet()
   o[k]--;pwSet(o);pwPaint();tone(700,.1)}
 function ai(p){const o=P[1-p.t],c=p.c,L=LV[level];Object.assign(p.pc,c);c.l=c.r=c.j=c.k=0;const own=p.t?W:0,tg=p.t?0:W,fwd=p.t?-1:1;
   const bAhead=(ball.x-p.x)*fwd>-10;
-  let tx=bAhead?ball.x-fwd*34:own+fwd*(p.t?-150:150)*-1;
-  if(!bAhead||Math.abs(ball.x-own)<220&&Math.abs(ball.vx)>3)tx=clamp(ball.x,own>W/2?W-200:70,own>W/2?W-70:200);
+  let tx=ball.x-fwd*34;
+  if(!bAhead&&Math.abs(ball.x-p.x)<95&&p.y>=GY)c.j=1;
   const dx=tx-p.x;if(Math.abs(dx)>12){if(dx>0)c.r=1;else c.l=1}
   const fx=p.x+p.face*46,fy=p.y-20;if(Math.hypot(ball.x-fx,ball.y-fy)<62&&p.aiT<=0&&bAhead){c.k=1;p.aiT=L.react+12}
   if(p.aiT>0)p.aiT--;
