@@ -192,3 +192,48 @@
 
 /space/manifest.webmanifest
   Cache-Control: no-cache
+
+/runner3d/sw.js
+  Cache-Control: no-cache
+
+/runner3d/index.html
+  Cache-Control: no-cache
+
+/runner3d/manifest.webmanifest
+  Cache-Control: no-cache
+
+/stack3d/sw.js
+  Cache-Control: no-cache
+
+/stack3d/index.html
+  Cache-Control: no-cache
+
+/stack3d/manifest.webmanifest
+  Cache-Control: no-cache
+
+/tanks3d/sw.js
+  Cache-Control: no-cache
+
+/tanks3d/index.html
+  Cache-Control: no-cache
+
+/tanks3d/manifest.webmanifest
+  Cache-Control: no-cache
+
+/snooker/sw.js
+  Cache-Control: no-cache
+
+/snooker/index.html
+  Cache-Control: no-cache
+
+/snooker/manifest.webmanifest
+  Cache-Control: no-cache
+
+/bubbles/sw.js
+  Cache-Control: no-cache
+
+/bubbles/index.html
+  Cache-Control: no-cache
+
+/bubbles/manifest.webmanifest
+  Cache-Control: no-cache

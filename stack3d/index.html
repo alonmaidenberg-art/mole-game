@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>מגדל 3D – אלון מידנברג</title>
+<meta name="description" content="בנו מגדל גבוה בלי להחמיץ.">
+<meta name="theme-color" content="#5a8ae8">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;background:#1a1038;color:#fff;font-family:system-ui,-apple-system,"Segoe UI",Arial,"Noto Sans Hebrew",sans-serif}
+body{background:radial-gradient(700px 500px at 80% -10%,#5b36d6 0,transparent 60%),radial-gradient(600px 500px at 0% 110%,#0f6b6b 0,transparent 55%),#1a1038;min-height:100vh;min-height:100dvh;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+main{max-width:520px;margin:0 auto;padding:max(12px,env(safe-area-inset-top)) 14px 24px}
+h1{margin:6px 0;font-size:30px;text-align:center}
+.sub{text-align:center;opacity:.75;margin:0 0 10px}
+.box{background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.12);border-radius:22px;padding:14px;margin:12px 0}
+.lb{opacity:.8;font-size:15px;margin-bottom:8px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{flex:1;min-width:70px;padding:13px 6px;border-radius:16px;border:2px solid rgba(255,255,255,.18);background:#150a30;color:#fff;font:inherit;font-weight:800;font-size:17px;cursor:pointer}
+.chip.on{background:#ffd05a;color:#2a1c00;border-color:#fff}
+.btn{display:block;width:100%;border:0;border-radius:18px;padding:15px;margin-top:12px;font:inherit;font-size:21px;font-weight:900;color:#06322b;background:linear-gradient(180deg,#5ff7d6,#1fc9a6);box-shadow:0 6px 0 #0d7a66;cursor:pointer}
+.btn:active{transform:translateY(3px);box-shadow:0 3px 0 #0d7a66}
+.btn.alt{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.3);box-shadow:none;font-size:16px;padding:12px}
+.ib{min-width:46px;height:42px;padding:0 12px;border-radius:13px;border:2px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#fff;font:inherit;font-size:17px;font-weight:800;cursor:pointer}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.scr{display:none}.scr.show{display:block}
+.ov{position:fixed;inset:0;background:rgba(10,5,30,.82);display:none;align-items:center;justify-content:center;z-index:30;padding:16px}.ov.show{display:flex}
+.ovc{width:100%;max-width:380px;background:linear-gradient(160deg,#2c1b6a,#1a1038);border:2px solid rgba(255,255,255,.2);border-radius:26px;padding:22px;text-align:center}
+.ovc h2{margin:0 0 6px;font-size:30px}
+body{overflow:hidden;position:fixed;inset:0;width:100%;background:#0d0826}
+#cv{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);display:block;touch-action:none}
+.ov{overflow:auto}.ovc{margin:auto}
+#hud{position:fixed;left:0;right:0;top:0;text-align:center;font-weight:900;font-size:22px;pointer-events:none;z-index:8;padding-top:max(8px,env(safe-area-inset-top));direction:ltr;text-shadow:0 2px 4px #000}
+.tb{position:fixed;bottom:max(10px,env(safe-area-inset-bottom));z-index:6;width:74px;height:74px;border-radius:50%;border:3px solid rgba(255,255,255,.5);background:rgba(20,12,60,.55);color:#fff;font-size:26px;font-weight:900;touch-action:none;display:none}
+.tb.on{background:rgba(255,160,40,.85)}
+#rot{position:fixed;inset:0;background:#120a2c;z-index:50;display:none;align-items:center;justify-content:center;text-align:center;font-size:24px;font-weight:800;padding:20px}#cv{left:0;top:0;width:100%;height:100%;transform:none}#hud{font-size:20px}
+</style>
+</head>
+<body>
+<script src="../lib/three.min.js"></script><canvas id="cv"></canvas><div id="hud"></div>
+<div class="ov show" id="menu"><div class="ovc" style="max-width:440px"><div style="font-size:56px">🏗️</div><h2>מגדל 3D</h2><div class="lb">לחצו בזמן הנכון כדי להניח קוביה. מה שחורג נחתך!</div><div style="opacity:.75;font-size:12.5px;margin-tp0:8px">לחיצה / רווח / נגיעה במסך</div><button class="btn" id="go">▶ שחק</button><div style="opacity:.8;margin-top:10px;font-size:15px">שיא: <b id="best">0</b></div></div></div>
+<div class="ov" id="end"><div class="ovc"><h2 id="eT">נגמר</h2><div style="font-size:48px;font-weight:900;color:#ffd05a" id="eS"></div><p id="eM"></p><button class="btn" id="again">🔁 שוב</button><button class="btn alt" id="menu2">תפריט</button></div></div>
+<script>
+'use strict';
+const $=s=>document.querySelector(s);
+const store={get(k,d){try{const v=localStorage.getItem(k);return v===null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+let _ac=null;function tone(f,d=.1,t='triangle',v=.07){try{_ac=_ac||new (window.AudioContext||window.webkitAudioContext)();const o=_ac.createOscillator(),g=_ac.createGain();o.type=t;o.frequency.value=f;g.gain.value=v;o.connect(g);g.connect(_ac.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,_ac.currentTime+d);o.stop(_ac.currentTime+d+.02)}catch(e){}}
+const keys={};const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),rnd=(a,b)=>a+Math.random()*(b-a);
+const cv=$('#cv'),R=new THREE.WebGLRenderer({canvas:cv,antialias:true});R.setPixelRatio(Math.min(devicePixelRatio||1,2));const scene=new THREE.Scene(),cam=new THREE.PerspectiveCamera(60,1,.1,300);
+function resize(){R.setSize(innerWidth,innerHeight,false);cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix()}addEventListener('resize',resize);resize();
+addEventListener('keydown',e=>{keys[e.code]=1;if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault()});addEventListener('keyup',e=>{keys[e.code]=0});
+function onSwipe(fn,tap){let s=null;cv.addEventListener('pointerdown',e=>{s={x:e.clientX,y:e.clientY}});cv.addEventListener('pointerup',e=>{if(!s)return;const dx=e.clientX-s.x,dy=e.clientY-s.y;s=null;if(Math.hypot(dx,dy)<20){tap&&tap()}else if(Math.abs(dx)>Math.abs(dy))fn(dx>0?'r':'l');else fn(dy<0?'u':'d')})}
+const BK='stack3d'+'_best';let best=+store.get(BK,0);$('#best').textContent=best;
+function endGame(title,score,msg,coins,dia){$('#eT').textContent=title;$('#eS').textContent=score;let m=msg||'';if(window.AG&&coins>0){AG.add(coins,dia||0);m+=' +'+coins+' 🪙'+(dia?' +'+dia+' 💎':'')}$('#eM').textContent=m;$('#end').classList.add('show')}
+function saveBest(s){if(s>best){best=s;store.set(BK,s);$('#best').textContent=s}}
+function runLoop(stepFn,active){let last=performance.now(),acc=0;function l(n){requestAnimationFrame(l);acc+=Math.min(100,n-last);last=n;while(acc>=1000/60){acc-=1000/60;if(active())stepFn()}R.render(scene,cam)}requestAnimationFrame(l)}
+
+scene.background=new THREE.Color(0x5a8ae8);scene.fog=new THREE.Fog(0x5a8ae8,25,70);scene.add(new THREE.HemisphereLight(0xffffff,0x445577,.9));const dl=new THREE.DirectionalLight(0xffffff,.8);dl.position.set(6,14,8);scene.add(dl);
+const H=.7;let blocks,cur,tp0,dir,axis,spd,score,state='menu',camY,debris,perfectRun,cut;
+const col=i=>new THREE.Color().setHSL((i*.035)%1,.7,.58);
+function addBlock(x,z,w,d,y,i){const m=new THREE.Mesh(new THREE.BoxGeometry(w,H,d),new THREE.MeshLambertMaterial({color:col(i)}));m.position.set(x,y,z);scene.add(m);return m}
+function reset(){for(const b of blocks||[])scene.remove(b.m);for(const d of debris||[])scene.remove(d.m);blocks=[];debris=[];score=0;perfectRun=0;const m=addBlock(0,0,4,4,0,0);blocks.push({m,w:4,d:4,x:0,z:0});tp0=blocks[0];axis='x';dir=1;spd=.07;camY=0;newCur();state='play'}
+function newCur(){const n=blocks.length,w=tp0.w,d=tp0.d;axis=n%2?'x':'z';const m=addBlock(axis==='x'?-6:tp0.x,axis==='z'?-6:tp0.z,w,d,n*H,n);cur={m,w,d,x:tp0.x,z:tp0.z};dir=1;spd=Math.min(.22,.07+n*.003)}
+function drop(){if(state!=='play')return;const a=axis,o=a==='x'?'w':'d',pos=cur.m.position[a],tp=tp0[a],delta=pos-tp,size=tp0[o];const ov=size-Math.abs(delta);
+  if(ov<=0){state='dead';debris.push({m:cur.m,vy:0,vx:0});saveBest(score);tone(120,.5,'sawtooth',.1);setTimeout(()=>endGame('המגדל התמוטט',score,'',Math.floor(score/3),score>=40?1:0),700);return}
+  let nw=ov,np=tp+delta/2;if(Math.abs(delta)<.15){nw=size;np=tp;perfectRun++;tone(700+perfectRun*80,.12);if(perfectRun>=3&&nw<4){}}else{perfectRun=0;tone(300,.08);const cutW=Math.abs(delta),cm=new THREE.Mesh(new THREE.BoxGeometry(a==='x'?cutW:cur.w,H,a==='z'?cutW:cur.d),cur.m.material);cm.position.copy(cur.m.position);cm.position[a]=delta>0?tp+size/2+cutW/2:tp-size/2-cutW/2;scene.add(cm);debris.push({m:cm,vy:0,vx:0})}
+  scene.remove(cur.m);const nb=blocks.length,k=a==='x'?[np,tp0.z,nw,tp0.d]:[tp0.x,np,tp0.w,nw];const m=addBlock(k[0],k[1],k[2],k[3],nb*H,nb);blocks.push({m,x:k[0],z:k[1],w:k[2],d:k[3]});tp0=blocks[blocks.length-1];score++;newCur()}
+function step(){if(state==='menu')return;
+  if(state==='play'){cur.m.position[axis]+=dir*spd;if(cur.m.position[axis]>6)dir=-1;if(cur.m.position[axis]<-6)dir=1;const t=blocks.length*H;camY+=(t-camY)*.08}
+  for(const d of debris){d.vy-=.02;d.m.position.y+=d.vy;d.m.rotation.z+=.02}debris=debris.filter(d=>{if(d.m.position.y<-30){scene.remove(d.m);return false}return true});
+  const a=camY;cam.position.set(9,a+7,9);cam.lookAt(0,a+2,0);$('#hud').textContent=score}
+addEventListener('keydown',e=>{if(e.code==='Space'||e.code==='Enter')drop()});cv.addEventListener('pointerdown',drop);
+$('#go').onclick=()=>{$('#menu').classList.remove('show');reset()};$('#again').onclick=()=>{$('#end').classList.remove('show');reset()};$('#menu2').onclick=()=>{state='menu';$('#end').classList.remove('show');$('#menu').classList.add('show')};
+window.__s={reset,step,drop,get state(){return state},get score(){return score},get cur(){return cur},get tp0(){return tp0}};
+cam.position.set(9,7,9);cam.lookAt(0,2,0);runLoop(step,()=>true);
+
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+</script>
+<script src="../hub.js"></script>
+</body>
+</html>

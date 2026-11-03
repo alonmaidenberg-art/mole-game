@@ -41,3 +41,13 @@ Import from Git, Build command ריק, Publish directory `.`.
 
 - `space/` קרב בחלל
 
+
+- `runner3d/` ריצה 3D
+
+- `stack3d/` מגדל 3D
+
+- `tanks3d/` קרב טנקים 3D
+
+- `snooker/` סנוקר
+
+- `bubbles/` פופ בועות

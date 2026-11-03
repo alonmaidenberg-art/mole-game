@@ -184,5 +184,45 @@
     "url": "space/",
     "icon": "space/icons/icon-192.png",
     "tag": "ירי"
+  },
+  {
+    "id": "runner3d",
+    "name": "ריצה 3D",
+    "description": "ריצה תלת-ממדית: קפיצה, החלקה ומטבעות",
+    "url": "runner3d/",
+    "icon": "runner3d/icons/icon-192.png",
+    "tag": "3D"
+  },
+  {
+    "id": "stack3d",
+    "name": "מגדל 3D",
+    "description": "בנו מגדל גבוה בלי להחמיץ",
+    "url": "stack3d/",
+    "icon": "stack3d/icons/icon-192.png",
+    "tag": "3D"
+  },
+  {
+    "id": "tanks3d",
+    "name": "קרב טנקים 3D",
+    "description": "קרב טנקים תלת-ממדי מול גלי אויבים",
+    "url": "tanks3d/",
+    "icon": "tanks3d/icons/icon-192.png",
+    "tag": "3D"
+  },
+  {
+    "id": "snooker",
+    "name": "סנוקר",
+    "description": "סנוקר נגד מחשב או חבר",
+    "url": "snooker/",
+    "icon": "snooker/icons/icon-192.png",
+    "tag": "ספורט"
+  },
+  {
+    "id": "bubbles",
+    "name": "פופ בועות",
+    "description": "פוצצו בועות צבעוניות",
+    "url": "bubbles/",
+    "icon": "bubbles/icons/icon-192.png",
+    "tag": "פאזל"
   }
 ]
