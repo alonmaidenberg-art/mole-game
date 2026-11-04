@@ -229,11 +229,11 @@ $('lbB').onclick=lbOpen;
   function jbGet(){return fetch(JB_URL+'/latest',{cache:'no-store',headers:{'X-Access-Key':JB_KEY,'X-Bin-Meta':'false'}}).then(function(r){if(!r.ok)throw r.status;return r.json()}).then(function(d){d=d&&d.record?d.record:d;if(!d||typeof d!=='object')d={};d.g=d.g||{};d.banned=d.banned||[];return d})}
   function jbPut(b){return fetch(JB_URL,{method:'PUT',headers:{'Content-Type':'application/json','X-Access-Key':JB_KEY},body:JSON.stringify(b)}).then(function(r){if(!r.ok)throw r.status;return b})}
   function cleanName(n){n=String(n||'').replace(/[\u0000-\u001f<>&"'`\\]/g,'').replace(/\s+/g,' ').trim().slice(0,14);return n.length>=2&&!BAD.test(n.replace(/[\s._-]/g,''))?n:''}
-  function load(){if(JB_BIN==='6aeb5887ac6210605a6c4c6a'){$('gbList').textContent=T('לוח התוצאות עוד לא הופעל.','The leaderboard is not switched on yet.');return}
+  function load(){if(!JB_BIN){$('gbList').textContent=T('לוח התוצאות עוד לא הופעל.','The leaderboard is not switched on yet.');return}
     jbGet().then(function(b){G=b.g;fill();paint()}).catch(function(){$('gbList').textContent=T('אין חיבור לשרת. נסו שוב מאוחר יותר.','No connection. Try again later.')})}
   function send(){var n0=nm.value.trim(),n=cleanName(n0);if(n0.length<2){msg(T('כתבו כינוי (לפחות 2 תווים)','Enter a nickname (at least 2 characters)'));return}
     if(!n){msg(T('הכינוי לא מתאים, נסו אחר','That nickname is not allowed'));return}
-    if(JB_BIN==='6aeb5887ac6210605a6c4c6a'){msg(T('לוח התוצאות עוד לא הופעל','The leaderboard is not switched on yet'));return}
+    if(!JB_BIN){msg(T('לוח התוצאות עוד לא הופעל','The leaderboard is not switched on yet'));return}
     var sc=localBests();if(!Object.keys(sc).length){msg(T('עוד אין לך שיאים. שחקו קודם!','You have no records yet. Play first!'));return}
     try{localStorage.setItem('ag_name',n)}catch(e){}
     msg(T('שולח…','Sending…'));
