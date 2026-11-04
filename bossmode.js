@@ -42,6 +42,7 @@
   var TAUNTS=EN?['Ha ha ha!','No way you can beat me!','I control the code!','Bye bye, little winner!','Is it a bug or is it you?','GLITCH!']:['חה חה חה!','אין סיכוי שתנצחו אותי!','אני שולט בקוד!','ביי ביי, מנצח קטן!','זה באג או שאתם?','חה חה! ‏GLITCH!','אני הגליץ׳ – שום דבר לא עוצר אותי!'];
   var DTAUNTS=EN?['ROAAAR!','You are too small!','Stomp stomp!','I am huge!']:['ROAAAR!','אתם קטנים מדי!','דום דום!','אני ענק!'];
   var EFF=['invert','rainbow','gray','blur'];
+  var NEED=[20,40,60];
   var CHN=Math.max(0,Math.min(CH.length-1,(+Q.get('ch')||1)-1));
   function prog(c){c=c===undefined?CHN:c;return Math.min(CH[c].st.length,+ls(CH[c].key)||0)}
   function el(t,c,x){var e=document.createElement(t);if(c)e.style.cssText=c;if(x!==undefined)e.textContent=x;return e}
@@ -60,7 +61,7 @@
   function url(ch,i){var s=CH[ch].st[i];return ROOT+s.g+'/?boss='+i+'&ch='+(ch+1)}
 
   function story(){
-    if(!(window.AG&&(AG.played()>=20||AG.isAdmin()))){location.href=ROOT+'boss/';return}
+    if(!(window.AG&&(AG.played()>=NEED[CHN]||AG.isAdmin()))){location.href=ROOT+'boss/';return}
     var ch=CHN,C=CH[ch],N=C.st.length,res=Q.get('res'),st=Math.min(+Q.get('st')||prog(ch),N-1),ui=overlay(),c=ui.card;
     if(res==='win')ls(C.key,String(Math.max(prog(ch),st+1)));
     var P=prog(ch),st_=document.createElement('style');st_.textContent='@keyframes agw{from{transform:translate(0,0) skew(0)}to{transform:translate(4px,-3px) skew(4deg)}}';document.head.appendChild(st_);
@@ -112,7 +113,7 @@
     if(document.body)arrive();else addEventListener('DOMContentLoaded',arrive);
   }
   window.AG=window.AG||{};window.AG.bossStory=function(ch){location.href=ROOT+'boss/?story=1'+(ch>1?'&ch='+ch:'')};
-  window.AG.bossInfo=function(){return {c1:+ls('boss_story')||0,c2:+ls('boss_story2')||0,c3:+ls('boss_story3')||0,n1:CH[0].st.length,n2:CH[1].st.length,n3:CH[2].st.length,done1:ls('boss_story_done')==='1',done2:ls('boss_story_done2')==='1'}};
+  window.AG.bossInfo=function(){return {need:NEED,played:window.AG?AG.played():0,c1:+ls('boss_story')||0,c2:+ls('boss_story2')||0,c3:+ls('boss_story3')||0,n1:CH[0].st.length,n2:CH[1].st.length,n3:CH[2].st.length,done1:ls('boss_story_done')==='1',done2:ls('boss_story_done2')==='1'}};
   if(Q.get('boss')!==null)inGame();
   else if(Q.get('story')!==null){var go=function(){story()};if(document.body)go();else addEventListener('DOMContentLoaded',go)}
 })();

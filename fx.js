@@ -89,22 +89,47 @@
       [['mirror',T('🪞 עולם הפוך','🪞 Mirror world')],['invert',T('🎨 צבעים הפוכים','🎨 Inverted')],['rainbow',T('🌈 קשת','🌈 Rainbow')],['gray',T('⚫ שחור לבן','⚫ Black & white')],['blur',T('🔍 מטושטש','🔍 Blurry')]].forEach(function(m){
         var on=modes.indexOf(m[0])>=0;p.append(btn(m[1],on,function(){var i=modes.indexOf(m[0]);if(i>=0)modes.splice(i,1);else modes.push(m[0]);applyModes();draw()}))});
       var n=document.createElement('div');n.style.cssText='opacity:.7;font-size:12px;margin-top:6px';n.textContent=T('חלק מהמצבים מתאימים רק למשחקי קנבס. הם מתאפסים כשסוגרים את הדף.','Some modes only suit canvas games. They reset when you close the page.');p.append(n)}}
+  var admTab=ls('ag_admtab')||'wal';
   function adminPanel(){var p=ensurePanel();if(p.dataset.k==='adm'&&p.classList.contains('show')){p.classList.remove('show');return}p.dataset.k='adm';p.classList.add('show');draw();
-    function draw(){p.textContent='';p.append(head(T('⚙️ פאנל אדמין – ','⚙️ Admin panel – ')+ID));
-      var w=document.createElement('div');w.textContent='🪙 '+AG.coins()+'   💎 '+AG.diamonds();p.append(w);
-      p.append(btn('+100 🪙',0,function(){AG.add(100,0);draw()}),btn('+1000 🪙',0,function(){AG.add(1000,0);draw()}),btn('+10 💎',0,function(){AG.add(0,10);draw()}),document.createElement('br'));
-      var inp=document.createElement('input');inp.type='number';inp.placeholder=T('שיא','best');inp.value=ls(KEY)||'';
-      p.append(document.createTextNode(T('שיא במשחק: ','Game best: ')),inp,btn(T('שמור','Save'),0,function(){var v=Math.max(0,Math.floor(+inp.value||0));ls(KEY,String(v));draw()}),btn(T('אפס','Reset'),0,function(){try{localStorage.removeItem(KEY)}catch(e){}draw()}),document.createElement('br'));
-      var sl=document.createElement('input');sl.type='range';sl.min='.25';sl.max='3';sl.step='.25';sl.value=scale;sl.style.cssText='width:150px;vertical-align:middle';var lab=document.createElement('span');lab.textContent=' ×'+scale;
-      sl.oninput=function(){setScale(+sl.value);lab.textContent=' ×'+scale};p.append(document.createTextNode(T('מהירות: ','Speed: ')),sl,lab,document.createElement('br'));
-      p.append(head(T('😈 טרולים','😈 Trolls')));
-      var inRoom=window.AG&&AG.net&&AG.net.room;
-      TROLLS.forEach(function(t){p.append(btn(t[1],0,function(){AG.troll(t[0]);if(inRoom&&ls('ag_tsend')!=='0')AG.net.broadcast({t:'troll',k:t[0]})}))});
-      p.append(document.createElement('br'),btn(T('📤 שלח גם לחברים בשרת: ','📤 Also send to room: ')+(ls('ag_tsend')==='0'?T('לא','no'):T('כן','yes')),0,function(){ls('ag_tsend',ls('ag_tsend')==='0'?'1':'0');draw()}),
-        btn(T('📥 לקבל טרולים: ','📥 Receive trolls: ')+(ls('ag_notroll')==='1'?T('לא','no'):T('כן','yes')),0,function(){ls('ag_notroll',ls('ag_notroll')==='1'?'0':'1');draw()}),document.createElement('br'));
-      p.append(btn(T('🔓 פתח את שלבי הבוס','🔓 Unlock boss levels'),0,function(){fetch(AG.root+'games.json').then(function(r){return r.json()}).then(function(l){ls('ag_played',JSON.stringify(l.map(function(g){return g.id}).filter(function(i){return i!=='boss'})));draw()})}),
-        btn(T('🚪 יציאה מאדמין','🚪 Log out'),0,function(){AG.adminLogout();location.reload()}))}}
-  function init(){if(ID==='hub'||!document.body)return;
+    function nl(){return document.createElement('br')}
+    function numRow(label,fn,ph){var inp=document.createElement('input');inp.type='number';inp.placeholder=ph||'0';inp.style.width='90px';p.append(document.createTextNode(label+' '),inp,btn(T('אישור','Go'),0,function(){var v=Math.floor(+inp.value);if(isFinite(v)){fn(v);draw()}}),nl())}
+    function allIds(cb){fetch(AG.root+'games.json').then(function(r){return r.json()}).then(function(l){cb(l.map(function(g){return g.id}).filter(function(i){return i!=='boss'}),l)})}
+    function setPlayed(n){allIds(function(ids){ls('ag_played',JSON.stringify(ids.slice(0,Math.max(0,n))));draw()})}
+    function draw(){p.textContent='';p.append(head(T('⚙️ פאנל אדמין','⚙️ Admin panel')));
+      var tabs=[['wal',T('💰 ארנק','💰 Wallet')],['game',T('🎮 משחק','🎮 Game')],['boss',T('👾 בוס','👾 Boss')],['troll',T('😈 טרולים','😈 Trolls')],['tools',T('🛠 כלים','🛠 Tools')]];
+      var tb=document.createElement('div');tb.style.cssText='display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px';tabs.forEach(function(t){tb.append(btn(t[1],admTab===t[0],function(){admTab=t[0];ls('ag_admtab',t[0]);draw()}))});p.append(tb);
+      if(admTab==='wal'){
+        var w=document.createElement('div');w.style.cssText='font-weight:900;font-size:17px;margin:4px 0';w.textContent='🪙 '+AG.coins()+'   💎 '+AG.diamonds();p.append(w);
+        [100,1000,10000,100000].forEach(function(n){p.append(btn('+'+n+' 🪙',0,function(){AG.add(n,0);draw()}))});p.append(nl());
+        [1,10,100].forEach(function(n){p.append(btn('+'+n+' 💎',0,function(){AG.add(0,n);draw()}))});p.append(nl());
+        numRow(T('הוסף מטבעות','Add coins'),function(v){AG.add(v,0)});numRow(T('הוסף יהלומים','Add diamonds'),function(v){AG.add(0,v)});
+        p.append(btn(T('🧹 אפס ארנק','🧹 Reset wallet'),0,function(){AG.add(-AG.coins(),-AG.diamonds());draw()}))}
+      else if(admTab==='game'){
+        var inp=document.createElement('input');inp.type='number';inp.placeholder=T('שיא','best');inp.value=ls(KEY)||'';
+        p.append(document.createTextNode(T('שיא במשחק: ','Game best: ')),inp,btn(T('שמור','Save'),0,function(){var v=Math.max(0,Math.floor(+inp.value||0));ls(KEY,String(v));draw()}),btn(T('אפס','Reset'),0,function(){try{localStorage.removeItem(KEY)}catch(e){}draw()}),nl());
+        var sl=document.createElement('input');sl.type='range';sl.min='.25';sl.max='3';sl.step='.25';sl.value=scale;sl.style.cssText='width:150px;vertical-align:middle';var lab=document.createElement('span');lab.textContent=' ×'+scale;
+        sl.oninput=function(){setScale(+sl.value);lab.textContent=' ×'+scale};p.append(document.createTextNode(T('מהירות: ','Speed: ')),sl,lab,nl());
+        [['slow',T('🐢 איטי','🐢 Slow'),.6],['norm',T('🙂 רגיל','🙂 Normal'),1],['fast',T('🐇 מהיר','🐇 Fast'),1.5],['crazy',T('⚡ מטורף','⚡ Crazy'),2]].forEach(function(m){p.append(btn(m[1],scale===m[2],function(){setScale(m[2]);draw()}))});p.append(nl());
+        p.append(btn(T('🔄 התחל משחק מחדש','🔄 Reload game'),0,function(){location.reload()}));
+        allIds(function(ids,l){var sel=document.createElement('select');sel.style.cssText='max-width:180px;font:inherit;padding:4px;border-radius:8px';l.forEach(function(g){var o=document.createElement('option');o.value=g.url;o.textContent=g.name;sel.append(o)});p.append(nl(),document.createTextNode(T('קפוץ למשחק: ','Jump to: ')),sel,btn(T('לך','Go'),0,function(){location.href=AG.root+sel.value}))})}
+      else if(admTab==='boss'){
+        var pl=document.createElement('div');pl.style.cssText='font-weight:900;margin:4px 0';pl.textContent=T('משחקים שונים ששוחקו: ','Different games played: ')+AG.played()+'  ('+T('בוס 1: 20 · בוס 2: 40 · בוס 3: 60','boss 1: 20 · boss 2: 40 · boss 3: 60')+')';p.append(pl);
+        [0,20,40,60].forEach(function(n){p.append(btn(T('קבע ','Set ')+n,0,function(){setPlayed(n)}))});p.append(btn(T('הכול','All'),0,function(){setPlayed(999)}),nl());
+        var inf=AG.bossInfo?AG.bossInfo():{c1:+ls('boss_story')||0,c2:+ls('boss_story2')||0,c3:+ls('boss_story3')||0,n1:20,n2:10,n3:10};
+        var st=document.createElement('div');st.style.margin='6px 0';st.textContent=T('סיפור – פרק 1: ','Story – ch1: ')+inf.c1+'/'+inf.n1+' · '+T('פרק 2: ','ch2: ')+inf.c2+'/'+inf.n2+' · '+T('פרק 3: ','ch3: ')+(inf.c3||0)+'/'+(inf.n3||10);p.append(st);
+        [['boss_story',20,'boss_story_done'],['boss_story2',10,'boss_story_done2'],['boss_story3',10,'boss_story_done3']].forEach(function(c,i){p.append(btn(T('✔ סיים פרק ','✔ Finish ch')+(i+1),0,function(){ls(c[0],String(c[1]));ls(c[2],'1');draw()}),btn(T('↺ אפס פרק ','↺ Reset ch')+(i+1),0,function(){ls(c[0],'0');try{localStorage.removeItem(c[2])}catch(e){}draw()}),nl())});
+        p.append(btn(T('👾 לדף הבוס','👾 Boss page'),0,function(){location.href=AG.root+'boss/'}))}
+      else if(admTab==='troll'){
+        var inRoom=window.AG&&AG.net&&AG.net.room;
+        TROLLS.forEach(function(t){p.append(btn(t[1],0,function(){AG.troll(t[0]);if(inRoom&&ls('ag_tsend')!=='0')AG.net.broadcast({t:'troll',k:t[0]})}))});
+        p.append(nl(),btn(T('📤 שלח גם לחברים בשרת: ','📤 Also send to room: ')+(ls('ag_tsend')==='0'?T('לא','no'):T('כן','yes')),0,function(){ls('ag_tsend',ls('ag_tsend')==='0'?'1':'0');draw()}),
+          btn(T('📥 לקבל טרולים: ','📥 Receive trolls: ')+(ls('ag_notroll')==='1'?T('לא','no'):T('כן','yes')),0,function(){ls('ag_notroll',ls('ag_notroll')==='1'?'0':'1');draw()}))}
+      else{
+        p.append(btn(T('⛶ מסך מלא','⛶ Fullscreen'),0,function(){var d=document.documentElement;(d.requestFullscreen||d.webkitRequestFullscreen||function(){}).call(d)}),
+          btn(T('🗑 אפס שיאים ונתונים של כל המשחקים','🗑 Wipe ALL saved data'),0,function(){if(confirm(T('למחוק הכול?','Delete everything?'))){try{var keep=localStorage.getItem('ag_admin');localStorage.clear();if(keep)localStorage.setItem('ag_admin',keep)}catch(e){}location.reload()}}),nl(),
+          btn(T('📋 העתק גיבוי נתונים','📋 Copy data backup'),0,function(){var o={};try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k.indexOf('ag_adm')!==0)o[k]=localStorage.getItem(k)}}catch(e){}try{navigator.clipboard.writeText(JSON.stringify(o));toast(T('הועתק','Copied'))}catch(e){}}),
+          btn(T('🚪 יציאה מאדמין','🚪 Log out'),0,function(){AG.adminLogout();location.reload()}))}}}
+  function init(){if(!document.body)return;if(ID==='hub'){if(window.AG&&AG.isAdmin())mkBtn('⚙️',104,adminPanel,'admin');return}
     var left=EN?92:92;mkBtn('⚡',left,funPanel,'fun modes');
     if(window.AG&&AG.isAdmin())mkBtn('⚙️',left+80,adminPanel,'admin')}
   if(document.body)init();else addEventListener('DOMContentLoaded',init);

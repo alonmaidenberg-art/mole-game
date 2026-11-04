@@ -31,3 +31,7 @@ a.card:hover,a.card:focus-visible{background:#fff!important;border-color:#2fd6c0
 a[aria-label="חזרה לכל המשחקים"],button[aria-label="online"],#ag-lang,body>button[style*="position:fixed"]:not([id]){background:rgba(255,255,255,.92)!important;color:var(--ink)!important;border:2px solid #fff!important;box-shadow:0 3px 10px rgba(20,150,140,.25)!important}
 button[aria-label="fun modes"],button[aria-label="admin"],button[aria-label]:not([aria-label="online"]):not([id]){}
 button[aria-label="fun modes"]{background:rgba(255,255,255,.92)!important;color:var(--ink)!important;border:2px solid #fff!important}
+html:fullscreen,html:fullscreen body{background:#06223a!important}
+#ag-panel{max-height:calc(100vh - 56px);max-height:calc(100dvh - 56px);overflow:auto}
+#ag-panel,#ag-panel *:not(input):not(select):not(option){color:#fff!important}
+#ag-panel button.on{color:#222!important}

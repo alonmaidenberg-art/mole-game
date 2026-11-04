@@ -70,8 +70,9 @@
   var sc=document.currentScript;var base=new URL('./',sc&&sc.src?sc.src:location.href).href;
   if(LANG==='en'){var s=document.createElement('script');s.src=base+'i18n.js';(document.head||document.documentElement).appendChild(s)}
   var isHub=(location.pathname.replace(/index\.html$/,'')===new URL(base).pathname);
-  if(!/\/boss\//.test(location.pathname)){var tl=document.createElement('link');tl.rel='stylesheet';tl.href=base+'theme.css?v=4';(document.head||document.documentElement).appendChild(tl)}
-  if(!isHub){var fx=document.createElement('script');fx.src=base+'fx.js';(document.head||document.documentElement).appendChild(fx)}
+  if(!/\/boss\//.test(location.pathname)){var tl=document.createElement('link');tl.rel='stylesheet';tl.href=base+'theme.css?v=5';(document.head||document.documentElement).appendChild(tl)}
+  var adm=false;try{adm=localStorage.getItem('ag_adm')!==null&&window.AG&&AG.isAdmin()}catch(e){}
+  if(!isHub||(window.AG&&AG.isAdmin&&AG.isAdmin())){var fx=document.createElement('script');fx.src=base+'fx.js';(document.head||document.documentElement).appendChild(fx)}
   var on_=document.createElement('script');on_.src=base+'online.js';(document.head||document.documentElement).appendChild(on_);
   if(/[?&](boss|story)=?/.test(location.search)||/\/boss\/?$/.test(location.pathname.replace(/index\.html$/,''))){var bm=document.createElement('script');bm.src=base+'bossmode.js';(document.head||document.documentElement).appendChild(bm)}
   function btn(){
@@ -83,4 +84,24 @@
     document.body.appendChild(b);
   }
   if(document.body)btn();else addEventListener('DOMContentLoaded',btn);
+})();
+
+/* fullscreen: auto on "play", plus a toggle button (c) Alon Maidenberg 2026 */
+(function(){
+  if(/\/boss\/$|\/boss\/index/.test(location.pathname))return;
+  var path=location.pathname.replace(/index\.html$/,'');
+  var parts=path.split('/').filter(Boolean);var HUB=window.AG&&AG.root&&path===new URL(AG.root).pathname;
+  if(HUB||parts.length===0)return;
+  function ls(k,v){try{if(v===undefined)return localStorage.getItem(k);if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v)}catch(e){}return null}
+  var de=document.documentElement,can=!!(de.requestFullscreen||de.webkitRequestFullscreen);
+  function isFs(){return !!(document.fullscreenElement||document.webkitFullscreenElement)}
+  function enter(){if(isFs()||!can)return;try{var r=(de.requestFullscreen||de.webkitRequestFullscreen).call(de);if(r&&r.catch)r.catch(function(){});if(document.getElementById('rot')&&screen.orientation&&screen.orientation.lock)screen.orientation.lock('landscape').catch(function(){})}catch(e){}}
+  function exit(){try{(document.exitFullscreen||document.webkitExitFullscreen).call(document)}catch(e){}}
+  addEventListener('click',function(e){var t=e.target;if(t&&t.closest&&t.closest('#go,#again,#startB,.btn')&&ls('ag_nofs')!=='1'&&(t.closest('#go')||t.closest('#again')))enter()},true);
+  function mk(){var b=document.createElement('button');b.type='button';b.textContent='⛶';b.setAttribute('aria-label','fullscreen');
+    var BOT=/\/(chess|englishbot|impostor|game2048)\//.test(location.pathname);
+    b.style.cssText='position:fixed;z-index:2147483000;'+(BOT?'bottom:max(8px,env(safe-area-inset-bottom));':'top:max(6px,env(safe-area-inset-top));')+'left:52px;margin-left:0;width:34px;height:34px;border-radius:50%;border:0;font-size:18px;background:rgba(255,255,255,.92);color:#0b4553;cursor:pointer;display:'+(can?'block':'none');
+    b.style.left='212px';
+    b.onclick=function(){if(isFs()){ls('ag_nofs','1');exit()}else{ls('ag_nofs',null);enter()}};document.body.appendChild(b)}
+  if(document.body)mk();else addEventListener('DOMContentLoaded',mk);
 })();

@@ -73,19 +73,21 @@ function run(upd,drw,bg){let last=performance.now(),acc=0;function l(n){requestA
 function wire(start){$('#go').onclick=()=>{$('#menu').classList.remove('show');start();on=true};$('#again').onclick=()=>{$('#end').classList.remove('show');start();on=true};$('#menu2').onclick=()=>{on=false;$('#end').classList.remove('show');$('#menu').classList.add('show')}}
 function over(title,score,msg,coins,dia,delay=600){on=false;window.__show=true;saveBest(score);setTimeout(()=>endGame(title,score,msg,coins,dia),delay)}
 
+const EN=window.AG_LANG==='en',TT=(h,e)=>EN?e:h;
 const WW=3200,WH=2400;
 let lvl=2;[...$('#lv').children].forEach(b=>b.onclick=()=>{[...$('#lv').children].forEach(k=>k.classList.toggle('on',k===b));lvl=+b.dataset.v});
 const NAMES=['דבורי','פיקל','נחשוש','זיגזג','ברק','לולי','טורבו','קיפוד','גמבו','שחור','פיצי','ירוק','סליים','בוסי','רוני','מיקי'];
+const NAMES_EN=['Buzzy','Pickle','Wiggles','Zigzag','Spark','Lulu','Turbo','Spike','Gumbo','Shadow','Pixie','Green','Slimy','Bossy','Ronny','Mickey'];
 const SK=[[20,60],[200,60],[300,70],[40,70],[170,65],[260,60],[0,70],[100,60],[330,60],[60,80]];
-let worms,orbs,me,cam,fr,kills,boostP=false,ang0=null,prs={},ptrSteer=null,keysA=0,sbest=0;
+const ZM=[.6,.8,1.05];let zi=+store.get('wm_zoom',1);let worms,orbs,me,cam,fr,kills,boostP=false,ang0=null,prs={},ptrSteer=null,keysA=0,sbest=0;
 const hsl=(h,s,l,a)=>`hsla(${h},${s}%,${l}%,${a===undefined?1:a})`;
-function mk(ai,i){const sk=ai?SK[i%SK.length]:[130,70];const w={ai,x:rnd(300,WW-300),y:rnd(300,WH-300),a:rnd(0,6.28),ta:0,len:ai?rnd(12,40):12,gr:0,seg:[],h:sk[0],s:sk[1],name:ai?NAMES[i%NAMES.length]:'אתה',boost:false,dead:false,sk:rnd(.5,1.2),tt:0,sc:0};w.ta=w.a;w.seg=[];const D=5;for(let k=0;k<Math.floor(w.len);k++)w.seg.push({x:w.x-Math.cos(w.a)*k*D,y:w.y-Math.sin(w.a)*k*D});return w}
+function mk(ai,i){const sk=ai?SK[i%SK.length]:[130,70];const w={ai,x:rnd(300,WW-300),y:rnd(300,WH-300),a:rnd(0,6.28),ta:0,len:ai?rnd(12,40):12,gr:0,seg:[],h:sk[0],s:sk[1],name:ai?(EN?NAMES_EN:NAMES)[i%NAMES.length]:TT('אתה','You'),boost:false,dead:false,sk:rnd(.5,1.2),tt:0,sc:0};w.ta=w.a;w.seg=[];const D=5;for(let k=0;k<Math.floor(w.len);k++)w.seg.push({x:w.x-Math.cos(w.a)*k*D,y:w.y-Math.sin(w.a)*k*D});return w}
 const rad=w=>7+Math.min(14,Math.sqrt(w.len)*.95);
 function orb(x,y,v,c){orbs.push({x,y,v:v||1,h:c===undefined?rnd(0,360):c,r:v>2?7:rnd(3,5)})}
 function start(){worms=[];orbs=[];kills=0;fr=0;boostP=false;me=mk(false);me.x=WW/2;me.y=WH/2;me.a=me.ta=0;me.seg=[];for(let k=0;k<12;k++)me.seg.push({x:me.x-k*5,y:me.y});worms.push(me);const n=[0,7,10,14][lvl];for(let i=0;i<n;i++){const w=mk(true,i);if(Math.hypot(w.x-me.x,w.y-me.y)<500){w.x=rnd(300,WW-300);w.y=WH-200}w.seg=[];for(let k=0;k<Math.floor(w.len);k++)w.seg.push({x:w.x-Math.cos(w.a)*k*5,y:w.y-Math.sin(w.a)*k*5});worms.push(w)}
- for(let i=0;i<520;i++)orb(rnd(30,WW-30),rnd(30,WH-30));cam={x:me.x,y:me.y,z:1}}
+ for(let i=0;i<520;i++)orb(rnd(30,WW-30),rnd(30,WH-30));cam={x:me.x,y:me.y,z:ZM[zi]}}
 function kill(w,by){if(w.dead)return;w.dead=true;if(by&&by===me)kills++;const m=Math.max(1,Math.floor(w.seg.length/3));for(let i=0;i<w.seg.length;i+=3)orb(w.seg[i].x+rnd(-8,8),w.seg[i].y+rnd(-8,8),2.5,w.h);tone(w===me?150:520,.2,'sawtooth',.08);
- if(w===me){over('נאכלת! 🐛',Math.floor(me.len*5),'אורך סופי: '+Math.floor(me.len)+' · הפלת '+kills+' תולעים',Math.min(70,Math.floor(me.len/5)+kills*4),me.len>180?1:0,900)}else{const i=worms.indexOf(w);const n=mk(true,Math.floor(rnd(0,99)));let tries=0;do{n.x=rnd(300,WW-300);n.y=rnd(300,WH-300);tries++}while(Math.hypot(n.x-me.x,n.y-me.y)<700&&tries<20);n.seg=[];for(let k=0;k<Math.floor(n.len);k++)n.seg.push({x:n.x-Math.cos(n.a)*k*5,y:n.y-Math.sin(n.a)*k*5});worms[i]=n}}
+ if(w===me){over(TT('נאכלת! 🐛','You got eaten! 🐛'),Math.floor(me.len*5),TT('אורך סופי: ','Final length: ')+Math.floor(me.len)+TT(' · הפלת ',' · defeated ')+kills+TT(' תולעים',' worms'),Math.min(70,Math.floor(me.len/5)+kills*4),me.len>180?1:0,900)}else{const i=worms.indexOf(w);const n=mk(true,Math.floor(rnd(0,99)));let tries=0;do{n.x=rnd(300,WW-300);n.y=rnd(300,WH-300);tries++}while(Math.hypot(n.x-me.x,n.y-me.y)<700&&tries<20);n.seg=[];for(let k=0;k<Math.floor(n.len);k++)n.seg.push({x:n.x-Math.cos(n.a)*k*5,y:n.y-Math.sin(n.a)*k*5});worms[i]=n}}
 function danger(w,ax,ay,r){for(const o of worms){if(o===w||o.dead)continue;const ro=rad(o);for(let i=0;i<o.seg.length;i+=2){if(Math.hypot(o.seg[i].x-ax,o.seg[i].y-ay)<ro+r+14)return true}}return false}
 function think(w){const sp=[0,.04,.06,.085][lvl];w.tt++;const r=rad(w);let best=null,bd=1e9;
  if(w.tt%8===0||!w.tg){w.tg=null;for(const o of orbs){const d=(o.x-w.x)**2+(o.y-w.y)**2;if(d<bd&&d<(280+lvl*60)**2){bd=d;best=o}}if(best)w.tg=best;else if(w.tt%90===0)w.ta=rnd(0,6.28)}
@@ -115,7 +117,7 @@ function upd(){fr++;
    if(hit){kill(a,b);break}}}
  if(me.dead)return;
  while(orbs.length<520)orb(rnd(30,WW-30),rnd(30,WH-30));
- const z=1-Math.min(.4,(me.len-12)/700);cam.z+=(z-cam.z)*.03;cam.x+=(me.x-cam.x)*.18;cam.y+=(me.y-cam.y)*.18}
+ const z=(ZM[zi])*(1-Math.min(.4,(me.len-12)/700));cam.z+=(z-cam.z)*.03;cam.x+=(me.x-cam.x)*.18;cam.y+=(me.y-cam.y)*.18}
 function drawWorm(w){const r=rad(w),n=w.seg.length;
  for(let i=n-1;i>=0;i--){const s=w.seg[i];if(s.x<cam.x-W/cam.z/2-30||s.x>cam.x+W/cam.z/2+30||s.y<cam.y-H/cam.z/2-30||s.y>cam.y+H/cam.z/2+30)continue;const t=1-i/n*.25;const rr2=r*(.7+.3*t);
   ctx.fillStyle='rgba(0,0,0,.18)';ctx.beginPath();ctx.arc(s.x+3,s.y+5,rr2,0,7);ctx.fill();
@@ -137,13 +139,14 @@ function drw(){
  // HUD
  const top=[...worms].sort((a,b)=>b.len-a.len).slice(0,5);const rk=[...worms].sort((a,b)=>b.len-a.len).indexOf(me)+1;
  T('‭'+me.sc+' נקודות · אורך '+Math.floor(me.len),W/2,18,20,'#fff');
- ctx.fillStyle='rgba(8,30,70,.5)';rr(W-190,36,176,26+top.length*22,12);ctx.fill();T('מקום '+rk+' מתוך '+worms.length,W-102,50,13,'#ffd23f');ctx.direction='ltr';
+ ctx.fillStyle='rgba(8,30,70,.5)';rr(W-190,36,176,26+top.length*22,12);ctx.fill();T(TT('מקום ','Place ')+rk+TT(' מתוך ',' of ')+worms.length,W-102,50,13,'#ffd23f');ctx.direction='ltr';
  top.forEach((w,i)=>{ctx.fillStyle=w===me?'#ffd23f':'#fff';ctx.font='bold 13px system-ui';ctx.textAlign='right';ctx.fillText(w.name,W-24,74+i*22);ctx.textAlign='left';ctx.fillText('‭'+w.sc,W-182,74+i*22)});
  // minimap
  ctx.fillStyle='rgba(8,30,70,.5)';rr(14,H-84,120,90,10);ctx.fill();for(const w of worms){ctx.fillStyle=w===me?'#ffd23f':hsl(w.h,80,60);ctx.beginPath();ctx.arc(14+w.x/WW*120,H-84+w.y/WH*90,w===me?4:2.5,0,7);ctx.fill()}
+ B(W-176,H-86,52,52,'rgba(255,255,255,.28)','🔍',()=>{zi=(zi+1)%3;store.set('wm_zoom',zi)},24);
  // boost button
  const bx=W-96,by=H-96,bp=prs.boost||boostP;ctx.fillStyle=bp?'#ffd23f':'rgba(255,255,255,.22)';ctx.beginPath();ctx.arc(bx,by,40,0,7);ctx.fill();ctx.strokeStyle='rgba(255,255,255,.6)';ctx.lineWidth=3;ctx.stroke();T('⚡',bx,by,34)}
-cv.addEventListener('pointerdown',e=>{const p=cpos(e);if(Math.hypot(p.x-(W-96),p.y-(H-96))<56){prs.boost=e.pointerId;boostP=true;cv.setPointerCapture&&cv.setPointerCapture(e.pointerId)}else{prs.steer=e.pointerId;ptrSteer=p}});
+cv.addEventListener('pointerdown',e=>{const p=cpos(e);if(p.x>W-204&&p.x<W-124&&p.y>H-90&&p.y<H-30){}else if(Math.hypot(p.x-(W-96),p.y-(H-96))<56){prs.boost=e.pointerId;boostP=true;cv.setPointerCapture&&cv.setPointerCapture(e.pointerId)}else{prs.steer=e.pointerId;ptrSteer=p}});
 cv.addEventListener('pointermove',e=>{if(prs.steer===e.pointerId||(e.pointerType==='mouse'&&prs.boost!==e.pointerId))ptrSteer=cpos(e)});
 for(const t of['pointerup','pointercancel'])cv.addEventListener(t,e=>{if(prs.boost===e.pointerId){prs.boost=0;boostP=false}if(prs.steer===e.pointerId){prs.steer=0;if(e.pointerType!=='mouse')ptrSteer=null}});
 addEventListener('keydown',e=>{if(e.code==='ArrowLeft'||e.code==='KeyA')keysA=-1;if(e.code==='ArrowRight'||e.code==='KeyD')keysA=1});addEventListener('keyup',e=>{if(['ArrowLeft','KeyA','ArrowRight','KeyD'].includes(e.code))keysA=0});
