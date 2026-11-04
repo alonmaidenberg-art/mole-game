@@ -95,7 +95,7 @@ window.__s={reset,step,get state(){return state},get sc(){return sc},get pk(){re
 
 if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 </script>
-<script>addEventListener('load',()=>{if(window.AG&&AG.net)AG.net.remote('hockey',{name:'הוקי אוויר',canvas:'#cv',start(){document.querySelector('#md [data-v="2p"]').click();document.querySelector('#go').click();},pad:[{c:'ArrowLeft',l:'◀',side:'L'},{c:'ArrowUp',l:'▲',side:'L'},{c:'ArrowDown',l:'▼',side:'L'},{c:'ArrowRight',l:'▶',side:'L'}],keys:{KeyA:'ArrowLeft',KeyD:'ArrowRight',KeyW:'ArrowUp',KeyS:'ArrowDown'}})});
+<script>addEventListener('load',()=>{if(window.AG&&AG.net)AG.net.remote('hockey',{pad1:[{c:'KeyA',l:'◀',side:'L'},{c:'KeyW',l:'▲',side:'L'},{c:'KeyS',l:'▼',side:'L'},{c:'KeyD',l:'▶',side:'L'}],name:'הוקי אוויר',canvas:'#cv',start(){document.querySelector('#md [data-v="2p"]').click();document.querySelector('#go').click();},pad:[{c:'ArrowLeft',l:'◀',side:'L'},{c:'ArrowUp',l:'▲',side:'L'},{c:'ArrowDown',l:'▼',side:'L'},{c:'ArrowRight',l:'▶',side:'L'}],keys:{KeyA:'ArrowLeft',KeyD:'ArrowRight',KeyW:'ArrowUp',KeyS:'ArrowDown'}})});
 </script>
 <script src="../hub.js"></script>
 </body>

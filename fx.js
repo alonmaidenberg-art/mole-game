@@ -51,6 +51,28 @@
   /* ---------- play time ---------- */
   setInterval(function(){if(document.visibilityState!=='visible'||ID==='hub')return;try{var o=JSON.parse(ls('ag_time')||'{}');o[ID]=(o[ID]||0)+5;ls('ag_time',JSON.stringify(o))}catch(e){}},5000);
 
+
+  /* ---------- trolls (admin pranks; harmless, visual, a few seconds) ---------- */
+  var trollSt=document.createElement('style');trollSt.textContent='@keyframes agq{0%,100%{transform:translate(0,0)}20%{transform:translate(-9px,5px)}40%{transform:translate(8px,-6px)}60%{transform:translate(-6px,-8px)}80%{transform:translate(7px,7px)}}@keyframes agf{to{transform:translateY(110vh) rotate(360deg)}}';(document.head||document.documentElement).appendChild(trollSt);
+  var TROLLS=[['flip',T('🙃 מסך הפוך','🙃 Flip screen')],['shake',T('📳 רעידת אדמה','📳 Earthquake')],['crash',T('💥 קריסה מזויפת','💥 Fake crash')],['coins',T('💸 "גנבו מטבעות"','💸 "Coins stolen"')],['fast',T('⚡ מהירות מטורפת','⚡ Crazy speed')],['slow',T('🐢 האטה','🐢 Slow motion')],['rain',T('👻 גשם רוחות','👻 Ghost rain')],['colors',T('🌈 צבעים משתגעים','🌈 Color madness')],['mirror',T('🪞 מראה','🪞 Mirror')]];
+  function ovl(css,html,ms){var d=document.createElement('div');d.style.cssText='position:fixed;z-index:2147483640;'+css;d.innerHTML=html;document.body.appendChild(d);setTimeout(function(){d.remove()},ms);return d}
+  function withMode(m,ms){if(modes.indexOf(m)<0){modes.push(m);applyModes();setTimeout(function(){var i=modes.indexOf(m);if(i>=0){modes.splice(i,1);applyModes()}},ms)}}
+  window.AG=window.AG||{};
+  AG.troll=function(k,remote){
+    if(remote&&ls('ag_notroll')==='1')return;
+    var ms=6000;
+    if(k==='flip'){document.documentElement.style.transition='transform .4s';document.documentElement.style.transform='rotate(180deg)';setTimeout(function(){document.documentElement.style.transform='';},ms)}
+    else if(k==='shake'){document.body.style.animation='agq .35s infinite';setTimeout(function(){document.body.style.animation=''},ms)}
+    else if(k==='crash'){var d=ovl('inset:0;background:#0a4aa8;color:#fff;font:700 22px system-ui,Arial;padding:10vh 8vw;direction:ltr','<div style="font-size:90px">:(</div><p>'+T('המשחק נתקל בבעיה וצריך להפעיל אותו מחדש.','Your game ran into a problem and needs to restart.')+'</p><p>0%</p>',3500);var n=0,iv=setInterval(function(){n+=7;var p=d.querySelector('p:last-child');if(p)p.textContent=Math.min(99,n)+'%';if(n>99)clearInterval(iv)},180);setTimeout(function(){ovl('left:50%;top:40%;transform:translateX(-50%);background:#ffd23f;color:#222;border-radius:18px;padding:14px 22px;font:900 22px system-ui,Arial','😜 '+T('סתם צוחקים!','Just kidding!'),2200)},3500)}
+    else if(k==='coins'){ovl('left:50%;top:30%;transform:translateX(-50%);background:#c01a2a;color:#fff;border-radius:18px;padding:14px 22px;font:900 22px system-ui,Arial;text-align:center','💸 '+T('גנבו לך את כל המטבעות!','All your coins were stolen!'),3000);setTimeout(function(){ovl('left:50%;top:30%;transform:translateX(-50%);background:#ffd23f;color:#222;border-radius:18px;padding:14px 22px;font:900 22px system-ui,Arial','😜 '+T('סתם – הכול בסדר','Just kidding – all is fine'),2200)},3100)}
+    else if(k==='fast'){var o=scale;setScale(2);setTimeout(function(){setScale(o)},ms)}
+    else if(k==='slow'){var o2=scale;setScale(.5);setTimeout(function(){setScale(o2)},ms)}
+    else if(k==='rain'){for(var i=0;i<26;i++){(function(i){var e=ovl('left:'+Math.random()*95+'vw;top:-60px;font-size:'+(28+Math.random()*30)+'px;pointer-events:none;animation:agf '+(2.5+Math.random()*2.5)+'s linear '+Math.random()*2+'s forwards','👻',6000)})(i)}}
+    else if(k==='colors'){withMode('rainbow',ms);withMode('invert',ms/2)}
+    else if(k==='mirror'){withMode('mirror',ms)}
+  };
+  if(window.AG&&AG.tampered){setTimeout(function(){AG.coins();if(AG.tampered())toast(T('⚠ זוהה שינוי לא חוקי בארנק – הוא אופס','⚠ Illegal wallet edit detected – wallet reset'))},900)}
+
   /* ---------- buttons + panels ---------- */
   var BOT=/\/(chess|englishbot|impostor|game2048)\//.test(location.pathname);
   function mkBtn(txt,left,fn,label){var b=document.createElement('button');b.type='button';b.textContent=txt;b.setAttribute('aria-label',label);
@@ -75,6 +97,11 @@
       p.append(document.createTextNode(T('שיא במשחק: ','Game best: ')),inp,btn(T('שמור','Save'),0,function(){var v=Math.max(0,Math.floor(+inp.value||0));ls(KEY,String(v));draw()}),btn(T('אפס','Reset'),0,function(){try{localStorage.removeItem(KEY)}catch(e){}draw()}),document.createElement('br'));
       var sl=document.createElement('input');sl.type='range';sl.min='.25';sl.max='3';sl.step='.25';sl.value=scale;sl.style.cssText='width:150px;vertical-align:middle';var lab=document.createElement('span');lab.textContent=' ×'+scale;
       sl.oninput=function(){setScale(+sl.value);lab.textContent=' ×'+scale};p.append(document.createTextNode(T('מהירות: ','Speed: ')),sl,lab,document.createElement('br'));
+      p.append(head(T('😈 טרולים','😈 Trolls')));
+      var inRoom=window.AG&&AG.net&&AG.net.room;
+      TROLLS.forEach(function(t){p.append(btn(t[1],0,function(){AG.troll(t[0]);if(inRoom&&ls('ag_tsend')!=='0')AG.net.broadcast({t:'troll',k:t[0]})}))});
+      p.append(document.createElement('br'),btn(T('📤 שלח גם לחברים בשרת: ','📤 Also send to room: ')+(ls('ag_tsend')==='0'?T('לא','no'):T('כן','yes')),0,function(){ls('ag_tsend',ls('ag_tsend')==='0'?'1':'0');draw()}),
+        btn(T('📥 לקבל טרולים: ','📥 Receive trolls: ')+(ls('ag_notroll')==='1'?T('לא','no'):T('כן','yes')),0,function(){ls('ag_notroll',ls('ag_notroll')==='1'?'0':'1');draw()}),document.createElement('br'));
       p.append(btn(T('🔓 פתח את שלבי הבוס','🔓 Unlock boss levels'),0,function(){fetch(AG.root+'games.json').then(function(r){return r.json()}).then(function(l){ls('ag_played',JSON.stringify(l.map(function(g){return g.id}).filter(function(i){return i!=='boss'})));draw()})}),
         btn(T('🚪 יציאה מאדמין','🚪 Log out'),0,function(){AG.adminLogout();location.reload()}))}}
   function init(){if(ID==='hub'||!document.body)return;

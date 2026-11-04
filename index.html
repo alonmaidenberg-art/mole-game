@@ -230,7 +230,7 @@ $('lbB').onclick=lbOpen;
   $('gbX').onclick=function(){$('gbM').classList.remove('show')};$('gbSend').onclick=send;sel.onchange=paint;
 })();
 $('lbX').onclick=function(){$('lbM').classList.remove('show')};
-(function(){var n=AG.played(),ok=n>=20||AG.isAdmin();$('bossT').textContent=ok?'נפתח! 20 שלבים ארוכים נגד הגליץ׳':'שחקו ב-20 משחקים שונים כדי לפתוח ('+Math.min(n,20)+'/20)';$('bossBar').style.width=Math.min(100,n/20*100)+'%'})();
+(function(){var n=AG.played(),ok=true;$('bossT').textContent=ok?'סיפור: 20 קרבות נגד הגליץ׳ + פרק 2 עם דינוזאור ענק':'שחקו ב-20 משחקים שונים כדי לפתוח ('+Math.min(n,20)+'/20)';var sp=0;try{sp=+localStorage.getItem('boss_story')||0}catch(e){}$('bossBar').style.width=Math.min(100,sp/20*100)+'%'})();
 function showNote(x){$('noteT').textContent=x.noteTitle||x.name;$('noteP').textContent=x.note;$('noteM').classList.add('show');$('noteGo').onclick=function(){location.href=x.url};$('noteX').onclick=function(){$('noteM').classList.remove('show')}}
 function $(i){return document.getElementById(i)}
 function wal(){$('wc').textContent=AG.coins().toLocaleString('he-IL');$('wd').textContent=AG.diamonds().toLocaleString('he-IL')}

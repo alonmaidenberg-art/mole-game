@@ -9,14 +9,23 @@
   try{var rel=location.href.slice(ROOT.length).split(/[?#]/)[0].replace(/index\.html$/,'').replace(/\/$/,'');
     if(rel&&rel.indexOf('/')<0&&rel!=='boss'&&rel!=='lib'&&rel!=='assets'){var pl=JSON.parse(localStorage.getItem('ag_played')||'[]');if(pl.indexOf(rel)<0){pl.push(rel);localStorage.setItem('ag_played',JSON.stringify(pl))}}}catch(e){}
   var K='ag_wallet',KA='ag_admin',subs=[];
-  function rd(){try{var w=JSON.parse(localStorage.getItem(K)||'{}');return{c:Math.max(0,+w.c||0),d:Math.max(0,+w.d||0)}}catch(e){return{c:0,d:0}}}
-  function wr(w){try{localStorage.setItem(K,JSON.stringify(w))}catch(e){}subs.forEach(function(f){try{f(w)}catch(e){}})}
+  /* anti-cheat: the wallet is signed; a hand-edited wallet is reset. (A deterrent only - real protection would need a server.) */
+  function sig(c,d){var t='ag|'+c+'|'+d+'|k7Qx',h=2166136261;for(var i=0;i<t.length;i++){h^=t.charCodeAt(i);h=Math.imul(h,16777619)>>>0}return h.toString(36)}
+  var tampered=false;
+  function rd(){try{var w=JSON.parse(localStorage.getItem(K)||'{}'),c=Math.max(0,+w.c||0),d=Math.max(0,+w.d||0);
+    if(w.s!==undefined&&w.s!==sig(c,d)&&!(localStorage.getItem(KA)===HASH)){tampered=true;try{localStorage.setItem(K,JSON.stringify({c:0,d:0,s:sig(0,0)}))}catch(e){}return{c:0,d:0}}
+    return{c:c,d:d}}catch(e){return{c:0,d:0}}}
+  function wr(w){try{localStorage.setItem(K,JSON.stringify({c:w.c,d:w.d,s:sig(w.c,w.d)}))}catch(e){}subs.forEach(function(f){try{f(w)}catch(e){}})}
+  var gains=[];function allow(c,d){var n=Date.now();gains=gains.filter(function(g){return n-g[0]<60000});
+    var sc=0,sd=0;gains.forEach(function(g){sc+=g[1];sd+=g[2]});
+    if(c>800||d>12||sc+c>3500||sd+d>40)return false;gains.push([n,c,d]);return true}
   var AG={
     root:ROOT,
     played:function(){try{return JSON.parse(localStorage.getItem('ag_played')||'[]').length}catch(e){return 0}},
     coins:function(){return rd().c},
     diamonds:function(){return rd().d},
-    add:function(c,d){var w=rd();w.c+=c||0;w.d+=d||0;wr(w)},
+    add:function(c,d){c=c||0;d=d||0;if((c>0||d>0)&&localStorage.getItem(KA)!==HASH&&!allow(Math.max(0,c),Math.max(0,d)))return;var w=rd();w.c=Math.max(0,w.c+c);w.d=Math.max(0,w.d+d);wr(w)},
+    tampered:function(){return tampered},
     spend:function(c,d){var w=rd();c=c||0;d=d||0;if(w.c<c||w.d<d)return false;w.c-=c;w.d-=d;wr(w);return true},
     onChange:function(f){subs.push(f)},
     isAdmin:function(){try{return localStorage.getItem(KA)===HASH}catch(e){return false}},

@@ -77,7 +77,7 @@ const NAMES=['באג זעיר','גליץ׳ קטן','פיקסל שבור','קוד
 const GAMES=['🏓 פונג','🧱 שוברי לבנים','🦖 דינוזאור','🐸 קפצן','👻 בולעים','🔴 סיימון','⚡ תגובה','🧠 מאסטרמיינד','💡 אורות','🔢 פאזל','🎨 צבעים','🪙 קליקר','☄️ אסטרואידים','🎯 קליעה','🏃 התחמקות','🏎️ מירוץ','🎳 באולינג','⛳ גולף'];
 const CN=['אדום','כחול','ירוק','צהוב'],CC=['#ff5a6e','#4a8aff','#3fe08a','#ffd05a'],SC=['#ff5a6e','#ffd05a','#5ff7d6','#7a9bff'],SF=[262,330,392,523];
 const played=()=>window.AG?AG.played():0,need=20,admin=()=>window.AG&&AG.isAdmin();
-const unlocked=()=>played()>=need||admin();
+const unlocked=()=>true;
 let maxLv=+store.get('boss_lv',1),state='select',lvl=1,P=[],frame=0,prog=0,target=0,solved=0,cfg,lastWon=false,shake=0,flash=0;
 function paintMenu(){const ok=unlocked();$('#bprog').textContent=ok?'נפתח! שלב מקסימלי: '+maxLv+'/20':'שיחקת '+Math.min(played(),need)+'/'+need+' משחקים שונים. עוד '+Math.max(0,need-played())+' כדי לפתוח';$('#go').disabled=!ok;$('#go').style.opacity=ok?1:.4}
 function mkCfg(n){return{n,P:[2,2,3,3,3,4,4,4,4,5,5,5,5,6,6,6,6,6,6,6][n-1],L:80+n*9,gap:Math.max(55,190-n*7),exp:Math.max(300,720-n*20),types:['bug','color'].concat(n>=3?['math']:[],n>=5?['react']:[],n>=7?['simon']:[])}}

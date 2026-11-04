@@ -223,7 +223,7 @@ requestAnimationFrame(loop);
 
 if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 </script>
-<script>addEventListener('load',()=>{if(window.AG&&AG.net)AG.net.remote('superfootball',{name:'סופר כדורגל',canvas:'#cv',start(){document.querySelector('#cMode [data-v="2p"]').click();document.querySelector('#go').click();},pad:[{c:'ArrowLeft',l:'◀',side:'L'},{c:'ArrowUp',l:'▲',side:'L'},{c:'ArrowDown',l:'▼',side:'L'},{c:'ArrowRight',l:'▶',side:'L'},{c:'KeyK',l:'K',side:'R'},{c:'KeyL',l:'L',side:'R'},{c:'KeyJ',l:'J',side:'R'},{c:'KeyU',l:'U',side:'R'}],keys:{KeyA:'ArrowLeft',KeyD:'ArrowRight',KeyW:'ArrowUp',KeyS:'ArrowDown'}})});
+<script>addEventListener('load',()=>{if(window.AG&&AG.net)AG.net.remote('superfootball',{pad1:[{c:'KeyA',l:'◀',side:'L'},{c:'KeyW',l:'▲',side:'L'},{c:'KeyS',l:'▼',side:'L'},{c:'KeyD',l:'▶',side:'L'},{c:'Space',l:'⤒',side:'R'},{c:'KeyF',l:'⚽',side:'R'},{c:'KeyG',l:'G',side:'R'},{c:'KeyE',l:'E',side:'R'}],name:'סופר כדורגל',canvas:'#cv',start(){document.querySelector('#cMode [data-v="2p"]').click();document.querySelector('#go').click();},pad:[{c:'ArrowLeft',l:'◀',side:'L'},{c:'ArrowUp',l:'▲',side:'L'},{c:'ArrowDown',l:'▼',side:'L'},{c:'ArrowRight',l:'▶',side:'L'},{c:'KeyK',l:'K',side:'R'},{c:'KeyL',l:'L',side:'R'},{c:'KeyJ',l:'J',side:'R'},{c:'KeyU',l:'U',side:'R'}],keys:{KeyA:'ArrowLeft',KeyD:'ArrowRight',KeyW:'ArrowUp',KeyS:'ArrowDown'}})});
 </script>
 <script src="../hub.js"></script>
 

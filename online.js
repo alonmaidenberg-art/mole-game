@@ -131,6 +131,7 @@
     if(m.t==='m'&&match&&m.from===match.peer){if(gameH&&gameH.h.msg)gameH.h.msg(m.d);return}
     if(m.t==='end'&&match&&m.from===match.peer){var h=gameH&&gameH.h;match=null;ss('ag_vs',null);emit();if(h&&h.end)h.end();return}
     if(m.t==='declined'&&pendingChal&&pendingChal.to===m.from){pendingChal=null;toast(T('דחו את האתגר','Challenge declined'));emit();return}
+    if(m.t==='troll'){if(window.AG&&AG.troll)AG.troll(m.k,true);return}
     if(m.t==='rtc'&&gameH&&gameH.h.rtc)gameH.h.rtc(m)
   }
   function begin(peer,role,nm){
@@ -218,11 +219,18 @@
 
   /* ---------- remote play for real-time two-player games: host runs the game, guest sees the video and sends keys ---------- */
   net.remote=function(id,cfg){
-    var pc=null,dc=null,vid=null,ui=null,peer=null,held={};
-    function cleanup(){try{if(pc)pc.close()}catch(e){}pc=dc=null;if(ui){ui.remove();ui=null}for(var k in held)delete held[k]}
+    var pc=null,dc=null,vid=null,ui=null,peer=null,held={},hostPad=null;
+    function cleanup(){if(hostPad){hostPad.forEach(function(e){e.remove()});hostPad=null}try{if(pc)pc.close()}catch(e){}pc=dc=null;if(ui){ui.remove();ui=null}for(var k in held)delete held[k]}
     function key(c,d){if(dc&&dc.readyState==='open')dc.send(JSON.stringify({c:c,d:d}))}
+    function padUI(list,send){
+      var held={},L=el('div','position:fixed;left:10px;bottom:34px;z-index:2147482400;display:flex;gap:8px'),R=el('div','position:fixed;right:10px;bottom:34px;z-index:2147482400;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;max-width:50vw');
+      list.forEach(function(p){var x=el('button','width:60px;height:60px;border-radius:50%;border:0;font:800 20px system-ui;background:rgba(255,255,255,.28);color:#fff;touch-action:none;-webkit-user-select:none',p.l);
+        function dn(e){e.preventDefault();held[p.c]=1;send(p.c,1);x.style.background='rgba(255,210,63,.6)'}function up(){if(!held[p.c])return;held[p.c]=0;send(p.c,0);x.style.background='rgba(255,255,255,.28)'}
+        x.addEventListener('pointerdown',dn);['pointerup','pointerleave','pointercancel'].forEach(function(v){x.addEventListener(v,up)});(p.side==='R'?R:L).appendChild(x)});
+      document.body.append(L,R);return [L,R]}
     function host(){
       cfg.start();
+      if(cfg.pad1&&(matchMedia('(pointer:coarse)').matches||ls('ag_pad')==='1'))hostPad=padUI(cfg.pad1,function(c,d){window.dispatchEvent(new KeyboardEvent(d?'keydown':'keyup',{code:c,key:c,bubbles:true}))});
       setTimeout(function(){
         var cv=document.querySelector(cfg.canvas||'#cv');if(ls('ag_dbg'))console.log('rtc host cv',!!cv);if(!cv||!cv.captureStream){toast(T('המשחק לא תומך בשידור','Streaming not supported'));return}
         pc=new RTCPeerConnection(ICE);dc=pc.createDataChannel('k');
