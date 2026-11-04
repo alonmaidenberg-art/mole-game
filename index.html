@@ -235,7 +235,7 @@ $('lbB').onclick=lbOpen;
     if(!n){msg(T('הכינוי לא מתאים, נסו אחר','That nickname is not allowed'));return}
     if(!JB_BIN){msg(T('לוח התוצאות עוד לא הופעל','The leaderboard is not switched on yet'));return}
     var sc=localBests();if(!Object.keys(sc).length){msg(T('עוד אין לך שיאים. שחקו קודם!','You have no records yet. Play first!'));return}
-    try{localStorage.setItem('ag_name',n);var so=JSON.parse(localStorage.getItem('ag_shop')||'{}');if(so.own&&so.own.crown&&(so.eq||{}).crown!==0&&n.indexOf('👑')<0)n='👑'+n}catch(e){}
+    try{localStorage.setItem('ag_name',n);var so=JSON.parse(localStorage.getItem('ag_shop')||'{}');var bd=(so.eq||{}).badge;if(bd===undefined&&so.own&&so.own.crown)bd='👑';if(bd&&n.indexOf(bd)<0)n=bd+n}catch(e){}
     msg(T('שולח…','Sending…'));
     jbGet().then(function(b){if(b.banned.indexOf(n.toLowerCase())>-1){throw 'banned'}var ch=0,k=0;
       Object.keys(sc).forEach(function(id){if(++k>90||!/^[a-z0-9]{2,20}$/.test(id))return;var v=Math.floor(+sc[id]);if(!isFinite(v)||v<=0||v>1e9)return;var arr=b.g[id]||(b.g[id]=[]);
@@ -251,7 +251,7 @@ $('lbB').onclick=lbOpen;
   $('gbX').onclick=function(){$('gbM').classList.remove('show')};$('gbSend').onclick=send;sel.onchange=paint;
 })();
 $('lbX').onclick=function(){$('lbM').classList.remove('show')};
-(function(){var n=AG.played(),ok=n>=20||AG.isAdmin();$('bossT').textContent=ok?'סיפור: 3 פרקים – הגליץ׳, דינוזאור ענק ודרקון קוסמי':'שחקו ב-20 משחקים שונים כדי לפתוח ('+Math.min(n,20)+'/20)';var sp=0;try{sp=+localStorage.getItem('boss_story')||0}catch(e){}$('bossBar').style.width=Math.min(100,sp/20*100)+'%'})();
+(function(){var n=AG.played(),ok=n>=20||AG.isAdmin();$('bossT').textContent=ok?'סיפור: 4 פרקים – הגליץ׳, דינוזאור, דרקון ומלך הרובוטים':'שחקו ב-20 משחקים שונים כדי לפתוח ('+Math.min(n,20)+'/20)';var sp=0;try{sp=+localStorage.getItem('boss_story')||0}catch(e){}$('bossBar').style.width=Math.min(100,sp/20*100)+'%'})();
 function showNote(x){$('noteT').textContent=x.noteTitle||x.name;$('noteP').textContent=x.note;$('noteM').classList.add('show');$('noteGo').onclick=function(){location.href=x.url};$('noteX').onclick=function(){$('noteM').classList.remove('show')}}
 function $(i){return document.getElementById(i)}
 function wal(){$('wc').textContent=AG.coins().toLocaleString('he-IL');$('wd').textContent=AG.diamonds().toLocaleString('he-IL')}

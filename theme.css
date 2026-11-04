@@ -88,3 +88,14 @@ body:not(:has(canvas))::after{content:'';position:fixed;inset:-20%;z-index:-1;po
 html.ag-amb,html.ag-amb body{background:#06223a!important}
 #ag-amb{position:fixed;inset:-6%;width:112%;height:112%;z-index:-1;filter:blur(36px) saturate(1.5) brightness(.9);pointer-events:none}
 html[data-th="night"] a.card,html[data-th="night"] .box,html[data-th="night"] .ovc{background:linear-gradient(135deg,rgba(255,255,255,.14),rgba(255,255,255,.05))!important;border-color:rgba(255,255,255,.22)!important}
+html[data-th="ocean"],html[data-th="ocean"] body{background:linear-gradient(180deg,#5ec8ff 0%,#2f8ee0 55%,#1a5db3 100%) fixed!important}
+html[data-th="ocean"]{--ink:#06304f;--ink2:#0f567f}
+html[data-th="forest"],html[data-th="forest"] body{background:linear-gradient(180deg,#b9f0a8 0%,#7fd68a 55%,#3ea36b 100%) fixed!important}
+html[data-th="forest"]{--ink:#0d3b21;--ink2:#2a6a45}
+html[data-th="gold"],html[data-th="gold"] body{background:linear-gradient(180deg,#fff2b0 0%,#ffd86b 55%,#f0a92a 100%) fixed!important}
+html[data-th="gold"]{--ink:#4a2f00;--ink2:#835411}
+html[data-th="cosmos"],html[data-th="cosmos"] body{background:radial-gradient(60% 50% at 20% 20%,#5b3ad6 0,transparent 70%),radial-gradient(50% 50% at 80% 70%,#1f9cd8 0,transparent 70%),#0a0f2e fixed!important;background-size:200% 200%!important;animation:agcos 20s ease-in-out infinite alternate;color:#eaf0ff!important}
+@keyframes agcos{to{background-position:100% 100%}}
+html[data-th="cosmos"]{--ink:#eaf0ff;--ink2:#b5c4ee}
+html[data-th="cosmos"] a.card,html[data-th="cosmos"] .box,html[data-th="cosmos"] .ovc{background:linear-gradient(135deg,rgba(255,255,255,.14),rgba(255,255,255,.04))!important;border-color:rgba(255,255,255,.22)!important}
+html[data-th="cosmos"] .sec,html[data-th="cosmos"] .t,html[data-th="cosmos"] .d,html[data-th="cosmos"] header p,html[data-th="cosmos"] footer,html[data-th="cosmos"] .stat{color:#eaf0ff!important}

@@ -31,7 +31,15 @@
     pl:[['GRAAAH! נשרפתם! נסו שוב!','GRAAAH! You got burned! Try again!'],['אפילו כוכב לכת היה מחזיק יותר!','Even a planet would last longer!']],
     sp:{0:['GRAAAH! אני הדרקון הקוסמי, הבוס האמיתי! הגליץ׳ והדינוזאור היו רק החימום. קרב אחרי קרב – אני אשרוף אתכם!','GRAAAH! I am the Cosmic Dragon, the real boss! Glitch and the Dino were just the warm-up. Battle after battle – I will burn you!'],
         9:['GRAAAAH!!! הקרב האחרון בגלקסיה! מי שמנצח שולט בכל היקום!','GRAAAAH!!! The last battle in the galaxy! The winner rules the universe!']},
-    fin:['GRAAAH… הלהבה שלי… כבה… נצחתם את הבוס האחרון… היקום שלכם!','GRAAAH… my flame… is out… you beat the final boss… the universe is yours!']}
+    fin:['GRAAAH… הלהבה שלי… כבה… נצחתם את הבוס האחרון… היקום שלכם!','GRAAAH… my flame… is out… you beat the final boss… the universe is yours!']},
+   {id:4,key:'boss_story4',emo:'🤖',he:'מלך הרובוטים',en:'The Robot King',st:[
+     S('fighter','w',0,'h'),S('meteors','s',350),S('hockey','w',0,'h'),S('blackhole','s',900),S('superhoops','w',0,'h'),S('mergefruit','s',250),S('race3d','w',0,'h'),S('munchmaze','s',1500),S('superfootball','w',0,'h'),S('fighter','w',0,'h')],
+    pi:[['ביפ בופ! אני מלך הרובוטים! כל המשחקים שלכם עכשיו בשליטה שלי!','Beep boop! I am the Robot King! All your games are under my control now!'],['מחשב אחד יכול לנצח אתכם, אנושיים!','One computer can beat you humans!'],['מחשב את הסיכויים שלכם… אפס!','Calculating your chances… zero!']],
+    pw:[['שגיאה! חישוב שגוי!','ERROR! Miscalculation!'],['אני… צריך… עדכון…','I… need… an update…']],
+    pl:[['ביפ! ניצחון אוטומטי למלך הרובוטים!','Beep! Automatic victory for the Robot King!'],['נא להפסיד בהתאם. ביפ.','Please lose accordingly. Beep.']],
+    sp:{0:['ביפ בופ! אני מלך הרובוטים, הבוס הסודי! הגליץ׳, הדינוזאור והדרקון היו רק גרסאות ניסיון שלי!','Beep boop! I am the Robot King, the secret boss! Glitch, the Dino and the Dragon were only my test versions!'],
+        9:['ביפ ביפ ביפ! הקרב הסופי! מי שמנצח – מקבל את המפתח לכל המשחקים!','Beep beep beep! The final battle! The winner gets the key to every game!']},
+    fin:['ש-ש-שגיאה קריטית… מערכת כבה… נצחתם את מלך הרובוטים…','C-c-critical error… system shutting down… you beat the Robot King…']}
   ];
   var GAMEN={race3d:'מירוץ מכוניות',superhoops:'כדורסל',hockey:'הוקי אוויר',fighter:'לחימה',superfootball:'כדורגל',meteors:'גשם מטאורים',lanes:'שלושה נתיבים',whack:'פוגעים בבועות',stackup:'מגדל גבוה',munchmaze:'מבוך הנשנשן',blackhole:'חור שחור',froghop:'צפרדע קופצת',mergefruit:'איחוד פירות',bricksmash:'שובר לבנים',dino:'דינוזאור'};
   var ENG={race3d:'Car race',superhoops:'Basketball',hockey:'Air hockey',fighter:'Fighting',superfootball:'Football',meteors:'Meteor Shower',lanes:'Three Lanes',whack:'Pop Targets',stackup:'Tall Tower',munchmaze:'Munch Maze',blackhole:'Black Hole',froghop:'Jumping Frog',mergefruit:'Fruit Merge',bricksmash:'Brick Breaker',dino:'Dino'};
@@ -42,7 +50,7 @@
   var TAUNTS=EN?['Ha ha ha!','No way you can beat me!','I control the code!','Bye bye, little winner!','Is it a bug or is it you?','GLITCH!']:['חה חה חה!','אין סיכוי שתנצחו אותי!','אני שולט בקוד!','ביי ביי, מנצח קטן!','זה באג או שאתם?','חה חה! ‏GLITCH!','אני הגליץ׳ – שום דבר לא עוצר אותי!'];
   var DTAUNTS=EN?['ROAAAR!','You are too small!','Stomp stomp!','I am huge!']:['ROAAAR!','אתם קטנים מדי!','דום דום!','אני ענק!'];
   var EFF=['invert','rainbow','gray','blur'];
-  var NEED=[20,40,60];
+  var NEED=[20,40,60,75];
   var CHN=Math.max(0,Math.min(CH.length-1,(+Q.get('ch')||1)-1));
   function prog(c){c=c===undefined?CHN:c;return Math.min(CH[c].st.length,+ls(CH[c].key)||0)}
   function el(t,c,x){var e=document.createElement(t);if(c)e.style.cssText=c;if(x!==undefined)e.textContent=x;return e}
@@ -55,7 +63,7 @@
       if(++n>26){clearInterval(iv);location.href=url}},50);
   }
   function overlay(){
-    var o=el('div','position:fixed;inset:0;z-index:2147483000;background:radial-gradient(600px 400px at 50% 0,'+(['#4a1a7a','#1a6a2a','#7a2a0a'][CHN])+',#0a0618);color:#fff;display:flex;align-items:center;justify-content:center;padding:16px;font-family:system-ui,Arial,sans-serif;overflow:auto');
+    var o=el('div','position:fixed;inset:0;z-index:2147483000;background:radial-gradient(600px 400px at 50% 0,'+(['#4a1a7a','#1a6a2a','#7a2a0a','#0a3a5a'][CHN])+',#0a0618);color:#fff;display:flex;align-items:center;justify-content:center;padding:16px;font-family:system-ui,Arial,sans-serif;overflow:auto');
     var card=el('div','max-width:460px;width:100%;text-align:center');o.appendChild(card);document.body.appendChild(o);return {o:o,card:card}}
   function type(node,text,done){node.textContent='';var i=0,iv=setInterval(function(){node.textContent=text.slice(0,++i);if(i>=text.length){clearInterval(iv);done&&done()}},24)}
   function url(ch,i){var s=CH[ch].st[i];return ROOT+s.g+'/?boss='+i+'&ch='+(ch+1)}
@@ -72,9 +80,10 @@
     c.append(el('div','opacity:.85;font-size:14px',T('קרב ','Battle ')+(cur+1)+'/'+N),el('div','height:8px;background:#ffffff22;border-radius:6px;margin:6px 0;overflow:hidden').appendChild(el('div','height:100%;background:#ffd23f;width:'+Math.round(P/N*100)+'%')).parentNode,bx,acts);
     var closeB=btn(T('⬅ חזרה לבוס','⬅ Back'),function(){location.href=ROOT+'boss/'},'#ddd');
     if(res==='win'&&P>=N){
-      var k='boss_story_done'+(ch?ch+1:'');if(ls(k)!=='1'){ls(k,'1');if(window.AG)AG.add([300,500,800][ch],[5,8,12][ch])}
-      type(bx,(EN?C.fin[1]:C.fin[0])+'\n\n'+[T('🎉 ניצחתם את הגליץ׳! קיבלתם 300 🪙 ו-5 💎. אבל… משהו גדול מתעורר בעמוד הדינוזאור…','🎉 You beat Glitch! +300 🪙 and 5 💎. But… something big is waking up in the dino game…'),T('🎉 ניצחתם את הדינוזאור הענק! קיבלתם 500 🪙 ו-8 💎. אבל… משהו נוצץ מופיע בשמיים…','🎉 You beat the Giant Dino! +500 🪙 and 8 💎. But… something glowing appears in the sky…'),T('🏆 ניצחתם את הדרקון הקוסמי, הבוס האחרון! קיבלתם 800 🪙 ו-12 💎. אתם אלופי היקום!','🏆 You beat the Cosmic Dragon, the final boss! +800 🪙 and 12 💎. You are champions of the universe!')][ch],function(){
+      var k='boss_story_done'+(ch?ch+1:'');if(ls(k)!=='1'){ls(k,'1');if(window.AG)AG.add([300,500,800,1200][ch],[5,8,12,20][ch])}
+      type(bx,(EN?C.fin[1]:C.fin[0])+'\n\n'+[T('🎉 ניצחתם את הגליץ׳! קיבלתם 300 🪙 ו-5 💎. אבל… משהו גדול מתעורר בעמוד הדינוזאור…','🎉 You beat Glitch! +300 🪙 and 5 💎. But… something big is waking up in the dino game…'),T('🎉 ניצחתם את הדינוזאור הענק! קיבלתם 500 🪙 ו-8 💎. אבל… משהו נוצץ מופיע בשמיים…','🎉 You beat the Giant Dino! +500 🪙 and 8 💎. But… something glowing appears in the sky…'),T('🎉 ניצחתם את הדרקון הקוסמי! קיבלתם 800 🪙 ו-12 💎. אבל… ביפ ביפ… משהו מתעורר במחשב…','🎉 You beat the Cosmic Dragon! +800 🪙 and 12 💎. But… beep beep… something wakes up in the computer…'),T('🏆 ניצחתם את מלך הרובוטים, הבוס האחרון באמת! קיבלתם 1200 🪙 ו-20 💎. אתם אלופי היקום!','🏆 You beat the Robot King, the real final boss! +1200 🪙 and 20 💎. You are champions of the universe!')][ch],function(){
         if(ch===0)acts.append(btn(T('🦖 לפרק 2: הדינוזאור הענק','🦖 Chapter 2: the Giant Dino'),function(){location.href=ROOT+'boss/?story=1&ch=2'},'#7fe3a0'));
+        if(ch===2)acts.append(btn(T('🤖 לפרק 4: מלך הרובוטים','🤖 Chapter 4: the Robot King'),function(){location.href=ROOT+'boss/?story=1&ch=4'},'#7fd0ff'));
         if(ch===1)acts.append(btn(T('🐲 לפרק 3: הדרקון הקוסמי','🐲 Chapter 3: the Cosmic Dragon'),function(){location.href=ROOT+'boss/?story=1&ch=3'},'#ff9a5a'));
         acts.append(btn(T('🔁 שחקו שוב מההתחלה','🔁 Play again'),function(){ls(C.key,'0');location.href=ROOT+'boss/?story=1&ch='+(ch+1)},'#ffd23f'),closeB)});return}
     var s=C.st[cur],line=res==='win'?say(ch,st,'w')+'\n\n'+T('הקרב הבא: ','Next battle: ')+stGoal(s):res==='lose'?say(ch,st,'l'):say(ch,cur,'a')+'\n\n'+T('אתגר: ','Challenge: ')+stGoal(s);
@@ -113,7 +122,7 @@
     if(document.body)arrive();else addEventListener('DOMContentLoaded',arrive);
   }
   window.AG=window.AG||{};window.AG.bossStory=function(ch){location.href=ROOT+'boss/?story=1'+(ch>1?'&ch='+ch:'')};
-  window.AG.bossInfo=function(){return {need:NEED,played:window.AG?AG.played():0,c1:+ls('boss_story')||0,c2:+ls('boss_story2')||0,c3:+ls('boss_story3')||0,n1:CH[0].st.length,n2:CH[1].st.length,n3:CH[2].st.length,done1:ls('boss_story_done')==='1',done2:ls('boss_story_done2')==='1'}};
+  window.AG.bossInfo=function(){return {need:NEED,played:window.AG?AG.played():0,c1:+ls('boss_story')||0,c2:+ls('boss_story2')||0,c3:+ls('boss_story3')||0,c4:+ls('boss_story4')||0,n1:CH[0].st.length,n2:CH[1].st.length,n3:CH[2].st.length,n4:CH[3].st.length,done1:ls('boss_story_done')==='1',done2:ls('boss_story_done2')==='1',done3:ls('boss_story_done3')==='1'}};
   if(Q.get('boss')!==null)inGame();
   else if(Q.get('story')!==null){var go=function(){story()};if(document.body)go();else addEventListener('DOMContentLoaded',go)}
 })();
