@@ -648,5 +648,13 @@
     "url": "munchmaze/",
     "icon": "munchmaze/icons/icon-192.png",
     "tag": "ארקייד"
+  },
+  {
+    "id": "hoops3",
+    "name": "כדורסל 3 על 3",
+    "description": "כדורסל 3 על 3 נגד המחשב – מסירות, זריקות ושלשות.",
+    "url": "hoops3/",
+    "icon": "hoops3/icons/icon-192.png",
+    "tag": "ספורט"
   }
 ]

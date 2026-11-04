@@ -125,6 +125,8 @@
     if(m.t==='name'&&room.host){setMember(m.from,m.name);sendMembers();return}
     if(m.t==='members'){room.members=m.list;emit();return}
     if(m.t==='chal')return showChal(m);
+    if(m.t==='party')return showParty(m);
+    if(m.t==='pscore'){if(party&&party.game===m.game){party.s[m.from]={name:m.name,score:m.score,txt:m.txt};renderParty()}return}
     if(m.t==='ready'&&pendingChal&&pendingChal.to===m.from&&gameH&&gameH.id===m.game){pendingChal=null;begin(m.from,0);return}
     if(m.t==='m'&&match&&m.from===match.peer){if(gameH&&gameH.h.msg)gameH.h.msg(m.d);return}
     if(m.t==='end'&&match&&m.from===match.peer){var h=gameH&&gameH.h;match=null;ss('ag_vs',null);emit();if(h&&h.end)h.end();return}
@@ -174,6 +176,7 @@
       var r=el('div','display:flex;align-items:center;justify-content:space-between;padding:4px 2px');r.appendChild(el('span','',(m.gid===room.gid?'⭐ ':'👤 ')+m.name));
       if(m.gid!==room.gid&&gameH&&!match)r.appendChild(b('⚔ '+T('אתגר','Challenge'),function(){net.challenge(m.gid,gameH.id);toast(T('נשלחה הזמנה – מחכים…','Invite sent – waiting…'));panelOpen=false;panel.style.display='none'},'#ff9a3a'));
       panel.appendChild(r)});
+    if(isScoreGame()&&!gameH)panel.appendChild(b(T('🎉 מסיבה: כולם משחקים את זה','🎉 Party: everyone plays this'),function(){net.partyStart();panelOpen=false;panel.style.display='none'},'#7fe3a0'));
     if(!gameH)panel.appendChild(el('div','opacity:.7;font-size:12px;margin-top:6px',T('כנסו למשחק לשניים ואתגרו מכאן: שחמט, איקס עיגול, 4 בשורה, הוקי אוויר, לחימה, כדורסל, סופר כדורגל וסופר כדורסל.','Open a two-player game and challenge from here: chess, tic-tac-toe, connect 4, air hockey, fighting, basketball, super football and super hoops.')));
     if(match){panel.appendChild(el('div','margin-top:6px;color:#7fe3a0',T('משחקים נגד ','Playing against ')+match.name));panel.appendChild(b(T('⏹ סיים משחק','⏹ End match'),function(){net.endMatch()},'#ff7a7a'))}
     panel.appendChild(b(T('🚪 עזוב שרת','🚪 Leave room'),function(){net.leave()},'#ddd'))}
@@ -184,10 +187,34 @@
     btn.style.cssText='position:fixed;z-index:2147483000;'+(isHub?'':(BOT?'bottom:max(8px,env(safe-area-inset-bottom));':'top:max(6px,env(safe-area-inset-top));'))+(isHub?'top:8px;left:56px;':'left:132px;')+'width:34px;height:34px;border-radius:50%;border:0;font-size:17px;color:#fff;cursor:pointer;background:rgba(0,0,0,.45);-webkit-tap-highlight-color:transparent';
     panel=el('div','position:fixed;z-index:2147483600;left:8px;right:8px;'+(BOT?'bottom:52px':'top:48px')+';max-width:320px;max-height:80vh;overflow:auto;background:rgba(20,12,50,.97);color:#fff;border:2px solid rgba(255,255,255,.25);border-radius:18px;padding:12px;font:600 14px system-ui,Arial,sans-serif;display:none');
     btn.onclick=function(){panelOpen=!panelOpen;panel.style.display=panelOpen?'block':'none';if(panelOpen)renderPanel()};
-    document.body.append(btn,panel);renderBtn();
+    document.body.append(btn,panel);renderBtn();resumeParty();
     var s=null;try{s=JSON.parse(ss('ag_room')||'null')}catch(e){}
     if(s&&s.code){room={code:s.code,host:s.host,gid:s.gid,name:s.name,members:[],links:{},link:null};if(s.host){room.members=[{gid:room.gid,name:room.name}];startHost()}else startGuest();emit()}
   }
+
+
+  /* ---------- party: everybody in the room plays the same game and compares scores ---------- */
+  var party=null,partyEl=null;
+  function isScoreGame(){return !!(document.getElementById('end')&&document.getElementById('eS'))}
+  function gtitle(){return (document.title||ID).split(' – ')[0]}
+  net.partyStart=function(){if(!room||!isScoreGame())return;party={game:ID,s:{}};ss('ag_party',JSON.stringify({game:ID}));net.broadcast({t:'party',game:ID,gname:gtitle(),fname:room.name});watchEnd();renderParty();toast(T('🎉 נשלחה הזמנה למסיבה לכולם','🎉 Party invite sent to everyone'))};
+  function showParty(m){
+    if(party&&party.game===m.game&&m.game===ID)return;
+    toast('🎉 '+m.fname+T(' פותח מסיבה ב',' started a party in ')+m.gname,[[T('הצטרף','Join'),function(){ss('ag_party',JSON.stringify({game:m.game}));if(m.game===ID){party={game:ID,s:{}};watchEnd();renderParty()}else location.href=new URL(m.game+'/',AG.root).href}],[T('לא עכשיו','Not now'),function(){},'#ddd']])}
+  var watching=false;
+  function watchEnd(){
+    if(watching)return;var end=document.getElementById('end');if(!end)return;watching=true;
+    new MutationObserver(function(){if(!party||!end.classList.contains('show'))return;
+      setTimeout(function(){var eS=document.getElementById('eS'),tx=(eS&&eS.textContent||'').trim(),sc=parseFloat(tx.replace(/[^0-9.\-]/g,''));if(isNaN(sc))sc=0;
+        if(!room)return;party.s[room.gid]={name:room.name,score:sc,txt:tx};net.broadcast({t:'pscore',game:ID,score:sc,txt:tx,name:room.name});renderParty()},400)}).observe(end,{attributes:true,attributeFilter:['class']})}
+  function renderParty(){
+    if(!party)return;if(!partyEl){partyEl=el('div','position:fixed;z-index:2147483100;right:8px;top:48px;min-width:140px;max-width:46vw;background:rgba(20,12,50,.92);color:#fff;border:2px solid #ffd23f;border-radius:14px;padding:8px 10px;font:700 13px system-ui,Arial;direction:'+(EN?'ltr':'rtl'));document.body.appendChild(partyEl)}
+    partyEl.textContent='';partyEl.appendChild(el('div','font-weight:900;margin-bottom:4px','🎉 '+T('מסיבה','Party')));
+    var rows=Object.keys(party.s).map(function(k){return party.s[k]}).sort(function(a,b){return b.score-a.score});
+    if(!rows.length)partyEl.appendChild(el('div','opacity:.75',T('משחקים… התוצאות יופיעו בסוף כל סיבוב','Playing… scores appear after each round')));
+    rows.forEach(function(r,i){partyEl.appendChild(el('div','',(i===0?'🥇 ':i===1?'🥈 ':i===2?'🥉 ':'')+r.name+': '+r.txt))});
+    var x=el('button','position:absolute;left:4px;top:2px;background:none;border:0;color:#fff;font-size:14px;cursor:pointer','✖');x.onclick=function(){party=null;ss('ag_party',null);partyEl.remove();partyEl=null};partyEl.appendChild(x)}
+  function resumeParty(){var v=null;try{v=JSON.parse(ss('ag_party')||'null')}catch(e){}if(v&&v.game===ID&&isScoreGame()){party={game:ID,s:{}};watchEnd();renderParty()}}
 
   /* ---------- remote play for real-time two-player games: host runs the game, guest sees the video and sends keys ---------- */
   net.remote=function(id,cfg){

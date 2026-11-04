@@ -161,3 +161,5 @@ Import from Git, Build command ריק, Publish directory `.`.
 - `sneakylevels/` מסדרון הפתעות
 
 - `munchmaze/` מבוך הנשנשן
+
+- `hoops3/` כדורסל 3 על 3
