@@ -74,12 +74,12 @@ function mallet(m,tx,ty,xmin,xmax,sp){const dx=tx-m.x,dy=ty-m.y,d=Math.hypot(dx,
 function step(){if(state!=='play')return;
   let tx=mouse?mouse.x:pa.x,ty=mouse?mouse.y:pa.y;if(mode==='2p'){tx=pa.x+((keys.KeyD?1:0)-(keys.KeyA?1:0))*9;ty=pa.y+((keys.KeyS?1:0)-(keys.KeyW?1:0))*9}mallet(pa,tx,ty,tx0+PR,W/2-PR,16);
   if(mode==='2p'){mallet(pb,pb.x+((keys.ArrowRight?1:0)-(keys.ArrowLeft?1:0))*9,pb.y+((keys.ArrowDown?1:0)-(keys.ArrowUp?1:0))*9,W/2+PR,tx1-PR,16)}
-  else{const sp=[0,4,6.2,8.5][lvl];let gx=W-90,gy=H/2;if(pk.x>W/2||pk.vx>1){gx=pk.x+30;gy=pk.y+pk.vy*3}if(pk.x>W/2&&pk.x<pb.x-15){gx=pk.x+40;gy=pk.y}if(pk.x>pb.x+5&&pk.x>W/2){gx=pk.x+60}mallet(pb,gx,gy,W/2+PR,tx1-PR,sp)}
+  else{const sp=[0,3.6,5.4,6.8][lvl];if(!window.__e||(pk.x<W/2&&pk.vx<0)){}window.__ec=(window.__ec||0)+1;if(window.__ec%25===1)window.__e=rnd(-1,1)*[0,60,38,26][lvl];let gx=W-90,gy=H/2;if(pk.x>W/2||pk.vx>1){gx=pk.x+30;gy=pk.y+pk.vy*3+window.__e}if(pk.x>W/2&&pk.x<pb.x-15){gx=pk.x+40;gy=pk.y}if(pk.x>pb.x+5&&pk.x>W/2){gx=pk.x+60}mallet(pb,gx,gy,W/2+PR,tx1-PR,sp)}
   for(let k=0;k<2;k++){pk.x+=pk.vx/2;pk.y+=pk.vy/2;
     for(const m of[pa,pb]){const dx=pk.x-m.x,dy=pk.y-m.y,d=Math.hypot(dx,dy);if(d<PR+BR&&d>.01){const nx=dx/d,ny=dy/d;pk.x=m.x+nx*(PR+BR);pk.y=m.y+ny*(PR+BR);const rv=(pk.vx-m.vx)*nx+(pk.vy-m.vy)*ny;if(rv<0){pk.vx-=2*rv*nx;pk.vy-=2*rv*ny;pk.vx+=m.vx*.5;pk.vy+=m.vy*.5;tone(300,.05,'square',.06)}}}
     if(pk.y<ty0+BR){pk.y=ty0+BR;pk.vy=Math.abs(pk.vy)}if(pk.y>ty1-BR){pk.y=ty1-BR;pk.vy=-Math.abs(pk.vy)}
     const inG=Math.abs(pk.y-H/2)<GWD/2;if(pk.x<tx0+BR){if(inG&&pk.x<tx0){goal(1);return}pk.x=tx0+BR;pk.vx=Math.abs(pk.vx)}if(pk.x>tx1-BR){if(inG&&pk.x>tx1){goal(0);return}pk.x=tx1-BR;pk.vx=-Math.abs(pk.vx)}}
-  const s=Math.hypot(pk.vx,pk.vy);pk.vx*=.997;pk.vy*=.997;if(s>16){pk.vx*=16/s;pk.vy*=16/s}if(s<1.2){pk.vx+=pk.x<W/2?.05:-.05}
+  const s=Math.hypot(pk.vx,pk.vy);pk.vx*=.997;pk.vy*=.997;if(s>14){pk.vx*=14/s;pk.vy*=14/s}if(s<1.2){pk.vx+=pk.x<W/2?.05:-.05}
   trail.push({x:pk.x,y:pk.y});if(trail.length>10)trail.shift();if(msgT>0)msgT--}
 function goal(w){sc[w]++;tone(700,.3);if(sc[w]>=7){state='over';const win=w===0;saveBest(sc[0]);setTimeout(()=>endGame(mode==='2p'?(win?'שחקן 1 ניצח!':'שחקן 2 ניצח!'):(win?'ניצחת! 🏆':'הפסדת הפעם'),sc[0]+' : '+sc[1],'',mode==='cpu'&&win?15+lvl*10:mode==='cpu'?4:0,mode==='cpu'&&win&&lvl===3?1:0),500)}else{serve(w?-1:1);msgT=50}}
 function draw(){const g=ctx.createLinearGradient(0,0,W,0);g.addColorStop(0,'#1c4fa8');g.addColorStop(.5,'#2a6fd6');g.addColorStop(1,'#1c4fa8');ctx.fillStyle='#0d0826';ctx.fillRect(0,0,W,H);ctx.fillStyle=g;ctx.beginPath();ctx.roundRect?ctx.roundRect(tx0-10,ty0-10,tx1-tx0+20,ty1-ty0+20,26):ctx.rect(tx0,ty0,tx1-tx0,ty1-ty0);ctx.fill();
