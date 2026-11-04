@@ -87,19 +87,23 @@ function aiCol(){const me=turn;const cols=[...Array(C).keys()].filter(c=>!g[c]);
   for(const c of [3,2,4,1,5,0,6]){if(g[c])continue;const r=drop(g,c,me);const s=search(g,lvl,-1e9,1e9,o,me)+Math.random()*(lvl<5?6:0);undo(g,r,c);if(s>best){best=s;m=[c]}else if(s===best)m.push(c)}
   return m[Math.floor(Math.random()*m.length)]}
 function newRound(){g=Array(R*C).fill(null);turn=starter;over=false;lastDrop=null;$('#again').style.display='none';draw();hdr();if(mode==='cpu'&&turn==='y')setTimeout(cpu,500)}
-function hdr(){$('#score').textContent='🔴 '+sc.r+' · תיקו '+sc.d+' · 🟡 '+sc.y;if(!over)$('#turn').textContent=mode==='cpu'?(turn==='r'?'התור שלך 🔴':'המחשב חושב… 🟡'):'תור '+(turn==='r'?'🔴':'🟡')}
+function hdr(){$('#score').textContent='🔴 '+sc.r+' · תיקו '+sc.d+' · 🟡 '+sc.y;if(!over)$('#turn').textContent=mode==='cpu'?(turn==='r'?'התור שלך 🔴':'המחשב חושב… 🟡'):mode==='online'?(turn===myc?'התור שלך ':'תור היריב ')+(turn==='r'?'🔴':'🟡'):'תור '+(turn==='r'?'🔴':'🟡')}
 function draw(w){const bd=$('#board');bd.innerHTML='';for(let c=0;c<C;c++){const col=document.createElement('div');col.className='col';col.onclick=()=>play(c);
   for(let r=0;r<R;r++){const d=document.createElement('div');const v=g[r*C+c];d.className='d'+(v?' '+v:'')+(w&&w.some(x=>x[0]===r&&x[1]===c)?' w':'')+(lastDrop&&lastDrop[0]===r&&lastDrop[1]===c?' drop':'');col.appendChild(d)}bd.appendChild(col)}}
-function play(c){if(over||g[c])return;if(mode==='cpu'&&turn!=='r')return;put(c)}
+let myc='r';function play(c){if(over||g[c])return;if(mode==='cpu'&&turn!=='r')return;if(mode==='online'){if(turn!==myc)return;AG.net.matchSend({k:'mv',c})}put(c)}
 function put(c){const r=drop(g,c,turn);lastDrop=[r,c];tone(300+r*40,.1);const w=win(g,turn);
-  if(w){over=true;sc[turn]++;draw(w);$('#turn').textContent=mode==='cpu'?(turn==='r'?'ניצחת! 🎉':'המחשב ניצח 🤖'):(turn==='r'?'🔴 ניצח! 🎉':'🟡 ניצח! 🎉');tone(880,.4);fin()}
+  if(w){over=true;sc[turn]++;draw(w);$('#turn').textContent=mode==='online'?(turn===myc?'ניצחת! 🎉':'היריב ניצח'):mode==='cpu'?(turn==='r'?'ניצחת! 🎉':'המחשב ניצח 🤖'):(turn==='r'?'🔴 ניצח! 🎉':'🟡 ניצח! 🎉');tone(880,.4);fin()}
   else if(g.every(x=>x)){over=true;sc.d++;draw();$('#turn').textContent='תיקו 🤝';fin()}
   else{turn=turn==='r'?'y':'r';draw();hdr();if(mode==='cpu'&&turn==='y')setTimeout(cpu,500)}}
 function cpu(){if(over)return;put(aiCol())}
 function fin(){$('#again').style.display='block';starter=starter==='r'?'y':'r';hdr()}
-$('#go').onclick=()=>{sc={r:0,y:0,d:0};starter='r';show('game');newRound()};$('#again').onclick=newRound;$('#back').onclick=()=>show('menu');
+$('#go').onclick=()=>{sc={r:0,y:0,d:0};starter='r';show('game');newRound()};let oAg=0,pAg=0;$('#again').onclick=()=>{if(mode==='online'){AG.net.matchSend({k:'again'});oAg=1;$('#turn').textContent='מחכים ליריב…';if(pAg){oAg=pAg=0;newRound()}}else newRound()};$('#back').onclick=()=>show('menu');
 window.__c4={get g(){return g},set g(v){g=v},win,aiCol,set turn(v){turn=v},set lvl(v){lvl=v}};
 
+addEventListener('load',()=>{if(window.AG&&AG.net)AG.net.game('connect4',{name:'4 בשורה',
+  start(role){mode='online';myc=role?'y':'r';sc={r:0,y:0,d:0};starter='r';oAg=pAg=0;show('game');newRound()},
+  msg(d){if(d.k==='mv'&&!over&&!g[d.c])put(d.c);else if(d.k==='again'){pAg=1;if(oAg){oAg=pAg=0;newRound()}}},
+  end(){mode='2p';over=true;$('#turn').textContent='היריב עזב';show('menu')}})});
 if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 </script>
 <script src="../hub.js"></script>

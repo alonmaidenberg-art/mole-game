@@ -123,8 +123,8 @@ const SFX={move(){beep(420,.07,'triangle')},cap(){beep(240,.12,'square',.1)},chk
 function newGame(){
   st=Chess.initState();hist=[];sel=-1;targets=[];gameOver=false;aiThinking=false;lastMove=null;reps={};
   reps[Chess.key(st)]=1;
-  human=mode==='cpu'?(myColor==='w'?1:myColor==='b'?-1:(Math.random()<.5?1:-1)):1;
-  flipped=mode==='cpu'?human===-1:false;
+  human=mode==='cpu'?(myColor==='w'?1:myColor==='b'?-1:(Math.random()<.5?1:-1)):mode==='online'?oHuman:1;
+  flipped=(mode==='cpu'||mode==='online')?human===-1:false;
   $('#menu').classList.remove('show');$('#endOv').classList.remove('show');
   render();maybeAI();
 }
@@ -159,7 +159,9 @@ function san(s,m){
   const n=Chess.make(s,m),stt=STAT(n);
   return t+(stt==='mate'?'#':stt==='check'?'+':'');
 }
-function doMove(m){
+let oHuman=1,oAg=0,pAg=0;
+function doMove(m,fromNet){
+  if(mode==='online'&&!fromNet)AG.net.matchSend({k:'mv',f:m.f,t:m.t,pr:m.pr||0});
   const before=st,cap=before.b[m.t]||(m.ep?-before.turn*P:0);
   const text=san(before,m);
   hist.push({st:before,m,cap,text,last:lastMove,reps:{...reps}});
@@ -184,6 +186,7 @@ function doMove(m){
   maybeAI();
 }
 function undo(){
+  if(mode==='online')return;
   if(!hist.length||aiThinking)return;
   const pop=()=>{const h=hist.pop();st=h.st;lastMove=h.last;reps=h.reps};
   pop();
@@ -237,6 +240,7 @@ function render(){
 }
 function onSq(i){
   if(gameOver||aiThinking||isAITurn())return;
+  if(mode==='online'&&st.turn!==human)return;
   const v=st.b[i];
   const tg=targets.filter(m=>m.t===i);
   if(sel>=0&&tg.length){
@@ -267,7 +271,7 @@ function buildMenu(){
   chips('#lvlRow',[[1,'קל'],[2,'בינוני'],[3,'קשה'],[4,'מקצוען']],level,v=>{level=+v;store.set('ch_lvl',v)});
   $('#cpuOpts').style.display=mode==='cpu'?'block':'none';
 }
-$('#startBtn').onclick=newGame;$('#againBtn').onclick=newGame;
+$('#startBtn').onclick=newGame;$('#againBtn').onclick=()=>{if(mode==='online'){AG.net.matchSend({k:'again'});oAg=1;$('#endMsg').textContent='מחכים ליריב…';if(pAg){oAg=pAg=0;oHuman=-oHuman;newGame()}}else newGame()};
 $('#menuBtn').onclick=()=>$('#menu').classList.add('show');$('#endMenuBtn').onclick=()=>{$('#endOv').classList.remove('show');$('#menu').classList.add('show')};
 $('#viewBtn').onclick=()=>$('#endOv').classList.remove('show');
 $('#undoBtn').onclick=undo;$('#flipBtn').onclick=()=>{flipped=!flipped;render()};
@@ -278,6 +282,10 @@ let deferredInstall=null;
 addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstall=e;$('#installBtn').style.display='block'});
 $('#installBtn').onclick=async()=>{if(!deferredInstall)return;deferredInstall.prompt();await deferredInstall.userChoice;deferredInstall=null;$('#installBtn').style.display='none'};
 addEventListener('appinstalled',()=>{$('#installBtn').style.display='none'});
+addEventListener('load',()=>{if(window.AG&&AG.net)AG.net.game('chess',{name:'שחמט',
+  start(role){mode='online';oHuman=role?-1:1;oAg=pAg=0;newGame()},
+  msg(d){if(d.k==='mv'&&!gameOver){const m=LEG(st).find(x=>x.f===d.f&&x.t===d.t&&(x.pr||0)===(d.pr||0));if(m)doMove(m,true)}else if(d.k==='again'){pAg=1;if(oAg){oAg=pAg=0;oHuman=-oHuman;newGame()}}},
+  end(){gameOver=true;mode='2p';$('#endTitle').textContent='היריב עזב';$('#endMsg').textContent='';$('#endOv').classList.add('show')}})});
 if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 
 st=Chess.initState();hist=[];buildMenu();render();

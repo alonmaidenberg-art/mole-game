@@ -746,6 +746,8 @@ buildMenu();
 /* developer/test hook: ?demo=1 plays AI vs AI automatically */
 if(new URLSearchParams(location.search).get('demo')){const q=new URLSearchParams(location.search);window.__ff=+q.get('ff')||1;startMatch('demo',{diff:q.get('diff')||'medium'})}
 </script>
+<script>addEventListener('load',()=>{if(window.AG&&AG.net)AG.net.remote('basketball',{name:'כדורסל',canvas:'#c',start(){document.querySelector('#twoBtn').click();},pad:[{c:'ArrowLeft',l:'◀',side:'L'},{c:'ArrowUp',l:'▲',side:'L'},{c:'ArrowRight',l:'▶',side:'L'},{c:'KeyL',l:'🏀',side:'R'}],keys:{KeyA:'ArrowLeft',KeyD:'ArrowRight',KeyW:'ArrowUp',KeyS:'ArrowDown'}})});
+</script>
 <script src="../hub.js"></script>
 </body>
 </html>

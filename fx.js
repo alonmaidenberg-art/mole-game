@@ -79,6 +79,6 @@
         btn(T('🚪 יציאה מאדמין','🚪 Log out'),0,function(){AG.adminLogout();location.reload()}))}}
   function init(){if(ID==='hub'||!document.body)return;
     var left=EN?92:92;mkBtn('⚡',left,funPanel,'fun modes');
-    if(window.AG&&AG.isAdmin())mkBtn('⚙️',left+40,adminPanel,'admin')}
+    if(window.AG&&AG.isAdmin())mkBtn('⚙️',left+80,adminPanel,'admin')}
   if(document.body)init();else addEventListener('DOMContentLoaded',init);
 })();

@@ -129,6 +129,8 @@ window.__s={begin,step,get F(){return F},get state(){return state},get wins(){re
 
 if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 </script>
+<script>addEventListener('load',()=>{if(window.AG&&AG.net)AG.net.remote('fighter',{name:'לחימה',canvas:'#cv',start(){document.querySelector('#md [data-v="2p"]').click();document.querySelector('#go').click();},pad:[{c:'ArrowLeft',l:'◀',side:'L'},{c:'ArrowUp',l:'▲',side:'L'},{c:'ArrowDown',l:'▼',side:'L'},{c:'ArrowRight',l:'▶',side:'L'},{c:'KeyK',l:'👊',side:'R'},{c:'KeyL',l:'🦵',side:'R'},{c:'Semicolon',l:'⭐',side:'R'}],keys:{KeyA:'ArrowLeft',KeyD:'ArrowRight',KeyW:'ArrowUp',KeyS:'ArrowDown'}})});
+</script>
 <script src="../hub.js"></script>
 </body>
 </html>

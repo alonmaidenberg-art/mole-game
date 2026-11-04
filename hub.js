@@ -62,6 +62,7 @@
   if(LANG==='en'){var s=document.createElement('script');s.src=base+'i18n.js';(document.head||document.documentElement).appendChild(s)}
   var isHub=(location.pathname.replace(/index\.html$/,'')===new URL(base).pathname);
   if(!isHub){var fx=document.createElement('script');fx.src=base+'fx.js';(document.head||document.documentElement).appendChild(fx)}
+  var on_=document.createElement('script');on_.src=base+'online.js';(document.head||document.documentElement).appendChild(on_);
   function btn(){
     var b=document.createElement('button');b.id='ag-lang';b.type='button';
     b.textContent=LANG==='en'?'עב':'EN';b.setAttribute('aria-label',LANG==='en'?'עברית':'English');
