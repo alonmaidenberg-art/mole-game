@@ -14,7 +14,7 @@
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<style>
+<style>@media(max-height:520px) and (orientation:landscape){#pad{display:none!important}main{padding-top:4px!important;padding-bottom:4px!important}}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;min-height:100%;background:#1a1038;color:#fff;font-family:system-ui,-apple-system,"Segoe UI",Arial,"Noto Sans Hebrew",sans-serif}
 body{background:radial-gradient(700px 500px at 80% -10%,#5b36d6 0,transparent 60%),radial-gradient(600px 500px at 0% 110%,#0f6b6b 0,transparent 55%),#1a1038;min-height:100vh;min-height:100dvh;user-select:none;-webkit-user-select:none;touch-action:manipulation}
@@ -51,7 +51,7 @@ h1{margin:6px 0;font-size:30px;text-align:center}
 </div>
 <div class="scr" id="game">
   <div class="bar"><button class="ib" id="back">→</button><div style="font-weight:900;font-size:20px">🍎 <span id="sc">0</span> · 🏆 <span id="bs">0</span></div><button class="ib" id="pause">⏸</button></div>
-  <canvas id="cv" width="360" height="360" style="width:100%;max-width:440px;display:block;margin:8px auto;border-radius:18px;border:3px solid rgba(255,255,255,.2);touch-action:none"></canvas>
+  <canvas id="cv" width="360" height="360" style="width:min(440px,100%,calc(100vh - 70px));width:min(440px,100%,calc(100dvh - 70px));aspect-ratio:1;height:auto;display:block;margin:8px auto;border-radius:18px;border:3px solid rgba(255,255,255,.2);touch-action:none"></canvas>
   <div id="pad" style="display:grid;grid-template-columns:repeat(3,76px);grid-template-rows:repeat(2,64px);gap:8px;justify-content:center;margin-top:8px;direction:ltr">
     <span></span><button class="ib" data-d="U" style="height:64px;font-size:26px">▲</button><span></span>
     <button class="ib" data-d="L" style="height:64px;font-size:26px">◀</button><button class="ib" data-d="D" style="height:64px;font-size:26px">▼</button><button class="ib" data-d="R" style="height:64px;font-size:26px">▶</button></div>
@@ -90,7 +90,7 @@ addEventListener('keydown',e=>{const m={ArrowUp:'U',ArrowDown:'D',ArrowLeft:'L',
 document.querySelectorAll('#pad button').forEach(b=>b.onclick=()=>turn(b.dataset.d));
 let t0=null;cv.addEventListener('touchstart',e=>{t0=[e.touches[0].clientX,e.touches[0].clientY]},{passive:true});
 cv.addEventListener('touchend',e=>{if(!t0)return;const t=e.changedTouches[0],dx=t.clientX-t0[0],dy=t.clientY-t0[1];if(Math.max(Math.abs(dx),Math.abs(dy))>18)turn(Math.abs(dx)>Math.abs(dy)?(dx>0?'R':'L'):(dy>0?'D':'U'));t0=null},{passive:true});
-$('#go').onclick=()=>{show('game');start()};$('#again').onclick=start;$('#menuB').onclick=()=>{$('#end').classList.remove('show');clearInterval(timer);show('menu')};$('#back').onclick=()=>{clearInterval(timer);show('menu')};
+$('#go').onclick=()=>{scrollTo(0,0)};$('#go').addEventListener('click',()=>setTimeout(()=>scrollTo(0,0),50));$('#go').onclick=()=>{show('game');start()};$('#again').onclick=start;$('#menuB').onclick=()=>{$('#end').classList.remove('show');clearInterval(timer);show('menu')};$('#back').onclick=()=>{clearInterval(timer);show('menu')};
 $('#pause').onclick=()=>{if(!alive)return;paused=!paused;$('#pause').textContent=paused?'▶':'⏸'};
 
 if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
