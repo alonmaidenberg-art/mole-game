@@ -1,0 +1,33 @@
+/* Light aqua theme (c) Alon Maidenberg 2026 */
+:root{--aq1:#8ff7e2;--aq2:#d9fff8;--ink:#0b4553;--ink2:#2d6f7e;--card:rgba(255,255,255,.78)}
+html,body{background:linear-gradient(180deg,#8ff7e2 0%,#c9fff4 55%,#effffb 100%) fixed!important;color:var(--ink)!important}
+body{background:radial-gradient(700px 420px at 85% -5%,#fff 0,rgba(255,255,255,0) 65%),radial-gradient(600px 420px at 0% 100%,#6fe9d3 0,rgba(111,233,211,0) 60%),linear-gradient(180deg,#8ff7e2 0%,#c9fff4 55%,#effffb 100%) fixed!important}
+h1,h2,h3,.t{color:var(--ink)!important}
+header p,.sub,.lb,.d,.stat,footer{color:var(--ink2)!important;opacity:1!important}
+a.card,.box,.mc,.ovc{background:var(--card)!important;border:2px solid #fff!important;color:var(--ink)!important;box-shadow:0 8px 24px rgba(20,150,140,.18)!important;backdrop-filter:blur(8px)}
+a.card:hover,a.card:focus-visible{background:#fff!important;border-color:#2fd6c0!important;box-shadow:0 12px 28px rgba(20,150,140,.28)!important}
+.ov{background:rgba(200,255,246,.72)!important;backdrop-filter:blur(6px)}
+.ovc{color:var(--ink)!important}.ovc *{color:inherit}
+.ovc .btn,.mb{color:#04423a!important}
+.chip,#chips button,.sr,.wal span,.ib,.key{background:rgba(255,255,255,.85)!important;border:2px solid #fff!important;color:var(--ink)!important;box-shadow:0 3px 10px rgba(20,150,140,.15)}
+.chip.on,#chips button.on{background:#ffd23f!important;color:#4a3300!important;border-color:#fff!important}
+.sr::placeholder{color:var(--ink2)!important;opacity:.8}
+.sec{color:var(--ink)!important}
+.btn.alt,.mb.alt{background:rgba(255,255,255,.7)!important;color:var(--ink)!important;border:2px solid #fff!important}
+.btn:not(.alt),.mb:not(.alt){background:linear-gradient(180deg,#52e6cd,#14b8a0)!important;color:#fff!important;text-shadow:0 1px 2px rgba(0,0,0,.2)}
+.tag{background:#2fd6c0!important;color:#05433b!important}
+.fav{color:#7fb9c4!important}.fav.on{color:#ffb02e!important}
+.mc input{background:#fff!important;color:var(--ink)!important;border-color:#8fe7da!important}
+.err{color:#d6335a!important}
+#ag-sig{background:rgba(255,255,255,.7)!important;color:var(--ink2)!important}
+#ag-sig *{color:inherit!important}
+.bossb,.bossb *{color:#fff!important}
+.daily button:not(#dailyB){background:rgba(255,255,255,.85)!important;color:var(--ink)!important;border:2px solid #fff!important;box-shadow:0 3px 10px rgba(20,150,140,.15)}
+.ov{background:rgba(200,255,246,.94)!important}
+.ov{overflow:auto}.ovc{max-height:calc(100vh - 24px);max-height:calc(100dvh - 24px);overflow:auto;margin:auto}
+@media(max-height:520px){.ovc{padding:12px 16px!important}.ovc h2{font-size:22px!important;margin:0 0 4px!important}.ovc .btn{padding:10px!important;margin-top:8px!important;font-size:18px!important}.ovc .chip{padding:8px 4px!important;font-size:15px!important}.ovc [style*="font-size:56px"],.ovc [style*="font-size:64px"],.ovc [style*="font-size:72px"]{font-size:34px!important;line-height:1!important}.ovc .lb{font-size:13px!important;margin-bottom:4px!important}}
+#ag-sig{pointer-events:none!important}
+.hudbtn,#ag-home,#ag-lang,#ag-fx,#ag-net{background:rgba(255,255,255,.9)!important;color:var(--ink)!important}
+a[aria-label="חזרה לכל המשחקים"],button[aria-label="online"],#ag-lang,body>button[style*="position:fixed"]:not([id]){background:rgba(255,255,255,.92)!important;color:var(--ink)!important;border:2px solid #fff!important;box-shadow:0 3px 10px rgba(20,150,140,.25)!important}
+button[aria-label="fun modes"],button[aria-label="admin"],button[aria-label]:not([aria-label="online"]):not([id]){}
+button[aria-label="fun modes"]{background:rgba(255,255,255,.92)!important;color:var(--ink)!important;border:2px solid #fff!important}

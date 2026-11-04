@@ -70,6 +70,7 @@
   var sc=document.currentScript;var base=new URL('./',sc&&sc.src?sc.src:location.href).href;
   if(LANG==='en'){var s=document.createElement('script');s.src=base+'i18n.js';(document.head||document.documentElement).appendChild(s)}
   var isHub=(location.pathname.replace(/index\.html$/,'')===new URL(base).pathname);
+  if(!/\/boss\//.test(location.pathname)){var tl=document.createElement('link');tl.rel='stylesheet';tl.href=base+'theme.css?v=4';(document.head||document.documentElement).appendChild(tl)}
   if(!isHub){var fx=document.createElement('script');fx.src=base+'fx.js';(document.head||document.documentElement).appendChild(fx)}
   var on_=document.createElement('script');on_.src=base+'online.js';(document.head||document.documentElement).appendChild(on_);
   if(/[?&](boss|story)=?/.test(location.search)||/\/boss\/?$/.test(location.pathname.replace(/index\.html$/,''))){var bm=document.createElement('script');bm.src=base+'bossmode.js';(document.head||document.documentElement).appendChild(bm)}
