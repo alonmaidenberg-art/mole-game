@@ -70,7 +70,7 @@
   var sc=document.currentScript;var base=new URL('./',sc&&sc.src?sc.src:location.href).href;
   if(LANG==='en'){var s=document.createElement('script');s.src=base+'i18n.js';(document.head||document.documentElement).appendChild(s)}
   var isHub=(location.pathname.replace(/index\.html$/,'')===new URL(base).pathname);
-  if(!/\/boss\//.test(location.pathname)){var tl=document.createElement('link');tl.rel='stylesheet';tl.href=base+'theme.css?v=11';(document.head||document.documentElement).appendChild(tl)}
+  if(!/\/boss\//.test(location.pathname)){var tl=document.createElement('link');tl.rel='stylesheet';tl.href=base+'theme.css?v=14';(document.head||document.documentElement).appendChild(tl)}
   var adm=false;try{adm=localStorage.getItem('ag_adm')!==null&&window.AG&&AG.isAdmin()}catch(e){}
   if(!isHub||(window.AG&&AG.isAdmin&&AG.isAdmin())){var fx=document.createElement('script');fx.src=base+'fx.js';(document.head||document.documentElement).appendChild(fx)}
   if(!/\/boss\//.test(location.pathname)){var sh=document.createElement('script');sh.src=base+'shop.js?v=2';(document.head||document.documentElement).appendChild(sh)}

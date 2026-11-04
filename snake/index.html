@@ -81,11 +81,23 @@ function tick(){if(!alive||paused)return;dir=ndir;let [x,y]=snake[0];x+=V[dir][0
   if(body.some(s=>s[0]===x&&s[1]===y))return die();
   snake.unshift([x,y]);if(eat){score++;$('#sc').textContent=score;tone(660,.08);place();if(score>best){best=score;store.set('s_best',best);$('#bs').textContent=best}}else snake.pop();draw()}
 function die(){alive=false;clearInterval(timer);tone(150,.4,'sawtooth');draw();$('#eT').textContent=score>=best&&score>0?'שיא חדש! 🏆':'נגמר!';$('#eM').textContent='אכלת '+score+' תפוחים';setTimeout(()=>$('#end').classList.add('show'),400)}
-function draw(){ctx.fillStyle='#142b44';ctx.fillRect(0,0,N*CS,N*CS);
-  for(let i=0;i<N;i++)for(let j=0;j<N;j++)if((i+j)%2){ctx.fillStyle='rgba(255,255,255,.035)';ctx.fillRect(i*CS,j*CS,CS,CS)}
-  ctx.font=(CS-2)+'px serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('🍎',food[0]*CS+CS/2,food[1]*CS+CS/2+1);
-  snake.forEach((s,i)=>{ctx.fillStyle=i?`hsl(${150-i*3},70%,${52-Math.min(i,14)}%)`:'#5ff7d6';const r=i?4:7;const x=s[0]*CS+1,y=s[1]*CS+1,w=CS-2;ctx.beginPath();ctx.roundRect?ctx.roundRect(x,y,w,w,r):ctx.rect(x,y,w,w);ctx.fill()});
-  const h=snake[0];ctx.fillStyle='#10102a';[[-3,-3],[3,-3]].forEach(([dx,dy])=>{ctx.beginPath();ctx.arc(h[0]*CS+CS/2+dx,h[1]*CS+CS/2+dy,2,0,7);ctx.fill()})}
+function draw(){const gb=ctx.createLinearGradient(0,0,N*CS,N*CS);gb.addColorStop(0,'#17406b');gb.addColorStop(1,'#0e2a4d');ctx.fillStyle=gb;ctx.fillRect(0,0,N*CS,N*CS);
+  for(let i=0;i<N;i++)for(let j=0;j<N;j++)if((i+j)%2){ctx.fillStyle='rgba(255,255,255,.045)';ctx.fillRect(i*CS,j*CS,CS,CS)}
+  // apple
+  const fx=food[0]*CS+CS/2,fy=food[1]*CS+CS/2,pu=1+Math.sin(performance.now()/180)*.06,ar=CS*.38*pu;
+  ctx.fillStyle='rgba(255,70,90,.25)';ctx.beginPath();ctx.arc(fx,fy,ar*1.9,0,7);ctx.fill();
+  const ag=ctx.createRadialGradient(fx-ar*.35,fy-ar*.4,ar*.1,fx,fy,ar*1.05);ag.addColorStop(0,'#ff9aa5');ag.addColorStop(.5,'#ff3b55');ag.addColorStop(1,'#b0102a');ctx.fillStyle=ag;ctx.beginPath();ctx.arc(fx,fy,ar,0,7);ctx.fill();
+  ctx.fillStyle='#3fd06a';ctx.beginPath();ctx.ellipse(fx+ar*.35,fy-ar*.95,ar*.34,ar*.17,-.5,0,7);ctx.fill();ctx.strokeStyle='#6b4a2a';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(fx,fy-ar*.8);ctx.lineTo(fx+1,fy-ar*1.2);ctx.stroke();
+  // body (rounded, connected)
+  const C=a=>[a[0]*CS+CS/2,a[1]*CS+CS/2];ctx.lineCap='round';ctx.lineJoin='round';
+  for(let pass=0;pass<2;pass++)for(let i=snake.length-1;i>0;i--){const a=C(snake[i]),b=C(snake[i-1]);if(Math.hypot(a[0]-b[0],a[1]-b[1])>CS*1.6)continue;
+    ctx.strokeStyle=pass?`hsl(${150-i*2.5},75%,${58-Math.min(i,12)}%)`:'rgba(0,0,0,.25)';ctx.lineWidth=pass?CS*.78:CS*.86;ctx.beginPath();ctx.moveTo(a[0],a[1]+(pass?0:3));ctx.lineTo(b[0],b[1]+(pass?0:3));ctx.stroke()}
+  // shine stripe
+  ctx.strokeStyle='rgba(255,255,255,.28)';ctx.lineWidth=CS*.16;for(let i=snake.length-1;i>0;i--){const a=C(snake[i]),b=C(snake[i-1]);if(Math.hypot(a[0]-b[0],a[1]-b[1])>CS*1.6)continue;ctx.beginPath();ctx.moveTo(a[0]-CS*.1,a[1]-CS*.18);ctx.lineTo(b[0]-CS*.1,b[1]-CS*.18);ctx.stroke()}
+  // head
+  const h=snake[0],hc=C(h),hg=ctx.createRadialGradient(hc[0]-3,hc[1]-4,2,hc[0],hc[1],CS*.5);hg.addColorStop(0,'#c9fff1');hg.addColorStop(1,'#1fd1a6');ctx.fillStyle=hg;ctx.beginPath();ctx.arc(hc[0],hc[1],CS*.46,0,7);ctx.fill();
+  const nx=snake[1]?h[0]-snake[1][0]:1,ny=snake[1]?h[1]-snake[1][1]:0,dx=Math.abs(nx)>1?-Math.sign(nx):nx,dy=Math.abs(ny)>1?-Math.sign(ny):ny;
+  for(const sd of[-1,1]){const ex=hc[0]+dx*CS*.14-dy*sd*CS*.2,ey=hc[1]+dy*CS*.14+dx*sd*CS*.2;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(ex,ey,CS*.14,0,7);ctx.fill();ctx.fillStyle='#10204a';ctx.beginPath();ctx.arc(ex+dx*2,ey+dy*2,CS*.07,0,7);ctx.fill()}}
 addEventListener('keydown',e=>{const m={ArrowUp:'U',ArrowDown:'D',ArrowLeft:'L',ArrowRight:'R',w:'U',s:'D',a:'L',d:'R',W:'U',S:'D',A:'L',D:'R'}[e.key];if(m){turn(m);e.preventDefault()}else if(e.key===' ')$('#pause').click()});
 document.querySelectorAll('#pad button').forEach(b=>b.onclick=()=>turn(b.dataset.d));
 let t0=null;cv.addEventListener('touchstart',e=>{t0=[e.touches[0].clientX,e.touches[0].clientY]},{passive:true});

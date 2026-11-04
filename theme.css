@@ -99,3 +99,10 @@ html[data-th="cosmos"],html[data-th="cosmos"] body{background:radial-gradient(60
 html[data-th="cosmos"]{--ink:#eaf0ff;--ink2:#b5c4ee}
 html[data-th="cosmos"] a.card,html[data-th="cosmos"] .box,html[data-th="cosmos"] .ovc{background:linear-gradient(135deg,rgba(255,255,255,.14),rgba(255,255,255,.04))!important;border-color:rgba(255,255,255,.22)!important}
 html[data-th="cosmos"] .sec,html[data-th="cosmos"] .t,html[data-th="cosmos"] .d,html[data-th="cosmos"] header p,html[data-th="cosmos"] footer,html[data-th="cosmos"] .stat{color:#eaf0ff!important}
+html.ag-amb{--ink:#eaf6ff;--ink2:#bcd8e8}
+html.ag-amb body,html.ag-amb h1,html.ag-amb .bar,html.ag-amb .sub{color:#eaf6ff!important}
+.ovc,.box,.mc{--ink:#0b4553;--ink2:#2d6f7e}
+html[data-th="night"] .ovc,html[data-th="night"] .box,html[data-th="cosmos"] .ovc,html[data-th="cosmos"] .box{--ink:#e8f2ff;--ink2:#a9c4ea}
+html:fullscreen:has(#cv){--ink:#eaf6ff;--ink2:#bcd8e8}
+html:fullscreen:has(#cv) body,html:fullscreen:has(#cv) h1,html:fullscreen:has(#cv) .bar,html:fullscreen:has(#cv) .sub{color:#eaf6ff!important}
+html:fullscreen #ag-sig,html.ag-amb #ag-sig{color:#eaf6ff!important;background:rgba(0,0,0,.35)!important}
