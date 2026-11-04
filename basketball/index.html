@@ -8,7 +8,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <title>כדורסל 1 על 1 – אלון מידנברג</title>
 <meta name="description" content="משחק כדורסל 1 על 1: מול המחשב, שני שחקנים או טורניר. זריקות, דאנקים, בלוקים וגניבות.">
-<meta name="theme-color" content="#150d3a">
+<meta name="theme-color" content="#163554">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/svg+xml" href="icons/basketball.svg">
 <link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png">
@@ -18,7 +18,7 @@
 <meta name="apple-mobile-web-app-title" content="כדורסל">
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
-html,body{margin:0;height:100%;overflow:hidden;background:#0d0826;overscroll-behavior:none;touch-action:none;
+html,body{margin:0;height:100%;overflow:hidden;background:#0e2338;overscroll-behavior:none;touch-action:none;
   font-family:system-ui,-apple-system,"Segoe UI",Arial,"Noto Sans Hebrew",sans-serif;color:#fff}
 #stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
 canvas{display:block;border-radius:10px;box-shadow:0 0 40px rgba(0,0,0,.6)}
@@ -42,24 +42,24 @@ canvas{display:block;border-radius:10px;box-shadow:0 0 40px rgba(0,0,0,.6)}
 .hd{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
 .hd h1,.hd h2{margin:0;font-size:clamp(22px,4vw,32px)}.sub{opacity:.8;font-size:14px;margin-top:2px}
 .pl1{opacity:.85;font-weight:700}
-.back{border:0;border-radius:12px;padding:9px 16px;font:inherit;font-size:16px;font-weight:800;background:#fff;color:#1b1340;cursor:pointer;box-shadow:0 3px 0 #bbb}
+.back{border:0;border-radius:12px;padding:9px 16px;font:inherit;font-size:16px;font-weight:800;background:#fff;color:#1c3c5e;cursor:pointer;box-shadow:0 3px 0 #bbb}
 .modes{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.mode,.last{border:0;border-radius:18px;background:#fff;color:#1b1340;font:inherit;padding:14px 10px;cursor:pointer;box-shadow:0 5px 0 #b9b2a6;text-align:center}
+.mode,.last{border:0;border-radius:18px;background:#fff;color:#1c3c5e;font:inherit;padding:14px 10px;cursor:pointer;box-shadow:0 5px 0 #b9b2a6;text-align:center}
 .mode{display:flex;flex-direction:column;align-items:center;gap:4px}.mode .ic{font-size:40px}.mode b{font-size:clamp(18px,3vw,24px)}.mode small{opacity:.7;font-size:13px}
 .mode:active,.last:active,.card2:active{transform:translateY(3px);box-shadow:0 2px 0 #b9b2a6}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}
 .last{text-align:center}.last small{opacity:.6}.lastrow{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:6px;font-size:18px}
 .ab{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;color:#fff;font-weight:900;font-size:13px;border:3px solid #fff8;flex:none}
-.set{background:#fff;border-radius:18px;padding:10px;color:#1b1340;box-shadow:0 5px 0 #b9b2a6}.set .lbl{opacity:.6}
-.set .chip{background:#fff;color:#1b1340;border-color:#cfc8ba}.set .chip.on{background:#1b1340;color:#fff;border-color:#1b1340}
+.set{background:#fff;border-radius:18px;padding:10px;color:#1c3c5e;box-shadow:0 5px 0 #b9b2a6}.set .lbl{opacity:.6}
+.set .chip{background:#fff;color:#1c3c5e;border-color:#cfc8ba}.set .chip.on{background:#1c3c5e;color:#fff;border-color:#1c3c5e}
 .grid5{display:grid;grid-template-columns:repeat(5,1fr);gap:11px}
-.card2{border:0;border-radius:16px;background:#fff;color:#1b1340;font:inherit;padding:10px 12px;cursor:pointer;box-shadow:0 4px 0 #b9b2a6;display:flex;align-items:center;gap:10px;text-align:right;min-height:74px}
+.card2{border:0;border-radius:16px;background:#fff;color:#1c3c5e;font:inherit;padding:10px 12px;cursor:pointer;box-shadow:0 4px 0 #b9b2a6;display:flex;align-items:center;gap:10px;text-align:right;min-height:74px}
 .card2 .tx{flex:1;min-width:0}.card2 .n{font-weight:900;font-size:17px;line-height:1.15}.card2 .c{opacity:.6;font-size:13px}
 .card2 .dots{display:flex;align-items:center;gap:3px;font-size:11.5px;opacity:.85;margin-top:1px}.dots i{width:9px;height:9px;border-radius:50%;background:#dcd8d0;display:inline-block}.dots i.f{background:#f08a24}
 .dots span{width:42px}
 .card2 .rt{font-size:12px;color:#d9731a;font-weight:900}
 @media(max-width:900px){.grid5{grid-template-columns:repeat(3,1fr)}}@media(max-width:560px){.grid5{grid-template-columns:repeat(2,1fr)}.modes{grid-template-columns:1fr}.two{grid-template-columns:1fr}}
-select{width:100%;max-width:300px;font:inherit;font-size:16px;padding:8px;border-radius:10px;border:2px solid #fff4;background:#241a5a;color:#fff;margin:4px 0}
+select{width:100%;max-width:300px;font:inherit;font-size:16px;padding:8px;border-radius:10px;border:2px solid #fff4;background:#275483;color:#fff;margin:4px 0}
 .hint{font-size:12px;opacity:.75;margin-bottom:6px}
 .sw{width:34px;height:34px;border-radius:50%;border:3px solid rgba(255,255,255,.35);cursor:pointer;padding:0}
 .sw.on{border-color:#fff;box-shadow:0 0 0 3px #ff9f2e}
@@ -71,7 +71,7 @@ input[type=text]{width:100%;max-width:240px;padding:9px 12px;border-radius:12px;
 .btn.green{background:linear-gradient(180deg,#7be495,#2fb457);box-shadow:0 5px 0 #17702f}
 .keys{font-size:12.5px;opacity:.8;line-height:1.6;margin-top:10px}
 #installBtn{display:none}
-#rotate{position:fixed;inset:0;z-index:40;background:#0d0826;display:none;align-items:center;justify-content:center;text-align:center;font-size:24px;font-weight:800;padding:30px}
+#rotate{position:fixed;inset:0;z-index:40;background:#0e2338;display:none;align-items:center;justify-content:center;text-align:center;font-size:24px;font-weight:800;padding:30px}
 @media (pointer:coarse) and (orientation:portrait){#rotate{display:flex}}
 #pw{position:fixed;z-index:12;top:52px;right:8px;display:none;flex-direction:column;gap:7px}
 #pw button{position:relative;width:46px;height:46px;border-radius:50%;border:2px solid rgba(255,255,255,.5);background:rgba(20,12,60,.65);color:#fff;font-size:22px;cursor:pointer;touch-action:none}
@@ -524,7 +524,7 @@ function humanCtrlFT(p){humanCtrl(p)}
 /* ---------- drawing ---------- */
 function drawCourt(){
   // arena
-  const g=ctx.createLinearGradient(0,0,0,FLOOR);g.addColorStop(0,'#1b1050');g.addColorStop(1,'#3b2a8c');
+  const g=ctx.createLinearGradient(0,0,0,FLOOR);g.addColorStop(0,'#1d4875');g.addColorStop(1,'#2f6a8c');
   ctx.fillStyle=g;ctx.fillRect(0,0,WW,FLOOR);
   // crowd
   for(let i=0;i<130;i++){const x=(i*37*1.15)%WW,y=70+((i*53)%90),h=(i*71)%360;ctx.fillStyle=`hsla(${h},60%,60%,.28)`;ctx.beginPath();ctx.arc(x,y,6,0,7);ctx.fill()}

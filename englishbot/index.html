@@ -7,7 +7,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>EnglishBot – אלון מידנברג</title>
-<meta name="theme-color" content="#1a1038">
+<meta name="theme-color" content="#193552">
 <meta name="description" content="EnglishBot: משחקים ללימוד אנגלית בעברית. תרגום, הפכים, זיכרון, וורדל ועוד.">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png">
@@ -18,7 +18,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;800;900&family=Space+Grotesk:wght@700;800&display=swap" rel="stylesheet">
 <style>
 :root{
-  --purple:#7c3aed;--purple-light:#a78bfa;--purple-glow:rgba(124,58,237,0.5);
+  --purple:#43b0ed;--purple-light:#91d4fa;--purple-glow:rgba(124,58,237,0.5);
   --cyan:#06b6d4;--cyan-glow:rgba(6,182,212,0.4);
   --green:#10b981;--green-glow:rgba(16,185,129,0.4);
   --orange:#f59e0b;--orange-glow:rgba(245,158,11,0.4);
@@ -108,7 +108,7 @@ body.night-mode .star.huge{width:4px;height:4px;box-shadow:0 0 10px 5px rgba(200
 body.night-mode .game-card,body.night-mode .challenge-card{filter:brightness(0.75);}
 body.night-mode .levelup-card,body.night-mode .results-card{filter:brightness(0.8);}
 /* Night moon icon in header */
-#night-btn.active{background:rgba(30,20,60,0.8) !important;border-color:rgba(167,139,250,0.5) !important;color:#c4b5fd !important;box-shadow:0 0 12px rgba(124,58,237,0.4);}
+#night-btn.active{background:rgba(30,20,60,0.8) !important;border-color:rgba(167,139,250,0.5) !important;color:#b9e4fd !important;box-shadow:0 0 12px rgba(124,58,237,0.4);}
 /* Nebula overlay in night mode */
 #nebula-overlay{position:fixed;inset:0;pointer-events:none;z-index:0;display:none;
   background:radial-gradient(ellipse 60% 40% at 20% 30%,rgba(30,0,60,0.5),transparent),
@@ -154,7 +154,7 @@ body.night-mode .levelup-card,body.night-mode .results-card{filter:brightness(0.
 .mem-card.flipped .mem-card-inner{transform:rotateY(180deg)}
 .mem-card-front,.mem-card-back{position:absolute;inset:0;border-radius:12px;
   display:flex;align-items:center;justify-content:center;backface-visibility:hidden;-webkit-backface-visibility:hidden}
-.mem-card-front{background:linear-gradient(135deg,#4c1d95,#7c3aed);border:2px solid rgba(167,139,250,0.3);
+.mem-card-front{background:linear-gradient(135deg,#236c95,#43b0ed);border:2px solid rgba(167,139,250,0.3);
   font-size:28px}
 .mem-card-back{background:rgba(255,255,255,0.06);border:2px solid rgba(255,255,255,0.12);
   transform:rotateY(180deg);padding:6px;text-align:center}
@@ -174,7 +174,7 @@ body.night-mode .levelup-card,body.night-mode .results-card{filter:brightness(0.
 .hm-letter{width:32px;height:36px;border-bottom:3px solid rgba(255,255,255,0.4);
   display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;
   color:#fff;direction:ltr;transition:all 0.3s}
-.hm-letter.revealed{border-color:var(--purple-light);color:#a78bfa;animation:letter-reveal 0.4s ease}
+.hm-letter.revealed{border-color:var(--purple-light);color:#91d4fa;animation:letter-reveal 0.4s ease}
 @keyframes letter-reveal{0%{transform:translateY(-10px);opacity:0}100%{transform:none;opacity:1}}
 .hm-key{width:34px;height:36px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);
   background:rgba(255,255,255,0.07);color:#fff;font-size:13px;font-weight:800;
@@ -265,7 +265,7 @@ body.night-mode .levelup-card,body.night-mode .results-card{filter:brightness(0.
 .menu-xp-name{color:var(--purple-light);font-size:13px;font-weight:700;cursor:pointer}
 .xp-track{height:7px;background:rgba(255,255,255,0.07);border-radius:4px;overflow:hidden;
   box-shadow:inset 0 1px 3px rgba(0,0,0,0.3)}
-.xp-fill{height:100%;background:linear-gradient(90deg,#7c3aed,#06b6d4,#10b981);
+.xp-fill{height:100%;background:linear-gradient(90deg,#43b0ed,#06b6d4,#10b981);
   border-radius:4px;transition:width 0.7s cubic-bezier(0.22,1,0.36,1);
   box-shadow:none}
 .xp-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--cyan));border-radius:3px;transition:width 0.6s}
@@ -370,7 +370,7 @@ button{color:inherit}
 .topbar-level{border-radius:20px;padding:5px 14px;color:#fff;font-weight:900;font-size:12px;
   background:linear-gradient(135deg,var(--purple),var(--cyan));letter-spacing:0.3px;
   box-shadow:none}
-.topbar-level.pink{background:linear-gradient(135deg,var(--pink),#a855f7);box-shadow:0 3px 12px rgba(236,72,153,0.35)}
+.topbar-level.pink{background:linear-gradient(135deg,var(--pink),#5dc0f7);box-shadow:0 3px 12px rgba(236,72,153,0.35)}
 .topbar-level.gold{background:linear-gradient(135deg,var(--orange),#ffd200);color:#1a1a2e;box-shadow:0 3px 12px rgba(245,158,11,0.35)}
 .topbar-level.green{background:linear-gradient(135deg,var(--green),#34d399);box-shadow:0 3px 12px rgba(16,185,129,0.35)}
 .topbar-lives{display:flex;gap:2px;font-size:18px}
@@ -380,7 +380,7 @@ button{color:inherit}
 .prog-fill{height:100%;border-radius:4px;transition:width 0.5s cubic-bezier(0.22,1,0.36,1);
   background:linear-gradient(90deg,var(--purple),var(--cyan));
   box-shadow:none}
-.prog-fill.pink{background:linear-gradient(90deg,var(--pink),#a855f7);box-shadow:none}
+.prog-fill.pink{background:linear-gradient(90deg,var(--pink),#5dc0f7);box-shadow:none}
 .prog-fill.gold{background:linear-gradient(90deg,var(--orange),#ffd200);box-shadow:none}
 .prog-fill.green{background:linear-gradient(90deg,var(--green),#34d399);box-shadow:none}
 .prog-label{display:flex;justify-content:space-between;margin-top:5px}
@@ -515,7 +515,7 @@ button{color:inherit}
   transition:transform 0.12s,box-shadow 0.12s;letter-spacing:0.2px}
 .big-btn:active{transform:scale(0.96);box-shadow:0 2px 12px rgba(124,58,237,0.3)}
 .big-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,0.15),transparent 60%);pointer-events:none}
-.big-btn.pink{background:linear-gradient(135deg,var(--pink),#a855f7)}
+.big-btn.pink{background:linear-gradient(135deg,var(--pink),#5dc0f7)}
 .big-btn.gold{background:linear-gradient(135deg,var(--orange),#ffd200);color:#1a1a2e}
 .big-btn.green{background:linear-gradient(135deg,var(--green),#34d399);color:#1a1a2e}
 .big-btn.secondary{background:rgba(255,255,255,0.07);box-shadow:none;border:1px solid var(--border);color:var(--text)}
@@ -595,8 +595,8 @@ button{color:inherit}
 .timer-ring .num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:800}
 
 /* ═══ אלון מידנברג – restyle (impostor look): CSS only, game logic untouched ═══ */
-:root{--purple:#8f6bff;--purple-light:#c4b2ff;--cyan:#2fe4c1;--orange:#ffd05a;--bg:#1a1038;--card:rgba(255,255,255,.08);--border:rgba(255,255,255,.14);--muted:#b9b0d9;--radius-lg:24px;--radius-md:18px}
-body:not(.night-mode){background:radial-gradient(700px 500px at 80% -10%,#5b36d6 0,transparent 60%),radial-gradient(600px 500px at 0% 110%,#0f6b6b 0,transparent 55%),#1a1038 !important}
+:root{--purple:#72ccff;--purple-light:#b6e5ff;--cyan:#2fe4c1;--orange:#ffd05a;--bg:#193552;--card:rgba(255,255,255,.08);--border:rgba(255,255,255,.14);--muted:#b9b0d9;--radius-lg:24px;--radius-md:18px}
+body:not(.night-mode){background:radial-gradient(700px 500px at 80% -10%,#3e9fd6 0,transparent 60%),radial-gradient(600px 500px at 0% 110%,#0f6b6b 0,transparent 55%),#193552 !important}
 body:not(.desktop-mode) .screen{max-width:560px;margin-inline:auto}
 body:not(.desktop-mode){justify-content:center}
 #screen-menu{padding-top:max(6px,env(safe-area-inset-top))}
@@ -619,8 +619,8 @@ body:not(.desktop-mode){justify-content:center}
 #screen-menu button[style*="width:30px"]{width:40px !important;height:38px !important;border-radius:12px !important}
 #menu-xp{font-size:17px}
 .xp-track{height:12px !important;border-radius:8px !important;background:rgba(255,255,255,.12) !important}
-.xp-fill{background:linear-gradient(90deg,#8f6bff,#2fe4c1) !important;border-radius:8px !important}
-#menu-level-badge{font-size:13px !important;padding:4px 12px !important;border-radius:12px !important;background:linear-gradient(180deg,#a888ff,#7a56e8) !important;box-shadow:0 3px 0 #4a2fa8}
+.xp-fill{background:linear-gradient(90deg,#72ccff,#2fe4c1) !important;border-radius:8px !important}
+#menu-level-badge{font-size:13px !important;padding:4px 12px !important;border-radius:12px !important;background:linear-gradient(180deg,#8ed6ff,#5db6e8) !important;box-shadow:0 3px 0 #357fa8}
 /* all screens: buttons, cards, inputs */
 .big-btn,.submit-btn,.next-btn,.modal-btn{background:linear-gradient(180deg,#5ff7d6,#1fc9a6) !important;color:#06322b !important;border:0 !important;border-radius:18px !important;
   box-shadow:0 6px 0 #0d7a66 !important;font-weight:900 !important;font-family:'Heebo',system-ui,sans-serif !important;transition:transform .1s,box-shadow .1s}
@@ -629,11 +629,11 @@ body:not(.desktop-mode){justify-content:center}
 .back-btn,.topbar-back{background:rgba(255,255,255,.1) !important;border:2px solid rgba(255,255,255,.2) !important;border-radius:14px !important;padding:8px 14px !important;font-weight:800 !important;color:#fff !important}
 .hint-btn{border-radius:14px !important;border:2px solid rgba(255,208,90,.5) !important;background:rgba(255,208,90,.12) !important;color:#ffd05a !important;font-weight:800 !important}
 .challenge-card{border-radius:24px !important;border:2px solid rgba(255,255,255,.16) !important;box-shadow:0 8px 0 rgba(0,0,0,.2)}
-.game-input,.modal-input{border-radius:16px !important;border:2px solid rgba(255,255,255,.25) !important;background:#150a30 !important;font-weight:700 !important}
+.game-input,.modal-input{border-radius:16px !important;border:2px solid rgba(255,255,255,.25) !important;background:#112b46 !important;font-weight:700 !important}
 .game-input:focus,.modal-input:focus{border-color:#2fe4c1 !important;outline:none}
 .stat-chip{border-radius:14px !important;font-weight:800 !important}
 .prog-track,.prog-bar-wrap{border-radius:8px !important}
-.modal-card{background:linear-gradient(160deg,#2c1b6a,#1a1038) !important;border:2px solid rgba(255,255,255,.2) !important;border-radius:26px !important;box-shadow:0 12px 40px rgba(0,0,0,.5)}
+.modal-card{background:linear-gradient(160deg,#2e639b,#193552) !important;border:2px solid rgba(255,255,255,.2) !important;border-radius:26px !important;box-shadow:0 12px 40px rgba(0,0,0,.5)}
 .modal-overlay{background:rgba(10,5,30,.8) !important}
 .section-title{color:#ffd05a !important;font-weight:900 !important}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms !important}}
@@ -668,13 +668,13 @@ body:not(.desktop-mode){justify-content:center}
   <div style="padding:14px 16px 0;display:flex;align-items:center;justify-content:space-between">
     <div style="display:flex;align-items:center;gap:8px">
       <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--purple),var(--cyan));display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 2px 12px rgba(124,58,237,0.3)">📚</div>
-      <div style="font-size:18px;font-weight:900;line-height:1;font-family:'Space Grotesk',sans-serif;background:linear-gradient(135deg,#a78bfa,#67e8f9);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">EnglishBot</div>
+      <div style="font-size:18px;font-weight:900;line-height:1;font-family:'Space Grotesk',sans-serif;background:linear-gradient(135deg,#91d4fa,#67e8f9);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">EnglishBot</div>
     </div>
     <div style="display:flex;align-items:center;gap:5px">
       <button id="flight-btn" onclick="toggleFlightMode()" style="width:34px;height:34px;border-radius:9px;border:1px solid rgba(255,165,0,0.2);background:rgba(255,165,0,0.05);color:#94a3b8;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.3s;flex-shrink:0" title="מצב טיסה">✈️</button>
       <button id="desktop-btn" onclick="toggleDesktopMode()" style="width:34px;height:34px;border-radius:9px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:#94a3b8;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0" title="מצב מחשב">🖥️</button>
       <button id="night-btn" onclick="toggleNightMode()" style="width:34px;height:34px;border-radius:9px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#94a3b8;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0" title="מצב לילה">🌙</button>
-      <button id="music-btn" onclick="toggleMusic()" style="width:34px;height:34px;border-radius:9px;border:1px solid rgba(124,58,237,0.3);background:rgba(124,58,237,0.1);color:#a78bfa;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0" title="מוזיקה">🎵</button>
+      <button id="music-btn" onclick="toggleMusic()" style="width:34px;height:34px;border-radius:9px;border:1px solid rgba(124,58,237,0.3);background:rgba(124,58,237,0.1);color:#91d4fa;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0" title="מוזיקה">🎵</button>
       <button id="voice-btn" onclick="showVoiceSelect()" style="width:34px;height:34px;border-radius:9px;border:1px solid rgba(6,182,212,0.3);background:rgba(6,182,212,0.1);color:#67e8f9;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0" title="קול">🗣️</button>
     </div>
   </div>
@@ -746,11 +746,11 @@ body:not(.desktop-mode){justify-content:center}
       </div>
       <div data-action="openGame" data-arg="freewrite" style="border-radius:14px;padding:14px 8px;background:rgba(168,85,247,0.07);border:1px solid rgba(168,85,247,0.15);cursor:pointer;text-align:center">
         <div style="font-size:24px;margin-bottom:4px">✍️</div>
-        <div style="color:#c4b5fd;font-size:11px;font-weight:800">כתיבה חופשית</div>
+        <div style="color:#b9e4fd;font-size:11px;font-weight:800">כתיבה חופשית</div>
       </div>
       <div data-action="showHangman" style="border-radius:14px;padding:14px 8px;background:rgba(124,58,237,0.07);border:1px solid rgba(124,58,237,0.15);cursor:pointer;text-align:center">
         <div style="font-size:24px;margin-bottom:4px">🪢</div>
-        <div style="color:#a78bfa;font-size:11px;font-weight:800">איש תלוי</div>
+        <div style="color:#91d4fa;font-size:11px;font-weight:800">איש תלוי</div>
       </div>
       <div data-action="showVerbs" style="border-radius:14px;padding:14px 8px;background:rgba(6,182,212,0.07);border:1px solid rgba(6,182,212,0.15);cursor:pointer;text-align:center">
         <div style="font-size:24px;margin-bottom:4px">🏃</div>
@@ -770,7 +770,7 @@ body:not(.desktop-mode){justify-content:center}
       </div>
       <div data-action="showFlashcards" style="border-radius:14px;padding:14px 8px;background:rgba(124,58,237,0.07);border:1px solid rgba(124,58,237,0.18);cursor:pointer;text-align:center">
         <div style="font-size:24px;margin-bottom:4px">🃏</div>
-        <div style="color:#a78bfa;font-size:11px;font-weight:800">Flashcards</div>
+        <div style="color:#91d4fa;font-size:11px;font-weight:800">Flashcards</div>
       </div>
       <div data-action="showPhrases" style="border-radius:14px;padding:14px 8px;background:rgba(6,182,212,0.07);border:1px solid rgba(6,182,212,0.15);cursor:pointer;text-align:center;position:relative;z-index:1">
         <div style="font-size:24px;margin-bottom:4px;pointer-events:none">💬</div>
@@ -782,7 +782,7 @@ body:not(.desktop-mode){justify-content:center}
       </div>
       <div data-action="showRhyme" style="border-radius:14px;padding:14px 8px;background:rgba(168,85,247,0.07);border:1px solid rgba(168,85,247,0.18);cursor:pointer;text-align:center">
         <div style="font-size:24px;margin-bottom:4px">🎵</div>
-        <div style="color:#c4b5fd;font-size:11px;font-weight:800">חרוזים</div>
+        <div style="color:#b9e4fd;font-size:11px;font-weight:800">חרוזים</div>
       </div>
       <div data-action="showSpelling" style="border-radius:14px;padding:14px 8px;background:rgba(59,130,246,0.07);border:1px solid rgba(59,130,246,0.18);cursor:pointer;text-align:center">
         <div style="font-size:24px;margin-bottom:4px">🔤</div>
@@ -843,7 +843,7 @@ body:not(.desktop-mode){justify-content:center}
       </div>
       <div data-action="showStats" style="border-radius:14px;padding:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);cursor:pointer;display:flex;align-items:center;gap:8px">
         <span style="font-size:20px">📊</span>
-        <span style="color:#a78bfa;font-size:12px;font-weight:800;direction:rtl">סטטיסטיקות</span>
+        <span style="color:#91d4fa;font-size:12px;font-weight:800;direction:rtl">סטטיסטיקות</span>
       </div>
     </div>
 
@@ -885,7 +885,7 @@ body:not(.desktop-mode){justify-content:center}
     <!-- streak & days -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
       <div style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.3);border-radius:14px;padding:14px;text-align:center">
-        <div style="font-size:32px;font-weight:900;color:#a78bfa" id="stat-streak-days">0</div>
+        <div style="font-size:32px;font-weight:900;color:#91d4fa" id="stat-streak-days">0</div>
         <div style="color:var(--muted);font-size:11px;margin-top:3px;direction:rtl">🔥 ימים ברצף</div>
       </div>
       <div style="background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.3);border-radius:14px;padding:14px;text-align:center">
@@ -960,7 +960,7 @@ body:not(.desktop-mode){justify-content:center}
         <div style="color:#fcd34d;font-weight:800;font-size:13px;margin-bottom:10px;direction:rtl">🏅 מובילים היום:</div>
         <div id="ch-top-today"><div style="color:var(--muted);font-size:12px;direction:rtl">טרם שיחקו היום...</div></div>
       </div>
-      <button class="big-btn" style="background:linear-gradient(135deg,#7c3aed,#06b6d4)" onclick="startChallenge()">⚡ התחל אתגר!</button>
+      <button class="big-btn" style="background:linear-gradient(135deg,#43b0ed,#06b6d4)" onclick="startChallenge()">⚡ התחל אתגר!</button>
     </div>
 
     <!-- Challenge game -->
@@ -1300,13 +1300,13 @@ body:not(.desktop-mode){justify-content:center}
 
     <!-- Add word form -->
     <div style="background:rgba(168,85,247,0.1);border:1px solid rgba(168,85,247,0.3);border-radius:16px;padding:16px;margin-bottom:16px">
-      <div style="color:#a78bfa;font-size:13px;font-weight:800;margin-bottom:10px;direction:rtl">➕ הוסף מילה חדשה</div>
+      <div style="color:#91d4fa;font-size:13px;font-weight:800;margin-bottom:10px;direction:rtl">➕ הוסף מילה חדשה</div>
       <div style="display:flex;gap:8px;margin-bottom:8px">
         <input id="my-word-heb" class="game-input" placeholder="עברית..." style="flex:1;height:44px;font-size:14px" oninput="checkMyWordInputs()">
         <input id="my-word-eng" class="game-input" placeholder="English..." style="flex:1;height:44px;font-size:14px;direction:ltr" oninput="checkMyWordInputs()">
       </div>
       <input id="my-word-hint" class="game-input" placeholder="רמז (לא חובה)..." style="width:100%;height:40px;font-size:13px;margin-bottom:10px" oninput="">
-      <button id="my-word-add-btn" onclick="addMyWord()" disabled class="submit-btn" style="width:100%;padding:11px;font-size:14px;background:linear-gradient(135deg,#a855f7,#ec4899)">➕ הוסף</button>
+      <button id="my-word-add-btn" onclick="addMyWord()" disabled class="submit-btn" style="width:100%;padding:11px;font-size:14px;background:linear-gradient(135deg,#5dc0f7,#ec4899)">➕ הוסף</button>
     </div>
 
     <!-- Word list -->
@@ -1319,7 +1319,7 @@ body:not(.desktop-mode){justify-content:center}
         עוד לא הוספת מילים.<br>הוסף מילות אוצר שאתה רוצה לתרגל!
       </div>
     </div>
-    <button id="my-words-practice-btn" class="big-btn" style="background:linear-gradient(135deg,#a855f7,#ec4899);display:none" onclick="startMyWordsPractice()">
+    <button id="my-words-practice-btn" class="big-btn" style="background:linear-gradient(135deg,#5dc0f7,#ec4899);display:none" onclick="startMyWordsPractice()">
       🎯 תרגל את המילים שלי!
     </button>
   </div>
@@ -1329,12 +1329,12 @@ body:not(.desktop-mode){justify-content:center}
 <div id="screen-my-words-practice" class="screen">
   <div class="game-topbar">
     <button class="topbar-back" onclick="showMyWords()">←</button>
-    <div class="topbar-level" style="background:linear-gradient(135deg,#a855f7,#ec4899)">📚 המילים שלי</div>
+    <div class="topbar-level" style="background:linear-gradient(135deg,#5dc0f7,#ec4899)">📚 המילים שלי</div>
     <div class="topbar-lives" id="myw-lives">❤️❤️❤️</div>
   </div>
   <div class="game-scroll">
     <div class="prog-bar-wrap">
-      <div class="prog-track"><div class="prog-fill" id="myw-prog" style="width:0%;background:linear-gradient(90deg,#a855f7,#ec4899)"></div></div>
+      <div class="prog-track"><div class="prog-fill" id="myw-prog" style="width:0%;background:linear-gradient(90deg,#5dc0f7,#ec4899)"></div></div>
       <div class="prog-label"><span class="prog-text" id="myw-prog-text">0/0</span><span class="prog-text" id="myw-prog-pct">0%</span></div>
     </div>
     <div class="stats-strip">
@@ -1346,7 +1346,7 @@ body:not(.desktop-mode){justify-content:center}
       <div class="gm-bubble" id="myw-mascot-msg">תרגם את המילה שלך!</div>
     </div>
     <div class="challenge-card">
-      <div class="ch-type" style="background:rgba(168,85,247,0.15);border-color:rgba(168,85,247,0.25);color:#c4b5fd">📚 המילה שלי</div>
+      <div class="ch-type" style="background:rgba(168,85,247,0.15);border-color:rgba(168,85,247,0.25);color:#b9e4fd">📚 המילה שלי</div>
       <div class="ch-word-row">
         <div class="ch-word" id="myw-word">—</div>
         <button class="ch-speak" style="background:rgba(168,85,247,0.2);border-color:rgba(168,85,247,0.4)" onclick="speakMywWord()">🔊</button>
@@ -1355,7 +1355,7 @@ body:not(.desktop-mode){justify-content:center}
       <div class="hint-box" id="myw-hint-box"></div>
       <div class="input-wrap">
         <input class="game-input" id="myw-input" placeholder="Type in English..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" oninput="onIC('myw-input','myw-submit')" onkeydown="onKD(event,'handleMywSubmit','nextMyw')">
-        <button class="mic-btn" id="myw-mic-btn" style="background:linear-gradient(135deg,#a855f7,#ec4899)" onclick="toggleMic('myw-input','myw-mic-btn','myw-mic-status','myw-no-mic')">🎤</button>
+        <button class="mic-btn" id="myw-mic-btn" style="background:linear-gradient(135deg,#5dc0f7,#ec4899)" onclick="toggleMic('myw-input','myw-mic-btn','myw-mic-status','myw-no-mic')">🎤</button>
       </div>
       <div class="listening-label" id="myw-mic-status">🎤 מאזין...</div>
       <div class="no-mic-msg" id="myw-no-mic">🚫 גישה נדחתה</div>
@@ -1366,10 +1366,10 @@ body:not(.desktop-mode){justify-content:center}
       </div>
       <div class="action-row" id="myw-action-row">
         <button class="hint-btn" onclick="showMywHint()">💡 רמז</button>
-        <button class="submit-btn" id="myw-submit" onclick="handleMywSubmit()" disabled style="background:linear-gradient(135deg,#a855f7,#ec4899)">✅ שלח</button>
+        <button class="submit-btn" id="myw-submit" onclick="handleMywSubmit()" disabled style="background:linear-gradient(135deg,#5dc0f7,#ec4899)">✅ שלח</button>
       </div>
       <div class="next-row" id="myw-next-row">
-        <button class="next-btn" id="myw-next-btn" onclick="nextMyw()" style="background:linear-gradient(135deg,#a855f7,#ec4899);color:#fff">הבא →</button>
+        <button class="next-btn" id="myw-next-btn" onclick="nextMyw()" style="background:linear-gradient(135deg,#5dc0f7,#ec4899);color:#fff">הבא →</button>
       </div>
     </div>
     <div class="bottom-pad"></div>
@@ -1544,10 +1544,10 @@ body:not(.desktop-mode){justify-content:center}
     <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:12px;margin-bottom:12px;text-align:center">
       <svg id="hm-svg" viewBox="0 0 200 200" width="180" height="180" style="margin:0 auto;display:block">
         <!-- Gallows (always shown) -->
-        <line x1="20" y1="190" x2="100" y2="190" stroke="#a78bfa" stroke-width="4" stroke-linecap="round"/>
-        <line x1="60" y1="190" x2="60" y2="20" stroke="#a78bfa" stroke-width="4" stroke-linecap="round"/>
-        <line x1="60" y1="20" x2="130" y2="20" stroke="#a78bfa" stroke-width="4" stroke-linecap="round"/>
-        <line x1="130" y1="20" x2="130" y2="45" stroke="#a78bfa" stroke-width="4" stroke-linecap="round"/>
+        <line x1="20" y1="190" x2="100" y2="190" stroke="#91d4fa" stroke-width="4" stroke-linecap="round"/>
+        <line x1="60" y1="190" x2="60" y2="20" stroke="#91d4fa" stroke-width="4" stroke-linecap="round"/>
+        <line x1="60" y1="20" x2="130" y2="20" stroke="#91d4fa" stroke-width="4" stroke-linecap="round"/>
+        <line x1="130" y1="20" x2="130" y2="45" stroke="#91d4fa" stroke-width="4" stroke-linecap="round"/>
         <!-- Body parts (shown progressively) -->
         <circle id="hm-head" cx="130" cy="60" r="15" fill="none" stroke="#f87171" stroke-width="3" style="display:none"/>
         <line id="hm-body" x1="130" y1="75" x2="130" y2="130" stroke="#f87171" stroke-width="3" style="display:none"/>
@@ -1726,7 +1726,7 @@ body:not(.desktop-mode){justify-content:center}
         <div class="stat-chip" style="background:rgba(245,158,11,0.2);border-color:rgba(245,158,11,0.4)">⭐ +<span id="mem-final-xp">0</span> XP</div>
       </div>
       <div style="display:flex;gap:8px">
-        <button class="big-btn" style="background:linear-gradient(135deg,#ec4899,#a855f7);margin-bottom:0;flex:1" onclick="startMemory()">🔄 שחק שוב</button>
+        <button class="big-btn" style="background:linear-gradient(135deg,#ec4899,#5dc0f7);margin-bottom:0;flex:1" onclick="startMemory()">🔄 שחק שוב</button>
         <button class="big-btn secondary" style="margin-bottom:0;flex:1" onclick="showScreen('menu')">🏠 תפריט</button>
       </div>
     </div>
@@ -1784,7 +1784,7 @@ body:not(.desktop-mode){justify-content:center}
         <div class="lc-desc">עברית → אנגלית</div>
       </div>
     </div>
-    <button class="big-btn" style="background:linear-gradient(135deg,#06b6d4,#7c3aed)" onclick="startToBe()">🗣️ התחל!</button>
+    <button class="big-btn" style="background:linear-gradient(135deg,#06b6d4,#43b0ed)" onclick="startToBe()">🗣️ התחל!</button>
     <button class="big-btn secondary" onclick="showScreen('menu')">← חזור</button>
   </div>
 </div>
@@ -1793,12 +1793,12 @@ body:not(.desktop-mode){justify-content:center}
 <div id="screen-tobe-game" class="screen">
   <div class="game-topbar">
     <button class="topbar-back" onclick="showScreen('tobe')">←</button>
-    <div class="topbar-level" id="tobe-badge" style="background:linear-gradient(135deg,#06b6d4,#7c3aed)">🗣️ am/is/are</div>
+    <div class="topbar-level" id="tobe-badge" style="background:linear-gradient(135deg,#06b6d4,#43b0ed)">🗣️ am/is/are</div>
     <div class="topbar-lives" id="tobe-lives">❤️❤️❤️</div>
   </div>
   <div class="game-scroll">
     <div class="prog-bar-wrap">
-      <div class="prog-track"><div class="prog-fill" id="tobe-prog" style="width:0%;background:linear-gradient(90deg,#06b6d4,#7c3aed)"></div></div>
+      <div class="prog-track"><div class="prog-fill" id="tobe-prog" style="width:0%;background:linear-gradient(90deg,#06b6d4,#43b0ed)"></div></div>
       <div class="prog-label"><span class="prog-text" id="tobe-prog-text">0/15</span><span class="prog-text" id="tobe-prog-pct">0%</span></div>
     </div>
     <div class="stats-strip">
@@ -1833,11 +1833,11 @@ body:not(.desktop-mode){justify-content:center}
       <div id="tobe-input-wrap" style="display:none">
         <div class="input-wrap" style="margin-bottom:8px">
           <input class="game-input" id="tobe-input" placeholder="Type the full sentence..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" oninput="onIC('tobe-input','tobe-submit')" onkeydown="onKD(event,'handleToBeSubmit','nextToBe')">
-          <button class="mic-btn" id="tobe-mic-btn" style="background:linear-gradient(135deg,#06b6d4,#7c3aed)" onclick="toggleMic('tobe-input','tobe-mic-btn','tobe-mic-status','tobe-no-mic')">🎤</button>
+          <button class="mic-btn" id="tobe-mic-btn" style="background:linear-gradient(135deg,#06b6d4,#43b0ed)" onclick="toggleMic('tobe-input','tobe-mic-btn','tobe-mic-status','tobe-no-mic')">🎤</button>
         </div>
         <div class="listening-label" id="tobe-mic-status">🎤 מאזין...</div>
         <div class="no-mic-msg" id="tobe-no-mic">🚫 גישה נדחתה</div>
-        <button class="submit-btn" id="tobe-submit" onclick="handleToBeSubmit()" disabled style="width:100%;padding:13px;background:linear-gradient(135deg,#06b6d4,#7c3aed)">✅ שלח</button>
+        <button class="submit-btn" id="tobe-submit" onclick="handleToBeSubmit()" disabled style="width:100%;padding:13px;background:linear-gradient(135deg,#06b6d4,#43b0ed)">✅ שלח</button>
       </div>
 
       <div class="hint-box" id="tobe-hint-box"></div>
@@ -1847,7 +1847,7 @@ body:not(.desktop-mode){justify-content:center}
         <div class="fb-xp" id="tobe-fb-xp"></div>
       </div>
       <div class="next-row" id="tobe-next-row">
-        <button class="next-btn" id="tobe-next-btn" onclick="nextToBe()" style="background:linear-gradient(135deg,#06b6d4,#7c3aed);color:#fff">הבא →</button>
+        <button class="next-btn" id="tobe-next-btn" onclick="nextToBe()" style="background:linear-gradient(135deg,#06b6d4,#43b0ed);color:#fff">הבא →</button>
       </div>
     </div>
     <div class="bottom-pad"></div>
@@ -1946,7 +1946,7 @@ body:not(.desktop-mode){justify-content:center}
         <div class="lc-desc">4 אפשרויות</div>
       </div>
     </div>
-    <button class="big-btn" style="background:linear-gradient(135deg,#06b6d4,#7c3aed)" onclick="startPhrases()">💬 התחל!</button>
+    <button class="big-btn" style="background:linear-gradient(135deg,#06b6d4,#43b0ed)" onclick="startPhrases()">💬 התחל!</button>
     <button class="big-btn secondary" onclick="showScreen('menu')">← חזור</button>
   </div>
 </div>
@@ -1955,12 +1955,12 @@ body:not(.desktop-mode){justify-content:center}
 <div id="screen-phrases-game" class="screen">
   <div class="game-topbar">
     <button class="topbar-back" onclick="showScreen('phrases')">←</button>
-    <div class="topbar-level" id="phrases-badge" style="background:linear-gradient(135deg,#06b6d4,#7c3aed)">💬 ביטויים</div>
+    <div class="topbar-level" id="phrases-badge" style="background:linear-gradient(135deg,#06b6d4,#43b0ed)">💬 ביטויים</div>
     <div class="topbar-lives" id="phrases-lives">❤️❤️❤️</div>
   </div>
   <div class="game-scroll">
     <div class="prog-bar-wrap">
-      <div class="prog-track"><div class="prog-fill" id="phrases-prog" style="width:0%;background:linear-gradient(90deg,#06b6d4,#7c3aed)"></div></div>
+      <div class="prog-track"><div class="prog-fill" id="phrases-prog" style="width:0%;background:linear-gradient(90deg,#06b6d4,#43b0ed)"></div></div>
       <div class="prog-label"><span class="prog-text" id="phrases-prog-text">0/12</span><span class="prog-text" id="phrases-prog-pct">0%</span></div>
     </div>
     <div class="stats-strip">
@@ -1989,11 +1989,11 @@ body:not(.desktop-mode){justify-content:center}
         <div class="ch-instruction">כתוב את הביטוי באנגלית:</div>
         <div class="input-wrap" style="margin-bottom:8px">
           <input class="game-input" id="phrases-input" placeholder="Type in English..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" oninput="onIC('phrases-input','phrases-submit')" onkeydown="onKD(event,'handlePhrasesSubmit','nextPhrase')">
-          <button class="mic-btn" id="phrases-mic-btn" style="background:linear-gradient(135deg,#06b6d4,#7c3aed)" onclick="toggleMic('phrases-input','phrases-mic-btn','phrases-mic-status','phrases-no-mic')">🎤</button>
+          <button class="mic-btn" id="phrases-mic-btn" style="background:linear-gradient(135deg,#06b6d4,#43b0ed)" onclick="toggleMic('phrases-input','phrases-mic-btn','phrases-mic-status','phrases-no-mic')">🎤</button>
         </div>
         <div class="listening-label" id="phrases-mic-status">🎤 מאזין...</div>
         <div class="no-mic-msg" id="phrases-no-mic">🚫 גישה נדחתה</div>
-        <button class="submit-btn" id="phrases-submit" onclick="handlePhrasesSubmit()" disabled style="width:100%;padding:13px;background:linear-gradient(135deg,#06b6d4,#7c3aed)">✅ שלח</button>
+        <button class="submit-btn" id="phrases-submit" onclick="handlePhrasesSubmit()" disabled style="width:100%;padding:13px;background:linear-gradient(135deg,#06b6d4,#43b0ed)">✅ שלח</button>
       </div>
 
       <!-- Choice mode options -->
@@ -2007,10 +2007,10 @@ body:not(.desktop-mode){justify-content:center}
       </div>
       <div class="action-row" id="phrases-action-row">
         <button class="hint-btn" onclick="showPhrasesHint()">💡 רמז</button>
-        <button id="phrases-submit-row" class="submit-btn" onclick="handlePhrasesSubmit()" disabled style="background:linear-gradient(135deg,#06b6d4,#7c3aed)" onclick="handlePhrasesSubmit()">✅ שלח</button>
+        <button id="phrases-submit-row" class="submit-btn" onclick="handlePhrasesSubmit()" disabled style="background:linear-gradient(135deg,#06b6d4,#43b0ed)" onclick="handlePhrasesSubmit()">✅ שלח</button>
       </div>
       <div class="next-row" id="phrases-next-row">
-        <button class="next-btn" id="phrases-next-btn" onclick="nextPhrase()" style="background:linear-gradient(135deg,#06b6d4,#7c3aed);color:#fff">הבא →</button>
+        <button class="next-btn" id="phrases-next-btn" onclick="nextPhrase()" style="background:linear-gradient(135deg,#06b6d4,#43b0ed);color:#fff">הבא →</button>
       </div>
     </div>
     <div class="bottom-pad"></div>
@@ -2029,7 +2029,7 @@ body:not(.desktop-mode){justify-content:center}
     </div>
     <div id="voice-cards" style="display:flex;flex-direction:column;gap:10px"></div>
     <div style="margin-top:18px">
-      <button class="big-btn" onclick="testVoice()" style="background:linear-gradient(135deg,#7c3aed,#06b6d4)">🔊 נסה את הקול</button>
+      <button class="big-btn" onclick="testVoice()" style="background:linear-gradient(135deg,#43b0ed,#06b6d4)">🔊 נסה את הקול</button>
     </div>
   </div>
 </div>
@@ -2140,7 +2140,7 @@ body:not(.desktop-mode){justify-content:center}
       </div>
     </div>
     <div style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.25);border-radius:14px;padding:12px;margin-bottom:14px;direction:rtl;font-size:13px;line-height:1.9;color:#fff">
-      נחש מילה אנגלית בת <strong style="color:#a78bfa">5 אותיות</strong>!<br>
+      נחש מילה אנגלית בת <strong style="color:#91d4fa">5 אותיות</strong>!<br>
       <span style="color:#6ee7b7">🟩 ירוק</span> = אות נכונה במקום נכון<br>
       <span style="color:#fcd34d">🟨 צהוב</span> = אות נכונה במקום שגוי<br>
       <span style="color:#94a3b8">⬜ אפור</span> = אות לא במילה
@@ -2153,7 +2153,7 @@ body:not(.desktop-mode){justify-content:center}
     <div id="wordle-keyboard" style="display:flex;flex-direction:column;gap:5px;align-items:center;margin-bottom:14px;direction:ltr"></div>
     <!-- Action buttons -->
     <div style="display:flex;gap:8px">
-      <button class="big-btn" style="background:linear-gradient(135deg,#7c3aed,#06b6d4);margin-bottom:0;flex:1" onclick="newWordleGame()">🔄 מילה חדשה</button>
+      <button class="big-btn" style="background:linear-gradient(135deg,#43b0ed,#06b6d4);margin-bottom:0;flex:1" onclick="newWordleGame()">🔄 מילה חדשה</button>
       <button class="hint-btn" onclick="showWordleHint()" id="wordle-hint-btn">💡 רמז</button>
     </div>
     <div id="wordle-result" style="display:none;text-align:center;padding:16px;border-radius:14px;margin-top:12px"></div>
@@ -2229,7 +2229,7 @@ body:not(.desktop-mode){justify-content:center}
       </div>
     </div>
     <div id="dm-next-row" style="display:none">
-      <button class="big-btn" style="background:linear-gradient(135deg,#6366f1,#a855f7)" onclick="dmNext()">הבא →</button>
+      <button class="big-btn" style="background:linear-gradient(135deg,#6366f1,#5dc0f7)" onclick="dmNext()">הבא →</button>
     </div>
   </div>
 </div>
@@ -2244,7 +2244,7 @@ body:not(.desktop-mode){justify-content:center}
     </div>
     <div style="background:rgba(168,85,247,0.1);border:1px solid rgba(168,85,247,0.25);border-radius:14px;padding:12px;margin-bottom:16px;direction:rtl;font-size:13px;color:#e2e8f0;line-height:1.6">
       🎵 מצא את המילה שמחרזת עם המילה הנתונה!<br>
-      <strong style="color:#c4b5fd">cat → bat, hat, mat, rat</strong>
+      <strong style="color:#b9e4fd">cat → bat, hat, mat, rat</strong>
     </div>
     <div class="challenge-card" style="text-align:center">
       <div style="color:var(--muted);font-size:12px;margin-bottom:8px">מצא חרוז ל:</div>
@@ -2253,7 +2253,7 @@ body:not(.desktop-mode){justify-content:center}
       <div class="feedback-card" id="rhyme-feedback"><div id="rhyme-fb-msg"></div><div id="rhyme-fb-xp" style="display:none"></div></div>
     </div>
     <div id="rhyme-next-row" style="display:none;margin-top:12px">
-      <button class="big-btn" style="background:linear-gradient(135deg,#a855f7,#7c3aed)" onclick="rhymeNext()">הבא →</button>
+      <button class="big-btn" style="background:linear-gradient(135deg,#5dc0f7,#43b0ed)" onclick="rhymeNext()">הבא →</button>
     </div>
   </div>
 </div>
@@ -2328,7 +2328,7 @@ body:not(.desktop-mode){justify-content:center}
 <div id="screen-home-opp" class="screen">
   <div class="home-screen-content">
     <div class="home-logo">
-      <div class="logo-icon" style="background:linear-gradient(135deg,var(--pink),#a855f7)">🔄</div>
+      <div class="logo-icon" style="background:linear-gradient(135deg,var(--pink),#5dc0f7)">🔄</div>
       <div class="logo-text"><h1>הפכים</h1><p>Opposites</p></div>
     </div>
     <div class="section-title">בחר רמה</div>
@@ -2470,7 +2470,7 @@ body:not(.desktop-mode){justify-content:center}
       </div>
       <div class="action-row" id="opp-action-row">
         <button class="hint-btn" onclick="showOppHint()">💡 רמז</button>
-        <button class="submit-btn" id="opp-submit" onclick="handleOppSubmit()" disabled style="background:linear-gradient(135deg,var(--pink),#a855f7)">✅ שלח</button>
+        <button class="submit-btn" id="opp-submit" onclick="handleOppSubmit()" disabled style="background:linear-gradient(135deg,var(--pink),#5dc0f7)">✅ שלח</button>
       </div>
       <div class="next-row" id="opp-next-row"><button class="next-btn" onclick="nextOpp()">הבא →</button></div>
     </div>
@@ -2582,7 +2582,7 @@ body:not(.desktop-mode){justify-content:center}
       <div style="margin-top:10px">
         <div class="lv-title" id="lv-main-title">עלית רמה! 🎉</div>
         <div id="lv-level-name-display" style="font-size:28px;font-weight:900;margin:8px 0;
-          background:linear-gradient(135deg,#a78bfa,#06b6d4);-webkit-background-clip:text;
+          background:linear-gradient(135deg,#91d4fa,#06b6d4);-webkit-background-clip:text;
           -webkit-text-fill-color:transparent;background-clip:text"></div>
         <div class="lv-sub" id="lv-bot-msg" style="font-size:15px;margin-bottom:8px">כל הכבוד!</div>
         <div class="lv-xp" id="lv-xp-total-new" style="font-size:18px;margin-bottom:20px"></div>
@@ -2612,7 +2612,7 @@ body:not(.desktop-mode){justify-content:center}
       <!-- CERTIFICATE (shown when accuracy >= 80%) -->
       <div id="certificate-wrap" style="display:none;margin-bottom:14px">
         <div id="certificate" style="
-          background:linear-gradient(135deg,#1a0533,#0a1628);
+          background:linear-gradient(135deg,#082839,#0a1628);
           border:3px solid #ffd200; border-radius:16px; padding:20px 16px;
           text-align:center; position:relative; overflow:hidden;
           box-shadow:0 0 30px rgba(255,210,0,0.2)">
@@ -2624,7 +2624,7 @@ body:not(.desktop-mode){justify-content:center}
           <div style="font-size:10px;color:#ffd200;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;opacity:0.8">תעודת הצלחה</div>
           <div style="font-size:28px;margin-bottom:6px">🏆</div>
           <div style="color:#fff;font-size:18px;font-weight:900;margin-bottom:4px" id="cert-name">—</div>
-          <div style="color:#a78bfa;font-size:12px;margin-bottom:8px;direction:rtl" id="cert-game">השלים בהצלחה</div>
+          <div style="color:#91d4fa;font-size:12px;margin-bottom:8px;direction:rtl" id="cert-game">השלים בהצלחה</div>
           <div style="font-size:10px;color:#fcd34d;letter-spacing:1px;margin-bottom:6px" id="cert-level">רמת — | XP: —</div>
           <div style="display:flex;justify-content:center;gap:12px;margin-bottom:8px">
             <div style="text-align:center">
@@ -2760,7 +2760,7 @@ function showStats(){
     {key:'magice',icon:'✨',name:'e קסומה'},
     {key:'freewrite',icon:'✍️',name:'כתיבה'},
   ];
-  const colors=['#a78bfa','#f9a8d4','#fcd34d','#6ee7b7'];
+  const colors=['#91d4fa','#f9a8d4','#fcd34d','#6ee7b7'];
   document.getElementById('stat-games').innerHTML=games.map((g,i)=>{
     const d=statsData[g.key];const tot=d.correct+d.wrong;
     const pct=tot>0?Math.round(d.correct/tot*100):0;
@@ -2786,7 +2786,7 @@ function showStats(){
     const max=Math.max(...hist.map(h=>h.xp));
     document.getElementById('stat-xp-history').innerHTML=hist.map((h,i)=>{
       const pct=max>0?Math.round(h.xp/max*100):0;
-      return '<div style="flex:1;background:linear-gradient(to top,#7c3aed,#06b6d4);border-radius:3px 3px 0 0;height:'+pct+'%;min-height:2px;position:relative" title="'+h.d+': '+h.xp+' XP"></div>';
+      return '<div style="flex:1;background:linear-gradient(to top,#43b0ed,#06b6d4);border-radius:3px 3px 0 0;height:'+pct+'%;min-height:2px;position:relative" title="'+h.d+': '+h.xp+' XP"></div>';
     }).join('');
     document.getElementById('stat-xp-oldest').textContent=hist[0].d.slice(5);
   }
@@ -3066,7 +3066,7 @@ const TRANSLATE_LEVELS=[
     {h:"אבא עובד",a:"Dad is working",t:"sentence",hint:"פעולת אבא"},
     {h:"יש לי שני כדורים",a:"I have two balls",t:"sentence",hint:"מספר חפצים"},
   ]},
-  {id:3,name:"מומחה",emoji:"🌳",desc:"משפטים מורכבים",color:"#7c3aed",challenges:[
+  {id:3,name:"מומחה",emoji:"🌳",desc:"משפטים מורכבים",color:"#43b0ed",challenges:[
     {h:"אתמול הלכתי לפארק",a:"Yesterday I went to the park",t:"sentence",hint:"זמן עבר"},
     {h:"מחר יהיה יום יפה",a:"Tomorrow will be a beautiful day",t:"sentence",hint:"זמן עתיד"},
     {h:"אני לומד אנגלית כי זה חשוב",a:"I learn English because it is important",t:"sentence",hint:"הסבר עם כי"},
@@ -3095,7 +3095,7 @@ const TRANSLATE_LEVELS=[
     {h:"החופש שלי / בחופש נסעתי לים. השמש הייתה חזקה ושחינו הרבה.",a:"During vacation I went to the sea. The sun was strong and we swam a lot.",t:"paragraph",hint:"תאר חופש"},
     {h:"האוכל האהוב / האוכל האהוב עלי הוא פיצה עם גבינה. בכל שישי אנחנו מזמינים פיצה.",a:"My favorite food is pizza with cheese. Every Friday we order pizza.",t:"paragraph",hint:"תאר אוכל אהוב"},
   ]},
-  {id:6,name:"מאסטר",emoji:"👑",desc:"טקסטים מלאים",color:"#a855f7",challenges:[
+  {id:6,name:"מאסטר",emoji:"👑",desc:"טקסטים מלאים",color:"#5dc0f7",challenges:[
     {h:"מכתב לחבר / שלום יונתן, התגעגעתי. בקיץ האחרון נהנינו ביחד. אני מקווה שנפגש.",a:"Hello Jonathan, I missed you. Last summer we had fun together. I hope we meet.",t:"paragraph",hint:"מכתב לחבר"},
     {h:"יום בחיי / אני קם בשבע, מתלבש ואוכל ארוחת בוקר. אחר כך הולך לבית ספר.",a:"I wake up at seven, get dressed and eat breakfast. Then I go to school.",t:"paragraph",hint:"תאר יום רגיל"},
     {h:"על הטבע / הטבע הוא מתנה יקרה. עצים, בעלי חיים ומים חשובים לחיינו.",a:"Nature is a precious gift. Trees, animals and water are important to our lives.",t:"paragraph",hint:"כתוב על טבע"},
@@ -3220,7 +3220,7 @@ const OPP_LEVELS=[
     {w:"monotonous",a:"varied",hint:"מגוון"},{w:"mutual",a:"one-sided",hint:"חד צדדי"},
     {w:"noble",a:"ignoble",hint:"נבזי"},{w:"obsolete",a:"current",hint:"עדכני"},
   ]},
-  {id:5,name:"מומחה",emoji:"🔵",desc:"מורכב מאוד",color:"#7c3aed",challenges:[
+  {id:5,name:"מומחה",emoji:"🔵",desc:"מורכב מאוד",color:"#43b0ed",challenges:[
     {w:"absolute",a:"relative",hint:"יחסי"},{w:"abstract",a:"concrete",hint:"קונקרטי"},
     {w:"accelerate",a:"decelerate",hint:"להאט"},{w:"accurate",a:"inaccurate",hint:"לא מדויק"},
     {w:"acknowledge",a:"ignore",hint:"להתעלם"},{w:"active",a:"dormant",hint:"רדום"},
@@ -3272,7 +3272,7 @@ const OPP_LEVELS=[
     {w:"rational",a:"irrational",hint:"לא הגיוני"},{w:"relevant",a:"irrelevant",hint:"לא רלוונטי"},
     {w:"resilient",a:"fragile",hint:"שביר"},{w:"sincere",a:"hypocritical",hint:"צבוע"},
   ]},
-  {id:6,name:"גאון",emoji:"⭐",desc:"ברמה הכי גבוהה",color:"#a855f7",challenges:[
+  {id:6,name:"גאון",emoji:"⭐",desc:"ברמה הכי גבוהה",color:"#5dc0f7",challenges:[
     {w:"abundance",a:"scarcity",hint:"מחסור"},{w:"genuine",a:"artificial",hint:"מלאכותי"},
     {w:"harmony",a:"conflict",hint:"סכסוך"},{w:"construct",a:"demolish",hint:"להרוס"},
     {w:"accelerate",a:"decelerate",hint:"להאט"},{w:"victory",a:"defeat",hint:"תבוסה"},
@@ -3302,7 +3302,7 @@ const ME_LEVELS=[
     {base:"shin",magic:"shine",rule:"i אומר 'אַי'",hint:"לזרוח"},
     {base:"tim",magic:"time",rule:"i אומר 'אַי'",hint:"זמן"},
   ]},
-  {id:3,name:"רמה 3",emoji:"✨✨✨",desc:"o_e מילים",color:"#7c3aed",challenges:[
+  {id:3,name:"רמה 3",emoji:"✨✨✨",desc:"o_e מילים",color:"#43b0ed",challenges:[
     {base:"hop",magic:"hope",rule:"o אומר 'אוֹ'",hint:"תקווה"},
     {base:"not",magic:"note",rule:"o אומר 'אוֹ'",hint:"פתק"},
     {base:"ton",magic:"tone",rule:"o אומר 'אוֹ'",hint:"צליל"},
@@ -3332,7 +3332,7 @@ const ME_LEVELS=[
     {base:"glob",magic:"globe",rule:"o אומר 'אוֹ'",hint:"גלובוס"},
     {base:"tub",magic:"tube",rule:"u אומר 'יוּ'",hint:"צינור"},
   ]},
-  {id:6,name:"רמה 6",emoji:"👑",desc:"מומחה e קסומה",color:"#a855f7",challenges:[
+  {id:6,name:"רמה 6",emoji:"👑",desc:"מומחה e קסומה",color:"#5dc0f7",challenges:[
     {base:"scrap",magic:"scrape",rule:"a אומר 'אֵי'",hint:"לגרד"},
     {base:"strid",magic:"stride",rule:"i אומר 'אַי'",hint:"צעד גדול"},
     {base:"smok",magic:"smoke",rule:"o אומר 'אוֹ'",hint:"עשן"},
@@ -3349,13 +3349,13 @@ const FW_LEVELS=[
    topics:["תאר את הבית שלך","תאר את חיית המחמד שלך","מה האוכל האהוב עליך?","תאר את החדר שלך","מה אתה אוהב לעשות אחרי בית ספר?"]},
   {id:2,name:"מתקדם",emoji:"🌿",desc:"3-4 משפטים",color:"#06b6d4",minWords:10,
    topics:["תאר את המשפחה שלך","מה עשית בחופש האחרון?","תאר את החבר הכי טוב שלך","מה אתה רוצה להיות כשתגדל?","תאר סרט שראית לאחרונה"]},
-  {id:3,name:"מומחה",emoji:"🌳",desc:"4-5 משפטים",color:"#7c3aed",minWords:15,
+  {id:3,name:"מומחה",emoji:"🌳",desc:"4-5 משפטים",color:"#43b0ed",minWords:15,
    topics:["למה חשוב ללמוד אנגלית?","תאר את היום האהוב עליך בשבוע","מה דעתך על בית הספר?","תאר טיול שהיה לך","מה הדבר שאתה הכי אוהב לעשות?"]},
   {id:4,name:"גאון",emoji:"⭐",desc:"5+ משפטים",color:"#f59e0b",minWords:20,
    topics:["תאר סיפור קצר על הרפתקה","כתוב על חלום שחלמת","מה היית עושה אם היית עשיר?","תאר את העיר שלך","כתוב מכתב לחבר בחו״ל"]},
   {id:5,name:"אלוף",emoji:"🏆",desc:"6+ משפטים מורכבים",color:"#ec4899",minWords:25,
    topics:["למה חשוב לשמור על הטבע?","תאר את החלום שלך לעתיד","מה דעתך על טכנולוגיה?","תאר את הספר האהוב עליך","כתוב על אדם שמעורר אותך"]},
-  {id:6,name:"מאסטר",emoji:"👑",desc:"פסקה שלמה",color:"#a855f7",minWords:35,
+  {id:6,name:"מאסטר",emoji:"👑",desc:"פסקה שלמה",color:"#5dc0f7",minWords:35,
    topics:["כתוב על נושא שאתה אוהב","תאר חוויה שלא תשכח","מה הדבר החשוב ביותר בחיים?","כתוב סיפור קצר עם גיבור","תאר את עצמך ב-10 שנים"]},
 ];
 
@@ -3635,7 +3635,7 @@ function loadT(){
   const wordEl=document.getElementById('hebrew-word');
   if(ch.t==='paragraph'){
     const parts=ch.h.split(' / ');
-    wordEl.innerHTML='<span style="font-size:14px;color:#a78bfa;display:block;margin-bottom:4px">'+parts[0]+'</span><span style="font-size:13px;font-weight:600;line-height:1.6;color:#e2e8f0">'+parts[1]+'</span>';
+    wordEl.innerHTML='<span style="font-size:14px;color:#91d4fa;display:block;margin-bottom:4px">'+parts[0]+'</span><span style="font-size:13px;font-weight:600;line-height:1.6;color:#e2e8f0">'+parts[1]+'</span>';
   }else{wordEl.textContent=ch.h;wordEl.style.fontSize='28px';}
   document.getElementById('type-tag').textContent=ch.t==='word'?'🔤 מילה':ch.t==='paragraph'?'📄 פסקה':'💬 משפט';
   const inp=document.getElementById('answer-input');
@@ -4134,7 +4134,7 @@ async function finishChallenge(){
 
 // ══ BOT CHARACTERS per level ══
 const BOT_CHARS=[
-  {emoji:'🤖',color:'#a78bfa',msg:'מתחיל על דרך ההצלחה! 🌱',glow:'rgba(124,58,237,0.5)'},
+  {emoji:'🤖',color:'#91d4fa',msg:'מתחיל על דרך ההצלחה! 🌱',glow:'rgba(124,58,237,0.5)'},
   {emoji:'🦾',color:'#67e8f9',msg:'מתקדם יפה! המשך כך! 💪',glow:'rgba(6,182,212,0.5)'},
   {emoji:'🧠',color:'#6ee7b7',msg:'אתה כבר מומחה! 🌳',glow:'rgba(16,185,129,0.5)'},
   {emoji:'⚡',color:'#fcd34d',msg:'גאון אמיתי! ⭐',glow:'rgba(245,158,11,0.6)'},
@@ -4147,7 +4147,7 @@ function launchConfetti(){
   const c=document.getElementById('confetti-container');
   if(!c)return;
   c.innerHTML='';
-  const colors=['#a78bfa','#06b6d4','#ffd200','#ec4899','#10b981','#f59e0b','#fff'];
+  const colors=['#91d4fa','#06b6d4','#ffd200','#ec4899','#10b981','#f59e0b','#fff'];
   for(let i=0;i<60;i++){
     const el=document.createElement('div');
     const size=6+Math.random()*8;
@@ -4656,7 +4656,7 @@ const TOPICS=[
     {h:'ביצה',a:'egg',hint:'מקור חלבון מתרנגולת'},
     {h:'אורז',a:'rice',hint:'מאכל לבן וגרגירי'},
   ]},
-  {id:'animals',name:'חיות',emoji:'🐶',color:'#a855f7',words:[
+  {id:'animals',name:'חיות',emoji:'🐶',color:'#5dc0f7',words:[
     {h:'כלב',a:'dog',hint:'חיית מחמד נאמנה'},
     {h:'חתול',a:'cat',hint:'חיה שאוהבת לישון'},
     {h:'אריה',a:'lion',hint:'מלך החיות'},
@@ -4842,7 +4842,7 @@ function renderHangmanWordOnly(){
   disp.innerHTML='<div style="display:flex;flex-direction:row;gap:8px;justify-content:center;direction:ltr">'+
     hmWord.split('').map(letter=>{
       const wasGuessed=hmGuessed.has(letter)&&!([...hmGuessed].filter(l=>!hmWord.includes(l))).includes(letter);
-      return '<div class="hm-letter'+(wasGuessed?' revealed':'')+'" dir="ltr" style="color:'+(wasGuessed?'#a78bfa':'#f87171')+'">'+letter+'</div>';
+      return '<div class="hm-letter'+(wasGuessed?' revealed':'')+'" dir="ltr" style="color:'+(wasGuessed?'#91d4fa':'#f87171')+'">'+letter+'</div>';
     }).join('')+
   '</div>';
 }
@@ -5746,7 +5746,7 @@ let toastQueue=[];
 function showAchievementToast(ach){
   const toast=document.createElement('div');
   toast.style.cssText='position:fixed;bottom:90px;left:50%;transform:translateX(-50%);'+
-    'background:linear-gradient(135deg,#1a1a2e,#2d1b4e);border:1px solid rgba(255,210,0,0.4);'+
+    'background:linear-gradient(135deg,#1a1a2e,#224971);border:1px solid rgba(255,210,0,0.4);'+
     'border-radius:14px;padding:12px 16px;z-index:999;display:flex;align-items:center;gap:10px;'+
     'min-width:260px;max-width:90vw;box-shadow:0 8px 24px rgba(0,0,0,0.5);'+
     'animation:slide-up 0.4s cubic-bezier(0.34,1.56,0.64,1)';
@@ -6256,7 +6256,7 @@ function buildVoiceCards(){
         '<div style="color:#fff;font-size:16px;font-weight:800">'+vs.name+'</div>'+
         '<div style="color:var(--muted);font-size:11px;margin-top:2px">pitch: '+vs.pitch+' | rate: '+vs.rate+'</div>'+
       '</div>'+
-      (isSelected?'<div style="color:#a78bfa;font-size:20px">✓</div>':'')+
+      (isSelected?'<div style="color:#91d4fa;font-size:20px">✓</div>':'')+
     '</div>';
   }).join('');
   // Update header button emoji
@@ -6599,7 +6599,7 @@ function buildWordleKeyboard(){
       back.style.cssText='padding:0 10px;height:38px;border-radius:7px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.1);color:#fff;font-size:16px;cursor:pointer;font-family:Heebo,sans-serif';
       back.textContent='⌫';back.setAttribute('data-wletter','BACK');
       const enter=document.createElement('button');
-      enter.style.cssText='padding:0 8px;height:38px;border-radius:7px;border:1px solid rgba(124,58,237,0.4);background:rgba(124,58,237,0.2);color:#a78bfa;font-size:11px;font-weight:800;cursor:pointer;font-family:Heebo,sans-serif';
+      enter.style.cssText='padding:0 8px;height:38px;border-radius:7px;border:1px solid rgba(124,58,237,0.4);background:rgba(124,58,237,0.2);color:#91d4fa;font-size:11px;font-weight:800;cursor:pointer;font-family:Heebo,sans-serif';
       enter.textContent='שלח';enter.setAttribute('data-wletter','ENTER');
       rowEl.prepend(back);rowEl.appendChild(enter);
     }
@@ -7014,7 +7014,7 @@ function loadRhymeQ(){
   const opts=shuffle([correct,...wrong]);
   const letters=['A','B','C','D'];
   document.getElementById('rhyme-options').innerHTML=opts.map((o,i)=>
-    `<div data-rhymeopt="${o}" data-correct="${correct}" style="padding:13px;border-radius:12px;border:1px solid rgba(168,85,247,0.3);background:rgba(168,85,247,0.08);cursor:pointer;font-size:16px;font-weight:900;color:#c4b5fd;direction:ltr;display:flex;align-items:center;gap:8px">
+    `<div data-rhymeopt="${o}" data-correct="${correct}" style="padding:13px;border-radius:12px;border:1px solid rgba(168,85,247,0.3);background:rgba(168,85,247,0.08);cursor:pointer;font-size:16px;font-weight:900;color:#b9e4fd;direction:ltr;display:flex;align-items:center;gap:8px">
       <span style="background:rgba(168,85,247,0.2);border-radius:6px;padding:2px 7px;font-size:11px">${letters[i]}</span>${o}
     </div>`
   ).join('');
@@ -7179,7 +7179,7 @@ function requestNotification(){
   if(!('Notification' in window)){
     var d=document.createElement('div');
     d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(20,10,40,0.98);border:1px solid rgba(251,191,36,0.5);border-radius:18px;padding:22px 20px;z-index:9999;font-family:Heebo,sans-serif;direction:rtl;max-width:290px;width:90%;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,0.7)';
-    d.innerHTML='<div style="font-size:36px;margin-bottom:8px">🔔</div><div style="color:#fff;font-weight:900;font-size:15px;margin-bottom:10px">תזכורת יומית</div><div style="color:rgba(255,255,255,0.65);font-size:12px;line-height:1.7;margin-bottom:16px">הגדר תזכורת בטלפון:<br>📅 שעון ← תזכורות ← הוסף<br><strong style="color:#fbbf24">שם:</strong> זמן לתרגל אנגלית<br><strong style="color:#fbbf24">שעה:</strong> 18:00 כל יום</div><button onclick="this.parentElement.remove()" style="background:linear-gradient(135deg,#8b5cf6,#22d3ee);border:none;color:#fff;border-radius:12px;padding:11px 24px;font-weight:900;cursor:pointer;font-family:Heebo,sans-serif;font-size:14px;width:100%">הבנתי</button>';
+    d.innerHTML='<div style="font-size:36px;margin-bottom:8px">🔔</div><div style="color:#fff;font-weight:900;font-size:15px;margin-bottom:10px">תזכורת יומית</div><div style="color:rgba(255,255,255,0.65);font-size:12px;line-height:1.7;margin-bottom:16px">הגדר תזכורת בטלפון:<br>📅 שעון ← תזכורות ← הוסף<br><strong style="color:#fbbf24">שם:</strong> זמן לתרגל אנגלית<br><strong style="color:#fbbf24">שעה:</strong> 18:00 כל יום</div><button onclick="this.parentElement.remove()" style="background:linear-gradient(135deg,#64c1f6,#22d3ee);border:none;color:#fff;border-radius:12px;padding:11px 24px;font-weight:900;cursor:pointer;font-family:Heebo,sans-serif;font-size:14px;width:100%">הבנתי</button>';
     document.body.appendChild(d);
     return;
   }

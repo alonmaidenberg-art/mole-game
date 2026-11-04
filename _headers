@@ -723,3 +723,12 @@
 
 /hoops3/manifest.webmanifest
   Cache-Control: no-cache
+
+/wormio/sw.js
+  Cache-Control: no-cache
+
+/wormio/index.html
+  Cache-Control: no-cache
+
+/wormio/manifest.webmanifest
+  Cache-Control: no-cache

@@ -22,9 +22,9 @@
   --dirt:#2a160a;--lip1:#8a5630;--lip2:#5a3216;
   --ink:#fff;--card:rgba(20,14,8,.78);--accent:#ffd23f;
 }
-body[data-theme=halloween]{--bg1:#2a1040;--bg2:#6a2a0e;--mat:#4a2a66;--mat2:#331a4a;--dirt:#0e0614;--lip1:#6a3a8a;--lip2:#3a1c52;--accent:#ff9a2e}
-body[data-theme=xmas]{--bg1:#0f2f5e;--bg2:#2d6fa8;--mat:#e9f3fb;--mat2:#bcd7ea;--dirt:#33506a;--lip1:#ffffff;--lip2:#bcd0e0;--accent:#ff5a5a}
-body[data-theme=space]{--bg1:#05061a;--bg2:#1b1250;--mat:#3a3d5c;--mat2:#2a2c47;--dirt:#0b0c1c;--lip1:#6d7194;--lip2:#40435f;--accent:#6ce6ff}
+body[data-theme=halloween]{--bg1:#1b3c5e;--bg2:#6a2a0e;--mat:#2c5f94;--mat2:#20456c;--dirt:#09121d;--lip1:#3e6f8a;--lip2:#244d78;--accent:#ff9a2e}
+body[data-theme=xmas]{--bg1:#0f2f5e;--bg2:#2d6fa8;--mat:#e9f3fb;--mat2:#bcd7ea;--dirt:#29598a;--lip1:#ffffff;--lip2:#bcd0e0;--accent:#ff5a5a}
+body[data-theme=space]{--bg1:#05061a;--bg2:#1f4975;--mat:#3a3d5c;--mat2:#2a2c47;--dirt:#0b0c1c;--lip1:#6d7194;--lip2:#40435f;--accent:#6ce6ff}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
 html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;touch-action:manipulation}
 body{font-family:system-ui,-apple-system,"Segoe UI",Arial,"Noto Sans Hebrew",sans-serif;color:var(--ink);
@@ -75,7 +75,7 @@ body[data-theme=space]{background:radial-gradient(1px 1px at 20% 30%,#fff,transp
 .sat{position:absolute;z-index:7;font-size:44px;transform:translate(-50%,var(--from));animation:satfall 2.4s cubic-bezier(.35,0,.9,.6) forwards;cursor:pointer}
 @keyframes satfall{from{transform:translate(-50%,var(--from)) rotate(-20deg)}to{transform:translate(-50%,0) rotate(25deg)}}
 #bh{position:absolute;inset:0;border-radius:26px;pointer-events:none;opacity:0;transition:opacity .4s;z-index:4;
-  background:radial-gradient(circle at 50% 50%,#000 0,#000 10%,#3b0a6b 22%,rgba(60,10,110,.35) 45%,transparent 70%)}
+  background:radial-gradient(circle at 50% 50%,#000 0,#000 10%,#115378 22%,rgba(60,10,110,.35) 45%,transparent 70%)}
 #bh.on{opacity:1;animation:spin 1.2s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 #rain{position:absolute;inset:0;border-radius:26px;pointer-events:none;opacity:0;transition:opacity .3s;z-index:4;
@@ -227,7 +227,7 @@ const SPRITES={
   ninja:()=>face('#2d2d3c','#4a4a5e','<rect x="16" y="40" width="68" height="18" rx="7" fill="#1a1a24"/><ellipse cx="37" cy="50" rx="7.5" ry="3.8" fill="#fff"/><ellipse cx="63" cy="50" rx="7.5" ry="3.8" fill="#fff"/><circle cx="38" cy="50" r="2.4" fill="#111"/><circle cx="64" cy="50" r="2.4" fill="#111"/><rect x="14" y="36" width="72" height="7" fill="#d63031"/><path d="M84 38 L96 32 M84 41 L97 46" stroke="#d63031" stroke-width="4" stroke-linecap="round"/>'),
   pirate:()=>face('#8b5e3c','#dcb893','<path d="M15 40 Q50 2 85 40 Q50 30 15 40Z" fill="#d63031"/><circle cx="35" cy="26" r="2.2" fill="#fff"/><circle cx="55" cy="20" r="2.2" fill="#fff"/><circle cx="68" cy="30" r="2.2" fill="#fff"/><circle cx="63" cy="52" r="7.5" fill="#111"/><path d="M20 38 L63 52 L82 40" stroke="#111" stroke-width="2" fill="none"/>'),
   ghost:()=>`<svg viewBox="0 0 100 100" aria-hidden="true"><path d="M18 95 V46 Q18 8 50 8 Q82 8 82 46 V95 L70 84 L58 95 L46 84 L34 95 L26 88Z" fill="#f4f6ff" opacity=".93" stroke="#b9c2ff" stroke-width="2"/><ellipse cx="38" cy="44" rx="6" ry="8" fill="#222"/><ellipse cx="62" cy="44" rx="6" ry="8" fill="#222"/><ellipse cx="50" cy="64" rx="8" ry="10" fill="#222"/></svg>`,
-  alien:()=>`<svg viewBox="0 0 100 100" aria-hidden="true"><path d="M30 24 L24 6" stroke="#4fc95b" stroke-width="3" stroke-linecap="round"/><circle cx="23" cy="5" r="4" fill="#ff6bd6"/><path d="M70 24 L76 6" stroke="#4fc95b" stroke-width="3" stroke-linecap="round"/><circle cx="77" cy="5" r="4" fill="#ff6bd6"/><ellipse cx="50" cy="56" rx="38" ry="38" fill="#6fe27a"/><path d="M18 46 Q34 42 44 60 Q28 68 18 46Z" fill="#101a10"/><path d="M82 46 Q66 42 56 60 Q72 68 82 46Z" fill="#101a10"/><circle cx="31" cy="52" r="2.5" fill="#fff" opacity=".8"/><circle cx="69" cy="52" r="2.5" fill="#fff" opacity=".8"/><path d="M40 78 Q50 85 60 78" stroke="#1d5a24" stroke-width="3" fill="none" stroke-linecap="round"/></svg>`,
+  alien:()=>`<svg viewBox="0 0 100 100" aria-hidden="true"><path d="M30 24 L24 6" stroke="#4fc95b" stroke-width="3" stroke-linecap="round"/><circle cx="23" cy="5" r="4" fill="#72ccff"/><path d="M70 24 L76 6" stroke="#4fc95b" stroke-width="3" stroke-linecap="round"/><circle cx="77" cy="5" r="4" fill="#72ccff"/><ellipse cx="50" cy="56" rx="38" ry="38" fill="#6fe27a"/><path d="M18 46 Q34 42 44 60 Q28 68 18 46Z" fill="#101a10"/><path d="M82 46 Q66 42 56 60 Q72 68 82 46Z" fill="#101a10"/><circle cx="31" cy="52" r="2.5" fill="#fff" opacity=".8"/><circle cx="69" cy="52" r="2.5" fill="#fff" opacity=".8"/><path d="M40 78 Q50 85 60 78" stroke="#1d5a24" stroke-width="3" fill="none" stroke-linecap="round"/></svg>`,
   bomb:()=>`<span class="big">💣</span>`,
   clock:()=>`<span class="big">⏰</span>`,
   bolt:()=>`<span class="big">⚡</span>`,

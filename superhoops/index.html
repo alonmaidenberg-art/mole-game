@@ -16,15 +16,15 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;min-height:100%;background:#1a1038;color:#fff;font-family:system-ui,-apple-system,"Segoe UI",Arial,"Noto Sans Hebrew",sans-serif}
-body{background:radial-gradient(700px 500px at 80% -10%,#5b36d6 0,transparent 60%),radial-gradient(600px 500px at 0% 110%,#0f6b6b 0,transparent 55%),#1a1038;min-height:100vh;min-height:100dvh;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+html,body{margin:0;min-height:100%;background:#193552;color:#fff;font-family:system-ui,-apple-system,"Segoe UI",Arial,"Noto Sans Hebrew",sans-serif}
+body{background:radial-gradient(700px 500px at 80% -10%,#3e9fd6 0,transparent 60%),radial-gradient(600px 500px at 0% 110%,#0f6b6b 0,transparent 55%),#193552;min-height:100vh;min-height:100dvh;user-select:none;-webkit-user-select:none;touch-action:manipulation}
 main{max-width:520px;margin:0 auto;padding:max(12px,env(safe-area-inset-top)) 14px 24px}
 h1{margin:6px 0;font-size:30px;text-align:center}
 .sub{text-align:center;opacity:.75;margin:0 0 10px}
 .box{background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.12);border-radius:22px;padding:14px;margin:12px 0}
 .lb{opacity:.8;font-size:15px;margin-bottom:8px}
 .chips{display:flex;gap:8px;flex-wrap:wrap}
-.chip{flex:1;min-width:70px;padding:13px 6px;border-radius:16px;border:2px solid rgba(255,255,255,.18);background:#150a30;color:#fff;font:inherit;font-weight:800;font-size:17px;cursor:pointer}
+.chip{flex:1;min-width:70px;padding:13px 6px;border-radius:16px;border:2px solid rgba(255,255,255,.18);background:#112b46;color:#fff;font:inherit;font-weight:800;font-size:17px;cursor:pointer}
 .chip.on{background:#ffd05a;color:#2a1c00;border-color:#fff}
 .btn{display:block;width:100%;border:0;border-radius:18px;padding:15px;margin-top:12px;font:inherit;font-size:21px;font-weight:900;color:#06322b;background:linear-gradient(180deg,#5ff7d6,#1fc9a6);box-shadow:0 6px 0 #0d7a66;cursor:pointer}
 .btn:active{transform:translateY(3px);box-shadow:0 3px 0 #0d7a66}
@@ -33,16 +33,16 @@ h1{margin:6px 0;font-size:30px;text-align:center}
 .bar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
 .scr{display:none}.scr.show{display:block}
 .ov{position:fixed;inset:0;background:rgba(10,5,30,.82);display:none;align-items:center;justify-content:center;z-index:30;padding:16px}.ov.show{display:flex}
-.ovc{width:100%;max-width:380px;background:linear-gradient(160deg,#2c1b6a,#1a1038);border:2px solid rgba(255,255,255,.2);border-radius:26px;padding:22px;text-align:center}
+.ovc{width:100%;max-width:380px;background:linear-gradient(160deg,#2e639b,#193552);border:2px solid rgba(255,255,255,.2);border-radius:26px;padding:22px;text-align:center}
 .ovc h2{margin:0 0 6px;font-size:30px}
-body{overflow:hidden;position:fixed;inset:0;width:100%;background:#0d0826}
+body{overflow:hidden;position:fixed;inset:0;width:100%;background:#0e2338}
 #cv{position:fixed;left:0;top:0;display:block;touch-action:none}
 #hud{position:fixed;inset:0;pointer-events:none;z-index:8;display:none}
 #bar{position:absolute;top:max(8px,env(safe-area-inset-top));left:50%;transform:translateX(-50%);display:flex;gap:18px;align-items:center;background:rgba(10,6,30,.72);border-radius:14px;padding:6px 22px;font-weight:900;direction:ltr}
 #bar .sc{font-size:32px;min-width:34px;text-align:center}#tm{font-size:20px}
 .slot{position:absolute;top:max(8px,env(safe-area-inset-top));left:56px;background:rgba(10,6,30,.65);border-radius:12px;padding:5px 12px;font-weight:800;font-size:14px;min-width:110px}.slot.r{left:auto;right:64px}.slot b{font-size:26px;margin-inline-end:6px}
 #chg{position:absolute;left:50%;bottom:max(150px,26vh);transform:translateX(-50%);width:220px;height:14px;background:rgba(0,0,0,.6);border-radius:8px;display:none;overflow:hidden;border:2px solid #fff}#chg i{position:absolute;left:0;top:0;bottom:0;width:0;background:#ffd05a}#chg b{position:absolute;left:75%;width:20%;top:0;bottom:0;background:rgba(46,204,113,.85)}
-#rot{position:fixed;inset:0;background:#120a2c;z-index:50;display:none;align-items:center;justify-content:center;text-align:center;font-size:24px;font-weight:800;padding:20px}
+#rot{position:fixed;inset:0;background:#112840;z-index:50;display:none;align-items:center;justify-content:center;text-align:center;font-size:24px;font-weight:800;padding:20px}
 @media (orientation:portrait) and (pointer:coarse){#rot{display:flex}}
 .sw{width:38px;height:38px;border-radius:50%;border:3px solid rgba(255,255,255,.3);cursor:pointer}.sw.on{border-color:#fff;box-shadow:0 0 0 3px #ffd05a}
 </style>
@@ -74,7 +74,7 @@ const G=-24,BG=-17,LX=31,LZ=12,RIMH=3.6,HOOPX=27.2,BRAD=.24,V3=THREE.Vector3;
 const rimR=[1.15,1.15],rimT=[0,0];
 const TREES=[{x:-11,z:-6,top:1.6,pl:[1.6]},{x:0,z:-7,top:4.2,pl:[1.6,4.2]},{x:11,z:-6,top:1.6,pl:[1.6]}];
 const PLATS=[];TREES.forEach(t=>t.pl.forEach(y=>PLATS.push({x:t.x,z:t.z,y,r:y>3?2:2.4})));
-const COLS=['#e8433f','#2f7bff','#27b36a','#f2b400','#a14bff','#ff7a1a'];
+const COLS=['#e8433f','#2f7bff','#27b36a','#f2b400','#54c1ff','#ff7a1a'];
 const POW={super:{e:'🦸',n:'סופרמן'},fire:{e:'🔥',n:'כדור אש'},freeze:{e:'❄️',n:'הקפאה'},bolt:{e:'⚡',n:'ברק'},jump:{e:'🦘',n:'קפיצת על'},giant:{e:'🕳️',n:'סל ענק'}};
 const PK=Object.keys(POW);
 const LVL={1:{sp:7,rng:12,err:.24,react:50},2:{sp:8.4,rng:14,err:.14,react:28},3:{sp:9.6,rng:15,err:.07,react:12}};
@@ -84,7 +84,7 @@ let mode=store.get('s3_mode','cpu'),level=+store.get('s3_lv',2),myCol=+store.get
 let P=[],ball,score=[0,0],clock=0,orbs=[],shake=0,frame=0,scoreT=0,lastScorer=0,orbT=0,camFX=0,touchS=null;
 const keys={};
 /* ---------- scene ---------- */
-const stage=A3.stage($('#cv'),{sky:['#1d2b7a','#7f4fd1','#ffb36b'],fog:0x9a62d0,fogNear:70,fogFar:220,fov:52});
+const stage=A3.stage($('#cv'),{sky:['#1d2b7a','#56a5d1','#ffb36b'],fog:0x9a62d0,fogNear:70,fogFar:220,fov:52});
 const sc=stage.sc,cam=stage.cam,FX=A3.particles(sc,220);
 function courtTex(){const c=document.createElement('canvas');c.width=1024;c.height=420;const g=c.getContext('2d');g.fillStyle='#c98a4b';g.fillRect(0,0,1024,420);
   for(let x=0;x<1024;x+=32){g.fillStyle=x%64?'rgba(120,70,25,.12)':'rgba(255,255,255,.05)';g.fillRect(x,0,32,420)}
@@ -194,7 +194,7 @@ function usePow(p){const w=p.power,o=P[1-p.t];p.power=null;shake=.2;tone(700,.15
   else if(w==='freeze'){o.stun=170;o.frz=170;popup('❄️ הקפאה!',o.x,o.y+2.6,o.z,'#9fe8ff');FX.burst(new V3(o.x,o.y+1,o.z),0xbff2ff,30,6)}
   else if(w==='bolt'){o.stun=60;popup('⚡ ברק!',o.x,o.y+2.6,o.z,'#ffe27a');FX.burst(new V3(o.x,o.y+1,o.z),0xffe27a,30,9);shake=.5;if(ball.owner===o){o.ball=false;takeBall(p)}}
   else if(w==='jump'){p.mega=420;popup('🦘 קפיצת על',p.x,p.y+2.6,p.z,'#7dff9a')}
-  else if(w==='giant'){rimT[p.t]=500;popup('🕳️ סל ענק!',p.x,p.y+2.6,p.z,'#c58bff')}}
+  else if(w==='giant'){rimT[p.t]=500;popup('🕳️ סל ענק!',p.x,p.y+2.6,p.z,'#91d7ff')}}
 function score_(t,pts,txt){if(state!=='play')return;const hx=(t?-1:1)*HOOPX;
   if(pts===2&&Math.abs(hx-P[t].x)>16&&!ball.fire)pts=3;if(ball.fire&&pts<3)pts=3;
   score[t]+=pts;lastScorer=t;state='scored';scoreT=110;ball.scored=true;shake=.7;popup(txt||('+'+pts+(pts===3?' שלשה!':'')),hx,RIMH+1.5,0,'#ffd05a');

@@ -9,8 +9,8 @@
   "orientation": "landscape",
   "lang": "he",
   "dir": "rtl",
-  "background_color": "#150d3a",
-  "theme_color": "#150d3a",
+  "background_color": "#113041",
+  "theme_color": "#113041",
   "categories": ["games", "sports"],
   "icons": [
     { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },

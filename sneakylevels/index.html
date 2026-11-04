@@ -8,7 +8,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>מסדרון הפתעות – אלון מידנברג</title>
 <meta name="description" content="150 שלבים ערמומיים – שום דבר הוא לא מה שהוא נראה.">
-<meta name="theme-color" content="#14102a">
+<meta name="theme-color" content="#12273d">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -16,15 +16,15 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;min-height:100%;background:#1a1038;color:#fff;font-family:system-ui,-apple-system,"Segoe UI",Arial,"Noto Sans Hebrew",sans-serif}
-body{background:radial-gradient(700px 500px at 80% -10%,#5b36d6 0,transparent 60%),radial-gradient(600px 500px at 0% 110%,#0f6b6b 0,transparent 55%),#1a1038;min-height:100vh;min-height:100dvh;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+html,body{margin:0;min-height:100%;background:#193552;color:#fff;font-family:system-ui,-apple-system,"Segoe UI",Arial,"Noto Sans Hebrew",sans-serif}
+body{background:radial-gradient(700px 500px at 80% -10%,#3e9fd6 0,transparent 60%),radial-gradient(600px 500px at 0% 110%,#0f6b6b 0,transparent 55%),#193552;min-height:100vh;min-height:100dvh;user-select:none;-webkit-user-select:none;touch-action:manipulation}
 main{max-width:520px;margin:0 auto;padding:max(12px,env(safe-area-inset-top)) 14px 24px}
 h1{margin:6px 0;font-size:30px;text-align:center}
 .sub{text-align:center;opacity:.75;margin:0 0 10px}
 .box{background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.12);border-radius:22px;padding:14px;margin:12px 0}
 .lb{opacity:.8;font-size:15px;margin-bottom:8px}
 .chips{display:flex;gap:8px;flex-wrap:wrap}
-.chip{flex:1;min-width:70px;padding:13px 6px;border-radius:16px;border:2px solid rgba(255,255,255,.18);background:#150a30;color:#fff;font:inherit;font-weight:800;font-size:17px;cursor:pointer}
+.chip{flex:1;min-width:70px;padding:13px 6px;border-radius:16px;border:2px solid rgba(255,255,255,.18);background:#112b46;color:#fff;font:inherit;font-weight:800;font-size:17px;cursor:pointer}
 .chip.on{background:#ffd05a;color:#2a1c00;border-color:#fff}
 .btn{display:block;width:100%;border:0;border-radius:18px;padding:15px;margin-top:12px;font:inherit;font-size:21px;font-weight:900;color:#06322b;background:linear-gradient(180deg,#5ff7d6,#1fc9a6);box-shadow:0 6px 0 #0d7a66;cursor:pointer}
 .btn:active{transform:translateY(3px);box-shadow:0 3px 0 #0d7a66}
@@ -33,15 +33,15 @@ h1{margin:6px 0;font-size:30px;text-align:center}
 .bar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
 .scr{display:none}.scr.show{display:block}
 .ov{position:fixed;inset:0;background:rgba(10,5,30,.82);display:none;align-items:center;justify-content:center;z-index:30;padding:16px}.ov.show{display:flex}
-.ovc{width:100%;max-width:380px;background:linear-gradient(160deg,#2c1b6a,#1a1038);border:2px solid rgba(255,255,255,.2);border-radius:26px;padding:22px;text-align:center}
+.ovc{width:100%;max-width:380px;background:linear-gradient(160deg,#2e639b,#193552);border:2px solid rgba(255,255,255,.2);border-radius:26px;padding:22px;text-align:center}
 .ovc h2{margin:0 0 6px;font-size:30px}
-body{overflow:hidden;position:fixed;inset:0;width:100%;background:#0d0826}
+body{overflow:hidden;position:fixed;inset:0;width:100%;background:#0e2338}
 #cv{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);display:block;touch-action:none}
 .ov{overflow:auto}.ovc{margin:auto}
 #hud{position:fixed;left:0;right:0;top:0;text-align:center;font-weight:900;font-size:22px;pointer-events:none;z-index:8;padding-top:max(8px,env(safe-area-inset-top));direction:ltr;text-shadow:0 2px 4px #000}
 .tb{position:fixed;bottom:max(10px,env(safe-area-inset-bottom));z-index:6;width:74px;height:74px;border-radius:50%;border:3px solid rgba(255,255,255,.5);background:rgba(20,12,60,.55);color:#fff;font-size:26px;font-weight:900;touch-action:none;display:none}
 .tb.on{background:rgba(255,160,40,.85)}
-#rot{position:fixed;inset:0;background:#120a2c;z-index:50;display:none;align-items:center;justify-content:center;text-align:center;font-size:24px;font-weight:800;padding:20px}@media (orientation:portrait) and (pointer:coarse){#rot{display:flex}}
+#rot{position:fixed;inset:0;background:#112840;z-index:50;display:none;align-items:center;justify-content:center;text-align:center;font-size:24px;font-weight:800;padding:20px}@media (orientation:portrait) and (pointer:coarse){#rot{display:flex}}
 </style>
 </head>
 <body>
@@ -136,8 +136,8 @@ function upd(){fr++;if(mt>0)mt--;tl--;if(tl<=0){die('לאט מדי!');return}
   if(lv>=NL){ls('sneak_lv','0');over('סיימתם את כל 150 השלבים!',NL,'מוות: '+deaths,100,1);return}load(lv);banner('שלב '+(lv+1))}}
 function drw(){
  ctx.fillStyle='#ffffff08';for(let x=0;x<W;x+=40)ctx.fillRect(x,0,1,H);for(let y=0;y<H;y+=40)ctx.fillRect(0,y,W,1);
- for(const s of L.s)if(s.on){for(let x=s.x;x<s.x+s.w;x+=40){const w=Math.min(40,s.x+s.w-x);for(let y=s.y;y<s.y+s.h;y+=40){ctx.fillStyle='#35306a';ctx.fillRect(x+1,y+1,w-2,Math.min(40,s.y+s.h-y)-2);ctx.fillStyle='#4a43a0';ctx.fillRect(x+1,y+1,w-2,5)}}}
- for(const b of L.dr){ctx.fillStyle='#35306a';ctx.fillRect(b.x,b.y,b.w,b.h);ctx.fillStyle='#ff5a6a';ctx.fillRect(b.x,b.y+b.h-6,b.w,6)}
+ for(const s of L.s)if(s.on){for(let x=s.x;x<s.x+s.w;x+=40){const w=Math.min(40,s.x+s.w-x);for(let y=s.y;y<s.y+s.h;y+=40){ctx.fillStyle='#2e639b';ctx.fillRect(x+1,y+1,w-2,Math.min(40,s.y+s.h-y)-2);ctx.fillStyle='#4a43a0';ctx.fillRect(x+1,y+1,w-2,5)}}}
+ for(const b of L.dr){ctx.fillStyle='#2e639b';ctx.fillRect(b.x,b.y,b.w,b.h);ctx.fillStyle='#ff5a6a';ctx.fillRect(b.x,b.y+b.h-6,b.w,6)}
  ctx.fillStyle='#ff4d6d';const sp=(x,w,h,y)=>{for(let i=0;i<w;i+=12){ctx.beginPath();ctx.moveTo(x+i,y);ctx.lineTo(x+i+6,y-h);ctx.lineTo(x+i+12,y);ctx.fill()}};
  for(const s of L.sp)if(s.on&&s.h>0)sp(s.x,s.w,s.h,GY);
  for(const m of L.mv){ctx.fillStyle='#ff8a3d';ctx.beginPath();ctx.moveTo(m.x,GY);ctx.lineTo(m.x+15,GY-20);ctx.lineTo(m.x+30,GY);ctx.fill()}
@@ -147,8 +147,8 @@ function drw(){
  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(p.x+7,p.y+4,5,0,7);ctx.fill();ctx.fillRect(p.x+5,p.y+8,4,8);ctx.fillRect(p.x+1,p.y+16,4,6);ctx.fillRect(p.x+9,p.y+16,4,6);
  T((tl/60).toFixed(1)+' ⏳',200,28,22,tl<180?'#ff5a6a':'#ffd23f');T(deaths+' ☠',W-50,28,22);T('שלב '+(lv+1)+'/'+NL,W/2,28,20,'#fff9');
  if(L.flip)T('↔ הפוך!',W/2,60,16,'#ff8a3d');
- if(mt>0){ctx.fillStyle='#ff2bd6';rr(W/2-130,H/2-80,260,56,28);ctx.fill();T(msg,W/2,H/2-52,26,'#fff')}}
-wire(start);run(upd,drw,'#14102a');
+ if(mt>0){ctx.fillStyle='#36b6ff';rr(W/2-130,H/2-80,260,56,28);ctx.fill();T(msg,W/2,H/2-52,26,'#fff')}}
+wire(start);run(upd,drw,'#12273d');
 const bt=document.createElement('div');bt.style.cssText='position:fixed;bottom:8px;left:0;right:0;display:flex;justify-content:space-between;padding:0 12px;pointer-events:none;z-index:5';
 bt.innerHTML='<div style="pointer-events:auto"><button data-k="ArrowLeft">◀</button><button data-k="ArrowRight">▶</button></div><div style="pointer-events:auto"><button data-k="Space">▲</button></div>';
 bt.querySelectorAll('button').forEach(b=>{b.style.cssText='width:64px;height:64px;margin:4px;border-radius:50%;border:0;font-size:24px;background:#ffffff30;color:#fff;touch-action:none';const k=b.dataset.k;b.addEventListener('pointerdown',e=>{e.preventDefault();key(k,1)});['pointerup','pointerleave','pointercancel'].forEach(v=>b.addEventListener(v,()=>key(k,0)))});

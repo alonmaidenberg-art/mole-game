@@ -656,5 +656,13 @@
     "url": "hoops3/",
     "icon": "hoops3/icons/icon-192.png",
     "tag": "ספורט"
+  },
+  {
+    "id": "wormio",
+    "name": "נחש נגד תולעים",
+    "description": "זירה ענקית עם תולעים צבעוניות: אכלו נקודות אור, גדלו, האיצו ואל תיפגעו בגוף של האחרות.",
+    "url": "wormio/",
+    "icon": "wormio/icons/icon-192.png",
+    "tag": "ארקייד"
   }
 ]

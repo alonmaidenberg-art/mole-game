@@ -32,7 +32,7 @@
   /* ---------- new best: confetti + toast + small reward ---------- */
   function confetti(){
     var c=document.createElement('canvas');c.style.cssText='position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:2147483500';
-    c.width=innerWidth;c.height=innerHeight;document.body.appendChild(c);var x=c.getContext('2d'),P=[],cols=['#ff5a6a','#ffd23f','#3ddc97','#4da8ff','#c07bff'];
+    c.width=innerWidth;c.height=innerHeight;document.body.appendChild(c);var x=c.getContext('2d'),P=[],cols=['#ff5a6a','#ffd23f','#3ddc97','#4da8ff','#82d2ff'];
     for(var i=0;i<90;i++)P.push({x:c.width/2,y:c.height*.35,vx:(Math.random()-.5)*14,vy:-Math.random()*13-3,c:cols[i%5],s:5+Math.random()*6,r:Math.random()*6});
     var n=0;(function f(){x.clearRect(0,0,c.width,c.height);P.forEach(function(p){p.x+=p.vx;p.y+=p.vy;p.vy+=.35;p.r+=.2;x.fillStyle=p.c;x.save();x.translate(p.x,p.y);x.rotate(p.r);x.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);x.restore()});
       if(++n<100)raf(f);else c.remove()})();

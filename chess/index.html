@@ -8,7 +8,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>שחמט – אלון מידנברג</title>
 <meta name="description" content="שחמט מלא: נגד המחשב ב-4 רמות, או שני שחקנים. הצרחה, אן-פסאן, המרה ותיקו.">
-<meta name="theme-color" content="#1d1636">
+<meta name="theme-color" content="#17324e">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/svg+xml" href="icons/chess.svg">
 <link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png">
@@ -17,8 +17,8 @@
 <meta name="mobile-web-app-capable" content="yes">
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;min-height:100%;background:#17102e;color:#fff;font-family:system-ui,-apple-system,"Segoe UI",Arial,"Noto Sans Hebrew",sans-serif}
-body{background:radial-gradient(800px 500px at 80% -10%,#4b2fb3 0,transparent 60%),#17102e;min-height:100vh}
+html,body{margin:0;min-height:100%;background:#142b44;color:#fff;font-family:system-ui,-apple-system,"Segoe UI",Arial,"Noto Sans Hebrew",sans-serif}
+body{background:radial-gradient(800px 500px at 80% -10%,#3686b3 0,transparent 60%),#142b44;min-height:100vh}
 main{max-width:640px;margin:0 auto;padding:max(10px,env(safe-area-inset-top)) 10px 18px;display:flex;flex-direction:column;gap:8px}
 .top{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .top h1{margin:0;font-size:20px}
@@ -33,7 +33,7 @@ main{max-width:640px;margin:0 auto;padding:max(10px,env(safe-area-inset-top)) 10
 .pl{display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;opacity:.9}
 .pl i{width:12px;height:12px;border-radius:50%;display:inline-block;border:2px solid #fff6}
 #boardWrap{width:100%;display:flex;justify-content:center}
-#board{direction:ltr;display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:repeat(8,1fr);width:min(100%,calc(100vh - 250px),620px);min-width:260px;aspect-ratio:1;border-radius:10px;overflow:hidden;box-shadow:0 8px 30px #0008;border:3px solid #3a2a78}
+#board{direction:ltr;display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:repeat(8,1fr);width:min(100%,calc(100vh - 250px),620px);min-width:260px;aspect-ratio:1;border-radius:10px;overflow:hidden;box-shadow:0 8px 30px #0008;border:3px solid #336986}
 .sq{position:relative;min-height:0;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:min(10.5vw,60px);line-height:1;cursor:pointer;user-select:none;touch-action:manipulation}
 @media(min-width:640px){.sq{font-size:58px}}
 .sq.l{background:#efd9b5}.sq.d{background:#b58863}
@@ -46,12 +46,12 @@ main{max-width:640px;margin:0 auto;padding:max(10px,env(safe-area-inset-top)) 10
 .sq .co.r{top:2px;left:3px}.sq .co.f{bottom:1px;right:3px}
 .pc{font-family:"Segoe UI Symbol","Noto Sans Symbols 2","Noto Sans Symbols","DejaVu Sans","Apple Symbols",sans-serif;font-variant-emoji:text;pointer-events:none}
 .pc.w{color:#fff;text-shadow:0 0 2px #000,0 0 2px #000,0 1px 1px #000,1px 0 1px #000,-1px 0 1px #000}
-.pc.b{color:#16121f;text-shadow:0 0 1px #fff7}
+.pc.b{color:#0e1d2e;text-shadow:0 0 1px #fff7}
 .moves{direction:ltr;display:flex;gap:10px;overflow-x:auto;padding:6px 4px;background:rgba(255,255,255,.07);border-radius:10px;font-size:14px;min-height:34px;white-space:nowrap}
 .moves span b{opacity:.55;margin-right:4px;font-weight:700}
 .ov{position:fixed;inset:0;background:rgba(10,6,28,.9);z-index:20;display:none;align-items:center;justify-content:center;padding:14px;overflow:auto}
 .ov.show{display:flex}
-.card{width:100%;max-width:420px;background:#2a1f55;border:2px solid rgba(255,255,255,.14);border-radius:22px;padding:18px;text-align:center}
+.card{width:100%;max-width:420px;background:#254f7c;border:2px solid rgba(255,255,255,.14);border-radius:22px;padding:18px;text-align:center}
 .card h2{margin:0 0 6px;font-size:28px}.card p{margin:6px 0;opacity:.85}
 .lbl{font-size:13px;opacity:.75;margin:12px 0 6px}
 .row{display:flex;flex-wrap:wrap;gap:7px;justify-content:center}
@@ -225,7 +225,7 @@ function render(){
   else{topEl.appendChild(fmt(capByWhite,'b',mat));botEl.appendChild(fmt(capByBlack,'w',-mat))}
   const label=(col)=>{const me=mode==='cpu'?(col===human?'אתה':'המחשב'):(col===1?'שחקן 1':'שחקן 2');return (col===1?'לבן':'שחור')+' · '+me+(mode==='cpu'&&col!==human?' ('+['','קל','בינוני','קשה','מקצוען'][level]+')':'')}
   const topC=flipped?1:-1,botC=-topC;
-  const pl=(el,col)=>{el.innerHTML='<i style="background:'+(col===1?'#fff':'#16121f')+'"></i>'+label(col)};
+  const pl=(el,col)=>{el.innerHTML='<i style="background:'+(col===1?'#fff':'#0e1d2e')+'"></i>'+label(col)};
   pl($('#topPl'),topC);pl($('#botPl'),botC);
   // status
   const s=STAT(st),el=$('#status');el.className='status';

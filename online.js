@@ -147,7 +147,7 @@
   var tEl=null;
   function toast(t,btns){
     if(tEl)tEl.remove();tEl=document.createElement('div');
-    tEl.style.cssText='position:fixed;z-index:2147483640;left:50%;top:12%;transform:translateX(-50%);background:#2b1b6e;color:#fff;border:2px solid #ffd23f;border-radius:18px;padding:12px 16px;font:700 16px system-ui,Arial,sans-serif;text-align:center;box-shadow:0 8px 30px #000a;max-width:90vw';
+    tEl.style.cssText='position:fixed;z-index:2147483640;left:50%;top:12%;transform:translateX(-50%);background:#2e66a0;color:#fff;border:2px solid #ffd23f;border-radius:18px;padding:12px 16px;font:700 16px system-ui,Arial,sans-serif;text-align:center;box-shadow:0 8px 30px #000a;max-width:90vw';
     tEl.textContent=t;(btns||[]).forEach(function(b){var x=document.createElement('button');x.textContent=b[0];x.style.cssText='margin:8px 4px 0;padding:8px 14px;border-radius:12px;border:0;font:800 15px system-ui,Arial;background:'+(b[2]||'#ffd23f')+';color:#222;cursor:pointer';x.onclick=function(){tEl.remove();tEl=null;b[1]()};tEl.appendChild(x)});
     document.body.appendChild(tEl);if(!btns)setTimeout(function(){if(tEl){tEl.remove();tEl=null}},2600)}
   function showChal(m){
