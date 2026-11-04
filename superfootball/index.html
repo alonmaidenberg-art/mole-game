@@ -75,7 +75,7 @@ const gw=[GW0,GW0],gT=[0,0];
 const COLS=['#e8433f','#2f7bff','#27b36a','#f2b400','#a14bff','#ff7a1a'];
 const POW={super:{e:'🦸',n:'סופרמן'},fire:{e:'🔥',n:'בעיטת אש'},freeze:{e:'❄️',n:'הקפאה'},bolt:{e:'⚡',n:'ברק'},jump:{e:'🦘',n:'קפיצת על'},giant:{e:'🥅',n:'שער ענק'}};
 const PK=Object.keys(POW);
-const LVL={1:{sp:6.8,rng:15,err:.26,react:55},2:{sp:8.2,rng:17,err:.15,react:30},3:{sp:9.6,rng:19,err:.07,react:14}};
+const LVL={1:{sp:5.6,rng:15,err:.26,react:55},2:{sp:6.8,rng:17,err:.15,react:30},3:{sp:7.9,rng:19,err:.07,react:14}};
 const randn=()=>{let u=0,v=0;while(!u)u=Math.random();while(!v)v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)};
 const rnd=(a,b)=>a+Math.random()*(b-a),clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 let mode=store.get('f3_mode','cpu'),level=+store.get('f3_lv',2),myCol=+store.get('f3_col',0),state='menu',paused=false,over=false;
@@ -128,7 +128,7 @@ function ai(p){const o=P[1-p.t],c=p.c,L=LVL[level];Object.assign(p.pc,c);c.x=c.z
   if(db>1.5||!own){ // go to a point behind the ball (so we push it toward the goal)
     const tx=ball.x-sg*1.1,tz=ball.z*.9;moveTo(c,p,db>6?ball.x-sg*1.4:tx,db>6?ball.z:tz,.4)}
   else{moveTo(c,p,hx,ball.z*.4+(p.z)*.3,.5);if(dg<L.rng+2){p.aiW++;if(p.aiW>L.react){if(!p.aiTarget)p.aiTarget=.85+(Math.random()*2-1)*L.err;c.s=p.charge<p.aiTarget?1:0}}}
-  if(db<2.5&&Math.hypot(o.x-p.x,o.z-p.z)<3&&Math.random()<.03)c.g=1;if(ball.y>1.5&&db<4&&Math.random()<.08)c.j=1;if(db>1.5)p.aiW=0;
+  if(ball.y>1.5&&db<4&&Math.random()<.08)c.j=1;if(db>1.5)p.aiW=0;
   if(p.power&&Math.random()<.02){const w=p.power,od=Math.hypot(o.x-p.x,o.z-p.z);if((w==='super'||w==='fire'||w==='giant')&&db<3)c.p=1;else if((w==='freeze'||w==='bolt')&&od<14)c.p=1;else if(w==='jump')c.p=1}}
 const DT=1/60;
 function stepP(p){const c=p.c,pc=p.pc,o=P[1-p.t];p.py=p.y;
@@ -149,10 +149,10 @@ function stepP(p){const c=p.c,pc=p.pc,o=P[1-p.t];p.py=p.y;
   if(c.s&&!pc.s&&near)p.charge=.001;
   if(p.charge>0){if(c.s){p.charge+=.024;if(p.charge>=1.05)kick(p,p.charge)}else kick(p,p.charge)}
   // dribble: touching the ball pushes it along
-  if(p.charge<=0&&ball.lock<=0&&bd<.95&&Math.abs(ball.y-(p.y+.45))<1.4&&p.stun<=0){const nx=(ball.x-p.x)/(bd||1),nz=(ball.z-p.z)/(bd||1),sp=Math.hypot(p.vx,p.vz);
+  if(p.charge<=0&&ball.lock<=0&&!(!p.human&&o.human&&Math.hypot(o.x-ball.x,o.z-ball.z)<1.6&&Math.random()<.85)&&bd<.95&&Math.abs(ball.y-(p.y+.45))<1.4&&p.stun<=0){const nx=(ball.x-p.x)/(bd||1),nz=(ball.z-p.z)/(bd||1),sp=Math.hypot(p.vx,p.vz);
     const into=(p.vx*nx+p.vz*nz);if(into>-1){ball.vx=p.vx*1.18+nx*2.2;ball.vz=p.vz*1.18+nz*2.2;if(sp>14){ball.vx*=1.1;ball.vz*=1.1}ball.last=p;
       if(!p.ground&&p.y>.6&&ball.y>1.0){ball.vx+=Math.cos(p.face)*7;ball.vz-=Math.sin(p.face)*7;ball.vy=Math.max(ball.vy,4);popup('נגיחה!',p.x,p.y+2.5,p.z,'#fff');tone(250,.08)}}}
-  if(p.dash>0&&bd<1.3&&Math.hypot(o.x-ball.x,o.z-ball.z)<2){ball.vx=Math.cos(p.face)*16;ball.vz=-Math.sin(p.face)*16;ball.last=p}}
+  if(p.human&&p.dash>0&&bd<1.3&&Math.hypot(o.x-ball.x,o.z-ball.z)<2){ball.vx=Math.cos(p.face)*16;ball.vz=-Math.sin(p.face)*16;ball.last=p}}
 function kick(p,q){q=clamp(q,0,1.05);p.charge=0;p.aiTarget=0;p.aiW=0;p.kickT=16;const hx=(p.t?-1:1)*FXL,sg=Math.sign(hx);
   const bd=Math.hypot(ball.x-p.x,ball.z-p.z);if(bd>2.1)return;
   const fa=p.face;
