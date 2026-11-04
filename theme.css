@@ -63,3 +63,28 @@ html[data-th="sun"]:has(#grid)::before{background:rgba(255,226,190,.9)}
 html[data-th="candy"]:has(#grid)::before{background:rgba(255,214,236,.9)}
 html:has(#grid) main{padding-top:calc(max(28px,env(safe-area-inset-top)) + 36px)!important}
 html[data-th="night"] .sec,html[data-th="night"] h1+p,html[data-th="night"] footer,html[data-th="night"] .stat,html[data-th="night"] header p,html[data-th="night"] .t,html[data-th="night"] .d{color:#e8f2ff!important}
+/* ===== Liquid glass ===== */
+:root{--glass:linear-gradient(135deg,rgba(255,255,255,.62),rgba(255,255,255,.22));--gb:1px solid rgba(255,255,255,.75);--gs:inset 0 1.5px 0 rgba(255,255,255,.95),inset 0 -1.5px 0 rgba(255,255,255,.25),inset 0 0 18px rgba(255,255,255,.18),0 12px 32px rgba(10,120,130,.2),0 2px 6px rgba(0,0,0,.05);--spring:cubic-bezier(.2,.9,.3,1.25)}
+body{background-attachment:fixed!important}
+a.card,.box,.ovc,.mc,#ag-panel{background:var(--glass)!important;border:var(--gb)!important;box-shadow:var(--gs)!important;backdrop-filter:blur(20px) saturate(1.7)!important;-webkit-backdrop-filter:blur(20px) saturate(1.7)!important;border-radius:26px!important}
+a.card{border-radius:22px!important;transition:transform .35s var(--spring),box-shadow .3s,background .3s!important}
+a.card:hover,a.card:focus-visible{background:linear-gradient(135deg,rgba(255,255,255,.85),rgba(255,255,255,.4))!important;transform:translateY(-4px) scale(1.015)!important;border-color:#fff!important}
+a.card:active{transform:scale(.98)!important}
+a.card img{border-radius:16px!important;box-shadow:0 6px 14px rgba(10,100,120,.25),inset 0 0 0 1px rgba(255,255,255,.4)}
+.chip,#chips button,.sr,.wal span,.ib,.key,#cmpB,.daily button:not(#dailyB),.btn.alt,.mb.alt{background:var(--glass)!important;border:var(--gb)!important;box-shadow:var(--gs)!important;backdrop-filter:blur(14px) saturate(1.6)!important;-webkit-backdrop-filter:blur(14px) saturate(1.6)!important;transition:transform .3s var(--spring),box-shadow .25s!important}
+.chip:hover,#chips button:hover,.daily button:hover{transform:translateY(-2px) scale(1.04)}
+.chip:active,#chips button:active{transform:scale(.95)}
+.chip.on,#chips button.on{background:linear-gradient(180deg,#ffe9a3,#ffc93d)!important;box-shadow:inset 0 1.5px 0 rgba(255,255,255,.95),0 6px 16px rgba(255,170,0,.4)!important;color:#4a3300!important}
+.btn:not(.alt),.mb:not(.alt){background:linear-gradient(180deg,#7ff3dd 0%,#27cdb2 55%,#14b39a 100%)!important;border:1px solid rgba(255,255,255,.7)!important;box-shadow:inset 0 2px 0 rgba(255,255,255,.7),inset 0 -3px 6px rgba(0,90,80,.25),0 10px 24px rgba(10,160,140,.38)!important;border-radius:20px!important;transition:transform .3s var(--spring),box-shadow .25s!important;text-shadow:0 1px 2px rgba(0,80,70,.35)}
+.btn:not(.alt):hover,.mb:not(.alt):hover{transform:translateY(-2px) scale(1.015)}
+.btn:not(.alt):active,.mb:not(.alt):active{transform:translateY(2px) scale(.985);box-shadow:inset 0 2px 0 rgba(255,255,255,.5),0 4px 10px rgba(10,160,140,.3)!important}
+#dailyB{box-shadow:inset 0 2px 0 rgba(255,255,255,.8),0 8px 20px rgba(255,170,0,.4)!important;border:1px solid rgba(255,255,255,.7)!important}
+.tag{background:linear-gradient(180deg,#7ff3dd,#27cdb2)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.8)}
+a[aria-label="חזרה לכל המשחקים"],button[aria-label="online"],button[aria-label="fun modes"],button[aria-label="shop"],button[aria-label="fullscreen"],button[aria-label="admin"],#ag-lang{background:var(--glass)!important;border:var(--gb)!important;box-shadow:var(--gs)!important;backdrop-filter:blur(14px)!important;-webkit-backdrop-filter:blur(14px)!important}
+html:has(#grid)::before{background:linear-gradient(180deg,rgba(255,255,255,.55),rgba(255,255,255,.2))!important;backdrop-filter:blur(18px) saturate(1.6)!important;border-bottom:1px solid rgba(255,255,255,.6);box-shadow:0 6px 24px rgba(10,120,130,.12)!important}
+.ov{background:rgba(190,250,240,.55)!important;backdrop-filter:blur(14px) saturate(1.4)!important;-webkit-backdrop-filter:blur(14px) saturate(1.4)!important}
+body:not(:has(canvas))::after{content:'';position:fixed;inset:-20%;z-index:-1;pointer-events:none;background:radial-gradient(40% 35% at 20% 25%,rgba(255,255,255,.55),transparent 70%),radial-gradient(35% 40% at 80% 70%,rgba(80,220,255,.35),transparent 70%),radial-gradient(30% 30% at 60% 15%,rgba(160,255,225,.45),transparent 70%);animation:agblob 18s ease-in-out infinite alternate}
+@keyframes agblob{to{transform:translate(3%,2%) scale(1.08)}}
+html.ag-amb,html.ag-amb body{background:#06223a!important}
+#ag-amb{position:fixed;inset:-6%;width:112%;height:112%;z-index:-1;filter:blur(36px) saturate(1.5) brightness(.9);pointer-events:none}
+html[data-th="night"] a.card,html[data-th="night"] .box,html[data-th="night"] .ovc{background:linear-gradient(135deg,rgba(255,255,255,.14),rgba(255,255,255,.05))!important;border-color:rgba(255,255,255,.22)!important}

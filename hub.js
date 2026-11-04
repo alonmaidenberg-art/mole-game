@@ -70,7 +70,7 @@
   var sc=document.currentScript;var base=new URL('./',sc&&sc.src?sc.src:location.href).href;
   if(LANG==='en'){var s=document.createElement('script');s.src=base+'i18n.js';(document.head||document.documentElement).appendChild(s)}
   var isHub=(location.pathname.replace(/index\.html$/,'')===new URL(base).pathname);
-  if(!/\/boss\//.test(location.pathname)){var tl=document.createElement('link');tl.rel='stylesheet';tl.href=base+'theme.css?v=9';(document.head||document.documentElement).appendChild(tl)}
+  if(!/\/boss\//.test(location.pathname)){var tl=document.createElement('link');tl.rel='stylesheet';tl.href=base+'theme.css?v=10';(document.head||document.documentElement).appendChild(tl)}
   var adm=false;try{adm=localStorage.getItem('ag_adm')!==null&&window.AG&&AG.isAdmin()}catch(e){}
   if(!isHub||(window.AG&&AG.isAdmin&&AG.isAdmin())){var fx=document.createElement('script');fx.src=base+'fx.js';(document.head||document.documentElement).appendChild(fx)}
   if(!/\/boss\//.test(location.pathname)){var sh=document.createElement('script');sh.src=base+'shop.js?v=1';(document.head||document.documentElement).appendChild(sh)}
@@ -118,4 +118,16 @@
   function go(){setTimeout(fix,60);setTimeout(fix,900)}
   if(document.readyState!=='loading')go();else addEventListener('DOMContentLoaded',go);
   addEventListener('load',go);
+})();
+
+/* ambient glow behind letterboxed canvases: no black bars (c) Alon Maidenberg 2026 */
+(function(){
+  if(/\/boss\//.test(location.pathname))return;
+  var am=null,cx=null,iv=null,cv=null;
+  function check(){cv=document.querySelector('#cv');if(!cv||!cv.getContext)return;var r=cv.getBoundingClientRect();var bars=r.width>0&&(r.width<innerWidth-6||r.height<innerHeight-6);
+    if(bars&&!am){am=document.createElement('canvas');am.id='ag-amb';am.width=64;am.height=36;cx=am.getContext('2d');document.documentElement.classList.add('ag-amb');document.body.insertBefore(am,document.body.firstChild);
+      iv=setInterval(function(){try{if(cv.width>0)cx.drawImage(cv,0,0,64,36)}catch(e){}},120)}
+    else if(!bars&&am){clearInterval(iv);am.remove();am=null;document.documentElement.classList.remove('ag-amb')}}
+  function go(){check();setInterval(check,1500);addEventListener('resize',check)}
+  if(document.readyState==='complete')go();else addEventListener('load',go)
 })();

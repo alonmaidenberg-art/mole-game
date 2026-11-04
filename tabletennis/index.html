@@ -1,14 +1,14 @@
 <!doctype html>
 <html lang="he" dir="rtl">
 <head>
-<meta name="author" content="Alon Maidenberg - אלון מידנברג"><meta name="copyright" content="© 2026 אלון מידנברג. כל הזכויות שמורות.">
-<!-- © 2026 Alon Maidenberg (אלון מידנברג). All rights reserved. Copying, republishing or modifying this game without written permission is not allowed. -->
 <meta name="robots" content="noai, noimageai">
+<meta name="author" content="Alon Maidenberg - אלון מידנברג"><meta name="copyright" content="© 2026 אלון מידנברג. כל הזכויות שמורות.">
+
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>פינג-פונג – אלון מידנברג</title>
-<meta name="description" content="נצחו את המחשב בפינג-פונג.">
-<meta name="theme-color" content="#0c2a1a">
+<meta name="description" content="נצחו את המחשב בפינג-פונג אמיתי עם מחבטים, רשת וסיבוב.">
+<meta name="theme-color" content="#0b3d4f">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -47,7 +47,7 @@ body{overflow:hidden;position:fixed;inset:0;width:100%;background:#0e2338}
 <body>
 <canvas id="cv"></canvas><div id="hud"></div>
 <div id="rot">📱↔️<br>סובבו את הטלפון לרוחב</div>
-<div class="ov show" id="menu"><div class="ovc" style="max-width:440px"><div style="font-size:56px">🏓</div><h2>פינג-פונג</h2><div class="lb">הזיזו את המחבט (גרירה / חצים). הראשון שמגיע ל-7 נקודות מנצח. כל ניצחון מעלה את רמת המחשב!</div><button class="btn" id="go">▶ שחק</button><div style="opacity:.8;margin-top:10px;font-size:15px">שיא: <b id="best">0</b></div></div></div>
+<div class="ov show" id="menu"><div class="ovc" style="max-width:440px"><div style="font-size:56px">🏓</div><h2>פינג-פונג</h2><div class="lb">הזיזו את המחבט ימינה ושמאלה (גרירה / חצים), והחזירו את הכדור אחרי שהוא קופץ אצלכם. המחשב משתפר בכל ניצחון! הראשון ל-7 נקודות.</div><button class="btn" id="go">▶ שחק</button><div style="opacity:.8;margin-top:10px;font-size:15px">שיא: <b id="best">0</b></div></div></div>
 <div class="ov" id="end"><div class="ovc"><h2 id="eT">נגמר</h2><div style="font-size:48px;font-weight:900;color:#ffd05a" id="eS"></div><p id="eM"></p><button class="btn" id="again">🔁 שוב</button><button class="btn alt" id="menu2">תפריט</button></div></div>
 <script>
 'use strict';
@@ -73,20 +73,97 @@ function run(upd,drw,bg){let last=performance.now(),acc=0;function l(n){requestA
 function wire(start){$('#go').onclick=()=>{$('#menu').classList.remove('show');start();on=true};$('#again').onclick=()=>{$('#end').classList.remove('show');start();on=true};$('#menu2').onclick=()=>{on=false;$('#end').classList.remove('show');$('#menu').classList.add('show')}}
 function over(title,score,msg,coins,dia,delay=600){on=false;window.__show=true;saveBest(score);setTimeout(()=>endGame(title,score,msg,coins,dia),delay)}
 
-let py,ay,bx,by,vx,vy,ps,as,lvl,sc;
-function serve(d){bx=W/2;by=H/2;const s=5+lvl*.5;vx=s*d;vy=rnd(-3,3)}
-function start(){py=H/2;ay=H/2;ps=0;as=0;lvl=0;sc=0;serve(1)}
-cv.addEventListener('pointermove',e=>{py=cpos(e).y});cv.addEventListener('pointerdown',e=>{py=cpos(e).y});
-function upd(){if(keys.ArrowUp||keys.KeyW)py-=8;if(keys.ArrowDown||keys.KeyS)py+=8;py=clamp(py,40,H-40);
-  const sp=2.4+lvl*.6;ay+=clamp(by-ay,-sp,sp);ay=clamp(ay,40,H-40);bx+=vx;by+=vy;if(by<8||by>H-8){vy*=-1;by=clamp(by,8,H-8)}
-  if(vx<0&&bx<34&&bx>16&&Math.abs(by-py)<46){vx=Math.abs(vx)*1.05;vy+=(by-py)*.12;tone(500,.04)}
-  if(vx>0&&bx>W-34&&bx<W-16&&Math.abs(by-ay)<46){vx=-Math.abs(vx)*1.05;vy+=(by-ay)*.12;tone(400,.04)}
-  vy=clamp(vy,-9,9);
-  if(bx<0){as++;tone(130,.3);if(as>=7){over('המחשב ניצח',sc,ps+':'+as,Math.floor(sc/10),lvl>=2?1:0);return}serve(1)}
-  if(bx>W){ps++;sc+=10;tone(900,.2);if(ps>=7){sc+=50;lvl++;ps=0;as=0}serve(-1)}}
-function drw(){ctx.fillStyle='#ffffff30';for(let y=0;y<H;y+=30)ctx.fillRect(W/2-2,y,4,16);ctx.fillStyle='#fff';rr(14,py-40,10,80,5);ctx.fill();rr(W-24,ay-40,10,80,5);ctx.fill();ctx.beginPath();ctx.arc(bx,by,8,0,7);ctx.fill();
-  T(ps+'',W/2-60,40,40);T(as+'',W/2+60,40,40);T('רמה '+(lvl+1),W/2,H-20,16,'#fff9')}
-wire(start);run(upd,drw,'#0c2a1a');window.__s={step:upd,start:()=>{start();on=true},get on(){return on},get score(){return sc},get by(){return by},get bx(){return bx},set py(v){py=v},get ps(){return ps},get lvl(){return lvl}};
+const G=.0022;
+let px,pvx,cx,ps,as,lvl,sc,ball,L,bnc,phase,pt,srv,swing,cswing,msg,mt,trail,tpx;
+const lerp=(a,b,t)=>a+(b-a)*t;
+const gy=y=>128+250*y, hw=y=>(120+200*y)*.92, kk=y=>hw(y);
+function P(x,y,h){return{x:W/2+x*hw(y),y:gy(y)-h*kk(y),s:kk(y)}}
+function launch(by,fy,tx,ty,T,hit){// aim ball from (bx,by,h) so it first lands at (tx,ty) after T frames
+  const b=ball;b.vx=(tx-b.x)/T;b.vy=(ty-b.y)/T;b.vh=(.5*G*T*T-b.h)/T;L=hit;bnc=[0,0];b.ok=true}
+function start(){px=0;pvx=0;tpx=0;cx=0;ps=0;as=0;lvl=0;sc=0;trail=[];msg='';mt=0;newPoint(0)}
+function newPoint(who){srv=who;phase='serve';pt=0;ball={x:who?cx:px,y:who?.04:1.0,h:.25,vx:0,vy:0,vh:0};L=-1;bnc=[0,0];trail=[]}
+cv.addEventListener('pointermove',e=>{tpx=clamp((cpos(e).x-W/2)/hw(1),-1.15,1.15)});cv.addEventListener('pointerdown',e=>{tpx=clamp((cpos(e).x-W/2)/hw(1),-1.15,1.15);if(phase==='serve'&&srv===0)serveP()});
+addEventListener('keydown',e=>{if(e.code==='Space'&&phase==='serve'&&srv===0)serveP()});
+function serveP(){swing=12;ball.x=px;ball.y=1.0;ball.h=.25;launch(1,1,rnd(-.5,.5),rnd(.2,.35),42,0);phase='play';tone(520,.05,'square',.08)}
+function serveC(){cswing=12;ball.x=cx;ball.y=.04;ball.h=.25;launch(0,0,rnd(-.6,.6),rnd(.65,.8),44-lvl,1);phase='play';tone(400,.05,'square',.08)}
+function score(w,why){if(w===0){ps++;sc+=10;tone(900,.2)}else{as++;tone(130,.3)}msg=(w===0?'נקודה! ':'נקודה למחשב ')+why;mt=70;phase='dead';pt=0;
+  if(ps>=7){sc+=50;lvl++;ps=0;as=0;msg='עולים רמה! 🔥';mt=90}else if(as>=7){over('המחשב ניצח',sc,'רמה '+(lvl+1)+' · '+ps+':'+as,Math.floor(sc/10),lvl>=2?1:0);return}
+  srv=1-w}
+function upd(){if(!isFinite(tpx))tpx=0;if(!isFinite(px))px=0;
+  const kx=(keys.ArrowRight||keys.KeyD?1:0)-(keys.ArrowLeft||keys.KeyA?1:0);if(kx)tpx=clamp(tpx+kx*.035,-1.15,1.15);
+  const op=px;px+=clamp(tpx-px,-.09,.09);pvx=px-op;if(swing>0)swing--;if(cswing>0)cswing--;if(mt>0)mt--;
+  const csp=.011+lvl*.0035;
+  if(phase==='serve'){pt++;ball.x=srv?cx:px;ball.y=srv?.04:1.0;ball.h=.25+Math.sin(pt*.1)*.03;if(srv===1){cx+=clamp(rnd(-.4,.4)-cx,-.01,.01);if(pt>70)serveC()}else if(pt>400)serveP();return}
+  if(phase==='dead'){pt++;ball.vh-=G;ball.h+=ball.vh;ball.x+=ball.vx*.5;ball.y+=ball.vy*.5;if(ball.h<0){ball.h=0;ball.vh=Math.abs(ball.vh)*.5}if(pt>70){newPoint(srv)}return}
+  const b=ball;trail.push({x:b.x,y:b.y,h:b.h});if(trail.length>9)trail.shift();
+  // cpu movement
+  let tgt=0;if(b.vy<0||b.y<.5){const t=Math.max(0,(b.y-.02)/Math.max(.004,-b.vy));tgt=clamp(b.x+b.vx*t*.9+Math.sin(pt*.05)*.0,-1.1,1.1)}
+  cx+=clamp(tgt-cx,-csp,csp);pt++;
+  const py=b.y;b.x+=b.vx;b.y+=b.vy;b.h+=b.vh;b.vh-=G;
+  // net
+  if((py-.5)*(b.y-.5)<=0&&b.h<.2){b.vy*=-.2;b.vx*=.3;score(L===0?1:0,'הכדור פגע ברשת');return}
+  // table bounce
+  const on=Math.abs(b.x)<=1&&b.y>=0&&b.y<=1;
+  if(b.h<=0&&b.vh<0){if(on){b.h=0;b.vh=-b.vh*.82;const side=b.y<.5?1:0;tone(260+side*40,.04,'sine',.08);
+      // side: 1 = cpu half, 0 = player half
+      const mine=(L===0?1:0);// half belonging to hitter's opponent? hitter 0 hits to cpu half(side1)
+      const oppSide=L===0?1:0;
+      if(side===oppSide){bnc[1]++;if(bnc[1]>=2){score(L,'שני קפיצות אצל היריב');return}}
+      else{score(L===0?1:0,L===0?'הכדור נחת בצד שלך':'הכדור נחת בצד שלו');return}}
+    else if(b.h<-.02){// off table
+      const opp=L===0?1:0;if(bnc[1]>=1)score(L,'הכדור יצא');else score(1-L,'הכדור יצא');return}}
+  // player hit
+  if(L===1&&b.vy>0&&b.y>.9&&b.y<1.2&&b.h<.6&&bnc[1]>=1&&Math.abs(b.x-px)<.3){
+    const sp=Math.abs(pvx)*20;const T=Math.round(clamp(46-sp*2,34,48));swing=14;
+    const tx=clamp((b.x-px)*-1.6+pvx*5+rnd(-.1,.1),-.85,.85),ty=clamp(.2+rnd(0,.16)-Math.abs(pvx)*.5,.1,.4);
+    b.h=Math.max(.05,b.h);launch(b.y,b.y,tx,ty,T,0);tone(560,.05,'square',.09);return}
+  // cpu hit
+  if(L===0&&b.vy<0&&b.y<.12&&b.y>-.08&&b.h<.6&&bnc[1]>=1&&Math.abs(b.x-cx)<.28+lvl*.025){
+    if(Math.random()<.12-lvl*.025&&!ball.cpuMiss){ball.cpuMiss=1}
+    if(!ball.cpuMiss){cswing=14;const T=Math.round(clamp(46-lvl*2,34,46));const tx=clamp(rnd(-.8,.8),-.85,.85),ty=rnd(.62,.84);b.h=Math.max(.05,b.h);launch(b.y,b.y,tx,ty,T,1);tone(430,.05,'square',.09);return}}
+  if(b.y<-.5||b.y>1.6||b.h<-.8){score(L===0?(bnc[1]>=1?0:1):(bnc[1]>=1?1:0),'פספוס')}
+}
+function paddleD(x,y,h,col,face,sw,flip){const q=P(x,y,h),r=q.s*(flip?.14:.17);ctx.save();ctx.translate(q.x,q.y);ctx.rotate((sw>0?(sw/14)*(flip?.9:-.9):0)+(flip?0:pvx*1.2));
+  ctx.fillStyle='rgba(0,0,0,.28)';ctx.beginPath();ctx.ellipse(6,q.s*.3,r*.9,r*.28,0,0,7);ctx.fill();
+  ctx.fillStyle='#c98a4d';rr(-r*.16,r*.7,r*.32,r*.95,r*.1);ctx.fill();ctx.fillStyle='#a56d35';ctx.fillRect(-r*.16,r*1.25,r*.32,r*.1);
+  ctx.fillStyle='#e8d2a8';ctx.beginPath();ctx.arc(0,0,r*1.06,0,7);ctx.fill();
+  const g=ctx.createRadialGradient(-r*.3,-r*.35,r*.1,0,0,r);g.addColorStop(0,face[0]);g.addColorStop(1,face[1]);ctx.fillStyle=g;ctx.beginPath();ctx.arc(0,0,r,0,7);ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,.35)';ctx.lineWidth=Math.max(1,r*.05);ctx.beginPath();ctx.arc(-r*.1,-r*.1,r*.7,3.6,5.2);ctx.stroke();ctx.restore()}
+function drawBall(b){const q=P(b.x,b.y,b.h),s0=P(b.x,b.y,0),r=Math.max(4,q.s*.036);
+  ctx.fillStyle='rgba(0,0,0,.28)';ctx.beginPath();ctx.ellipse(s0.x,s0.y,r*1.1,r*.45,0,0,7);ctx.fill();
+  ctx.fillStyle='#ff8a2a33';trail.forEach((t,i)=>{const p=P(t.x,t.y,t.h);ctx.globalAlpha=i/trail.length*.35;ctx.beginPath();ctx.arc(p.x,p.y,r*(.5+i/trail.length*.5),0,7);ctx.fill()});ctx.globalAlpha=1;
+  const g=ctx.createRadialGradient(q.x-r*.35,q.y-r*.4,r*.1,q.x,q.y,r);g.addColorStop(0,'#fff');g.addColorStop(.5,'#ffe2b8');g.addColorStop(1,'#ff9a3a');ctx.fillStyle=g;ctx.beginPath();ctx.arc(q.x,q.y,r,0,7);ctx.fill()}
+function drw(){
+  // room
+  const bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#0d4a63');bg.addColorStop(.55,'#126b7e');bg.addColorStop(1,'#0a3446');ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+  const sp=ctx.createRadialGradient(W/2,40,10,W/2,260,420);sp.addColorStop(0,'rgba(255,255,255,.28)');sp.addColorStop(1,'rgba(255,255,255,0)');ctx.fillStyle=sp;ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='rgba(255,255,255,.05)';for(let i=0;i<6;i++)ctx.fillRect(i*140-30,0,6,gy(0)-10);
+  // floor shadow + legs
+  ctx.fillStyle='rgba(0,0,0,.25)';ctx.beginPath();ctx.ellipse(W/2,gy(.5)+96,hw(.55)*1.05,34,0,0,7);ctx.fill();
+  const a=P(-1,0,0),b2=P(1,0,0),c=P(1,1,0),d=P(-1,1,0);
+  ctx.fillStyle='#222';for(const [lx,ly] of[[-.88,.06],[.88,.06],[-.9,.96],[.9,.96]]){const t=P(lx,ly,0),f=kk(ly);ctx.fillRect(t.x-f*.025,t.y+14,f*.05,f*.55)}
+  // table body edge
+  ctx.fillStyle='#0f2f6b';ctx.beginPath();ctx.moveTo(d.x,d.y);ctx.lineTo(c.x,c.y);ctx.lineTo(c.x,c.y+16);ctx.lineTo(d.x,d.y+16);ctx.fill();
+  // top
+  const tg=ctx.createLinearGradient(0,a.y,0,d.y);tg.addColorStop(0,'#2c7be0');tg.addColorStop(1,'#1659b8');ctx.fillStyle=tg;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b2.x,b2.y);ctx.lineTo(c.x,c.y);ctx.lineTo(d.x,d.y);ctx.closePath();ctx.fill();
+  const sh=ctx.createLinearGradient(0,a.y,0,d.y);sh.addColorStop(0,'rgba(255,255,255,.25)');sh.addColorStop(.5,'rgba(255,255,255,0)');ctx.fillStyle=sh;ctx.fill();
+  ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b2.x,b2.y);ctx.lineTo(c.x,c.y);ctx.lineTo(d.x,d.y);ctx.closePath();ctx.stroke();
+  const m1=P(0,0,0),m2=P(0,1,0);ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(m1.x,m1.y);ctx.lineTo(m2.x,m2.y);ctx.stroke();
+  // cpu side objects
+  paddleD(cx,.0,.2,'',['#3a3a3a','#101010'],cswing,true);
+  if(ball&&ball.y<.5)drawBall(ball);
+  // net
+  const n1=P(-1.06,.5,0),n2=P(1.06,.5,0),h=.2*kk(.5);ctx.fillStyle='rgba(255,255,255,.2)';ctx.fillRect(n1.x,n1.y-h,n2.x-n1.x,h);
+  ctx.strokeStyle='rgba(255,255,255,.35)';ctx.lineWidth=1;for(let x=n1.x;x<n2.x;x+=8){ctx.beginPath();ctx.moveTo(x,n1.y-h);ctx.lineTo(x,n1.y);ctx.stroke()}for(let y=n1.y-h;y<n1.y;y+=8){ctx.beginPath();ctx.moveTo(n1.x,y);ctx.lineTo(n2.x,y);ctx.stroke()}
+  ctx.fillStyle='#fff';ctx.fillRect(n1.x,n1.y-h-2,n2.x-n1.x,4);ctx.fillStyle='#ccc';ctx.fillRect(n1.x-3,n1.y-h-4,6,h+8);ctx.fillRect(n2.x-3,n2.y-h-4,6,h+8);
+  if(ball&&ball.y>=.5&&ball.y<1)drawBall(ball);
+  paddleD(px,1.04,.2,'',['#ff4d5e','#b3122a'],swing,false);
+  if(ball&&ball.y>=1)drawBall(ball);
+  ctx.fillStyle='rgba(8,30,50,.45)';rr(W/2-96,10,192,50,16);ctx.fill();
+  T(ps+'',W/2-48,36,34);T(':',W/2,34,30,'#fff9');T(as+'',W/2+48,36,34);T('רמה '+(lvl+1),W/2,H-14,15,'#fffc');
+  if(phase==='serve'&&srv===0)T('לחצו/רווח להגשה',W/2,H-44,20,'#ffd23f');
+  if(mt>0&&msg)T(msg,W/2,h*0+170,26,'#ffd23f')}
+wire(start);run(upd,drw,'#0b3d4f');window.__s={step:upd,start:()=>{start();on=true},get on(){return on},get score(){return sc},get ball(){return ball},get ps(){return ps},get as(){return as},get lvl(){return lvl},get phase(){return phase},set tpx(v){tpx=v},get px(){return px},serveP};
 
 if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 </script>
