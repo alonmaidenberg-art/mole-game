@@ -115,10 +115,10 @@
         allIds(function(ids,l){var sel=document.createElement('select');sel.style.cssText='max-width:180px;font:inherit;padding:4px;border-radius:8px';l.forEach(function(g){var o=document.createElement('option');o.value=g.url;o.textContent=g.name;sel.append(o)});p.append(nl(),document.createTextNode(T('קפוץ למשחק: ','Jump to: ')),sel,btn(T('לך','Go'),0,function(){location.href=AG.root+sel.value}))})}
       else if(admTab==='boss'){
         var pl=document.createElement('div');pl.style.cssText='font-weight:900;margin:4px 0';pl.textContent=T('משחקים שונים ששוחקו: ','Different games played: ')+AG.played()+'  ('+T('בוס 1: 20 · בוס 2: 40 · בוס 3: 60','boss 1: 20 · boss 2: 40 · boss 3: 60')+')';p.append(pl);
-        [0,20,40,60,75].forEach(function(n){p.append(btn(T('קבע ','Set ')+n,0,function(){setPlayed(n)}))});p.append(btn(T('הכול','All'),0,function(){setPlayed(999)}),nl());
+        [0,20,40,60,75,80].forEach(function(n){p.append(btn(T('קבע ','Set ')+n,0,function(){setPlayed(n)}))});p.append(btn(T('הכול','All'),0,function(){setPlayed(999)}),nl());
         var inf=AG.bossInfo?AG.bossInfo():{c1:+ls('boss_story')||0,c2:+ls('boss_story2')||0,c3:+ls('boss_story3')||0,n1:20,n2:10,n3:10};
         var st=document.createElement('div');st.style.margin='6px 0';st.textContent=T('סיפור – פרק 1: ','Story – ch1: ')+inf.c1+'/'+inf.n1+' · '+T('פרק 2: ','ch2: ')+inf.c2+'/'+inf.n2+' · '+T('פרק 3: ','ch3: ')+(inf.c3||0)+'/'+(inf.n3||10);p.append(st);
-        [['boss_story',20,'boss_story_done'],['boss_story2',10,'boss_story_done2'],['boss_story3',10,'boss_story_done3'],['boss_story4',10,'boss_story_done4']].forEach(function(c,i){p.append(btn(T('✔ סיים פרק ','✔ Finish ch')+(i+1),0,function(){ls(c[0],String(c[1]));ls(c[2],'1');draw()}),btn(T('↺ אפס פרק ','↺ Reset ch')+(i+1),0,function(){ls(c[0],'0');try{localStorage.removeItem(c[2])}catch(e){}draw()}),nl())});
+        [['boss_story',20,'boss_story_done'],['boss_story2',10,'boss_story_done2'],['boss_story3',10,'boss_story_done3'],['boss_story4',10,'boss_story_done4'],['boss_story5',10,'boss_story_done5']].forEach(function(c,i){p.append(btn(T('✔ סיים פרק ','✔ Finish ch')+(i+1),0,function(){ls(c[0],String(c[1]));ls(c[2],'1');draw()}),btn(T('↺ אפס פרק ','↺ Reset ch')+(i+1),0,function(){ls(c[0],'0');try{localStorage.removeItem(c[2])}catch(e){}draw()}),nl())});
         p.append(btn(T('👾 לדף הבוס','👾 Boss page'),0,function(){location.href=AG.root+'boss/'}))}
       else if(admTab==='troll'){
         var inRoom=window.AG&&AG.net&&AG.net.room;

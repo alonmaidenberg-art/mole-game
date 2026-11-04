@@ -251,7 +251,7 @@ $('lbB').onclick=lbOpen;
   $('gbX').onclick=function(){$('gbM').classList.remove('show')};$('gbSend').onclick=send;sel.onchange=paint;
 })();
 $('lbX').onclick=function(){$('lbM').classList.remove('show')};
-(function(){var n=AG.played(),ok=n>=20||AG.isAdmin();$('bossT').textContent=ok?'סיפור: 4 פרקים – הגליץ׳, דינוזאור, דרקון ומלך הרובוטים':'שחקו ב-20 משחקים שונים כדי לפתוח ('+Math.min(n,20)+'/20)';var sp=0;try{sp=+localStorage.getItem('boss_story')||0}catch(e){}$('bossBar').style.width=Math.min(100,sp/20*100)+'%'})();
+(function(){var n=AG.played(),ok=n>=20||AG.isAdmin();$('bossT').textContent=ok?'סיפור: 5 פרקים – הגליץ׳, דינוזאור, דרקון, מלך הרובוטים ומלכת הקרח':'שחקו ב-20 משחקים שונים כדי לפתוח ('+Math.min(n,20)+'/20)';var sp=0;try{sp=+localStorage.getItem('boss_story')||0}catch(e){}$('bossBar').style.width=Math.min(100,sp/20*100)+'%'})();
 function showNote(x){$('noteT').textContent=x.noteTitle||x.name;$('noteP').textContent=x.note;$('noteM').classList.add('show');$('noteGo').onclick=function(){location.href=x.url};$('noteX').onclick=function(){$('noteM').classList.remove('show')}}
 function $(i){return document.getElementById(i)}
 function wal(){$('wc').textContent=AG.coins().toLocaleString('he-IL');$('wd').textContent=AG.diamonds().toLocaleString('he-IL')}
