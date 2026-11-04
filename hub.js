@@ -24,7 +24,7 @@
     played:function(){try{return JSON.parse(localStorage.getItem('ag_played')||'[]').length}catch(e){return 0}},
     coins:function(){return rd().c},
     diamonds:function(){return rd().d},
-    add:function(c,d){c=c||0;d=d||0;if((c>0||d>0)&&localStorage.getItem(KA)!==HASH&&!allow(Math.max(0,c),Math.max(0,d)))return;var w=rd();w.c=Math.max(0,w.c+c);w.d=Math.max(0,w.d+d);wr(w)},
+    add:function(c,d){c=c||0;d=d||0;if((c>0||d>0)&&localStorage.getItem(KA)!==HASH&&!allow(Math.max(0,c),Math.max(0,d)))return;if(c>0&&AG.coinMult)c=Math.floor(c*AG.coinMult());var w=rd();w.c=Math.max(0,w.c+c);w.d=Math.max(0,w.d+d);wr(w)},
     tampered:function(){return tampered},
     spend:function(c,d){var w=rd();c=c||0;d=d||0;if(w.c<c||w.d<d)return false;w.c-=c;w.d-=d;wr(w);return true},
     onChange:function(f){subs.push(f)},
@@ -70,9 +70,10 @@
   var sc=document.currentScript;var base=new URL('./',sc&&sc.src?sc.src:location.href).href;
   if(LANG==='en'){var s=document.createElement('script');s.src=base+'i18n.js';(document.head||document.documentElement).appendChild(s)}
   var isHub=(location.pathname.replace(/index\.html$/,'')===new URL(base).pathname);
-  if(!/\/boss\//.test(location.pathname)){var tl=document.createElement('link');tl.rel='stylesheet';tl.href=base+'theme.css?v=6';(document.head||document.documentElement).appendChild(tl)}
+  if(!/\/boss\//.test(location.pathname)){var tl=document.createElement('link');tl.rel='stylesheet';tl.href=base+'theme.css?v=8';(document.head||document.documentElement).appendChild(tl)}
   var adm=false;try{adm=localStorage.getItem('ag_adm')!==null&&window.AG&&AG.isAdmin()}catch(e){}
   if(!isHub||(window.AG&&AG.isAdmin&&AG.isAdmin())){var fx=document.createElement('script');fx.src=base+'fx.js';(document.head||document.documentElement).appendChild(fx)}
+  if(!/\/boss\//.test(location.pathname)){var sh=document.createElement('script');sh.src=base+'shop.js?v=1';(document.head||document.documentElement).appendChild(sh)}
   var on_=document.createElement('script');on_.src=base+'online.js';(document.head||document.documentElement).appendChild(on_);
   if(/[?&](boss|story)=?/.test(location.search)||/\/boss\/?$/.test(location.pathname.replace(/index\.html$/,''))){var bm=document.createElement('script');bm.src=base+'bossmode.js';(document.head||document.documentElement).appendChild(bm)}
   function btn(){

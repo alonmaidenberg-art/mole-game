@@ -15,6 +15,7 @@
     if(vt===null){if(scale===1)return cb(ts);vt=ts;lr=ts}
     var d=Math.min(100,ts-lr);lr=ts;vt+=d*scale;cb(vt)})};
   function setScale(s){scale=s;ss('ag_scale',String(s))}
+  window.AG=window.AG||{};window.AG.setScale=setScale;
 
   /* ---------- visual modes ---------- */
   var st=document.createElement('style');
@@ -125,7 +126,7 @@
         p.append(nl(),btn(T('📤 שלח גם לחברים בשרת: ','📤 Also send to room: ')+(ls('ag_tsend')==='0'?T('לא','no'):T('כן','yes')),0,function(){ls('ag_tsend',ls('ag_tsend')==='0'?'1':'0');draw()}),
           btn(T('📥 לקבל טרולים: ','📥 Receive trolls: ')+(ls('ag_notroll')==='1'?T('לא','no'):T('כן','yes')),0,function(){ls('ag_notroll',ls('ag_notroll')==='1'?'0':'1');draw()}))}
       else{
-        p.append(btn(T('⛶ מסך מלא','⛶ Fullscreen'),0,function(){var d=document.documentElement;(d.requestFullscreen||d.webkitRequestFullscreen||function(){}).call(d)}),
+        p.append(btn(T('🛒 קבל את כל פריטי החנות','🛒 Unlock whole shop'),0,function(){var o=window.AG_SHOP?AG_SHOP.read():{own:{},until:{},eq:{}};(window.AG_SHOP?AG_SHOP.items:[]).forEach(function(i){if(i.k==='p')o.own[i.id]=1;else o.until[i.id]=Date.now()+3600000});if(window.AG_SHOP)AG_SHOP.write(o);toast(T('נפתח','Unlocked'))}),btn(T('🛒 אפס חנות','🛒 Reset shop'),0,function(){try{localStorage.removeItem('ag_shop')}catch(e){}location.reload()}),nl(),btn(T('⛶ מסך מלא','⛶ Fullscreen'),0,function(){var d=document.documentElement;(d.requestFullscreen||d.webkitRequestFullscreen||function(){}).call(d)}),
           btn(T('🗑 אפס שיאים ונתונים של כל המשחקים','🗑 Wipe ALL saved data'),0,function(){if(confirm(T('למחוק הכול?','Delete everything?'))){try{var keep=localStorage.getItem('ag_admin');localStorage.clear();if(keep)localStorage.setItem('ag_admin',keep)}catch(e){}location.reload()}}),nl(),
           btn(T('📋 העתק גיבוי נתונים','📋 Copy data backup'),0,function(){var o={};try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k.indexOf('ag_adm')!==0)o[k]=localStorage.getItem(k)}}catch(e){}try{navigator.clipboard.writeText(JSON.stringify(o));toast(T('הועתק','Copied'))}catch(e){}}),
           btn(T('🚪 יציאה מאדמין','🚪 Log out'),0,function(){AG.adminLogout();location.reload()}))}}}

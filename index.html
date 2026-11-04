@@ -235,7 +235,7 @@ $('lbB').onclick=lbOpen;
     if(!n){msg(T('הכינוי לא מתאים, נסו אחר','That nickname is not allowed'));return}
     if(!JB_BIN){msg(T('לוח התוצאות עוד לא הופעל','The leaderboard is not switched on yet'));return}
     var sc=localBests();if(!Object.keys(sc).length){msg(T('עוד אין לך שיאים. שחקו קודם!','You have no records yet. Play first!'));return}
-    try{localStorage.setItem('ag_name',n)}catch(e){}
+    try{localStorage.setItem('ag_name',n);var so=JSON.parse(localStorage.getItem('ag_shop')||'{}');if(so.own&&so.own.crown&&(so.eq||{}).crown!==0&&n.indexOf('👑')<0)n='👑'+n}catch(e){}
     msg(T('שולח…','Sending…'));
     jbGet().then(function(b){if(b.banned.indexOf(n.toLowerCase())>-1){throw 'banned'}var ch=0,k=0;
       Object.keys(sc).forEach(function(id){if(++k>90||!/^[a-z0-9]{2,20}$/.test(id))return;var v=Math.floor(+sc[id]);if(!isFinite(v)||v<=0||v>1e9)return;var arr=b.g[id]||(b.g[id]=[]);
