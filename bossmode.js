@@ -23,7 +23,15 @@
     pl:[['ROAAAR! נדרסתם!','ROAAAR! You got stomped!'],['קטנים מדי, חה חה… ‏ROAR!','Too small, ha ha… ROAR!']],
     sp:{0:['ROAAAR! אני הדינוזאור הענק! אחרי הגליץ׳ אתם חושבים שזה נגמר? אני אדרוך על כל המשחקים שלכם!','ROAAAR! I am the Giant Dino! After Glitch you think it is over? I will stomp on all your games!'],
         9:['ROAAAAR!!! הקרב האחרון! מי שמנצח – שולט בכל העולם הפרהיסטורי!','ROAAAAR!!! The last battle! Whoever wins rules the whole prehistoric world!']},
-    fin:['ROAR… אני… מתכווץ… נצחתם… אני חוזר לשבת בעמוד המשחק…','ROAR… I am… shrinking… you won… I go back to sit in the game…']}
+    fin:['ROAR… אני… מתכווץ… נצחתם… אני חוזר לשבת בעמוד המשחק…','ROAR… I am… shrinking… you won… I go back to sit in the game…']},
+   {id:3,key:'boss_story3',emo:'🐲',he:'הדרקון הקוסמי',en:'The Cosmic Dragon',st:[
+     S('race3d','w',0,'h'),S('meteors','s',300),S('hockey','w',0,'h'),S('lanes','s',300),S('superhoops','w',0,'h'),S('froghop','s',90),S('fighter','w',0,'h'),S('bricksmash','s',600),S('superfootball','w',0,'h'),S('fighter','w',0,'h')],
+    pi:[['GRAAAH! אני הדרקון הקוסמי! אכלתי את הגליץ׳ ואת הדינוזאור לארוחת בוקר!','GRAAAH! I am the Cosmic Dragon! I ate Glitch and the Dino for breakfast!'],['הלהבות שלי שורפות כל משחק!','My flames burn every game!'],['אין לכם לאן לברוח, אני בכל הגלקסיה!','Nowhere to run, I am all over the galaxy!']],
+    pw:[['GRAAH?! הלהבה שלי כבתה?!','GRAAH?! My flame went out?!'],['מזל מוחלט… אבל אני עוד לא גמרתי!','Pure luck… but I am not done!']],
+    pl:[['GRAAAH! נשרפתם! נסו שוב!','GRAAAH! You got burned! Try again!'],['אפילו כוכב לכת היה מחזיק יותר!','Even a planet would last longer!']],
+    sp:{0:['GRAAAH! אני הדרקון הקוסמי, הבוס האמיתי! הגליץ׳ והדינוזאור היו רק החימום. קרב אחרי קרב – אני אשרוף אתכם!','GRAAAH! I am the Cosmic Dragon, the real boss! Glitch and the Dino were just the warm-up. Battle after battle – I will burn you!'],
+        9:['GRAAAAH!!! הקרב האחרון בגלקסיה! מי שמנצח שולט בכל היקום!','GRAAAAH!!! The last battle in the galaxy! The winner rules the universe!']},
+    fin:['GRAAAH… הלהבה שלי… כבה… נצחתם את הבוס האחרון… היקום שלכם!','GRAAAH… my flame… is out… you beat the final boss… the universe is yours!']}
   ];
   var GAMEN={race3d:'מירוץ מכוניות',superhoops:'כדורסל',hockey:'הוקי אוויר',fighter:'לחימה',superfootball:'כדורגל',meteors:'גשם מטאורים',lanes:'שלושה נתיבים',whack:'פוגעים בבועות',stackup:'מגדל גבוה',munchmaze:'מבוך הנשנשן',blackhole:'חור שחור',froghop:'צפרדע קופצת',mergefruit:'איחוד פירות',bricksmash:'שובר לבנים',dino:'דינוזאור'};
   var ENG={race3d:'Car race',superhoops:'Basketball',hockey:'Air hockey',fighter:'Fighting',superfootball:'Football',meteors:'Meteor Shower',lanes:'Three Lanes',whack:'Pop Targets',stackup:'Tall Tower',munchmaze:'Munch Maze',blackhole:'Black Hole',froghop:'Jumping Frog',mergefruit:'Fruit Merge',bricksmash:'Brick Breaker',dino:'Dino'};
@@ -46,25 +54,27 @@
       if(++n>26){clearInterval(iv);location.href=url}},50);
   }
   function overlay(){
-    var o=el('div','position:fixed;inset:0;z-index:2147483000;background:radial-gradient(600px 400px at 50% 0,'+(CHN?'#1a6a2a':'#4a1a7a')+',#0a0618);color:#fff;display:flex;align-items:center;justify-content:center;padding:16px;font-family:system-ui,Arial,sans-serif;overflow:auto');
+    var o=el('div','position:fixed;inset:0;z-index:2147483000;background:radial-gradient(600px 400px at 50% 0,'+(['#4a1a7a','#1a6a2a','#7a2a0a'][CHN])+',#0a0618);color:#fff;display:flex;align-items:center;justify-content:center;padding:16px;font-family:system-ui,Arial,sans-serif;overflow:auto');
     var card=el('div','max-width:460px;width:100%;text-align:center');o.appendChild(card);document.body.appendChild(o);return {o:o,card:card}}
   function type(node,text,done){node.textContent='';var i=0,iv=setInterval(function(){node.textContent=text.slice(0,++i);if(i>=text.length){clearInterval(iv);done&&done()}},24)}
   function url(ch,i){var s=CH[ch].st[i];return ROOT+s.g+'/?boss='+i+'&ch='+(ch+1)}
 
   function story(){
+    if(!(window.AG&&(AG.played()>=20||AG.isAdmin()))){location.href=ROOT+'boss/';return}
     var ch=CHN,C=CH[ch],N=C.st.length,res=Q.get('res'),st=Math.min(+Q.get('st')||prog(ch),N-1),ui=overlay(),c=ui.card;
     if(res==='win')ls(C.key,String(Math.max(prog(ch),st+1)));
     var P=prog(ch),st_=document.createElement('style');st_.textContent='@keyframes agw{from{transform:translate(0,0) skew(0)}to{transform:translate(4px,-3px) skew(4deg)}}';document.head.appendChild(st_);
     c.appendChild(el('div','font-size:84px;filter:drop-shadow(0 0 20px #f0f);animation:agw .6s infinite alternate',C.emo));
-    c.appendChild(el('h2','margin:6px 0',(CHN?T('פרק 2: ','Chapter 2: '):T('פרק 1: ','Chapter 1: '))+(EN?C.en:C.he)));
+    c.appendChild(el('h2','margin:6px 0',T('פרק ','Chapter ')+(CHN+1)+': '+(EN?C.en:C.he)));
     var bx=el('div','background:#ffffff18;border:2px solid #ff4dff66;border-radius:18px;padding:14px;font:700 19px/1.5 system-ui;min-height:96px;margin:10px 0'),acts=el('div','margin-top:8px');
     var cur=Math.min(res==='win'?P:st,N-1);
     c.append(el('div','opacity:.85;font-size:14px',T('קרב ','Battle ')+(cur+1)+'/'+N),el('div','height:8px;background:#ffffff22;border-radius:6px;margin:6px 0;overflow:hidden').appendChild(el('div','height:100%;background:#ffd23f;width:'+Math.round(P/N*100)+'%')).parentNode,bx,acts);
     var closeB=btn(T('⬅ חזרה לבוס','⬅ Back'),function(){location.href=ROOT+'boss/'},'#ddd');
     if(res==='win'&&P>=N){
-      var k='boss_story_done'+(ch?2:'');if(ls(k)!=='1'){ls(k,'1');if(window.AG)AG.add(ch?500:300,ch?8:5)}
-      type(bx,(EN?C.fin[1]:C.fin[0])+'\n\n'+(ch?T('🎉 ניצחתם את הדינוזאור הענק! קיבלתם 500 🪙 ו-8 💎','🎉 You beat the Giant Dino! +500 🪙 and 8 💎'):T('🎉 ניצחתם את הגליץ׳! קיבלתם 300 🪙 ו-5 💎. אבל… משהו גדול מתעורר בעמוד הדינוזאור…','🎉 You beat Glitch! +300 🪙 and 5 💎. But… something big is waking up in the dino game…')),function(){
-        if(!ch)acts.append(btn(T('🦖 לפרק 2: הדינוזאור הענק','🦖 Chapter 2: the Giant Dino'),function(){location.href=ROOT+'boss/?story=1&ch=2'},'#7fe3a0'));
+      var k='boss_story_done'+(ch?ch+1:'');if(ls(k)!=='1'){ls(k,'1');if(window.AG)AG.add([300,500,800][ch],[5,8,12][ch])}
+      type(bx,(EN?C.fin[1]:C.fin[0])+'\n\n'+[T('🎉 ניצחתם את הגליץ׳! קיבלתם 300 🪙 ו-5 💎. אבל… משהו גדול מתעורר בעמוד הדינוזאור…','🎉 You beat Glitch! +300 🪙 and 5 💎. But… something big is waking up in the dino game…'),T('🎉 ניצחתם את הדינוזאור הענק! קיבלתם 500 🪙 ו-8 💎. אבל… משהו נוצץ מופיע בשמיים…','🎉 You beat the Giant Dino! +500 🪙 and 8 💎. But… something glowing appears in the sky…'),T('🏆 ניצחתם את הדרקון הקוסמי, הבוס האחרון! קיבלתם 800 🪙 ו-12 💎. אתם אלופי היקום!','🏆 You beat the Cosmic Dragon, the final boss! +800 🪙 and 12 💎. You are champions of the universe!')][ch],function(){
+        if(ch===0)acts.append(btn(T('🦖 לפרק 2: הדינוזאור הענק','🦖 Chapter 2: the Giant Dino'),function(){location.href=ROOT+'boss/?story=1&ch=2'},'#7fe3a0'));
+        if(ch===1)acts.append(btn(T('🐲 לפרק 3: הדרקון הקוסמי','🐲 Chapter 3: the Cosmic Dragon'),function(){location.href=ROOT+'boss/?story=1&ch=3'},'#ff9a5a'));
         acts.append(btn(T('🔁 שחקו שוב מההתחלה','🔁 Play again'),function(){ls(C.key,'0');location.href=ROOT+'boss/?story=1&ch='+(ch+1)},'#ffd23f'),closeB)});return}
     var s=C.st[cur],line=res==='win'?say(ch,st,'w')+'\n\n'+T('הקרב הבא: ','Next battle: ')+stGoal(s):res==='lose'?say(ch,st,'l'):say(ch,cur,'a')+'\n\n'+T('אתגר: ','Challenge: ')+stGoal(s);
     var go=function(){teleport(url(ch,cur),'⚡ '+(ch?T('הדינוזאור משגר אתכם אל ','The Dino sends you to '):T('הגליץ׳ משגר אתכם אל ','Glitch is teleporting you to '))+gname(s.g)+' ⚡')};
@@ -102,7 +112,7 @@
     if(document.body)arrive();else addEventListener('DOMContentLoaded',arrive);
   }
   window.AG=window.AG||{};window.AG.bossStory=function(ch){location.href=ROOT+'boss/?story=1'+(ch>1?'&ch='+ch:'')};
-  window.AG.bossInfo=function(){return {c1:+ls('boss_story')||0,c2:+ls('boss_story2')||0,n1:CH[0].st.length,n2:CH[1].st.length,done1:ls('boss_story_done')==='1'}};
+  window.AG.bossInfo=function(){return {c1:+ls('boss_story')||0,c2:+ls('boss_story2')||0,c3:+ls('boss_story3')||0,n1:CH[0].st.length,n2:CH[1].st.length,n3:CH[2].st.length,done1:ls('boss_story_done')==='1',done2:ls('boss_story_done2')==='1'}};
   if(Q.get('boss')!==null)inGame();
   else if(Q.get('story')!==null){var go=function(){story()};if(document.body)go();else addEventListener('DOMContentLoaded',go)}
 })();

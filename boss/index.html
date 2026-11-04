@@ -47,7 +47,7 @@ body{overflow:hidden;position:fixed;inset:0;width:100%;background:#0d0826}
 <body>
 <canvas id="cv"></canvas><div id="hud"></div>
 <div id="rot">📱↔️<br>סובבו את הטלפון לרוחב</div>
-<div class="ov show" id="menu"><div class="ovc" style="max-width:440px"><div style="font-size:56px">👾</div><h2>שלבי הבוס: הגליץ׳</h2><div class="lb" id="bmsg">גליץ׳ מסתורי פורץ לכל המשחקים! רק מי ששיחק בהרבה משחקים יכול לעצור אותו. 20 שלבי בוס ארוכים, כמה משחקים בו זמנית, והעולם תלוי בך.</div><div id="bprog" style="font-weight:900;margin:8px 0;color:#ffd05a"></div><button class="btn" id="storyB">📖 הסיפור: הגליץ׳ משתלט (20 קרבות)</button><button class="btn alt" id="story2B" style="display:none;margin-top:8px">🦖 פרק 2: הדינוזאור הענק</button><button class="btn alt" id="go" style="margin-top:8px">🎯 מצב תרגול: שלבי חידות</button><div id="sprog" style="opacity:.85;margin-top:6px;font-size:14px"></div><div style="opacity:.8;margin-top:10px;font-size:15px">שיא: <b id="best">0</b></div></div></div>
+<div class="ov show" id="menu"><div class="ovc" style="max-width:440px"><div style="font-size:56px">👾</div><h2>שלבי הבוס: הגליץ׳</h2><div class="lb" id="bmsg">גליץ׳ מסתורי פורץ לכל המשחקים! רק מי ששיחק בהרבה משחקים יכול לעצור אותו. 20 שלבי בוס ארוכים, כמה משחקים בו זמנית, והעולם תלוי בך.</div><div id="bprog" style="font-weight:900;margin:8px 0;color:#ffd05a"></div><button class="btn" id="storyB">📖 הסיפור: הגליץ׳ משתלט (20 קרבות)</button><button class="btn alt" id="story3B" style="display:none;margin-top:8px">🐲 פרק 3: הדרקון הקוסמי</button><button class="btn alt" id="story2B" style="display:none;margin-top:8px">🦖 פרק 2: הדינוזאור הענק</button><button class="btn alt" id="go" style="margin-top:8px">🎯 מצב תרגול: שלבי חידות</button><div id="sprog" style="opacity:.85;margin-top:6px;font-size:14px"></div><div style="opacity:.8;margin-top:10px;font-size:15px">שיא: <b id="best">0</b></div></div></div>
 <div class="ov" id="end"><div class="ovc"><h2 id="eT">נגמר</h2><div style="font-size:48px;font-weight:900;color:#ffd05a" id="eS"></div><p id="eM"></p><button class="btn" id="again">🔁 שוב</button><button class="btn alt" id="menu2">תפריט</button></div></div>
 <script>
 'use strict';
@@ -77,7 +77,7 @@ const NAMES=['באג זעיר','גליץ׳ קטן','פיקסל שבור','קוד
 const GAMES=['🏓 פונג','🧱 שוברי לבנים','🦖 דינוזאור','🐸 קפצן','👻 בולעים','🔴 סיימון','⚡ תגובה','🧠 מאסטרמיינד','💡 אורות','🔢 פאזל','🎨 צבעים','🪙 קליקר','☄️ אסטרואידים','🎯 קליעה','🏃 התחמקות','🏎️ מירוץ','🎳 באולינג','⛳ גולף'];
 const CN=['אדום','כחול','ירוק','צהוב'],CC=['#ff5a6e','#4a8aff','#3fe08a','#ffd05a'],SC=['#ff5a6e','#ffd05a','#5ff7d6','#7a9bff'],SF=[262,330,392,523];
 const played=()=>window.AG?AG.played():0,need=20,admin=()=>window.AG&&AG.isAdmin();
-const unlocked=()=>true;
+const unlocked=()=>played()>=need||admin();
 let maxLv=+store.get('boss_lv',1),state='select',lvl=1,P=[],frame=0,prog=0,target=0,solved=0,cfg,lastWon=false,shake=0,flash=0;
 function paintMenu(){const ok=unlocked();$('#bprog').textContent=ok?'נפתח! שלב מקסימלי: '+maxLv+'/20':'שיחקת '+Math.min(played(),need)+'/'+need+' משחקים שונים. עוד '+Math.max(0,need-played())+' כדי לפתוח';$('#go').disabled=!ok;$('#go').style.opacity=ok?1:.4}
 function mkCfg(n){return{n,P:[2,2,3,3,3,4,4,4,4,5,5,5,5,6,6,6,6,6,6,6][n-1],L:80+n*9,gap:Math.max(55,190-n*7),exp:Math.max(300,720-n*20),types:['bug','color'].concat(n>=3?['math']:[],n>=5?['react']:[],n>=7?['simon']:[])}}
@@ -129,7 +129,7 @@ function start(){paintMenu();state='select';$('#again').textContent='🔁 שוב
 $('#go').onclick=()=>{$('#menu').classList.remove('show');state='select';on=true;window.__show=true};
 $('#again').onclick=()=>{$('#end').classList.remove('show');const n=lastWon&&lvl<20?lvl+1:lvl;on=true;startLevel(n)};
 $('#menu2').onclick=()=>{$('#end').classList.remove('show');state='select';on=true;paintMenu()};
-$('#storyB').onclick=()=>{if(window.AG&&AG.bossStory)AG.bossStory(1);else location.href='?story=1'};$('#story2B').onclick=()=>AG.bossStory(2);function paintStory(){try{const i=AG.bossInfo();$('#sprog').textContent='פרק 1: '+i.c1+'/'+i.n1+(i.done1?' ✔':'')+(i.done1?' · פרק 2: '+i.c2+'/'+i.n2:'');$('#story2B').style.display=i.done1?'block':'none'}catch(e){}}addEventListener('load',paintStory);paintMenu();addEventListener('load',paintMenu);run(upd,drw,'#0b0b1e');
+$('#storyB').onclick=()=>{if(!unlocked()){$('#bprog').textContent='🔒 שחקו ב-20 משחקים שונים כדי לפתוח ('+Math.min(played(),need)+'/20)';return}if(window.AG&&AG.bossStory)AG.bossStory(1);else location.href='?story=1'};$('#story2B').onclick=()=>AG.bossStory(2);$('#story3B').onclick=()=>AG.bossStory(3);function paintStory(){try{const i=AG.bossInfo();$('#sprog').textContent='פרק 1: '+i.c1+'/'+i.n1+(i.done1?' ✔':'')+(i.done1?' · פרק 2: '+i.c2+'/'+i.n2+(i.done2?' ✔ · פרק 3: '+i.c3+'/'+i.n3:''):'');$('#story2B').style.display=i.done1?'block':'none';$('#story3B').style.display=i.done2?'block':'none'}catch(e){}}addEventListener('load',paintStory);paintMenu();addEventListener('load',paintMenu);run(upd,drw,'#0b0b1e');
 window.__s={step:upd,startLevel,get on(){return on},get state(){return state},get P(){return P},get cfg(){return cfg},solve,get lvl(){return lvl},get maxLv(){return maxLv},get prog(){return prog},get target(){return target},spawn,set on(v){on=v}};
 
 if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));

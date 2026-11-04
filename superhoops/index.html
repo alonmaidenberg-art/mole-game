@@ -124,7 +124,7 @@ function start(){score=[0,0];clock=150*60;over=false;frame=0;rimT[0]=rimT[1]=0;r
   state='play';paused=false;['menu','end','pause'].forEach(i=>$('#'+i).classList.remove('show'));$('#pauseB').style.display='block';$('#hud').style.display='block';
   if(matchMedia('(pointer:coarse)').matches&&mode!=='2p'){if(!touchS){touchS=A3.touchUI([['j','⤒'],['g','💨'],['p','⭐'],['s','🏀','big']])}touchS.el.style.display='block'}else if(touchS)touchS.el.style.display='none';
   camFX=-8;popup('יאללה!',0,2,0,'#fff')}
-function giveBall(t){const p=P[t];P[1-t].ball=false;p.ball=true;ball.owner=p;ball.fire=false;ball.scored=false;ball.last=p}
+function giveBall(t){const p=P[t];P[1-t].ball=false;p.ball=true;p.safe=p.human?150:0;ball.owner=p;ball.fire=false;ball.scored=false;ball.last=p}
 function popup(text,x,y,z,col){A3.pop(stage,text,new V3(x,y,z),col)}
 /* ---------- input ---------- */
 const KM=[{l:['KeyA'],r:['KeyD'],u:['KeyW'],d:['KeyS'],j:['Space'],s:['KeyF'],g:['ShiftLeft','KeyG'],p:['KeyE']},{l:['ArrowLeft'],r:['ArrowRight'],u:['ArrowUp'],d:['ArrowDown'],j:['KeyK'],s:['KeyL'],g:['KeyJ'],p:['KeyU']}];
@@ -140,12 +140,12 @@ function ai(p){const o=P[1-p.t],c=p.c,L=LVL[level];Object.assign(p.pc,c);c.x=c.z
     if(d<L.rng+4&&p.aiW>L.react){if(!p.aiTarget)p.aiTarget=.85+(Math.random()*2-1)*L.err;c.s=p.charge<p.aiTarget?1:0}
     if(Math.hypot(o.x-p.x,o.z-p.z)<4&&Math.random()<.03)c.g=1;if(Math.random()<.008)c.j=1}
   else{p.aiW=0;p.aiTarget=0;const tx=ball.owner?o.x:ball.x,tz=ball.owner?o.z:ball.z;moveTo(c,p,tx,tz,.9);const d=Math.hypot(tx-p.x,tz-p.z);
-    if(ball.owner===o&&d<2.2&&Math.random()<.07)c.s=1;if(ball.owner===o&&d<5&&Math.random()<.03)c.g=1;if(!ball.owner&&ball.y>2&&d<4&&Math.random()<.06)c.j=1}
+    if(ball.owner===o&&d<2.2&&Math.random()<.025)c.s=1;if(ball.owner===o&&d<5&&Math.random()<.03)c.g=1;if(!ball.owner&&ball.y>2&&d<4&&Math.random()<.06)c.j=1}
   if(p.power&&Math.random()<.02){const w=p.power,od=Math.hypot(o.x-p.x,o.z-p.z);if((w==='super'||w==='fire'||w==='giant')&&p.ball)c.p=1;else if((w==='freeze'||w==='bolt')&&od<16)c.p=1;else if(w==='jump')c.p=1}}
 /* ---------- player step ---------- */
 const DT=1/60;
 function stepP(p){const c=p.c,pc=p.pc,o=P[1-p.t];p.py=p.y;
-  if(p.stun>0){p.stun--;c.x=c.z=c.j=c.s=c.g=c.p=0}if(p.frz>0)p.frz--;if(p.inv>0)p.inv--;if(p.dashCd>0)p.dashCd--;if(p.swipeCd>0)p.swipeCd--;if(p.shootT>0)p.shootT--;
+  if(p.safe>0)p.safe--;if(p.stun>0){p.stun--;c.x=c.z=c.j=c.s=c.g=c.p=0}if(p.frz>0)p.frz--;if(p.inv>0)p.inv--;if(p.dashCd>0)p.dashCd--;if(p.swipeCd>0)p.swipeCd--;if(p.shootT>0)p.shootT--;
   const hsign=p.t?-1:1,hx=hsign*HOOPX;
   if(p.sdT){const tx=hx-hsign*1.0,ty=RIMH+.5,dx=tx-p.x,dy=ty-p.y,dz=-p.z,d=Math.hypot(dx,dy,dz),s=Math.min(d,.55);p.x+=dx/d*s;p.y+=dy/d*s;p.z+=dz/d*s;p.face=Math.atan2(-dz,dx);p.vy=0;
     if(Math.random()<.8)FX.burst(new V3(p.x,p.y+1,p.z),p.t?0x7ad0ff:0xff5a4a,2,2,0);if(d<.7){p.sdT=0;score_(p.t,3,'סופר דאנק! 🦸')}return}
@@ -175,11 +175,11 @@ function stepP(p){const c=p.c,pc=p.pc,o=P[1-p.t];p.py=p.y;
       p.charge=.001}
     if(p.charge>0){if(c.s){p.charge+=.022;if(p.charge>=1.05)release(p)}else release(p)}
   }else{p.charge=0;if(c.s&&!pc.s&&p.swipeCd<=0)swipe(p)}
-  if(p.dash>0&&ball.owner===o&&Math.hypot(o.x-p.x,o.z-p.z)<1.4&&Math.abs(o.y-p.y)<1.8&&o.inv<=0)steal(p,o);
+  if(p.dash>0&&(p.human||Math.random()<.04)&&ball.owner===o&&Math.hypot(o.x-p.x,o.z-p.z)<1.4&&Math.abs(o.y-p.y)<1.8&&o.inv<=0)steal(p,o);
   if(!ball.owner&&ball.lock<=0&&p.stun<=0&&Math.hypot(ball.x-p.x,ball.z-p.z)<1.2&&Math.abs(ball.y-(p.y+1))<1.6)takeBall(p)}
-function takeBall(p){P[1-p.t].ball=false;P[0].charge=P[1].charge=0;p.ball=true;ball.owner=p;ball.fire=false;ball.lock=0;ball.last=p;p.aiW=0;p.aiTarget=0;tone(250,.06)}
-function steal(p,o){o.ball=false;o.charge=0;o.stun=18;takeBall(p);popup('גניבה!',p.x,p.y+2.5,p.z,'#7dff9a');FX.burst(new V3(o.x,o.y+1,o.z),0xffffff,14,5);shake=.25;tone(180,.1,'square',.08)}
-function swipe(p){p.swipeCd=26;const o=P[1-p.t];tone(300,.04);if(ball.owner===o&&Math.hypot(o.x-p.x,o.z-p.z)<2.2&&Math.abs(o.y-p.y)<2&&o.inv<=0){if(Math.random()<(p.fly>0?1:.5))steal(p,o);else popup('החטאה',p.x,p.y+2.4,p.z,'#aaa')}}
+function takeBall(p){P[1-p.t].ball=false;P[0].charge=P[1].charge=0;p.ball=true;p.safe=p.human?120:0;ball.owner=p;ball.fire=false;ball.lock=0;ball.last=p;p.aiW=0;p.aiTarget=0;tone(250,.06)}
+function steal(p,o){if(!p.human&&o.safe>0)return;if(!p.human&&p.nsc>0)return;p.nsc=0;o.ball=false;o.charge=0;o.stun=18;takeBall(p);popup('גניבה!',p.x,p.y+2.5,p.z,'#7dff9a');FX.burst(new V3(o.x,o.y+1,o.z),0xffffff,14,5);shake=.25;tone(180,.1,'square',.08)}
+function swipe(p){p.swipeCd=26;const o=P[1-p.t];tone(300,.04);if(ball.owner===o&&Math.hypot(o.x-p.x,o.z-p.z)<2.2&&Math.abs(o.y-p.y)<2&&o.inv<=0){if(Math.random()<(p.fly>0?1:(p.human?.5:.3)))steal(p,o);else popup('החטאה',p.x,p.y+2.4,p.z,'#aaa')}}
 function release(p){const q=clamp(p.charge,0,1.05);p.charge=0;p.aiTarget=0;shoot(p,q)}
 function shoot(p,q){const hsign=p.t?-1:1,hx=hsign*HOOPX,o=P[1-p.t];p.ball=false;ball.owner=null;ball.lock=22;ball.last=p;ball.scored=false;p.shootT=16;
   ball.x=p.x+Math.cos(p.face)*.4;ball.y=p.y+2.0;ball.z=p.z-Math.sin(p.face)*.4;
