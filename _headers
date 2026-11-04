@@ -705,3 +705,12 @@
 
 /sneakylevels/manifest.webmanifest
   Cache-Control: no-cache
+
+/munchmaze/sw.js
+  Cache-Control: no-cache
+
+/munchmaze/index.html
+  Cache-Control: no-cache
+
+/munchmaze/manifest.webmanifest
+  Cache-Control: no-cache

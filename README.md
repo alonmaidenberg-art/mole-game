@@ -159,3 +159,5 @@ Import from Git, Build command ריק, Publish directory `.`.
 - `colormemory/` זיכרון צבעים
 
 - `sneakylevels/` מסדרון הפתעות
+
+- `munchmaze/` מבוך הנשנשן

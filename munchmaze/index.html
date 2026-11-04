@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta name="author" content="Alon Maidenberg - אלון מידנברג"><meta name="copyright" content="© 2026 אלון מידנברג. כל הזכויות שמורות.">
+<!-- © 2026 Alon Maidenberg (אלון מידנברג). All rights reserved. Copying, republishing or modifying this game without written permission is not allowed. -->
+<meta name="robots" content="noai, noimageai">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>מבוך הנשנשן – אלון מידנברג</title>
+<meta name="description" content="אספו את כל הגבישים במבוך ובריחו מהבאגים!">
+<meta name="theme-color" content="#0e0a24">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;background:#1a1038;color:#fff;font-family:system-ui,-apple-system,"Segoe UI",Arial,"Noto Sans Hebrew",sans-serif}
+body{background:radial-gradient(700px 500px at 80% -10%,#5b36d6 0,transparent 60%),radial-gradient(600px 500px at 0% 110%,#0f6b6b 0,transparent 55%),#1a1038;min-height:100vh;min-height:100dvh;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+main{max-width:520px;margin:0 auto;padding:max(12px,env(safe-area-inset-top)) 14px 24px}
+h1{margin:6px 0;font-size:30px;text-align:center}
+.sub{text-align:center;opacity:.75;margin:0 0 10px}
+.box{background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.12);border-radius:22px;padding:14px;margin:12px 0}
+.lb{opacity:.8;font-size:15px;margin-bottom:8px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{flex:1;min-width:70px;padding:13px 6px;border-radius:16px;border:2px solid rgba(255,255,255,.18);background:#150a30;color:#fff;font:inherit;font-weight:800;font-size:17px;cursor:pointer}
+.chip.on{background:#ffd05a;color:#2a1c00;border-color:#fff}
+.btn{display:block;width:100%;border:0;border-radius:18px;padding:15px;margin-top:12px;font:inherit;font-size:21px;font-weight:900;color:#06322b;background:linear-gradient(180deg,#5ff7d6,#1fc9a6);box-shadow:0 6px 0 #0d7a66;cursor:pointer}
+.btn:active{transform:translateY(3px);box-shadow:0 3px 0 #0d7a66}
+.btn.alt{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.3);box-shadow:none;font-size:16px;padding:12px}
+.ib{min-width:46px;height:42px;padding:0 12px;border-radius:13px;border:2px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#fff;font:inherit;font-size:17px;font-weight:800;cursor:pointer}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.scr{display:none}.scr.show{display:block}
+.ov{position:fixed;inset:0;background:rgba(10,5,30,.82);display:none;align-items:center;justify-content:center;z-index:30;padding:16px}.ov.show{display:flex}
+.ovc{width:100%;max-width:380px;background:linear-gradient(160deg,#2c1b6a,#1a1038);border:2px solid rgba(255,255,255,.2);border-radius:26px;padding:22px;text-align:center}
+.ovc h2{margin:0 0 6px;font-size:30px}
+body{overflow:hidden;position:fixed;inset:0;width:100%;background:#0d0826}
+#cv{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);display:block;touch-action:none}
+.ov{overflow:auto}.ovc{margin:auto}
+#hud{position:fixed;left:0;right:0;top:0;text-align:center;font-weight:900;font-size:22px;pointer-events:none;z-index:8;padding-top:max(8px,env(safe-area-inset-top));direction:ltr;text-shadow:0 2px 4px #000}
+.tb{position:fixed;bottom:max(10px,env(safe-area-inset-bottom));z-index:6;width:74px;height:74px;border-radius:50%;border:3px solid rgba(255,255,255,.5);background:rgba(20,12,60,.55);color:#fff;font-size:26px;font-weight:900;touch-action:none;display:none}
+.tb.on{background:rgba(255,160,40,.85)}
+#rot{position:fixed;inset:0;background:#120a2c;z-index:50;display:none;align-items:center;justify-content:center;text-align:center;font-size:24px;font-weight:800;padding:20px}@media (orientation:portrait) and (pointer:coarse){#rot{display:flex}}
+</style>
+</head>
+<body>
+<canvas id="cv"></canvas><div id="hud"></div>
+<div id="rot">📱↔️<br>סובבו את הטלפון לרוחב</div>
+<div class="ov show" id="menu"><div class="ovc" style="max-width:440px"><div style="font-size:56px">🟠</div><h2>מבוך הנשנשן</h2><div class="lb">אספו את כל הגבישים במבוך. הימנעו מהבאגים הסגולים! כוכב ⭐ גדול הופך אותם לפחדנים לכמה שניות – אז אפשר לאכול אותם. חצים/WASD או החלקה במגע. כל שלב – מבוך חדש!</div><button class="btn" id="go">▶ שחק</button><div style="opacity:.8;margin-top:10px;font-size:15px">שיא: <b id="best">0</b></div></div></div>
+<div class="ov" id="end"><div class="ovc"><h2 id="eT">נגמר</h2><div style="font-size:48px;font-weight:900;color:#ffd05a" id="eS"></div><p id="eM"></p><button class="btn" id="again">🔁 שוב</button><button class="btn alt" id="menu2">תפריט</button></div></div>
+<script>
+'use strict';
+const $=s=>document.querySelector(s);
+const store={get(k,d){try{const v=localStorage.getItem(k);return v===null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+let _ac=null;function tone(f,d=.1,t='triangle',v=.07){try{_ac=_ac||new (window.AudioContext||window.webkitAudioContext)();const o=_ac.createOscillator(),g=_ac.createGain();o.type=t;o.frequency.value=f;g.gain.value=v;o.connect(g);g.connect(_ac.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,_ac.currentTime+d);o.stop(_ac.currentTime+d+.02)}catch(e){}}
+const W=800,H=450;const cv=$('#cv'),ctx=cv.getContext('2d');const keys={};const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),rnd=(a,b)=>a+Math.random()*(b-a);
+function resize(){const s=Math.min(innerWidth/W,innerHeight/H),d=Math.min(devicePixelRatio||1,2);cv.style.width=Math.floor(W*s)+'px';cv.style.height=Math.floor(H*s)+'px';cv.width=Math.floor(W*s*d);cv.height=Math.floor(H*s*d);ctx.setTransform(s*d,0,0,s*d,0,0)}
+addEventListener('resize',resize);resize();
+addEventListener('keydown',e=>{keys[e.code]=1;if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault()});addEventListener('keyup',e=>{keys[e.code]=0});
+function cpos(e){const r=cv.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width*W,y:(e.clientY-r.top)/r.height*H}}
+function holdBtn(id,fn){const b=$(id);b.addEventListener('pointerdown',e=>{e.preventDefault();fn(1);b.classList.add('on')});for(const t of['pointerup','pointerleave','pointercancel'])b.addEventListener(t,e=>{fn(0);b.classList.remove('on')})}
+const BK='munchmaze'+'_best';let best=+store.get(BK,0);$('#best').textContent=best;
+function endGame(title,score,msg,coins,dia){$('#eT').textContent=title;$('#eS').textContent=score;let m=msg||'';if(window.AG&&coins>0){AG.add(coins,dia||0);m+=' +'+coins+' 🪙'+(dia?' +'+dia+' 💎':'')}$('#eM').textContent=m;$('#end').classList.add('show')}
+function saveBest(s){if(s>best){best=s;store.set(BK,s);$('#best').textContent=s}}
+
+let hits=[],on=false;
+function rr(x,y,w,h,r){ctx.beginPath();ctx.roundRect?ctx.roundRect(x,y,w,h,r):ctx.rect(x,y,w,h)}
+function B(x,y,w,h,col,txt,fn,fs=22,tc='#fff'){ctx.fillStyle=col;rr(x,y,w,h,12);ctx.fill();if(txt!=null){ctx.fillStyle=tc;ctx.font='bold '+fs+'px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(txt,x+w/2,y+h/2+1)}if(fn)hits.push({x,y,w,h,fn})}
+function T(t,x,y,fs=22,c='#fff',al='center'){ctx.fillStyle=c;ctx.font='bold '+fs+'px system-ui';ctx.textAlign=al;ctx.textBaseline='middle';ctx.fillText(t,x,y)}
+cv.addEventListener('pointerdown',e=>{const p=cpos(e);for(let i=hits.length-1;i>=0;i--){const h=hits[i];if(p.x>=h.x&&p.x<=h.x+h.w&&p.y>=h.y&&p.y<=h.y+h.h){h.fn(p);break}}});
+function run(upd,drw,bg){let last=performance.now(),acc=0;function l(n){requestAnimationFrame(l);acc+=Math.min(100,n-last);last=n;while(acc>=1000/60){acc-=1000/60;if(on)upd()}hits=[];ctx.fillStyle=bg||'#111';ctx.fillRect(0,0,W,H);if(on||window.__show)drw()}requestAnimationFrame(l)}
+function wire(start){$('#go').onclick=()=>{$('#menu').classList.remove('show');start();on=true};$('#again').onclick=()=>{$('#end').classList.remove('show');start();on=true};$('#menu2').onclick=()=>{on=false;$('#end').classList.remove('show');$('#menu').classList.add('show')}}
+function over(title,score,msg,coins,dia,delay=600){on=false;window.__show=true;saveBest(score);setTimeout(()=>endGame(title,score,msg,coins,dia),delay)}
+
+const CS=30,CW=25,CH=15,OX=25,OY=0;
+function mul(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function mkMaze(seed){
+  const R=mul(seed*7919+13),g=[];for(let y=0;y<CH;y++){g.push(Array(CW).fill(1))}
+  // coarse cells at odd coords: cols 1,3,..23 (12), rows 1,3,..13 (7). generate left 6 coarse columns (x=1..11) then mirror
+  const vis={};const st=[[1,1]];g[1][1]=0;vis['1,1']=1;
+  while(st.length){const [x,y]=st[st.length-1];const nb=[[2,0],[-2,0],[0,2],[0,-2]].map(d=>[x+d[0],y+d[1],d]).filter(n=>n[0]>=1&&n[0]<=11&&n[1]>=1&&n[1]<=13&&!vis[n[0]+','+n[1]]);
+    if(!nb.length){st.pop();continue}const n=nb[Math.floor(R()*nb.length)];g[y+n[2][1]/2][x+n[2][0]/2]=0;g[n[1]][n[0]]=0;vis[n[0]+','+n[1]]=1;st.push([n[0],n[1]])}
+  // braid: remove random inner walls on left half (keep border)
+  for(let k=0;k<26;k++){const x=1+Math.floor(R()*11),y=1+Math.floor(R()*13);if(g[y][x]===1&&((x%2===0)!==(y%2===0)))g[y][x]=0}
+  // open connection to center column x=12 at several rows
+  for(let y=1;y<CH-1;y+=2)if(R()<.6||y===7)g[y][12]=0;
+  for(let y=1;y<CH-1;y++){if(g[y][12]===0&&g[y][11]===1&&!(y%2===0)){g[y][11]=0}}
+  // make sure center column is reachable: open a vertical run on x=12 at rows 1..13 where needed
+  for(let y=1;y<=13;y++)if(y%2===1)g[y][12]=0;
+  for(let y=1;y<=13;y+=2)if(g[y][11]===1)g[y][11]=0;
+  // mirror
+  for(let y=0;y<CH;y++)for(let x=0;x<12;x++)g[y][24-x]=g[y][x];
+  // carve center room
+  for(let y=6;y<=8;y++)for(let x=10;x<=14;x++)g[y][x]=0;
+  // start area
+  g[13][12]=0;g[13][11]=0;g[13][13]=0;
+  return g}
+let G,pel,P,gh,sc,lives,lvl,pw,nm,tot,eatc,fr,msg,mt;
+const DIR=[[1,0],[-1,0],[0,1],[0,-1]];
+const ctr=(c)=>c*CS+CS/2;
+function free(x,y){return x>=0&&x<CW&&y>=0&&y<CH&&G[y][x]===0}
+function mkLevel(){G=mkMaze(lvl+3);pel=G.map(r=>r.map(v=>v===0?1:0));tot=0;
+  for(let y=6;y<=8;y++)for(let x=10;x<=14;x++)pel[y][x]=0;for(const [x,y] of [[11,13],[12,13],[13,13]])pel[y][x]=0;
+  for(const [x,y] of [[1,1],[23,1],[1,13],[23,13]]){pel[y][x]=2}
+  for(let y=0;y<CH;y++)for(let x=0;x<CW;x++)if(pel[y][x])tot++;
+  reset()}
+function reset(){P={x:ctr(12)+OX,y:ctr(13),dx:0,dy:0,nx:0,ny:0,mo:0};pw=0;eatc=0;
+  const n=Math.min(4,2+Math.floor(lvl/2));gh=[];const cols=['#b04aff','#ff5a6a','#2ad0e0','#ff9ad8'];
+  for(let i=0;i<n;i++)gh.push({x:ctr(11+i%3)+OX-(n>3&&i===3?30:0),y:ctr(7),dx:0,dy:-1,c:cols[i],st:0,out:i*90,eat:0});
+  for(const g of gh){g.x=ctr(10+i2(g))+OX}
+  mt=0}
+function i2(g){return gh.indexOf(g)%5}
+function start(){lvl=0;sc=0;lives=3;msg='';mkLevel();msg='שלב 1';mt=80}
+function setDir(dx,dy){P.nx=dx;P.ny=dy}
+addEventListener('keydown',e=>{const k=e.code;if(k==='ArrowLeft'||k==='KeyA')setDir(-1,0);else if(k==='ArrowRight'||k==='KeyD')setDir(1,0);else if(k==='ArrowUp'||k==='KeyW')setDir(0,-1);else if(k==='ArrowDown'||k==='KeyS')setDir(0,1);if(k.startsWith('Arrow'))e.preventDefault()});
+let sx=0,sy=0;cv.addEventListener('pointerdown',e=>{const p=cpos(e);sx=p.x;sy=p.y});cv.addEventListener('pointermove',e=>{if(!sx&&!sy)return;const p=cpos(e),dx=p.x-sx,dy=p.y-sy;if(Math.hypot(dx,dy)>24){if(Math.abs(dx)>Math.abs(dy))setDir(dx>0?1:-1,0);else setDir(0,dy>0?1:-1);sx=p.x;sy=p.y}});cv.addEventListener('pointerup',()=>{sx=sy=0});
+function atC(o){return (o.x-OX-CS/2)%CS===0&&(o.y-CS/2)%CS===0}
+function cell(o){return [Math.round((o.x-OX-CS/2)/CS),Math.round((o.y-CS/2)/CS)]}
+function movePlayer(){const sp=2;
+  if(atC(P)){const [cx,cy]=cell(P);
+    if(P.nx||P.ny){if(free(cx+P.nx,cy+P.ny)){P.dx=P.nx;P.dy=P.ny}}
+    if(!free(cx+P.dx,cy+P.dy)){P.dx=P.dy=0}
+    if(pel[cy][cx]){const k=pel[cy][cx];pel[cy][cx]=0;tot--;sc+=k===2?50:10;if(k===2){pw=Math.max(240,420-lvl*20);eatc=0;for(const g of gh)if(!g.eat)g.st=1;tone(300,.2)}else tone(500+(tot%2)*80,.03)}}
+  else if((P.nx===-P.dx&&P.dx)||(P.ny===-P.dy&&P.dy)){P.dx=P.nx;P.dy=P.ny}
+  P.x+=P.dx*sp;P.y+=P.dy*sp;P.mo+=.3}
+function moveGhost(g){const fb=lvl>=4?2:1.5;const base=g.st===1&&!g.eat?fb/2:fb;if(g.sp===undefined||atC(g))g.sp=base;const sp=g.sp;
+  if(g.out>0){g.out--;return}
+  if(atC(g)){const [cx,cy]=cell(g);const [px,py]=cell(P);
+    let opts=DIR.filter(d=>free(cx+d[0],cy+d[1])&&!(d[0]===-g.dx&&d[1]===-g.dy));if(!opts.length)opts=DIR.filter(d=>free(cx+d[0],cy+d[1]));
+    let tx=px,ty=py;if(g.eat){tx=12;ty=7}
+    else if(g.st===0){const i=gh.indexOf(g);if(i===1){tx=px+P.dx*3;ty=py+P.dy*3}else if(i===2){tx=px;ty=py}else if(i===3&&Math.hypot(cx-px,cy-py)<5){tx=1;ty=13}}
+    let best=null,bd=1e9;
+    if(g.st===1&&!g.eat){best=opts[Math.floor(Math.random()*opts.length)]}
+    else{const rnd=Math.random()<(g.eat?0:Math.max(.08,.25-lvl*.03));if(rnd)best=opts[Math.floor(Math.random()*opts.length)];else for(const d of opts){const dd=Math.hypot(cx+d[0]-tx,cy+d[1]-ty);if(dd<bd){bd=dd;best=d}}}
+    g.dx=best[0];g.dy=best[1];
+    if(g.eat&&cx===12&&cy===7){g.eat=0;g.st=0;g.out=40}}
+  g.x+=g.dx*sp;g.y+=g.dy*sp}
+function upd(){if(mt>0)mt--;fr=(fr||0)+1;movePlayer();if(pw>0){pw--;if(pw===0)for(const g of gh)if(!g.eat)g.st=0}
+  for(const g of gh){moveGhost(g);if(Math.hypot(g.x-P.x,g.y-P.y)<22){
+    if(g.eat)continue;
+    if(g.st===1){g.eat=1;g.st=0;eatc++;sc+=100*Math.pow(2,eatc);tone(800,.15)}
+    else{lives--;tone(110,.4,'sawtooth');if(lives<=0){over('הבאגים תפסו אתכם!',sc,'שלב '+(lvl+1),Math.floor(sc/20),lvl>=3?1:0);return}reset();msg='אוי!';mt=60;return}}}
+  if(tot<=0){sc+=200;lvl++;mkLevel();msg='שלב '+(lvl+1);mt=80;tone(900,.3)}}
+function drw(){ctx.fillStyle='#1e1650';
+  for(let y=0;y<CH;y++)for(let x=0;x<CW;x++){if(G[y][x]===1){ctx.fillStyle='#2b2178';ctx.fillRect(OX+x*CS+1,y*CS+1,CS-2,CS-2);ctx.fillStyle='#4636b8';ctx.fillRect(OX+x*CS+1,y*CS+1,CS-2,4)}
+    else if(pel[y][x]===1){ctx.fillStyle='#4ee8ff';ctx.beginPath();ctx.moveTo(OX+x*CS+15,y*CS+10);ctx.lineTo(OX+x*CS+20,y*CS+15);ctx.lineTo(OX+x*CS+15,y*CS+20);ctx.lineTo(OX+x*CS+10,y*CS+15);ctx.fill()}
+    else if(pel[y][x]===2){ctx.fillStyle='#ffd23f';ctx.save();ctx.translate(OX+x*CS+15,y*CS+15);ctx.rotate(fr/30);ctx.beginPath();for(let i=0;i<10;i++){const r=i%2?4:9,a=i*Math.PI/5;ctx.lineTo(Math.cos(a)*r,Math.sin(a)*r)}ctx.fill();ctx.restore()}}
+  // player: round blob with eyes
+  ctx.fillStyle='#ff9a3a';ctx.beginPath();ctx.arc(P.x,P.y,12+Math.sin(P.mo)*1.2,0,7);ctx.fill();
+  ctx.fillStyle='#fff';const ex=P.dx*3,ey=P.dy*3;ctx.beginPath();ctx.arc(P.x-5+ex,P.y-3+ey,4,0,7);ctx.arc(P.x+5+ex,P.y-3+ey,4,0,7);ctx.fill();ctx.fillStyle='#222';ctx.beginPath();ctx.arc(P.x-5+ex*1.4,P.y-3+ey*1.4,2,0,7);ctx.arc(P.x+5+ex*1.4,P.y-3+ey*1.4,2,0,7);ctx.fill();
+  for(const g of gh){const sc_=g.st===1&&!(pw<90&&Math.floor(fr/8)%2);const col=g.eat?'#ffffff55':sc_?'#3a5aff':g.c;ctx.fillStyle=col;rr(g.x-11,g.y-10,22,20,6);ctx.fill();
+    ctx.strokeStyle=col;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(g.x-5,g.y-10);ctx.lineTo(g.x-8,g.y-16);ctx.moveTo(g.x+5,g.y-10);ctx.lineTo(g.x+8,g.y-16);ctx.stroke();
+    for(let i=-1;i<=1;i++){ctx.fillRect(g.x+i*7-2,g.y+9,4,4)}
+    ctx.fillStyle='#fff';ctx.fillRect(g.x-7,g.y-4,5,6);ctx.fillRect(g.x+2,g.y-4,5,6);ctx.fillStyle='#111';ctx.fillRect(g.x-6+(g.dx>0?1:g.dx<0?-1:0),g.y-2,2,3);ctx.fillRect(g.x+3+(g.dx>0?1:g.dx<0?-1:0),g.y-2,2,3)}
+  T('⭐ '+sc,230,22,22);T('❤️'.repeat(lives),W-60,22,16);T('שלב '+(lvl+1),W/2,438,16,'#fff8');if(mt>0)T(msg,W/2,H/2,34,'#ffd23f')}
+wire(start);run(upd,drw,'#0e0a24');
+window.__s={step:upd,start:()=>{start();on=true},get on(){return on},get score(){return sc},get P(){return P},get G(){return G},get gh(){return gh},get pel(){return pel},get tot(){return tot},get lives(){return lives},get lvl(){return lvl},setDir,cell,atC,free,mk:mkMaze};
+
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+</script>
+<script src="../hub.js"></script>
+</body>
+</html>

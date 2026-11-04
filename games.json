@@ -640,5 +640,13 @@
     "url": "sneakylevels/",
     "icon": "sneakylevels/icons/icon-192.png",
     "tag": "אקשן"
+  },
+  {
+    "id": "munchmaze",
+    "name": "מבוך הנשנשן",
+    "description": "אספו את כל הגבישים במבוך והימנעו מהבאגים.",
+    "url": "munchmaze/",
+    "icon": "munchmaze/icons/icon-192.png",
+    "tag": "ארקייד"
   }
 ]
