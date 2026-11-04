@@ -223,19 +223,30 @@ $('lbB').onclick=lbOpen;
     var o=document.createElement('option');o.value='_all';o.textContent=T('🏅 כללי (נקודות)','🏅 Overall (points)');sel.append(o);
     LIST.forEach(function(x){if(G&&G[x.id]&&G[x.id].length){var p=document.createElement('option');p.value=x.id;p.textContent=x.name;sel.append(p)}});
     if(cur&&[].some.call(sel.options,function(q){return q.value===cur}))sel.value=cur}
-  function load(){fetch('/api/scores',{cache:'no-store'}).then(function(r){if(!r.ok)throw r.status;return r.json()}).then(function(d){G=d.g||{};fill();paint()})
-    .catch(function(e){$('gbList').textContent=e===503?T('לוח התוצאות עוד לא הופעל.','The leaderboard is not switched on yet.'):T('אין חיבור לשרת. נסו שוב מאוחר יותר.','No connection. Try again later.')})}
-  function send(){var n=nm.value.trim();if(n.length<2){msg(T('כתבו כינוי (לפחות 2 תווים)','Enter a nickname (at least 2 characters)'));return}
+  /* JSONBin-backed board (access key is Read+Update only). (c) Alon Maidenberg 2026 */
+  var JB_BIN='__BIN__',JB_KEY='$2a$10$V.Rz3BoGAuOqV3rf.yhVUuM.u.gCBl5Qdg3FHw.2YSHkR.VIEFZH2',JB_URL='https://api.jsonbin.io/v3/b/'+JB_BIN,TOP=30;
+  var BAD=/(fuck|shit|bitch|cunt|dick|porn|nazi|hitler|rape|sex|nigg|http|www|\.com|זונה|שרמוט|כוס|זין|מניאק|הומו|נאצי|היטלר|אנס|סקס)/i;
+  function jbGet(){return fetch(JB_URL+'/latest',{cache:'no-store',headers:{'X-Access-Key':JB_KEY,'X-Bin-Meta':'false'}}).then(function(r){if(!r.ok)throw r.status;return r.json()}).then(function(d){d=d&&d.record?d.record:d;if(!d||typeof d!=='object')d={};d.g=d.g||{};d.banned=d.banned||[];return d})}
+  function jbPut(b){return fetch(JB_URL,{method:'PUT',headers:{'Content-Type':'application/json','X-Access-Key':JB_KEY},body:JSON.stringify(b)}).then(function(r){if(!r.ok)throw r.status;return b})}
+  function cleanName(n){n=String(n||'').replace(/[\u0000-\u001f<>&"'`\\]/g,'').replace(/\s+/g,' ').trim().slice(0,14);return n.length>=2&&!BAD.test(n.replace(/[\s._-]/g,''))?n:''}
+  function load(){if(JB_BIN==='__BIN__'){$('gbList').textContent=T('לוח התוצאות עוד לא הופעל.','The leaderboard is not switched on yet.');return}
+    jbGet().then(function(b){G=b.g;fill();paint()}).catch(function(){$('gbList').textContent=T('אין חיבור לשרת. נסו שוב מאוחר יותר.','No connection. Try again later.')})}
+  function send(){var n0=nm.value.trim(),n=cleanName(n0);if(n0.length<2){msg(T('כתבו כינוי (לפחות 2 תווים)','Enter a nickname (at least 2 characters)'));return}
+    if(!n){msg(T('הכינוי לא מתאים, נסו אחר','That nickname is not allowed'));return}
+    if(JB_BIN==='__BIN__'){msg(T('לוח התוצאות עוד לא הופעל','The leaderboard is not switched on yet'));return}
     var sc=localBests();if(!Object.keys(sc).length){msg(T('עוד אין לך שיאים. שחקו קודם!','You have no records yet. Play first!'));return}
     try{localStorage.setItem('ag_name',n)}catch(e){}
     msg(T('שולח…','Sending…'));
-    fetch('/api/scores',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({name:n,scores:sc})}).then(function(r){return r.json().then(function(d){return{s:r.status,d:d}})})
-      .then(function(o){if(o.s===200){G=o.d.g;fill();paint();msg(o.d.changed?T('נשלח! עודכנו '+o.d.changed+' שיאים 🎉','Sent! '+o.d.changed+' records updated 🎉'):T('הכול כבר מעודכן','Everything is up to date'))}
-        else msg(o.d.error==='name'?T('הכינוי לא מתאים, נסו אחר','That nickname is not allowed'):o.d.error==='banned'?T('הכינוי הזה נחסם','This nickname is blocked'):o.d.error==='not-configured'?T('לוח התוצאות עוד לא הופעל','The leaderboard is not switched on yet'):T('משהו השתבש','Something went wrong'))})
-      .catch(function(){msg(T('אין חיבור לשרת','No connection'))})}
-  function del(name){var code=prompt(T('קוד אדמין:','Admin code:'));if(!code)return;var ban=confirm(T('לחסום את הכינוי גם להמשך?','Also block this nickname from now on?'));
-    fetch('/api/scores',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({action:'delete',name:name,ban:ban,code:code})}).then(function(r){return r.json().then(function(d){return{s:r.status,d:d}})})
-      .then(function(o){if(o.s===200){G=o.d.g;fill();paint();msg(T('נמחק','Deleted'))}else msg(T('קוד שגוי','Wrong code'))})}
+    jbGet().then(function(b){if(b.banned.indexOf(n.toLowerCase())>-1){throw 'banned'}var ch=0,k=0;
+      Object.keys(sc).forEach(function(id){if(++k>90||!/^[a-z0-9]{2,20}$/.test(id))return;var v=Math.floor(+sc[id]);if(!isFinite(v)||v<=0||v>1e9)return;var arr=b.g[id]||(b.g[id]=[]);
+        var mine=arr.filter(function(e){return e.n.toLowerCase()===n.toLowerCase()})[0];if(mine){if(v>mine.s){mine.s=v;mine.n=n;ch++}}else{arr.push({n:n,s:v});ch++}
+        arr.sort(function(x,y){return y.s-x.s});if(arr.length>TOP)arr.length=TOP});
+      if(!ch)return {b:b,ch:0};return jbPut(b).then(function(){return {b:b,ch:ch}})})
+     .then(function(o){G=o.b.g;fill();paint();msg(o.ch?T('נשלח! עודכנו '+o.ch+' שיאים 🎉','Sent! '+o.ch+' records updated 🎉'):T('הכול כבר מעודכן','Everything is up to date'))})
+     .catch(function(e){msg(e==='banned'?T('הכינוי הזה נחסם','This nickname is blocked'):T('משהו השתבש, נסו שוב','Something went wrong, try again'))})}
+  function del(name){if(!AG.isAdmin()){msg(T('רק אדמין יכול למחוק','Admins only'));return}var ban=confirm(T('לחסום את הכינוי גם להמשך?','Also block this nickname from now on?')),nl=name.toLowerCase();
+    jbGet().then(function(b){Object.keys(b.g).forEach(function(id){b.g[id]=b.g[id].filter(function(e){return e.n.toLowerCase()!==nl})});if(ban&&b.banned.indexOf(nl)<0)b.banned.push(nl);return jbPut(b)})
+     .then(function(b){G=b.g;fill();paint();msg(T('נמחק','Deleted'))}).catch(function(){msg(T('משהו השתבש','Something went wrong'))})}
   $('gbB').onclick=function(){try{nm.value=localStorage.getItem('ag_name')||''}catch(e){}$('gbM').classList.add('show');msg('');G=null;paint();load()};
   $('gbX').onclick=function(){$('gbM').classList.remove('show')};$('gbSend').onclick=send;sel.onchange=paint;
 })();
