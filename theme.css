@@ -35,3 +35,11 @@ html:fullscreen,html:fullscreen body{background:#06223a!important}
 #ag-panel{max-height:calc(100vh - 56px);max-height:calc(100dvh - 56px);overflow:auto}
 #ag-panel,#ag-panel *:not(input):not(select):not(option){color:#fff!important}
 #ag-panel button.on{color:#222!important}
+/* compact, wider menus: less empty space */
+@media(min-width:620px) and (orientation:landscape){
+ #menu .ovc,.ov.show .ovc{max-width:min(760px,94vw)!important;column-count:2;column-gap:26px;text-align:center}
+ .ovc>*{break-inside:avoid}
+ .ovc>div:first-child:not(.chips):not(.lb),.ovc>h2:first-of-type,.ovc>.btn,.ovc>.lb:first-of-type,.ovc>p:first-of-type{column-span:all}
+}
+.ovc .lb{margin-bottom:4px}
+.ovc .agmore{cursor:pointer;color:#0a8f86;font-weight:900;margin-inline-start:6px}

@@ -70,7 +70,7 @@
   var sc=document.currentScript;var base=new URL('./',sc&&sc.src?sc.src:location.href).href;
   if(LANG==='en'){var s=document.createElement('script');s.src=base+'i18n.js';(document.head||document.documentElement).appendChild(s)}
   var isHub=(location.pathname.replace(/index\.html$/,'')===new URL(base).pathname);
-  if(!/\/boss\//.test(location.pathname)){var tl=document.createElement('link');tl.rel='stylesheet';tl.href=base+'theme.css?v=5';(document.head||document.documentElement).appendChild(tl)}
+  if(!/\/boss\//.test(location.pathname)){var tl=document.createElement('link');tl.rel='stylesheet';tl.href=base+'theme.css?v=6';(document.head||document.documentElement).appendChild(tl)}
   var adm=false;try{adm=localStorage.getItem('ag_adm')!==null&&window.AG&&AG.isAdmin()}catch(e){}
   if(!isHub||(window.AG&&AG.isAdmin&&AG.isAdmin())){var fx=document.createElement('script');fx.src=base+'fx.js';(document.head||document.documentElement).appendChild(fx)}
   var on_=document.createElement('script');on_.src=base+'online.js';(document.head||document.documentElement).appendChild(on_);
@@ -104,4 +104,17 @@
     b.style.left='212px';
     b.onclick=function(){if(isFs()){ls('ag_nofs','1');exit()}else{ls('ag_nofs',null);enter()}};document.body.appendChild(b)}
   if(document.body)mk();else addEventListener('DOMContentLoaded',mk);
+})();
+
+/* shorten long menu descriptions to one short line, tap to expand */
+(function(){
+  if(/\/boss\//.test(location.pathname))return;
+  function fix(){var o=document.querySelectorAll('#menu .ovc .lb,.ov .ovc>.lb:first-of-type');o.forEach(function(e){
+    if(e.dataset.agd||e.children.length||e.querySelector('button'))return;var t=e.textContent.trim();if(t.length<46)return;e.dataset.agd='1';
+    var cut=t.search(/[.!?](\s|$)/);var first=cut>8&&cut<95?t.slice(0,cut+1):t.slice(0,64).replace(/\s+\S*$/,'')+'…';if(first.length>=t.length-3)return;
+    e.textContent=first+' ';var m=document.createElement('span');m.className='agmore';m.textContent=(window.AG_LANG==='en'?'more ▾':'עוד ▾');
+    m.onclick=function(){e.textContent=t};e.appendChild(m)})}
+  function go(){setTimeout(fix,60);setTimeout(fix,900)}
+  if(document.readyState!=='loading')go();else addEventListener('DOMContentLoaded',go);
+  addEventListener('load',go);
 })();

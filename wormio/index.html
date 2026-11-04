@@ -47,7 +47,7 @@ body{overflow:hidden;position:fixed;inset:0;width:100%;background:#0e2338}
 <body>
 <canvas id="cv"></canvas><div id="hud"></div>
 <div id="rot">📱↔️<br>סובבו את הטלפון לרוחב</div>
-<div class="ov show" id="menu"><div class="ovc" style="max-width:440px"><div style="font-size:56px">🐛</div><h2>נחש נגד תולעים</h2><div class="lb">הזיזו את האצבע/העכבר לכיוון שרוצים לנוע. אכלו נקודות אור כדי לגדול. אם הראש שלכם פוגע בגוף של תולעת אחרת – אתם נופלים! לחצו על ⚡ (או רווח) כדי להאיץ. אפשר גם עם החצים.</div><div class="chips" id="lv"><button class="chip" data-v="1">קל</button><button class="chip on" data-v="2">רגיל</button><button class="chip" data-v="3">קשה</button></div><button class="btn" id="go">▶ שחק</button><div style="opacity:.8;margin-top:10px;font-size:15px">שיא: <b id="best">0</b></div></div></div>
+<div class="ov show" id="menu"><div class="ovc" style="max-width:440px"><div style="font-size:56px">🐛</div><h2>נחש נגד תולעים</h2><div class="lb">המעגל מצטמצם לאט – מי שנוגע בקצה שלו מת! אכלו נקודות אור כדי לגדול, ואל תפגעו בגוף של תולעת אחרת. הזיזו את האצבע/העכבר כדי לנוע, ⚡ (או רווח) להאצה.</div><div class="chips" id="lv"><button class="chip" data-v="1">קל</button><button class="chip on" data-v="2">רגיל</button><button class="chip" data-v="3">קשה</button></div><button class="btn" id="go">▶ שחק</button><div style="opacity:.8;margin-top:10px;font-size:15px">שיא: <b id="best">0</b></div></div></div>
 <div class="ov" id="end"><div class="ovc"><h2 id="eT">נגמר</h2><div style="font-size:48px;font-weight:900;color:#ffd05a" id="eS"></div><p id="eM"></p><button class="btn" id="again">🔁 שוב</button><button class="btn alt" id="menu2">תפריט</button></div></div>
 <script>
 'use strict';
@@ -79,12 +79,12 @@ let lvl=2;[...$('#lv').children].forEach(b=>b.onclick=()=>{[...$('#lv').children
 const NAMES=['דבורי','פיקל','נחשוש','זיגזג','ברק','לולי','טורבו','קיפוד','גמבו','שחור','פיצי','ירוק','סליים','בוסי','רוני','מיקי'];
 const NAMES_EN=['Buzzy','Pickle','Wiggles','Zigzag','Spark','Lulu','Turbo','Spike','Gumbo','Shadow','Pixie','Green','Slimy','Bossy','Ronny','Mickey'];
 const SK=[[20,60],[200,60],[300,70],[40,70],[170,65],[260,60],[0,70],[100,60],[330,60],[60,80]];
-const ZM=[.6,.8,1.05];let zi=+store.get('wm_zoom',1);let worms,orbs,me,cam,fr,kills,boostP=false,ang0=null,prs={},ptrSteer=null,keysA=0,sbest=0;
+const ZM=[.6,.8,1.05];let zi=+store.get('wm_zoom',1);let ZR=1500,ZR0=1500,ZMIN=300;let worms,orbs,me,cam,fr,kills,boostP=false,ang0=null,prs={},ptrSteer=null,keysA=0,sbest=0;
 const hsl=(h,s,l,a)=>`hsla(${h},${s}%,${l}%,${a===undefined?1:a})`;
 function mk(ai,i){const sk=ai?SK[i%SK.length]:[130,70];const w={ai,x:rnd(300,WW-300),y:rnd(300,WH-300),a:rnd(0,6.28),ta:0,len:ai?rnd(12,40):12,gr:0,seg:[],h:sk[0],s:sk[1],name:ai?(EN?NAMES_EN:NAMES)[i%NAMES.length]:TT('אתה','You'),boost:false,dead:false,sk:rnd(.5,1.2),tt:0,sc:0};w.ta=w.a;w.seg=[];const D=5;for(let k=0;k<Math.floor(w.len);k++)w.seg.push({x:w.x-Math.cos(w.a)*k*D,y:w.y-Math.sin(w.a)*k*D});return w}
 const rad=w=>7+Math.min(14,Math.sqrt(w.len)*.95);
 function orb(x,y,v,c){orbs.push({x,y,v:v||1,h:c===undefined?rnd(0,360):c,r:v>2?7:rnd(3,5)})}
-function start(){worms=[];orbs=[];kills=0;fr=0;boostP=false;me=mk(false);me.x=WW/2;me.y=WH/2;me.a=me.ta=0;me.seg=[];for(let k=0;k<12;k++)me.seg.push({x:me.x-k*5,y:me.y});worms.push(me);const n=[0,7,10,14][lvl];for(let i=0;i<n;i++){const w=mk(true,i);if(Math.hypot(w.x-me.x,w.y-me.y)<500){w.x=rnd(300,WW-300);w.y=WH-200}w.seg=[];for(let k=0;k<Math.floor(w.len);k++)w.seg.push({x:w.x-Math.cos(w.a)*k*5,y:w.y-Math.sin(w.a)*k*5});worms.push(w)}
+function start(){ZR=ZR0;worms=[];orbs=[];kills=0;fr=0;boostP=false;me=mk(false);me.x=WW/2;me.y=WH/2;me.a=me.ta=0;me.seg=[];for(let k=0;k<12;k++)me.seg.push({x:me.x-k*5,y:me.y});worms.push(me);const n=[0,7,10,14][lvl];for(let i=0;i<n;i++){const w=mk(true,i);if(Math.hypot(w.x-me.x,w.y-me.y)<500){w.x=rnd(300,WW-300);w.y=WH-200}w.seg=[];for(let k=0;k<Math.floor(w.len);k++)w.seg.push({x:w.x-Math.cos(w.a)*k*5,y:w.y-Math.sin(w.a)*k*5});worms.push(w)}
  for(let i=0;i<520;i++)orb(rnd(30,WW-30),rnd(30,WH-30));cam={x:me.x,y:me.y,z:ZM[zi]}}
 function kill(w,by){if(w.dead)return;w.dead=true;if(by&&by===me)kills++;const m=Math.max(1,Math.floor(w.seg.length/3));for(let i=0;i<w.seg.length;i+=3)orb(w.seg[i].x+rnd(-8,8),w.seg[i].y+rnd(-8,8),2.5,w.h);tone(w===me?150:520,.2,'sawtooth',.08);
  if(w===me){over(TT('נאכלת! 🐛','You got eaten! 🐛'),Math.floor(me.len*5),TT('אורך סופי: ','Final length: ')+Math.floor(me.len)+TT(' · הפלת ',' · defeated ')+kills+TT(' תולעים',' worms'),Math.min(70,Math.floor(me.len/5)+kills*4),me.len>180?1:0,900)}else{const i=worms.indexOf(w);const n=mk(true,Math.floor(rnd(0,99)));let tries=0;do{n.x=rnd(300,WW-300);n.y=rnd(300,WH-300);tries++}while(Math.hypot(n.x-me.x,n.y-me.y)<700&&tries<20);n.seg=[];for(let k=0;k<Math.floor(n.len);k++)n.seg.push({x:n.x-Math.cos(n.a)*k*5,y:n.y-Math.sin(n.a)*k*5});worms[i]=n}}
@@ -92,7 +92,7 @@ function danger(w,ax,ay,r){for(const o of worms){if(o===w||o.dead)continue;const
 function think(w){const sp=[0,.04,.06,.085][lvl];w.tt++;const r=rad(w);let best=null,bd=1e9;
  if(w.tt%8===0||!w.tg){w.tg=null;for(const o of orbs){const d=(o.x-w.x)**2+(o.y-w.y)**2;if(d<bd&&d<(280+lvl*60)**2){bd=d;best=o}}if(best)w.tg=best;else if(w.tt%90===0)w.ta=rnd(0,6.28)}
  let want=w.tg?Math.atan2(w.tg.y-w.y,w.tg.x-w.x):w.ta;
- const mg=140;if(w.x<mg)want=0;if(w.x>WW-mg)want=Math.PI;if(w.y<mg)want=Math.PI/2;if(w.y>WH-mg)want=-Math.PI/2;
+ if(Math.hypot(w.x-WW/2,w.y-WH/2)>ZR-170)want=Math.atan2(WH/2-w.y,WW/2-w.x);const mg=140;if(w.x<mg&&ZR>1000)want=0;if(w.x>WW-mg)want=Math.PI;if(w.y<mg&&ZR>1000)want=Math.PI/2;if(w.y>WH-mg&&ZR>1000)want=-Math.PI/2;
  for(const da of [0,.5,-.5,1,-1,1.6,-1.6]){const aa=w.a+da,ax=w.x+Math.cos(aa)*(r*2+30),ay=w.y+Math.sin(aa)*(r*2+30);if(!danger(w,ax,ay,r)){if(da!==0&&danger(w,w.x+Math.cos(w.a)*(r*2+30),w.y+Math.sin(w.a)*(r*2+30),r))want=aa;break}}
  let d=want-w.a;while(d>Math.PI)d-=6.283;while(d<-Math.PI)d+=6.283;w.a+=clamp(d,-sp*1.6,sp*1.6);
  w.boost=lvl>1&&w.len>30&&!!w.tg&&Math.random()<.002}
@@ -102,7 +102,9 @@ function stepW(w){const r=rad(w);let sp=2.35+(w===me?0:[0,-.35,-.1,.1][lvl]);let
  const D=Math.max(4,r*.5);let px=w.x,py=w.y;for(const s of w.seg){const dx=s.x-px,dy=s.y-py,d=Math.hypot(dx,dy)||1;if(d>D){s.x=px+dx/d*D;s.y=py+dy/d*D}px=s.x;py=s.y}
  for(let i=orbs.length-1;i>=0;i--){const o=orbs[i];if((o.x-w.x)**2+(o.y-w.y)**2<(r+o.r+10)**2){w.len+=o.v*.28;orbs.splice(i,1);if(w===me&&fr%3===0)tone(700+Math.random()*300,.03,'sine',.03)}}
  w.sc=Math.floor(w.len*5)}
-function upd(){fr++;
+function inZone(x,y,r){return Math.hypot(x-WW/2,y-WH/2)+r*.6<=ZR}
+function upd(){fr++;if(ZR>ZMIN)ZR-=[0,.22,.3,.4][lvl]/ (lvl?1:1)*.5;
+ for(const w of worms.slice())if(!w.dead&&!inZone(w.x,w.y,rad(w))){kill(w,null);if(w===me)return}
  // player steering
  if(ptrSteer){const dx=ptrSteer.x-W/2,dy=ptrSteer.y-H/2;if(Math.hypot(dx,dy)>12)me.ta=Math.atan2(dy,dx)}
  if(keysA){me.ta=me.a+keysA*.12}
@@ -116,7 +118,7 @@ function upd(){fr++;
    for(let i=1;i<b.seg.length&&!hit;i+=1){const s=b.seg[i];if((s.x-a.x)**2+(s.y-a.y)**2<((ra+rb)*.72)**2)hit=true}
    if(hit){kill(a,b);break}}}
  if(me.dead)return;
- while(orbs.length<520)orb(rnd(30,WW-30),rnd(30,WH-30));
+ while(orbs.length<520){const a=rnd(0,6.28),d=Math.sqrt(Math.random())*ZR*.97;orb(WW/2+Math.cos(a)*d,WH/2+Math.sin(a)*d)}
  const z=(ZM[zi])*(1-Math.min(.4,(me.len-12)/700));cam.z+=(z-cam.z)*.03;cam.x+=(me.x-cam.x)*.18;cam.y+=(me.y-cam.y)*.18}
 function drawWorm(w){const r=rad(w),n=w.seg.length;
  for(let i=n-1;i>=0;i--){const s=w.seg[i];if(s.x<cam.x-W/cam.z/2-30||s.x>cam.x+W/cam.z/2+30||s.y<cam.y-H/cam.z/2-30||s.y>cam.y+H/cam.z/2+30)continue;const t=1-i/n*.25;const rr2=r*(.7+.3*t);
@@ -130,9 +132,10 @@ function drw(){
  const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#1a7bd0');g.addColorStop(1,'#0b4a95');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
  ctx.save();ctx.translate(W/2,H/2);ctx.scale(cam.z,cam.z);ctx.translate(-cam.x,-cam.y);
  const vx0=cam.x-W/cam.z/2,vy0=cam.y-H/cam.z/2,vx1=cam.x+W/cam.z/2,vy1=cam.y+H/cam.z/2;
- ctx.fillStyle='#14396e';ctx.fillRect(0,0,WW,WH);ctx.fillStyle='rgba(255,255,255,.05)';
+ ctx.fillStyle='#14396e';ctx.fillRect(vx0-50,vy0-50,vx1-vx0+100,vy1-vy0+100);ctx.fillStyle='rgba(255,255,255,.05)';
  for(let x=Math.floor(vx0/80)*80;x<vx1;x+=80)for(let y=Math.floor(vy0/80)*80;y<vy1;y+=80){const o=((y/80)&1)*40;ctx.beginPath();ctx.arc(x+o,y,18,0,7);ctx.fill()}
- ctx.strokeStyle='rgba(120,210,255,.9)';ctx.lineWidth=10;ctx.strokeRect(0,0,WW,WH);
+ ctx.save();ctx.fillStyle='rgba(255,40,70,.28)';ctx.beginPath();ctx.rect(vx0-50,vy0-50,vx1-vx0+100,vy1-vy0+100);ctx.arc(WW/2,WH/2,ZR,0,7,true);ctx.fill('evenodd');ctx.restore();
+ ctx.strokeStyle=ZR<ZMIN+200?'rgba(255,80,100,.95)':'rgba(255,255,255,.9)';ctx.lineWidth=12;ctx.setLineDash([30,18]);ctx.lineDashOffset=-fr*.6;ctx.beginPath();ctx.arc(WW/2,WH/2,ZR,0,7);ctx.stroke();ctx.setLineDash([]);
  for(const o of orbs){if(o.x<vx0-10||o.x>vx1+10||o.y<vy0-10||o.y>vy1+10)continue;const pu=1+Math.sin(fr*.1+o.x)*.12;ctx.fillStyle=hsl(o.h,90,60,.25);ctx.beginPath();ctx.arc(o.x,o.y,o.r*2.2*pu,0,7);ctx.fill();ctx.fillStyle=hsl(o.h,95,68);ctx.beginPath();ctx.arc(o.x,o.y,o.r*pu,0,7);ctx.fill();ctx.fillStyle='rgba(255,255,255,.8)';ctx.beginPath();ctx.arc(o.x-o.r*.3,o.y-o.r*.3,o.r*.3,0,7);ctx.fill()}
  for(const w of worms)if(w!==me)drawWorm(w);drawWorm(me);
  ctx.restore();
@@ -141,8 +144,9 @@ function drw(){
  T('‭'+me.sc+' נקודות · אורך '+Math.floor(me.len),W/2,18,20,'#fff');
  ctx.fillStyle='rgba(8,30,70,.5)';rr(W-190,36,176,26+top.length*22,12);ctx.fill();T(TT('מקום ','Place ')+rk+TT(' מתוך ',' of ')+worms.length,W-102,50,13,'#ffd23f');ctx.direction='ltr';
  top.forEach((w,i)=>{ctx.fillStyle=w===me?'#ffd23f':'#fff';ctx.font='bold 13px system-ui';ctx.textAlign='right';ctx.fillText(w.name,W-24,74+i*22);ctx.textAlign='left';ctx.fillText('‭'+w.sc,W-182,74+i*22)});
+ {const dz=ZR-Math.hypot(me.x-WW/2,me.y-WH/2);if(dz<220&&fr%30<20)T(TT('⚠ חזרו למעגל!','⚠ Back to the circle!'),W/2,60,26,'#ff5a7a')}
  // minimap
- ctx.fillStyle='rgba(8,30,70,.5)';rr(14,H-84,120,90,10);ctx.fill();for(const w of worms){ctx.fillStyle=w===me?'#ffd23f':hsl(w.h,80,60);ctx.beginPath();ctx.arc(14+w.x/WW*120,H-84+w.y/WH*90,w===me?4:2.5,0,7);ctx.fill()}
+ ctx.fillStyle='rgba(8,30,70,.5)';rr(14,H-84,120,90,10);ctx.fill();ctx.strokeStyle='#ff5a7a';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(14+60,H-84+45,ZR/WW*120,ZR/WH*90,0,0,7);ctx.stroke();for(const w of worms){ctx.fillStyle=w===me?'#ffd23f':hsl(w.h,80,60);ctx.beginPath();ctx.arc(14+w.x/WW*120,H-84+w.y/WH*90,w===me?4:2.5,0,7);ctx.fill()}
  B(W-176,H-86,52,52,'rgba(255,255,255,.28)','🔍',()=>{zi=(zi+1)%3;store.set('wm_zoom',zi)},24);
  // boost button
  const bx=W-96,by=H-96,bp=prs.boost||boostP;ctx.fillStyle=bp?'#ffd23f':'rgba(255,255,255,.22)';ctx.beginPath();ctx.arc(bx,by,40,0,7);ctx.fill();ctx.strokeStyle='rgba(255,255,255,.6)';ctx.lineWidth=3;ctx.stroke();T('⚡',bx,by,34)}
