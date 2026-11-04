@@ -65,6 +65,15 @@ a.card:hover{box-shadow:0 8px 26px rgba(255,210,63,.25)}
 .bossb{display:flex;align-items:center;gap:14px;text-decoration:none;color:#fff;margin:6px 0 18px;padding:16px 18px;border-radius:22px;background:linear-gradient(120deg,#5b36d6,#c2307a);border:2px solid rgba(255,255,255,.3);box-shadow:0 8px 28px rgba(194,48,122,.35)}
 .bossb .em{font-size:48px}.bossb b{display:block;font-size:20px}.bossb small{opacity:.9;font-size:14px}
 .bossb .bar{height:8px;background:rgba(0,0,0,.3);border-radius:4px;margin-top:8px;overflow:hidden}.bossb .bar i{display:block;height:100%;background:#ffd23f;border-radius:4px}
+body.cmp #grid{grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:8px}
+body.cmp a.card{padding:7px 9px;gap:9px;border-radius:16px;border-width:1.5px}
+body.cmp a.card img{width:40px;height:40px;border-radius:11px}
+body.cmp .t{font-size:14.5px;line-height:1.15}
+body.cmp .d{display:none}
+body.cmp .tag{margin-top:3px;font-size:10.5px;padding:1px 7px}
+body.cmp .fav{top:2px;left:4px;font-size:16px;padding:2px}
+body.cmp .sec{margin-top:6px}
+body.cmp .new{top:-5px;font-size:9.5px;padding:2px 6px}
 </style>
 <link rel="canonical" href="https://alon-maidenberg.pages.dev/">
 <meta property="og:title" content="המשחקים של אלון מידנברג">
@@ -80,7 +89,7 @@ a.card:hover{box-shadow:0 8px 26px rgba(255,210,63,.25)}
     <p>בחרו משחק ותתחילו לשחק 🎮</p><div class="stat" id="stat"></div>
     <div class="wal"><span>🪙 <b id="wc">0</b></span><span>💎 <b id="wd">0</b></span><button class="key" id="keyB" aria-label="קוד אדמין">🔑</button></div>
   <div class="daily"><button id="dailyB">🎁 מתנה יומית</button> <button id="lbB" style="font:inherit;font-weight:900;font-size:16px;padding:10px 20px;border-radius:999px;border:2px solid rgba(255,255,255,.3);background:rgba(255,255,255,.08);color:#fff;cursor:pointer">🏆 השיאים שלי</button> <button id="gbB" style="font:inherit;font-weight:900;font-size:16px;padding:10px 20px;border-radius:999px;border:2px solid rgba(255,255,255,.3);background:rgba(255,255,255,.08);color:#fff;cursor:pointer">🌍 לוח תוצאות</button> <button id="achB" style="font:inherit;font-weight:900;font-size:16px;padding:10px 20px;border-radius:999px;border:2px solid rgba(255,255,255,.3);background:rgba(255,255,255,.08);color:#fff;cursor:pointer">🏅 הישגים</button></div>
-    <div class="tools"><input class="sr" id="sr" type="search" placeholder="🔍 חיפוש משחק…" autocomplete="off"></div>
+    <div class="tools" style="display:flex;gap:8px"><input class="sr" id="sr" type="search" placeholder="🔍 חיפוש משחק…" autocomplete="off"><button class="sr" id="cmpB" type="button" style="width:auto;flex:none;cursor:pointer;font-weight:900" aria-label="תצוגה"></button></div>
     <div id="chips"></div>
   <a class="bossb" id="bossB" href="boss/"><span class="em">👾</span><span style="flex:1"><b>שלבי הבוס: הגליץ׳</b><small id="bossT"></small><div class="bar"><i id="bossBar"></i></div></span></a>
   </header>
@@ -137,6 +146,7 @@ function render(){
 function chips(){
   var c=$('chips');c.textContent='';var tags=['הכל'];LIST.forEach(function(x){if(x.tag&&tags.indexOf(x.tag)<0)tags.push(x.tag)});if(FAV.length)tags.push('⭐ מועדפים');
   tags.forEach(function(t){var b=document.createElement('button');b.textContent=t;if(t===cat)b.className='on';b.onclick=function(){cat=t;chips();render()};c.append(b)})}
+(function(){var b=$('cmpB'),k='ag_cmp';function ap(){var c=localStorage.getItem(k)!=='0';document.body.classList.toggle('cmp',c);b.textContent=c?'▦':'☰';b.title=c?'תצוגה מורחבת':'תצוגה מצומצמת'}b.onclick=function(){try{localStorage.setItem(k,localStorage.getItem(k)==='0'?'1':'0')}catch(e){}ap()};ap()})();
 $('sr').addEventListener('input',function(){q=this.value.trim().toLowerCase();render()});
 fetch('games.json',{cache:'no-cache'}).then(function(r){return r.json()}).then(function(list){if(window.AG_LANG==='en'||localStorage.getItem('ag_lang')==='en')list=list.filter(function(g){return g.id!=='englishbot'});
   LIST=list;$('stat').textContent=list.length+' משחקים · משחקים חדשים מתווספים כל הזמן';chips();render()
