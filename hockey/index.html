@@ -78,7 +78,7 @@ function step(){if(state!=='play')return;
   for(let k=0;k<2;k++){pk.x+=pk.vx/2;pk.y+=pk.vy/2;
     for(const m of[pa,pb]){const dx=pk.x-m.x,dy=pk.y-m.y,d=Math.hypot(dx,dy);if(d<PR+BR&&d>.01){const nx=dx/d,ny=dy/d;pk.x=m.x+nx*(PR+BR);pk.y=m.y+ny*(PR+BR);const rv=(pk.vx-m.vx)*nx+(pk.vy-m.vy)*ny;if(rv<0){pk.vx-=2*rv*nx;pk.vy-=2*rv*ny;pk.vx+=m.vx*.5;pk.vy+=m.vy*.5;tone(300,.05,'square',.06)}}}
     if(pk.y<ty0+BR){pk.y=ty0+BR;pk.vy=Math.abs(pk.vy)}if(pk.y>ty1-BR){pk.y=ty1-BR;pk.vy=-Math.abs(pk.vy)}
-    const inG=Math.abs(pk.y-H/2)<GWD/2;if(pk.x<tx0+BR){if(inG&&pk.x<tx0){goal(1);return}pk.x=tx0+BR;pk.vx=Math.abs(pk.vx)}if(pk.x>tx1-BR){if(inG&&pk.x>tx1){goal(0);return}pk.x=tx1-BR;pk.vx=-Math.abs(pk.vx)}}
+    const inG=Math.abs(pk.y-H/2)<GWD/2;if(pk.x<tx0+BR){if(inG){if(pk.x<tx0){goal(1);return}}else{pk.x=tx0+BR;pk.vx=Math.abs(pk.vx)}}if(pk.x>tx1-BR){if(inG){if(pk.x>tx1){goal(0);return}}else{pk.x=tx1-BR;pk.vx=-Math.abs(pk.vx)}}}
   const s=Math.hypot(pk.vx,pk.vy);pk.vx*=.997;pk.vy*=.997;if(s>14){pk.vx*=14/s;pk.vy*=14/s}if(s<1.2){pk.vx+=pk.x<W/2?.05:-.05}
   trail.push({x:pk.x,y:pk.y});if(trail.length>10)trail.shift();if(msgT>0)msgT--}
 function goal(w){sc[w]++;tone(700,.3);if(sc[w]>=7){state='over';const win=w===0;saveBest(sc[0]);setTimeout(()=>endGame(mode==='2p'?(win?'שחקן 1 ניצח!':'שחקן 2 ניצח!'):(win?'ניצחת! 🏆':'הפסדת הפעם'),sc[0]+' : '+sc[1],'',mode==='cpu'&&win?15+lvl*10:mode==='cpu'?4:0,mode==='cpu'&&win&&lvl===3?1:0),500)}else{serve(w?-1:1);msgT=50}}
