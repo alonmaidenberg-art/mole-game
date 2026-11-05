@@ -49,6 +49,7 @@ body{overflow:hidden;position:fixed;inset:0;width:100%;background:#0e2338}
 <div id="rot">📱↔️<br>סובבו את הטלפון לרוחב</div>
 <div class="ov show" id="menu"><div class="ovc" style="max-width:440px"><div style="font-size:56px">🏎️</div><h2>מירוץ כביש</h2><div class="lb">המירוץ מאיץ לאט לאט. התחמקו ממכוניות ואספו מטבעות</div><div class="chips" id="ch"></div><div style="opacity:.75;font-size:12.5px;margin-top:8px"><b>◀ ▶</b> או A/D · בטלפון: גע בצד ימין או שמאל של המסך</div><button class="btn" id="go">▶ שחק</button><div style="opacity:.8;margin-top:10px;font-size:15px">שיא: <b id="best">0</b></div></div></div>
 <div class="ov" id="end"><div class="ovc"><h2 id="eT">נגמר</h2><div style="font-size:48px;font-weight:900;color:#ffd05a" id="eS"></div><p id="eM"></p><button class="btn" id="again">🔁 שוב</button><button class="btn alt" id="menu2">תפריט</button></div></div>
+<script src="../lib/real2d.js"></script>
 <script>
 'use strict';
 const $=s=>document.querySelector(s);
@@ -74,8 +75,29 @@ function step(){if(state!=='play')return;frame++;sp=Math.min(22,5+frame/260);con
   for(const o of obs){o.y+=sp-o.v;if(Math.abs(o.x-px)<44&&Math.abs(o.y-360)<(o.t==='truck'?62:46)){state='dead';shake=14;tone(110,.5,'sawtooth',.12);saveBest(score);setTimeout(()=>endGame('התנגשות!',score+' מ׳',got?'אספת '+got+' מטבעות':'',Math.floor(score/12)+got,score>=300?1:0),600)}}
   for(const c of coins){c.y+=sp;if(Math.abs(c.x-px)<28&&Math.abs(c.y-360)<34){c.y=999;got++;tone(900,.06)}}
   obs=obs.filter(o=>o.y<H+80);coins=coins.filter(c=>c.y<H+40);if(shake>0)shake--}
-function car(x,y,c,t){ctx.fillStyle='rgba(0,0,0,.3)';ctx.fillRect(x-22,y-36,48,78);ctx.fillStyle=c;const h=t==='truck'?120:84;ctx.beginPath();ctx.roundRect?ctx.roundRect(x-23,y-h/2,46,h,10):ctx.rect(x-23,y-h/2,46,h);ctx.fill();ctx.fillStyle='#bfe8ff';ctx.fillRect(x-16,y-h/2+10,32,16);ctx.fillRect(x-16,y+h/2-26,32,12);ctx.fillStyle='#111';ctx.fillRect(x-27,y-h/2+8,5,16);ctx.fillRect(x+22,y-h/2+8,5,16);ctx.fillRect(x-27,y+h/2-24,5,16);ctx.fillRect(x+22,y+h/2-24,5,16)}
-function draw(){ctx.save();if(shake>0)ctx.translate(rnd(-shake,shake)*.4,rnd(-shake,shake)*.4);const th=Math.min(1,sp/22);ctx.fillStyle='#2f9a46';ctx.fillRect(-10,0,W+20,H);ctx.fillStyle='#2a8a3e';for(let y=-80+roadOff;y<H;y+=80){ctx.fillRect(0,y,RX,40);ctx.fillRect(RX+RW,y,W,40)}
+function car(x,y,c,t){const h=t==='truck'?120:84;
+  ctx.save();ctx.globalAlpha=.32;ctx.fillStyle='#000';
+  R2.round(ctx,x-24,y-h/2+6,52,h,12);ctx.fill();ctx.restore();
+  // wheels first, so the body sits over them
+  ctx.fillStyle='#15151a';
+  for(const [wx,wy] of [[x-27,y-h/2+8],[x+22,y-h/2+8],[x-27,y+h/2-24],[x+22,y+h/2-24]]){
+    R2.round(ctx,wx,wy,5,16,2);ctx.fill()}
+  // body, lit across its width
+  const bg=ctx.createLinearGradient(x-23,0,x+23,0);
+  bg.addColorStop(0,R2.darken(c,.34));bg.addColorStop(.3,R2.lighten(c,.3));
+  bg.addColorStop(.62,c);bg.addColorStop(1,R2.darken(c,.3));
+  ctx.fillStyle=bg;R2.round(ctx,x-23,y-h/2,46,h,10);ctx.fill();
+  ctx.save();ctx.globalAlpha=.4;ctx.strokeStyle=R2.lighten(c,.75);ctx.lineWidth=1.4;
+  R2.round(ctx,x-21.5,y-h/2+1.5,43,h-3,9);ctx.stroke();ctx.restore();
+  // glass
+  const gg=ctx.createLinearGradient(0,y-h/2+10,0,y-h/2+26);
+  gg.addColorStop(0,'#dff2ff');gg.addColorStop(1,'#6f9fc4');
+  ctx.fillStyle=gg;R2.round(ctx,x-16,y-h/2+10,32,16,4);ctx.fill();
+  ctx.fillStyle='#8fb8d4';R2.round(ctx,x-16,y+h/2-26,32,12,4);ctx.fill()}
+function draw(){ctx.save();if(shake>0)ctx.translate(rnd(-shake,shake)*.4,rnd(-shake,shake)*.4);const th=Math.min(1,sp/22);const vg=ctx.createLinearGradient(0,0,0,H);
+  vg.addColorStop(0,'#38a851');vg.addColorStop(1,'#248239');
+  ctx.fillStyle=vg;ctx.fillRect(-10,0,W+20,H);
+  ctx.fillStyle='#2a8a3e';for(let y=-80+roadOff;y<H;y+=80){ctx.fillRect(0,y,RX,40);ctx.fillRect(RX+RW,y,W,40)}
   ctx.fillStyle='#3d3d4a';ctx.fillRect(RX,0,RW,H);ctx.fillStyle='#fff';ctx.fillRect(RX-5,0,5,H);ctx.fillRect(RX+RW,0,5,H);for(let k=1;k<LN;k++)for(let y=-80+roadOff;y<H;y+=80)ctx.fillRect(RX+RW/LN*k-2,y,4,40);
   for(const c of coins){ctx.fillStyle='#ffd05a';ctx.beginPath();ctx.arc(c.x,c.y,10,0,7);ctx.fill();ctx.strokeStyle='#b8860b';ctx.lineWidth=2;ctx.stroke()}
   for(const o of obs)car(o.x,o.y,o.c,o.t);if(state!=='dead')car(px,360,CARS[sel],'car');else{ctx.font='50px serif';ctx.textAlign='center';ctx.fillText('💥',px,370)}

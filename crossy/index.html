@@ -49,6 +49,7 @@ body{overflow:hidden;position:fixed;inset:0;width:100%;background:#0e2338}
 <div id="rot">📱↔️<br>סובבו את הטלפון לרוחב</div>
 <div class="ov show" id="menu"><div class="ovc" style="max-width:440px"><div style="font-size:56px">🐔</div><h2>חוצה כבישים</h2><div class="lb">חצו כבישים ונהרות בלי להיפגע. כל צעד קדימה = נקודה</div><div class="chips" id="ch"></div><div style="opacity:.75;font-size:12.5px;margin-top:8px"><b>חצים/WASD</b> או החלקה / לחיצה על המסך</div><button class="btn" id="go">▶ שחק</button><div style="opacity:.8;margin-top:10px;font-size:15px">שיא: <b id="best">0</b></div></div></div>
 <div class="ov" id="end"><div class="ovc"><h2 id="eT">נגמר</h2><div style="font-size:48px;font-weight:900;color:#ffd05a" id="eS"></div><p id="eM"></p><button class="btn" id="again">🔁 שוב</button><button class="btn alt" id="menu2">תפריט</button></div></div>
+<script src="../lib/real2d.js"></script>
 <script>
 'use strict';
 const $=s=>document.querySelector(s);
@@ -94,8 +95,24 @@ function step(){if(state==='menu')return;frame++;if(hop>0)hop--;
 const sy=r=>H-90-(r-cam)*TS;
 function draw(){ctx.fillStyle='#8fd16a';ctx.fillRect(0,0,W,H);const lo=Math.floor(cam)-3,hi=Math.floor(cam)+10;
   for(let r=lo;r<=hi;r++){const row=rows[r];if(!row||r<0)continue;const y=sy(r)-TS/2;
-    if(row.t==='grass'){ctx.fillStyle=r%2?'#8fd16a':'#9ddb78';ctx.fillRect(0,y,W,TS);for(const c of row.tr){const x=c*TS+TS/2;ctx.fillStyle='#6b4a2a';ctx.fillRect(x-4,y+TS-18,8,14);ctx.fillStyle='#2f9a46';ctx.beginPath();ctx.arc(x,y+TS-28,18,0,7);ctx.fill()}}
-    else if(row.t==='road'){ctx.fillStyle='#4a4a58';ctx.fillRect(0,y,W,TS);ctx.fillStyle='#ffffff55';for(let x=0;x<W;x+=60)ctx.fillRect(x,y+TS/2-2,30,4);for(const c of row.tr){ctx.fillStyle=c.c;ctx.beginPath();ctx.roundRect?ctx.roundRect(c.x,y+8,c.w,TS-16,8):ctx.rect(c.x,y+8,c.w,TS-16);ctx.fill();ctx.fillStyle='#bfe8ff';const wx=row.dir>0?c.x+c.w-26:c.x+6;ctx.fillRect(wx,y+12,20,TS-24)}}
+    if(row.t==='grass'){
+      const gg=ctx.createLinearGradient(0,y,0,y+TS);
+      const base=r%2?'#8fd16a':'#9ddb78';
+      gg.addColorStop(0,R2.lighten(base,.12));gg.addColorStop(1,R2.darken(base,.14));
+      ctx.fillStyle=gg;ctx.fillRect(0,y,W,TS);
+      for(const c of row.tr){const x=c*TS+TS/2;
+        ctx.save();R2.shadow(ctx,7,'rgba(0,0,0,.3)',0,3);
+        ctx.fillStyle='#6b4a2a';R2.round(ctx,x-4,y+TS-18,8,14,2);ctx.fill();ctx.restore();
+        R2.ball(ctx,x,y+TS-28,18,'#2f9a46',{shadowAlpha:.22,gloss:false})}}
+    else if(row.t==='road'){ctx.fillStyle='#4a4a58';ctx.fillRect(0,y,W,TS);ctx.fillStyle='#ffffff55';for(let x=0;x<W;x+=60)ctx.fillRect(x,y+TS/2-2,30,4);for(const c of row.tr){
+        ctx.save();R2.shadow(ctx,8,'rgba(0,0,0,.35)',0,4);
+        const cg=ctx.createLinearGradient(0,y+8,0,y+TS-8);
+        cg.addColorStop(0,R2.lighten(c.c,.34));cg.addColorStop(.5,c.c);cg.addColorStop(1,R2.darken(c.c,.28));
+        ctx.fillStyle=cg;R2.round(ctx,c.x,y+8,c.w,TS-16,8);ctx.fill();ctx.restore();
+        const wx=row.dir>0?c.x+c.w-26:c.x+6;
+        const wg=ctx.createLinearGradient(0,y+12,0,y+TS-12);
+        wg.addColorStop(0,'#e8f6ff');wg.addColorStop(1,'#7fb4d6');
+        ctx.fillStyle=wg;R2.round(ctx,wx,y+12,20,TS-24,4);ctx.fill()}}
     else if(row.t==='water'){ctx.fillStyle='#3b9be8';ctx.fillRect(0,y,W,TS);ctx.fillStyle='#ffffff30';for(let x=0;x<W;x+=70)ctx.fillRect((x+frame*row.dir)%W,y+10,24,3);for(const c of row.tr){ctx.fillStyle='#9a6a3a';ctx.beginPath();ctx.roundRect?ctx.roundRect(c.x,y+6,c.w,TS-12,10):ctx.rect(c.x,y+6,c.w,TS-12);ctx.fill();ctx.fillStyle='#b98450';ctx.fillRect(c.x+8,y+14,c.w-16,4)}}
     else{ctx.fillStyle='#6a5a4a';ctx.fillRect(0,y,W,TS);ctx.fillStyle='#2a2a2a';ctx.fillRect(0,y+14,W,4);ctx.fillRect(0,y+TS-18,W,4);if(row.warn&&frame%10<5){ctx.fillStyle='#ff3a3a';ctx.beginPath();ctx.arc(30,y+TS/2,10,0,7);ctx.arc(W-30,y+TS/2,10,0,7);ctx.fill()}
       const t=row.tr[0];if(row.run){ctx.fillStyle='#d94a4a';ctx.fillRect(t.x,y+6,t.w,TS-12);ctx.fillStyle='#fff';for(let k=0;k<5;k++)ctx.fillRect(t.x+10+k*55,y+14,26,12)}}}
