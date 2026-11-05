@@ -223,22 +223,17 @@ cv.addEventListener('pointermove',e=>{
 });
 cv.addEventListener('mouseenter',()=>{_mouseOnCanvas=true});
 cv.addEventListener('mouseleave',()=>{_mouseOnCanvas=false;});
-// document mousemove — מחבט עוקב אחרי עכבר בדיוק
+// document mousemove — מחבט = עכבר בדיוק
+// screenY = 128 + 250*(1.04+pdy) - 0.2*(120+200*(1.04+pdy))*0.92
+// = 128 + 250*1.04 + 250*pdy - 0.184*(120+200*1.04+200*pdy)
+// = קבוע + pdy*(250 - 0.184*200) = קבוע + pdy*213.2
+// קבוע = 128+260 - 0.184*(120+208) = 388 - 0.184*328 = 388-60.35 = 327.65
 document.addEventListener('mousemove',e=>{
   if(!_mouseOnCanvas)return;
   const r=cv.getBoundingClientRect();
   const sx=(e.clientX-r.left)/r.width*W;
   const sy=(e.clientY-r.top)/r.height*H;
-  // המחבט מצויר ב P(px, 1.04+pdy, 0.2) → screenY = gy(1.04+pdy) - 0.2*kk(1.04+pdy)
-  // הפוך: מ-sy מצא pdy בינארית (פשוט — נסה ערכים)
-  let best=0,bestD=9999;
-  for(let t=-.40;t<=.08;t+=.005){
-    const yy=1.04+t;
-    const sy2=128+250*yy - 0.2*(120+200*yy)*.92;
-    const d=Math.abs(sy2-sy);
-    if(d<bestD){bestD=d;best=t;}
-  }
-  if(!swipeDir) pdy=best;
+  if(!swipeDir) pdy=clamp((sy-327.65)/213.2,-.40,.08);
   tpx=clamp((sx-W/2)/hw(1.04+pdy),-1.15,1.15);
 });
 cv.addEventListener('pointerdown',e=>{
