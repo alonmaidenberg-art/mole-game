@@ -232,9 +232,9 @@ function upd(){if(!isFinite(tpx))tpx=0;if(!isFinite(px))px=0;
     swing=isSmash?22:isSlice?6:14;
     let tx,ty;
     if(isSmash){
-      tx=clamp((sd==='up'?pvx*4:0)+rnd(-.06,.06),-.8,.8);
-      ty=clamp(.04+rnd(0,.02),.02,.07);
-      spd2=5+Math.round((1-ss)*3);// 5-8 frames — BLAZING fast like Poki
+      tx=clamp((sd==='up'?pvx*4:0)+rnd(-.1,.1),-.85,.85);
+      ty=clamp(.05+rnd(0,.12),.05,.17);// lands deep in opponent's court
+      spd2=4+Math.round((1-ss)*2);// 4-6 frames — BLAZING fast
       tone(920,.14,'square',.28);tone(580,.08,'square',.14);msg='הנחתה! 💥';mt=50;smashCd=3;
       smashFlash=12;
     } else if(isSlice){
