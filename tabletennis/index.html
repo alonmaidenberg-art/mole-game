@@ -202,7 +202,7 @@ cv.addEventListener('pointermove',e=>{
   const screenFrac=clamp(cp.y/H,0,1);
   if(!swipeDir){
     const targetPdy=clamp((screenFrac-.55)*1.1,-.38,.08);
-    pdy=lerp(pdy,targetPdy,.18);
+    pdy=targetPdy; // מיידי — העכבר הוא המחבט
   }
   // detect fast swipe for smash — only when pointer was already tracked
   if(_lx!==null){
@@ -252,7 +252,7 @@ function upd(){if(!isFinite(tpx))tpx=0;if(!isFinite(px))px=0;
   if(smashCd>0)smashCd--;
   if(smashFlash>0)smashFlash--;
   if(trollTimer>0){trollTimer--;if(trollTimer===0){cpuSpeedMult=1.0;$('#trollMsg').textContent=''}}
-  const op=px;px+=clamp(tpx-px,-.18,.18);pvx=px-op;
+  const op=px;px=_mouseOnCanvas?tpx:px+clamp(tpx-px,-.18,.18);pvx=px-op;
   // wind swoosh — arc trails when paddle moves fast sideways (like original game)
   if(Math.abs(pvx)>.045){const q=P(px,1.04+pdy,.2);const n=Math.floor(Math.abs(pvx)*80);for(let i=0;i<n;i++)windTrail.push({x:q.x+rnd(-18,18),y:q.y+rnd(-28,28),vx:pvx*rnd(60,110)+rnd(-8,8),vy:rnd(-30,10),life:rnd(8,14),maxLife:14,dir:pvx>0?1:-1});}
   windTrail=windTrail.filter(p=>{p.x+=p.vx*.06;p.y+=p.vy*.06;p.life--;return p.life>0;});if(swing>0)swing--;if(cswing>0)cswing--;if(mt>0)mt--;
