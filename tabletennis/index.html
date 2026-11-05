@@ -45,6 +45,7 @@ body{overflow:hidden;position:fixed;inset:0;width:100%;background:#0e2338}
 </style>
 </head>
 <body>
+<script src="../hub.js"></script>
 <canvas id="cv"></canvas><div id="hud"></div>
 <div id="rot">📱↔️<br>סובבו את הטלפון לרוחב</div>
 <div class="ov show" id="menu"><div class="ovc" style="max-width:440px"><div style="font-size:56px">🏓</div><h2>פינג-פונג</h2><div class="lb">גררו את המחבט ימינה/שמאלה.<br>🔥 <b>סוויש קדימה</b> = הנחתה 💥<br>⬇️ <b>סוויש למטה</b> = סלייס ✂️ (איטי נמוך)<br>➡️ <b>סוויש ימינה/שמאלה</b> = זווית חדה 📐<br>על מחשב: W/↑ קדימה. הראשון ל-7.</div><button class="btn" id="go">▶ שחק</button><button class="btn alt" id="settBtn" style="margin-top:8px;display:none">⚙️ הגדרות</button><div style="opacity:.8;margin-top:10px;font-size:15px">שיא: <b id="best">0</b></div></div></div>
@@ -302,6 +303,5 @@ wire(start);run(upd,drw,'#0b3d4f');window.__s={step:upd,start:()=>{start();on=tr
 
 if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 </script>
-<script src="../hub.js"></script>
 </body>
 </html>
