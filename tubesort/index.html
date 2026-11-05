@@ -84,7 +84,12 @@ function tap(i){if(!on)return;if(sel<0){if(tubes[i].length)sel=i}else if(sel===i
 function upd(){time--;if(time<=0)over('נגמר הזמן!',sc,'שלבים: '+lvl,Math.floor(sc/10),lvl>=4?1:0)}
 function drw(){const n=tubes.length,w=64,g=Math.min(30,(W-80-n*w)/(n-1)||30),x0=(W-(n*w+(n-1)*g))/2;
   tubes.forEach((t,i)=>{const x=x0+i*(w+g),y=sel===i?110:140;ctx.strokeStyle=sel===i?'#ffd23f':'#cfe8ff';ctx.lineWidth=4;ctx.fillStyle='#ffffff14';rr(x,y,w,230,22);ctx.fill();ctx.stroke();
-    t.forEach((c,k)=>{ctx.fillStyle=CS[c];rr(x+6,y+230-6-(k+1)*54,w-12,50,14);ctx.fill()});hits.push({x,y:y,w,h:240,fn:()=>tap(i)})});
+    t.forEach((c,k)=>{const ly=y+230-6-(k+1)*54;
+      const lg=ctx.createLinearGradient(x+6,ly,x+6,ly+50);
+      lg.addColorStop(0,R2.lighten(CS[c],.34));lg.addColorStop(.45,CS[c]);lg.addColorStop(1,R2.darken(CS[c],.32));
+      ctx.fillStyle=lg;rr(x+6,ly,w-12,50,14);ctx.fill();
+      ctx.save();ctx.globalAlpha=.3;ctx.fillStyle='#fff';rr(x+11,ly+3,w-22,8,4);ctx.fill();ctx.restore()});
+    ctx.save();ctx.globalAlpha=.16;ctx.fillStyle='#fff';rr(x+7,y+8,10,214,6);ctx.fill();ctx.restore();hits.push({x,y:y,w,h:240,fn:()=>tap(i)})});
   T('⭐ '+sc,90,28,26);T('שלב '+(lvl+1),W/2,28,22);T('⏱ '+Math.ceil(time/60),W-60,28,22);T(msg,W/2,76,26,'#7fff9f')}
 wire(start);run(upd,drw,'#15304b');window.__s={step:upd,start:()=>{start();on=true},get on(){return on},get score(){return sc},get tubes(){return tubes},tap,get lvl(){return lvl}};
 

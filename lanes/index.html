@@ -83,7 +83,11 @@ const LX=[W/2-150,W/2,W/2+150];
 function upd(){fr++;sp=5+fr/500;tx+=(ln-tx)*.25;if(fr%Math.max(20,Math.floor(60-fr/60))===0){const l=Math.floor(Math.random()*3);obs.push({l,y:-30,c:Math.random()<.35})}
   for(const o of obs){o.y+=sp;if(Math.abs(o.y-(H-70))<28&&o.l===ln){if(o.c){o.dead=1;sc+=10;tone(900,.08)}else{tone(100,.4,'sawtooth');over('התנגשות!',sc,'',Math.floor(sc/10),sc>=200?1:0);return}}}
   obs=obs.filter(o=>!o.dead&&o.y<H+40);if(fr%10===0)sc++}
-function drw(){ctx.fillStyle='#234b75';ctx.fillRect(W/2-225,0,450,H);ctx.fillStyle='#ffffff30';for(const x of[W/2-75,W/2+75])for(let y=(fr*sp)%60-60;y<H;y+=60)ctx.fillRect(x-2,y,4,30);
+function drw(){
+  const rg=ctx.createLinearGradient(W/2-225,0,W/2+225,0);
+  rg.addColorStop(0,'#17334f');rg.addColorStop(.5,'#2b5783');rg.addColorStop(1,'#17334f');
+  ctx.fillStyle=rg;ctx.fillRect(W/2-225,0,450,H);
+  ctx.fillStyle='rgba(255,255,255,.2)';ctx.fillRect(W/2-229,0,5,H);ctx.fillRect(W/2+224,0,5,H);ctx.fillStyle='#ffffff30';for(const x of[W/2-75,W/2+75])for(let y=(fr*sp)%60-60;y<H;y+=60)ctx.fillRect(x-2,y,4,30);
   ctx.font='36px serif';ctx.textAlign='center';ctx.textBaseline='middle';for(const o of obs)ctx.fillText(o.c?'🪙':'🚧',LX[o.l],o.y);ctx.fillText('🏃',W/2-150+tx*150,H-70);
   T('⭐ '+sc,90,28,24)}
 wire(start);run(upd,drw,'#17304b');window.__s={step:upd,start:()=>{start();on=true},get on(){return on},get score(){return sc},mv,get ln(){return ln},get obs(){return obs}};
