@@ -48,7 +48,7 @@ body{overflow:hidden;position:fixed;inset:0;width:100%;background:#0e2338}
 <script src="../hub.js"></script>
 <canvas id="cv"></canvas><div id="hud"></div>
 <div id="rot">📱↔️<br>סובבו את הטלפון לרוחב</div>
-<div class="ov show" id="menu"><div class="ovc" style="max-width:440px"><div style="font-size:56px">🏓</div><h2>פינג-פונג</h2><div class="lb">גררו את המחבט ימינה/שמאלה.<br>🔥 <b>סוויש קדימה</b> = הנחתה 💥<br>⬇️ <b>סוויש למטה</b> = סלייס ✂️ (איטי נמוך)<br>➡️ <b>סוויש ימינה/שמאלה</b> = זווית חדה 📐<br>על מחשב: W/↑ קדימה. הראשון ל-7.</div><button class="btn" id="go">▶ שחק</button><button class="btn alt" id="settBtn" style="margin-top:8px;display:none">⚙️ הגדרות</button><div style="opacity:.8;margin-top:10px;font-size:15px">שיא: <b id="best">0</b></div></div></div>
+<div class="ov show" id="menu"><div class="ovc" style="max-width:440px"><div style="font-size:56px">🏓</div><h2>פינג-פונג</h2><div class="lb">גררו את המחבט ימינה/שמאלה.<br>🔥 <b>סוויש קדימה</b> = הנחתה 💥<br>⬇️ <b>סוויש למטה</b> = סלייס ✂️ (איטי נמוך)<br>➡️ <b>סוויש ימינה/שמאלה</b> = זווית חדה 📐<br>על מחשב: עכבר להזזה, W/↑=הנחתה, S/↓=סלייס, A/D=זווית. הראשון ל-7.</div><button class="btn" id="go">▶ שחק</button><button class="btn alt" id="settBtn" style="margin-top:8px;display:none">⚙️ הגדרות</button><div style="opacity:.8;margin-top:10px;font-size:15px">שיא: <b id="best">0</b></div></div></div>
 <div class="ov" id="end"><div class="ovc"><h2 id="eT">נגמר</h2><div style="font-size:48px;font-weight:900;color:#ffd05a" id="eS"></div><p id="eM"></p><button class="btn" id="again">🔁 שוב</button><button class="btn alt" id="menu2">תפריט</button></div></div>
 <div class="ov" id="settM"><div class="ovc" style="max-width:400px;text-align:center">
   <h2>⚙️ הגדרות</h2>
@@ -82,7 +82,23 @@ let _ac=null;function tone(f,d=.1,t='triangle',v=.07){try{_ac=_ac||new (window.A
 const W=800,H=450;const cv=$('#cv'),ctx=cv.getContext('2d');const keys={};const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),rnd=(a,b)=>a+Math.random()*(b-a);
 function resize(){const s=Math.min(innerWidth/W,innerHeight/H),d=Math.min(devicePixelRatio||1,2);cv.style.width=Math.floor(W*s)+'px';cv.style.height=Math.floor(H*s)+'px';cv.width=Math.floor(W*s*d);cv.height=Math.floor(H*s*d);ctx.setTransform(s*d,0,0,s*d,0,0)}
 addEventListener('resize',resize);resize();
-addEventListener('keydown',e=>{keys[e.code]=1;if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault()});addEventListener('keyup',e=>{keys[e.code]=0});
+addEventListener('keydown',e=>{
+  if(keys[e.code])return;// ignore held keys
+  keys[e.code]=1;
+  if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();
+  // W/↑ = smash, S/↓ = slice, A/D = angle shot (desktop)
+  if((e.code==='KeyW'||e.code==='ArrowUp')&&phase==='play'&&!swipeDir){
+    swipeDir='up';swipeStr=0.8;swipePending=true;
+    pdy=-0.35;pdyv=0.03;swing=10;
+    tone(920,.14,'square',.28);tone(580,.08,'square',.14);smashFlash=12;
+  }
+  if((e.code==='KeyS'||e.code==='ArrowDown')&&phase==='play'&&!swipeDir){
+    swipeDir='down';swipeStr=0.7;swipePending=true;
+  }
+  if(e.code==='KeyA'&&phase==='play'&&!swipeDir){swipeDir='left';swipeStr=0.7;swipePending=true;}
+  if(e.code==='KeyD'&&phase==='play'&&!swipeDir){swipeDir='right';swipeStr=0.7;swipePending=true;}
+});
+addEventListener('keyup',e=>{keys[e.code]=0});
 function cpos(e){const r=cv.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width*W,y:(e.clientY-r.top)/r.height*H}}
 function holdBtn(id,fn){const b=$(id);b.addEventListener('pointerdown',e=>{e.preventDefault();fn(1);b.classList.add('on')});for(const t of['pointerup','pointerleave','pointercancel'])b.addEventListener(t,e=>{fn(0);b.classList.remove('on')})}
 const BK='tabletennis'+'_best';let best=+store.get(BK,0);$('#best').textContent=best;
@@ -179,33 +195,32 @@ let swipePending=false; // swipe registered, waiting for ball to come in range
 cv.addEventListener('pointermove',e=>{
   const cp=cpos(e);
   tpx=clamp((cp.x-W/2)/hw(1),-1.15,1.15);
-  if(e.pointerId!==_lid)return;
+  // touch: only track active pointer for swipes
+  const isTouch=e.pointerType==='touch';
+  if(isTouch&&e.pointerId!==_lid)return;
   const nx=e.clientX,ny=e.clientY,dx=nx-_lx,dy=ny-_ly;
   _vx=_vx*.4+dx*.6;_vy=_vy*.4+dy*.6;
   _lx=nx;_ly=ny;
-  // drag Y on screen moves paddle forward/back freely
-  // screen Y maps: top of canvas = forward (negative pdy), bottom = back
-  const screenFrac=clamp(cp.y/H,0,1);// 0=top 1=bottom
-  if(!swipeDir){// only free-move when not mid-swipe
-    const targetPdy=clamp((screenFrac-.55)*1.1,-.38,.08);
-    pdy=lerp(pdy,targetPdy,.18);// smooth follow
-  }
-  // detect fast swipe for smash
-  const spd=Math.sqrt(_vx*_vx+_vy*_vy);
-  if(spd>8){
-    const ax=Math.abs(_vx),ay=Math.abs(_vy);
-    if(ay>ax*.5&&_vy<-8){// fast UP = smash
-      const str=Math.min((-_vy-8)/10,1);
-      if(!swipeDir){
-        swipeDir='up';swipeStr=str;swipePending=true;
-        pdy=-0.30-str*.08;pdyv=0.03;swing=10;
-        tone(920,.14,'square',.28);tone(580,.08,'square',.14);smashFlash=12;
+  // drag Y on screen moves paddle forward/back freely (touch only)
+  if(isTouch){
+    const screenFrac=clamp(cp.y/H,0,1);
+    if(!swipeDir){
+      const targetPdy=clamp((screenFrac-.55)*1.1,-.38,.08);
+      pdy=lerp(pdy,targetPdy,.18);
+    }
+    // detect fast swipe for smash
+    const spd=Math.sqrt(_vx*_vx+_vy*_vy);
+    if(spd>8){
+      const ax=Math.abs(_vx),ay=Math.abs(_vy);
+      if(ay>ax*.5&&_vy<-8){
+        const str=Math.min((-_vy-8)/10,1);
+        if(!swipeDir){swipeDir='up';swipeStr=str;swipePending=true;pdy=-0.30-str*.08;pdyv=0.03;swing=10;tone(920,.14,'square',.28);tone(580,.08,'square',.14);smashFlash=12;}
+      } else if(ay>ax*.7&&_vy>9){
+        if(!swipeDir){swipeDir='down';swipeStr=Math.min((_vy-9)/10,1);swipePending=true;}
+      } else if(ax>ay*.7&&ax>9){
+        const d=_vx>0?'right':'left';
+        if(!swipeDir){swipeDir=d;swipeStr=Math.min((ax-9)/12,1);swipePending=true;}
       }
-    } else if(ay>ax*.7&&_vy>9){
-      if(!swipeDir){swipeDir='down';swipeStr=Math.min((_vy-9)/10,1);swipePending=true;}
-    } else if(ax>ay*.7&&ax>9){
-      const d=_vx>0?'right':'left';
-      if(!swipeDir){swipeDir=d;swipeStr=Math.min((ax-9)/12,1);swipePending=true;}
     }
   }
 });
