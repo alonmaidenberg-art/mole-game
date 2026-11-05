@@ -66,8 +66,9 @@ function runLoop(stepFn,active){let last=performance.now(),acc=0;function l(n){r
 /* ================= realistic scene =================
    Textures are generated here in code (no photos), then lit with real
    shadows, reflections and tone mapping. Physics below is untouched. */
+if(THREE.ColorManagement)THREE.ColorManagement.legacyMode=false;
 R.shadowMap.enabled=true;R.shadowMap.type=THREE.PCFSoftShadowMap;
-R.outputEncoding=THREE.sRGBEncoding;R.toneMapping=THREE.ACESFilmicToneMapping;R.toneMappingExposure=1.05;
+R.outputEncoding=THREE.sRGBEncoding;R.toneMapping=THREE.ACESFilmicToneMapping;R.toneMappingExposure=1.25;
 R.physicallyCorrectLights=false;
 const MAXA=R.capabilities.getMaxAnisotropy?R.capabilities.getMaxAnisotropy():4;
 function cvs(w,h){const c=document.createElement('canvas');c.width=w;c.height=h;return c}
@@ -94,14 +95,14 @@ scene.background=new THREE.Color(0x120d20);scene.fog=new THREE.Fog(0x140e24,34,7
 })();
 
 /* lights: one shadow-casting key light plus fill, like a real lane */
-scene.add(new THREE.HemisphereLight(0xcfd8ff,0x1a1228,.22));
+scene.add(new THREE.HemisphereLight(0xcfd8ff,0x1a1228,.4));
 const key=new THREE.DirectionalLight(0xfff4e2,1.15);
 key.position.set(5,15,3);key.target.position.set(0,0,-11);scene.add(key.target);
 key.castShadow=true;{const small=Math.min(innerWidth,innerHeight)<740||(matchMedia&&matchMedia('(pointer:coarse)').matches);key.shadow.mapSize.set(small?1024:2048,small?1024:2048)}
 key.shadow.camera.left=-10;key.shadow.camera.right=10;key.shadow.camera.top=22;key.shadow.camera.bottom=-22;
 key.shadow.camera.near=1;key.shadow.camera.far=55;key.shadow.bias=-.0005;key.shadow.normalBias=.022;
 scene.add(key);
-const fill=new THREE.DirectionalLight(0x9ab6ff,.3);fill.position.set(-7,7,8);scene.add(fill);
+const fill=new THREE.DirectionalLight(0x9ab6ff,.45);fill.position.set(-7,7,8);scene.add(fill);
 const deckLight=new THREE.SpotLight(0xffffff,1.35,17,.5,.75,1.6);
 deckLight.position.set(0,6.5,-10.6);deckLight.target.position.set(0,.3,-12.6);scene.add(deckLight.target);scene.add(deckLight);
 
