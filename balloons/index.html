@@ -83,7 +83,24 @@ function upd(){fr++;
   if(fr%Math.max(12,40-Math.floor(fr/90))===0){const r=Math.random();bs.push({x:rnd(40,W-40),y:H+40,r:rnd(26,40),vy:rnd(1.2,2.2)+fr/2400,k:r<.1?'b':r<.18?'g':'n',c:['#ff5a6a','#5ac8ff','#7be07b','#ffd05a','#82d2ff'][Math.floor(Math.random()*5)],ph:rnd(0,6)})}
   for(const b of bs){b.y-=b.vy;b.x+=Math.sin(fr/30+b.ph)*.6;if(b.y<-50){b.d=1;if(b.k==='n'||b.k==='g'){esc++;combo=0;tone(150,.15,'square');if(esc>=5)end()}}}
   bs=bs.filter(b=>!b.d);for(const p of pops)p.t--;pops=pops.filter(p=>p.t>0)}
-function drw(){for(const b of bs){ctx.fillStyle=b.k==='g'?'#ffd700':b.k==='b'?'#333':b.c;ctx.beginPath();ctx.ellipse(b.x,b.y,b.r*.85,b.r,0,0,7);ctx.fill();ctx.fillStyle='#fff5';ctx.beginPath();ctx.ellipse(b.x-b.r*.3,b.y-b.r*.35,b.r*.18,b.r*.3,0,0,7);ctx.fill();ctx.strokeStyle='#fff7';ctx.beginPath();ctx.moveTo(b.x,b.y+b.r);ctx.lineTo(b.x,b.y+b.r+22);ctx.stroke();if(b.k==='b'){ctx.font='26px serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('💣',b.x,b.y)}}
+function drw(){for(const b of bs){
+  const col=b.k==='g'?'#ffd700':b.k==='b'?'#3a3a42':b.c;
+  // string, drawn first so the balloon sits over it
+  ctx.save();ctx.strokeStyle='rgba(255,255,255,.4)';ctx.lineWidth=1.4;ctx.beginPath();
+  ctx.moveTo(b.x,b.y+b.r);
+  ctx.bezierCurveTo(b.x+5,b.y+b.r+8,b.x-5,b.y+b.r+15,b.x,b.y+b.r+24);ctx.stroke();ctx.restore();
+  // body: lit from upper left, darker at the rim
+  ctx.save();R2.shadow(ctx,12,'rgba(0,0,0,.3)',0,6);
+  const g=ctx.createRadialGradient(b.x-b.r*.34,b.y-b.r*.4,b.r*.06,b.x,b.y,b.r*1.08);
+  g.addColorStop(0,R2.lighten(col,.62));g.addColorStop(.5,col);g.addColorStop(1,R2.darken(col,.42));
+  ctx.fillStyle=g;ctx.beginPath();ctx.ellipse(b.x,b.y,b.r*.85,b.r,0,0,7);ctx.fill();ctx.restore();
+  // knot
+  ctx.fillStyle=R2.darken(col,.3);ctx.beginPath();
+  ctx.moveTo(b.x-b.r*.11,b.y+b.r);ctx.lineTo(b.x+b.r*.11,b.y+b.r);ctx.lineTo(b.x,b.y+b.r*1.14);ctx.closePath();ctx.fill();
+  // gloss
+  ctx.save();ctx.globalAlpha=.55;ctx.fillStyle='#fff';
+  ctx.beginPath();ctx.ellipse(b.x-b.r*.3,b.y-b.r*.36,b.r*.17,b.r*.29,-.35,0,7);ctx.fill();ctx.restore();
+  if(b.k==='b'){ctx.font='26px serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('💣',b.x,b.y)}}
   for(const p of pops){ctx.strokeStyle=p.c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(p.x,p.y,(20-p.t)*3,0,7);ctx.stroke()}
   T('⭐ '+sc+(combo>2?'  x'+combo:''),120,26,24);T('🎈 '+(5-esc),W-60,26,22)}
 wire(start);run(upd,drw,'#153a60');window.__s={step:upd,start:()=>{start();on=true},get on(){return on},get score(){return sc},get bs(){return bs},pop};
