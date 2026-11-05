@@ -48,7 +48,7 @@ body{overflow:hidden;position:fixed;inset:0;width:100%;background:#0e2338}
 <script src="../hub.js"></script>
 <canvas id="cv"></canvas><div id="hud"></div>
 <div id="rot">📱↔️<br>סובבו את הטלפון לרוחב</div>
-<div class="ov show" id="menu"><div class="ovc" style="max-width:440px"><div style="font-size:56px">🏓</div><h2>פינג-פונג</h2><div class="lb" id="howto">🖱️ <b>מחשב:</b> העכבר הוא המחבט – בלי ללחוץ. הזיזו אותו אל הכדור.<br>💥 תנועה מהירה קדימה (למעלה) ברגע המכה = הנחתה<br>📐 תנועה הצידה ברגע המכה = זווית<br>📱 <b>טלפון:</b> גררו את המחבט; סוויש קדימה = הנחתה, למטה = סלייס.<br>הראשון ל-7 מנצח.</div><button class="btn" id="go">▶ שחק</button><button class="btn alt" id="settBtn" style="margin-top:8px;display:none">⚙️ הגדרות</button><div style="opacity:.8;margin-top:10px;font-size:15px">שיא: <b id="best">0</b></div></div></div>
+<div class="ov show" id="menu"><div class="ovc" style="max-width:440px"><div style="font-size:56px">🏓</div><h2>פינג-פונג</h2><div class="lb" id="howto">🖱️ המחבט דבוק לעכבר – פשוט מזיזים אותו אל הכדור, בלי ללחוץ.<br>מזיזים מהר = מכה חזקה 💥<br>הראשון ל-7 מנצח.</div><button class="btn" id="go">▶ שחק</button><button class="btn alt" id="settBtn" style="margin-top:8px;display:none">⚙️ הגדרות</button><div style="opacity:.8;margin-top:10px;font-size:15px">שיא: <b id="best">0</b></div></div></div>
 <div class="ov" id="end"><div class="ovc"><h2 id="eT">נגמר</h2><div style="font-size:48px;font-weight:900;color:#ffd05a" id="eS"></div><p id="eM"></p><button class="btn" id="again">🔁 שוב</button><button class="btn alt" id="menu2">תפריט</button></div></div>
 <div class="ov" id="settM"><div class="ovc" style="max-width:400px;text-align:center">
   <h2>⚙️ הגדרות</h2>
@@ -81,10 +81,14 @@ const store={get(k,d){try{const v=localStorage.getItem(k);return v===null?d:v}ca
 let _ac=null;function tone(f,d=.1,t='triangle',v=.07){try{_ac=_ac||new (window.AudioContext||window.webkitAudioContext)();const o=_ac.createOscillator(),g=_ac.createGain();o.type=t;o.frequency.value=f;g.gain.value=v;o.connect(g);g.connect(_ac.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,_ac.currentTime+d);o.stop(_ac.currentTime+d+.02)}catch(e){}}
 const W=800,H=450;const cv=$('#cv'),ctx=cv.getContext('2d');const keys={};const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),rnd=(a,b)=>a+Math.random()*(b-a);
 const EN=window.AG_LANG==='en',tt=(he,en)=>EN?en:he;
-if(EN)$('#howto').innerHTML='🖱️ <b>Computer:</b> the mouse IS the paddle – no clicking. Move it onto the ball.<br>💥 Flick forward (up) as you hit = smash<br>📐 Move sideways as you hit = angle<br>📱 <b>Phone:</b> drag the paddle; swipe forward = smash, down = slice.<br>First to 7 wins.';
-function resize(){const s=Math.min(innerWidth/W,innerHeight/H),d=Math.min(devicePixelRatio||1,2);cv.style.width=Math.floor(W*s)+'px';cv.style.height=Math.floor(H*s)+'px';cv.width=Math.floor(W*s*d);cv.height=Math.floor(H*s*d);ctx.setTransform(s*d,0,0,s*d,0,0)}
+// The canvas fills the WHOLE window. The 800x450 game sits centred in it and the space
+// around it is part of the game too, so the paddle can go anywhere on the screen.
+const VB={x0:0,y0:0,x1:W,y1:H}; // visible area in game units
+function resize(){const iw=innerWidth,ih=innerHeight,s=Math.min(iw/W,ih/H),d=Math.min(devicePixelRatio||1,2),ox=(iw-W*s)/2,oy=(ih-H*s)/2;
+  cv.style.width=iw+'px';cv.style.height=ih+'px';cv.width=Math.round(iw*d);cv.height=Math.round(ih*d);ctx.setTransform(s*d,0,0,s*d,ox*d,oy*d);
+  VB.x0=-ox/s;VB.y0=-oy/s;VB.x1=W+ox/s;VB.y1=H+oy/s}
 addEventListener('resize',resize);resize();
-function cpos(e){const r=cv.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width*W,y:(e.clientY-r.top)/r.height*H}}
+function cpos(e){const r=cv.getBoundingClientRect(),s=Math.min(r.width/W,r.height/H);return{x:(e.clientX-r.left-(r.width-W*s)/2)/s,y:(e.clientY-r.top-(r.height-H*s)/2)/s}}
 function holdBtn(id,fn){const b=$(id);b.addEventListener('pointerdown',e=>{e.preventDefault();fn(1);b.classList.add('on')});for(const t of['pointerup','pointerleave','pointercancel'])b.addEventListener(t,e=>{fn(0);b.classList.remove('on')})}
 const BK='tabletennis'+'_best';let best=+store.get(BK,0);$('#best').textContent=best;
 
@@ -131,7 +135,7 @@ function rr(x,y,w,h,r){ctx.beginPath();ctx.roundRect?ctx.roundRect(x,y,w,h,r):ct
 function B(x,y,w,h,col,txt,fn,fs=22,tc='#fff'){ctx.fillStyle=col;rr(x,y,w,h,12);ctx.fill();if(txt!=null){ctx.fillStyle=tc;ctx.font='bold '+fs+'px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(txt,x+w/2,y+h/2+1)}if(fn)hits.push({x,y,w,h,fn})}
 function T(t,x,y,fs=22,c='#fff',al='center'){ctx.fillStyle=c;ctx.font='bold '+fs+'px system-ui';ctx.textAlign=al;ctx.textBaseline='middle';ctx.fillText(t,x,y)}
 cv.addEventListener('pointerdown',e=>{const p=cpos(e);for(let i=hits.length-1;i>=0;i--){const h=hits[i];if(p.x>=h.x&&p.x<=h.x+h.w&&p.y>=h.y&&p.y<=h.y+h.h){h.fn(p);break}}});
-function run(upd,drw,bg){let last=performance.now(),acc=0;function l(n){requestAnimationFrame(l);acc+=Math.min(100,n-last);last=n;while(acc>=1000/60){acc-=1000/60;if(on)upd()}hits=[];ctx.fillStyle=bg||'#111';ctx.fillRect(0,0,W,H);if(on||window.__show)drw()}requestAnimationFrame(l)}
+function run(upd,drw,bg){let last=performance.now(),acc=0;function l(n){requestAnimationFrame(l);acc+=Math.min(100,n-last);last=n;while(acc>=1000/60){acc-=1000/60;if(on)upd()}hits=[];ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle=bg||'#111';ctx.fillRect(0,0,cv.width,cv.height);ctx.restore();if(on||window.__show)drw()}requestAnimationFrame(l)}
 function wire(start){$('#go').onclick=()=>{$('#menu').classList.remove('show');start();on=true};$('#again').onclick=()=>{$('#end').classList.remove('show');start();on=true};$('#menu2').onclick=()=>{on=false;$('#end').classList.remove('show');$('#menu').classList.add('show')}}
 function over(title,score,msg,coins,dia,delay=600){on=false;window.__show=true;saveBest(score);setTimeout(()=>endGame(title,score,msg,coins,dia),delay)}
 
@@ -149,8 +153,12 @@ function P(x,y,h){return{x:W/2+x*hw(y),y:gy(y)-h*kk(y),s:kk(y)}}
    shot comes from how the mouse is moving at that moment (fast forward = smash).
    Phone ('touch'): drag + swipes, unchanged. */
 let ctl=(window.matchMedia&&matchMedia('(pointer:fine)').matches)?'mouse':'touch';
+$('#howto').innerHTML=ctl==='mouse'
+  ?tt('🖱️ המחבט דבוק לעכבר – פשוט מזיזים אותו אל הכדור, בלי ללחוץ.<br>מזיזים מהר = מכה חזקה 💥<br>הראשון ל-7 מנצח.','🖱️ The paddle is stuck to your mouse – just move it onto the ball, no clicking.<br>Move fast = harder hit 💥<br>First to 7 wins.')
+  :tt('📱 גררו את המחבט.<br>🔥 <b>סוויש קדימה</b> = הנחתה 💥<br>⬇️ <b>סוויש למטה</b> = סלייס ✂️<br>➡️ <b>סוויש הצידה</b> = זווית 📐<br>הראשון ל-7 מנצח.','📱 Drag the paddle.<br>🔥 <b>Swipe forward</b> = smash 💥<br>⬇️ <b>Swipe down</b> = slice ✂️<br>➡️ <b>Swipe sideways</b> = angle 📐<br>First to 7 wins.');
 const PH=.2;    // paddle height above the table
-const PSZ=.105; // paddle size
+const PSZ=.105; // paddle size (phone)
+const PR=27;    // paddle size on computer: fixed, like a paddle stuck to the mouse
 let psx=W/2,psy=350; // computer: paddle centre in canvas pixels (= the cursor)
 // depth of a paddle whose centre is drawn at screen y (exact inverse of P(x,z,PH).y)
 const zOf=sy=>(sy-(128-PH*.92*120))/(250-PH*.92*200);
@@ -167,7 +175,7 @@ function paddleVel(){ // canvas px per 1/60 s
   return{x:(a.x-o.x)/dt*16.667,y:(a.y-o.y)/dt*16.667};
 }
 function pScreen(){ // player paddle centre on screen, radius, depth
-  if(ctl==='mouse'){const z=clamp(zOf(psy),.35,1.9);return{x:psx,y:psy,r:kk(z)*PSZ,z}}
+  if(ctl==='mouse')return{x:psx,y:psy,r:PR,z:clamp(zOf(psy),.35,1.9)};
   const z=1.04+pdy,q=P(px,z,PH);return{x:q.x,y:q.y,r:q.s*PSZ,z}
 }
 function segDist(ax,ay,bx,by){const dx=bx-ax,dy=by-ay,l=dx*dx+dy*dy;const t=l>0?clamp(-(ax*dx+ay*dy)/l,0,1):0;return Math.hypot(ax+dx*t,ay+dy*t)}
@@ -176,7 +184,7 @@ function segDist(ax,ay,bx,by){const dx=bx-ax,dy=by-ay,l=dx*dx+dy*dy;const t=l>0?
 addEventListener('pointermove',e=>{
   if(e.pointerType!=='mouse')return;
   ctl='mouse';
-  const cp=cpos(e);psx=clamp(cp.x,0,W);psy=clamp(cp.y,0,H);
+  const cp=cpos(e);psx=clamp(cp.x,VB.x0,VB.x1);psy=clamp(cp.y,VB.y0,VB.y1);
   pushHist(psx,psy,e.timeStamp||performance.now());
 },{passive:true});
 
@@ -209,7 +217,7 @@ cv.addEventListener('pointermove',e=>{
   }
 });
 cv.addEventListener('pointerdown',e=>{
-  if(e.pointerType==='mouse'){ctl='mouse';const cp=cpos(e);psx=clamp(cp.x,0,W);psy=clamp(cp.y,0,H);pushHist(psx,psy,e.timeStamp||performance.now())}
+  if(e.pointerType==='mouse'){ctl='mouse';const cp=cpos(e);psx=clamp(cp.x,VB.x0,VB.x1);psy=clamp(cp.y,VB.y0,VB.y1);pushHist(psx,psy,e.timeStamp||performance.now())}
   else{ctl='touch';tpx=clamp((cpos(e).x-W/2)/hw(1),-1.15,1.15);_lid=e.pointerId;_lx=null;_ly=null;_vx=0;_vy=0;swipeDir=null;swipeStr=0;swipePending=false}
   if(on&&phase==='serve'&&srv===0)serveP()});
 const endTouch=e=>{if(e.pointerId===_lid){_lid=null;_lx=null;_ly=null;_vx=0;_vy=0}};
@@ -247,9 +255,9 @@ function start(){px=0;pvx=0;tpx=0;cx=0;ps=0;as=0;lvl=0;sc=0;trail=[];msg='';mt=0
 function newPoint(who){srv=who;phase='serve';pt=0;ball={x:who?cx:px,y:who?.04:1.0,h:.25,vx:0,vy:0,vh:0};L=-1;bnc=[0,0];trail=[];if(!who)placeServeBall()}
 function placeServeBall(){ // hold the ball next to the paddle while serving
   if(ctl!=='mouse'){ball.x=px;ball.y=1.0;ball.h=.25+Math.sin(pt*.1)*.03;return}
-  const pp=pScreen(),zb=clamp(pp.z,.62,1.45),side=psx>W/2?-1:1;
+  const pp=pScreen(),zb=clamp(pp.z,.62,1.9),side=psx>W/2?-1:1;
   ball.y=zb;ball.h=PH+.05+Math.sin(pt*.1)*.02;
-  ball.x=clamp((psx+side*pp.r*1.3-W/2)/hw(zb),-1.3,1.3);
+  ball.x=clamp((psx+side*pp.r*1.3-W/2)/hw(zb),-2.4,2.4);
 }
 function serveP(){swing=12;placeServeBall();launch(ball.y,ball.y,rnd(-.5,.5),rnd(.2,.35),42,0);phase='play';tone(520,.05,'square',.08)}
 function serveC(){cswing=12;ball.x=cx;ball.y=.04;ball.h=.25;launch(0,0,rnd(-.6,.6),rnd(.65,.8),44-lvl,1);phase='play';tone(400,.05,'square',.08)}
@@ -282,7 +290,7 @@ function upd(){if(!isFinite(tpx))tpx=0;if(!isFinite(px))px=0;
   const kx=(keys.ArrowRight||keys.KeyD?1:0)-(keys.ArrowLeft||keys.KeyA?1:0);
   const ky=(keys.KeyS||keys.ArrowDown?1:0)-(keys.KeyW||keys.ArrowUp?1:0);
   if(ctl==='mouse'){
-    if(kx||ky){psx=clamp(psx+kx*9,0,W);psy=clamp(psy+ky*7,0,H);pushHist(psx,psy,performance.now())}
+    if(kx||ky){psx=clamp(psx+kx*9,VB.x0,VB.x1);psy=clamp(psy+ky*7,VB.y0,VB.y1);pushHist(psx,psy,performance.now())}
     const z=clamp(zOf(psy),.35,1.9),npx=(psx-W/2)/hw(z);
     pvx=npx-px;px=npx;tpx=px;
   }else{
@@ -435,9 +443,10 @@ function drawFX(){
 }
 function drw(){
   // room
-  const bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#0d4a63');bg.addColorStop(.55,'#126b7e');bg.addColorStop(1,'#0a3446');ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
-  const sp=ctx.createRadialGradient(W/2,40,10,W/2,260,420);sp.addColorStop(0,'rgba(255,255,255,.28)');sp.addColorStop(1,'rgba(255,255,255,0)');ctx.fillStyle=sp;ctx.fillRect(0,0,W,H);
-  ctx.fillStyle='rgba(255,255,255,.05)';for(let i=0;i<6;i++)ctx.fillRect(i*140-30,0,6,gy(0)-10);
+  const vw=VB.x1-VB.x0,vh=VB.y1-VB.y0;
+  const bg=ctx.createLinearGradient(0,VB.y0,0,VB.y1);bg.addColorStop(0,'#0d4a63');bg.addColorStop(.55,'#126b7e');bg.addColorStop(1,'#0a3446');ctx.fillStyle=bg;ctx.fillRect(VB.x0,VB.y0,vw,vh);
+  const sp=ctx.createRadialGradient(W/2,40,10,W/2,260,420);sp.addColorStop(0,'rgba(255,255,255,.28)');sp.addColorStop(1,'rgba(255,255,255,0)');ctx.fillStyle=sp;ctx.fillRect(VB.x0,VB.y0,vw,vh);
+  ctx.fillStyle='rgba(255,255,255,.05)';for(let x=-30-Math.ceil(Math.max(0,-VB.x0)/140)*140;x<VB.x1;x+=140)ctx.fillRect(x,VB.y0,6,gy(0)-10-VB.y0);
   // floor shadow + legs
   ctx.fillStyle='rgba(0,0,0,.25)';ctx.beginPath();ctx.ellipse(W/2,gy(.5)+96,hw(.55)*1.05,34,0,0,7);ctx.fill();
   const a=P(-1,0,0),b2=P(1,0,0),c=P(1,1,0),d=P(-1,1,0);
@@ -462,7 +471,7 @@ function drw(){
   const near=ball&&ball.y>=.5;
   if(near&&ball.y<=pp.z)drawBall(ball);
   drawSwoosh(pp);
-  const n=ptrail.length,tilt=n>2?clamp((ptrail[n-1].x-ptrail[n-3].x)*.012,-.5,.5):0;
+  const n=ptrail.length,tilt=n>2?clamp((ptrail[n-1].x-ptrail[n-3].x)*.01,-.3,.3):0;
   drawPaddle(pp.x,pp.y,pp.r,tilt+(swing>0?-Math.min(swing/14,1)*.75:0),['#ff4d5e','#b3122a']);
   if(near&&ball.y>pp.z)drawBall(ball);
   drawFX();
@@ -471,7 +480,7 @@ function drw(){
   T(ps+'',W/2-48,36,34);T(':',W/2,34,30,'#fff9');T(as+'',W/2+48,36,34);T(tt('רמה ','Level ')+(lvl+1),W/2,H-14,15,'#fffc');
   if(phase==='serve'&&srv===0)T(ctl==='mouse'?tt('לחצו להגשה','Click to serve'):tt('לחצו/רווח להגשה','Tap to serve'),W/2,H-44,20,'#ffd23f');
   // smash flash
-  if(smashFlash>0){const f=smashFlash/12;ctx.save();ctx.globalAlpha=f*.22;ctx.fillStyle='#ff8800';ctx.fillRect(0,0,W,H);ctx.globalAlpha=f*.12;ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H);ctx.restore()}
+  if(smashFlash>0){const f=smashFlash/12;ctx.save();ctx.globalAlpha=f*.22;ctx.fillStyle='#ff8800';ctx.fillRect(VB.x0,VB.y0,vw,vh);ctx.globalAlpha=f*.12;ctx.fillStyle='#fff';ctx.fillRect(VB.x0,VB.y0,vw,vh);ctx.restore()}
   if(mt>0&&msg){
     if(msgBig){ctx.save();ctx.font='bold 34px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.shadowBlur=18;ctx.shadowColor='#ff4400';ctx.fillStyle='#fff';ctx.fillText(msg,W/2,165);ctx.restore()}
     else T(msg,W/2,170,26,'#ffd23f');
