@@ -230,11 +230,9 @@ cv.addEventListener('mouseleave',()=>{_mouseOnCanvas=false;});
 // קבוע = 128+260 - 0.184*(120+208) = 388 - 0.184*328 = 388-60.35 = 327.65
 document.addEventListener('mousemove',e=>{
   if(!_mouseOnCanvas)return;
-  const r=cv.getBoundingClientRect();
-  const sx=(e.clientX-r.left)/r.width*W;
-  const sy=(e.clientY-r.top)/r.height*H;
-  if(!swipeDir) pdy=clamp((sy-327.65)/213.2,-.40,.08);
-  tpx=clamp((sx-W/2)/hw(1.04+pdy),-1.15,1.15);
+  const cp=cpos(e); // cp.x, cp.y בקואורדינטות canvas (0..W, 0..H)
+  if(!swipeDir) pdy=clamp((cp.y-327.648)/213.2,-.40,.08);
+  tpx=clamp((cp.x-W/2)/hw(1.04+pdy),-1.15,1.15);
 });
 cv.addEventListener('pointerdown',e=>{
   tpx=clamp((cpos(e).x-W/2)/hw(1),-1.15,1.15);
