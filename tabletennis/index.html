@@ -245,9 +245,10 @@ function upd(){if(!isFinite(tpx))tpx=0;if(!isFinite(px))px=0;
     else{pdyv=Math.min(pdyv+.014,.04)}
     pdy=clamp(pdy+pdyv,-.40,.08);
   } else {
-    pdy=clamp(pdy,-.40,.08);// touch controls pdy directly via lerp above
+    // auto-return to 0: spring back when no input
+    pdy=lerp(pdy,0,.09);
+    if(Math.abs(pdy)<.005)pdy=0;
   }
-  if(ky===0&&!_lid&&Math.abs(pdy)<.005)pdy=0;
   if(smashCd>0)smashCd--;
   if(smashFlash>0)smashFlash--;
   if(trollTimer>0){trollTimer--;if(trollTimer===0){cpuSpeedMult=1.0;$('#trollMsg').textContent=''}}
