@@ -83,7 +83,7 @@ function upd(){if(keys.ArrowLeft||keys.KeyA){x-=6;tx=null}if(keys.ArrowRight||ke
   const ty=H*.4;if(y+cam<ty){const d=ty-(y+cam);cam+=d;sc=Math.max(sc,Math.floor(cam/10))}
   while(pl[pl.length-1].y+cam>-60){const l=pl[pl.length-1];pl.push({x:rnd(30,W-110),y:l.y-rnd(55,Math.min(110,60+sc/5)),m:Math.random()<.2?1:0})}
   pl=pl.filter(p=>p.y+cam<H+40);if(y+cam>H+30){over('נפלתם!',sc,'',Math.floor(sc/5),sc>=100?1:0)}}
-function drw(){for(const p of pl){ctx.fillStyle=p.m?'#ff9a3a':'#4ad06a';rr(p.x,p.y+cam,80,12,6);ctx.fill()}ctx.font='34px serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('🐸',x,y+cam-14);T('⬆ '+sc,90,28,24)}
+function drw(){for(const p of pl)R2.block(ctx,p.x,p.y+cam,80,12,6,p.m?'#ff9a3a':'#4ad06a');ctx.font='34px serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('🐸',x,y+cam-14);T('⬆ '+sc,90,28,24)}
 wire(start);run(upd,drw,'#153a60');window.__s={step:upd,start:()=>{start();on=true},get on(){return on},get score(){return sc},get y(){return y},get x(){return x},set x(v){x=v},get pl(){return pl},get cam(){return cam}};
 
 if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
