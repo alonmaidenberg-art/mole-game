@@ -222,15 +222,19 @@ cv.addEventListener('pointermove',e=>{
   }
 });
 cv.addEventListener('mouseenter',()=>{_mouseOnCanvas=true});
-cv.addEventListener('mouseleave',()=>{_mouseOnCanvas=false});
-// document-level mousemove — always fires on desktop regardless of canvas focus
+cv.addEventListener('mouseleave',()=>{_mouseOnCanvas=false;});
+// document mousemove — עובד תמיד בלי לחיצה
 document.addEventListener('mousemove',e=>{
   if(!_mouseOnCanvas)return;
-  const cp=cpos(e);
-  tpx=clamp((cp.x-W/2)/hw(1),-1.15,1.15);
+  const r=cv.getBoundingClientRect();
+  // מיקום יחסי לcanvas בין 0-1
+  const fx=clamp((e.clientX-r.left)/r.width,0,1);
+  const fy=clamp((e.clientY-r.top)/r.height,0,1);
+  // X: -1.15 עד 1.15
+  tpx=clamp((fx-.5)*2.3,-1.15,1.15);
+  // Y: למעלה=קדימה, למטה=רגיל
   if(!swipeDir){
-    const screenFrac=clamp(cp.y/H,0,1);
-    pdy=clamp((screenFrac-.55)*1.1,-.38,.08);
+    pdy=clamp((fy-.55)*1.1,-.38,.08);
   }
 });
 cv.addEventListener('pointerdown',e=>{
