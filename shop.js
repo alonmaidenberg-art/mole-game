@@ -45,6 +45,16 @@
     if(!window.AG)return;var pc=it.admin?0:price(it),pd=it.admin?0:(it.dm||0);if(AG.coins()<pc||AG.diamonds()<pd||!AG.spend(pc,pd)){toast(T('אין מספיק מטבעות','Not enough coins'));return}
     o=rd();if(it.k==='t'){o.until[it.id]=Math.max(o.until[it.id]||0,Date.now())+it.ms}else{o.own[it.id]=1;if(it.th)o.eq.theme=it.th;if(it.grp)o.eq[it.grp]=it.id;if(it.badge)o.eq.badge=it.badge}
     wr(o);applyTheme();tick();toast('✅ '+it.n);draw()}
+  function refund(it){var o=rd();if(!o.own[it.id])return;
+    // refund 70% of price
+    var pc=Math.floor((it.c||0)*.7),pd=Math.floor((it.dm||0)*.7);
+    if(window.AG&&pc)AG.add(pc,0);if(window.AG&&pd)AG.add(0,pd);
+    delete o.own[it.id];
+    // unequip if equipped
+    if(it.th&&o.eq.theme===it.th)delete o.eq.theme;
+    if(it.grp&&o.eq[it.grp]===it.id)delete o.eq[it.grp];
+    if(it.badge&&o.eq.badge===it.badge)delete o.eq.badge;
+    wr(o);applyTheme();toast(T('בוטל – הוחזרו ','Refunded ')+(pc?pc+' 🪙':'')+(pd?' '+pd+' 💎':''));draw()}
   function equip(it){var o=rd();if(it.th){o.eq.theme=o.eq.theme===it.th?'':it.th}else if(it.grp){o.eq[it.grp]=o.eq[it.grp]===it.id?'':it.id}else if(it.badge){o.eq.badge=o.eq.badge===it.badge?'':it.badge}else{o.eq[it.id]=o.eq[it.id]===0?1:0}wr(o);applyTheme();draw()}
   function draw(){if(!ov)return;var o=rd(),box=ov.firstChild;box.textContent='';
     var h=document.createElement('div');h.style.cssText='display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px';
@@ -56,7 +66,9 @@
       var m=document.createElement('div');m.style.cssText='flex:1;min-width:0';var nm=document.createElement('div');nm.style.cssText='font-weight:900;color:#0b4553';nm.textContent=it.n;var ds=document.createElement('div');ds.style.cssText='font-size:12px;color:#2d6f7e;line-height:1.3';ds.textContent=it.d;m.append(nm,ds);
       var rem=it.k==='t'?Math.max(0,Math.ceil(((o.until[it.id]||0)-Date.now())/1000)):0;if(rem){var r=document.createElement('div');r.style.cssText='font-size:12px;font-weight:900;color:#d6892a';r.textContent='⏳ '+Math.floor(rem/60)+':'+String(rem%60).padStart(2,'0');m.append(r)}
       var b=document.createElement('button');b.style.cssText='flex:none;border:0;border-radius:12px;padding:8px 10px;font:900 14px system-ui,Arial;cursor:pointer;background:#ffd23f;color:#4a3300';
-      if(it.k==='p'&&(o.own[it.id]||it.admin)){var on=it.th?o.eq.theme===it.th:it.grp?o.eq[it.grp]===it.id:it.badge?o.eq.badge===it.badge:o.eq[it.id]!==0;b.textContent=on?T('✔ פעיל','✔ On'):T('הפעל','Equip');b.style.background=on?'#7de3c9':'#e6f7f4';b.onclick=function(){equip(it)}}
+      if(it.k==='p'&&(o.own[it.id]||it.admin)){var on=it.th?o.eq.theme===it.th:it.grp?o.eq[it.grp]===it.id:it.badge?o.eq.badge===it.badge:o.eq[it.id]!==0;b.textContent=on?T('✔ פעיל','✔ On'):T('הפעל','Equip');b.style.background=on?'#7de3c9':'#e6f7f4';b.onclick=function(){equip(it)};
+        // refund button (not for admin items)
+        if(o.own[it.id]&&!it.admin&&(it.c||it.dm)){var rb=document.createElement('button');rb.textContent=T('↩ בטל','↩ Undo');rb.title=T('החזר '+(Math.floor((it.c||0)*.7))+' 🪙 (70%)','Refund '+(Math.floor((it.c||0)*.7))+' 🪙 (70%)');rb.style.cssText='flex:none;border:0;border-radius:10px;padding:5px 8px;font:800 12px system-ui,Arial;cursor:pointer;background:#ffe0e0;color:#a00;margin-top:4px';rb.onclick=function(){if(confirm(T('לבטל את הרכישה ולקבל בחזרה '+Math.floor((it.c||0)*.7)+' 🪙?','Refund and get back '+Math.floor((it.c||0)*.7)+' 🪙?')))refund(it)};m.append(rb)}}
       else{var dl=deal(),isd=dl&&dl.id===it.id;b.textContent=(it.c?(isd?price(it)+' 🪙':it.c+' 🪙'):it.dm+' 💎');b.onclick=function(){buy(it)};if(isd){var tg=document.createElement('div');tg.textContent=T('מבצע היום -40%','Today -40%');tg.style.cssText='font-size:11px;font-weight:900;color:#fff;background:#ff3d71;border-radius:8px;padding:1px 6px;margin-top:3px;display:inline-block';m.append(tg)}}
       c.append(e,m,b);g.append(c)});
     box.append(g)}
