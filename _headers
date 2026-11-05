@@ -685,6 +685,9 @@
 /tabletennis/index.html
   Cache-Control: no-cache
 
+/tabletennis/
+  Cache-Control: no-cache
+
 /tabletennis/manifest.webmanifest
   Cache-Control: no-cache
 

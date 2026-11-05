@@ -36,7 +36,7 @@ h1{margin:6px 0;font-size:30px;text-align:center}
 .ovc{width:100%;max-width:380px;background:linear-gradient(160deg,#2e639b,#193552);border:2px solid rgba(255,255,255,.2);border-radius:26px;padding:22px;text-align:center}
 .ovc h2{margin:0 0 6px;font-size:30px}
 body{overflow:hidden;position:fixed;inset:0;width:100%;background:#0e2338}
-#cv{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);display:block;touch-action:none}
+#cv{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);display:block;touch-action:none;cursor:none}
 .ov{overflow:auto}.ovc{margin:auto}
 #hud{position:fixed;left:0;right:0;top:0;text-align:center;font-weight:900;font-size:22px;pointer-events:none;z-index:8;padding-top:max(8px,env(safe-area-inset-top));direction:ltr;text-shadow:0 2px 4px #000}
 .tb{position:fixed;bottom:max(10px,env(safe-area-inset-bottom));z-index:6;width:74px;height:74px;border-radius:50%;border:3px solid rgba(255,255,255,.5);background:rgba(20,12,60,.55);color:#fff;font-size:26px;font-weight:900;touch-action:none;display:none}
@@ -48,7 +48,7 @@ body{overflow:hidden;position:fixed;inset:0;width:100%;background:#0e2338}
 <script src="../hub.js"></script>
 <canvas id="cv"></canvas><div id="hud"></div>
 <div id="rot">📱↔️<br>סובבו את הטלפון לרוחב</div>
-<div class="ov show" id="menu"><div class="ovc" style="max-width:440px"><div style="font-size:56px">🏓</div><h2>פינג-פונג</h2><div class="lb">גררו את המחבט ימינה/שמאלה.<br>🔥 <b>סוויש קדימה</b> = הנחתה 💥<br>⬇️ <b>סוויש למטה</b> = סלייס ✂️ (איטי נמוך)<br>➡️ <b>סוויש ימינה/שמאלה</b> = זווית חדה 📐<br>על מחשב: עכבר להזזה, W/↑=הנחתה, S/↓=סלייס, A/D=זווית. הראשון ל-7.</div><button class="btn" id="go">▶ שחק</button><button class="btn alt" id="settBtn" style="margin-top:8px;display:none">⚙️ הגדרות</button><div style="opacity:.8;margin-top:10px;font-size:15px">שיא: <b id="best">0</b></div></div></div>
+<div class="ov show" id="menu"><div class="ovc" style="max-width:440px"><div style="font-size:56px">🏓</div><h2>פינג-פונג</h2><div class="lb" id="howto">🖱️ <b>מחשב:</b> העכבר הוא המחבט – בלי ללחוץ. הזיזו אותו אל הכדור.<br>💥 תנועה מהירה קדימה (למעלה) ברגע המכה = הנחתה<br>📐 תנועה הצידה ברגע המכה = זווית<br>📱 <b>טלפון:</b> גררו את המחבט; סוויש קדימה = הנחתה, למטה = סלייס.<br>הראשון ל-7 מנצח.</div><button class="btn" id="go">▶ שחק</button><button class="btn alt" id="settBtn" style="margin-top:8px;display:none">⚙️ הגדרות</button><div style="opacity:.8;margin-top:10px;font-size:15px">שיא: <b id="best">0</b></div></div></div>
 <div class="ov" id="end"><div class="ovc"><h2 id="eT">נגמר</h2><div style="font-size:48px;font-weight:900;color:#ffd05a" id="eS"></div><p id="eM"></p><button class="btn" id="again">🔁 שוב</button><button class="btn alt" id="menu2">תפריט</button></div></div>
 <div class="ov" id="settM"><div class="ovc" style="max-width:400px;text-align:center">
   <h2>⚙️ הגדרות</h2>
@@ -80,25 +80,10 @@ const $=s=>document.querySelector(s);
 const store={get(k,d){try{const v=localStorage.getItem(k);return v===null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
 let _ac=null;function tone(f,d=.1,t='triangle',v=.07){try{_ac=_ac||new (window.AudioContext||window.webkitAudioContext)();const o=_ac.createOscillator(),g=_ac.createGain();o.type=t;o.frequency.value=f;g.gain.value=v;o.connect(g);g.connect(_ac.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,_ac.currentTime+d);o.stop(_ac.currentTime+d+.02)}catch(e){}}
 const W=800,H=450;const cv=$('#cv'),ctx=cv.getContext('2d');const keys={};const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),rnd=(a,b)=>a+Math.random()*(b-a);
+const EN=window.AG_LANG==='en',tt=(he,en)=>EN?en:he;
+if(EN)$('#howto').innerHTML='🖱️ <b>Computer:</b> the mouse IS the paddle – no clicking. Move it onto the ball.<br>💥 Flick forward (up) as you hit = smash<br>📐 Move sideways as you hit = angle<br>📱 <b>Phone:</b> drag the paddle; swipe forward = smash, down = slice.<br>First to 7 wins.';
 function resize(){const s=Math.min(innerWidth/W,innerHeight/H),d=Math.min(devicePixelRatio||1,2);cv.style.width=Math.floor(W*s)+'px';cv.style.height=Math.floor(H*s)+'px';cv.width=Math.floor(W*s*d);cv.height=Math.floor(H*s*d);ctx.setTransform(s*d,0,0,s*d,0,0)}
 addEventListener('resize',resize);resize();
-addEventListener('keydown',e=>{
-  if(keys[e.code])return;// ignore held keys
-  keys[e.code]=1;
-  if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();
-  // W/↑ = smash, S/↓ = slice, A/D = angle shot (desktop)
-  if((e.code==='KeyW'||e.code==='ArrowUp')&&phase==='play'&&!swipeDir){
-    swipeDir='up';swipeStr=0.8;swipePending=true;
-    pdy=-0.35;pdyv=0.03;swing=10;
-    tone(920,.14,'square',.28);tone(580,.08,'square',.14);smashFlash=12;
-  }
-  if((e.code==='KeyS'||e.code==='ArrowDown')&&phase==='play'&&!swipeDir){
-    swipeDir='down';swipeStr=0.7;swipePending=true;
-  }
-  if(e.code==='KeyA'&&phase==='play'&&!swipeDir){swipeDir='left';swipeStr=0.7;swipePending=true;}
-  if(e.code==='KeyD'&&phase==='play'&&!swipeDir){swipeDir='right';swipeStr=0.7;swipePending=true;}
-});
-addEventListener('keyup',e=>{keys[e.code]=0});
 function cpos(e){const r=cv.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width*W,y:(e.clientY-r.top)/r.height*H}}
 function holdBtn(id,fn){const b=$(id);b.addEventListener('pointerdown',e=>{e.preventDefault();fn(1);b.classList.add('on')});for(const t of['pointerup','pointerleave','pointercancel'])b.addEventListener(t,e=>{fn(0);b.classList.remove('on')})}
 const BK='tabletennis'+'_best';let best=+store.get(BK,0);$('#best').textContent=best;
@@ -113,7 +98,6 @@ let trollTimer=0;      // frames left for troll effect on cpu
 $('#settBtn').style.display='';
 $('#settBtn').onclick=()=>$('#settM').classList.add('show');
 $('#settClose').onclick=()=>$('#settM').classList.remove('show');
-// speed chips
 document.querySelectorAll('#settM .chip[data-sp]').forEach(b=>{
   b.onclick=()=>{
     document.querySelectorAll('#settM .chip[data-sp]').forEach(c=>c.classList.remove('on'));
@@ -121,7 +105,6 @@ document.querySelectorAll('#settM .chip[data-sp]').forEach(b=>{
     ballSpeedMult=parseFloat(b.dataset.sp);
   }
 });
-// difficulty chips
 document.querySelectorAll('#settM .chip[data-diff]').forEach(b=>{
   b.onclick=()=>{
     document.querySelectorAll('#settM .chip[data-diff]').forEach(c=>c.classList.remove('on'));
@@ -129,9 +112,8 @@ document.querySelectorAll('#settM .chip[data-diff]').forEach(b=>{
     diffMult=parseFloat(b.dataset.diff);
   }
 });
-// troll buttons
 $('#trFast').onclick=()=>{
-  cpuSpeedMult=2.2;trollTimer=420;// 7 seconds at 60fps — CPU gets fast (harder to track)
+  cpuSpeedMult=2.2;trollTimer=420;
   $('#trollMsg').textContent='😈 היריב קיבל טורבו! הוא יהיה מהיר מדי לעצמו…';
   setTimeout(()=>{if(trollTimer<=0)$('#trollMsg').textContent=''},500);
 };
@@ -154,200 +136,303 @@ function wire(start){$('#go').onclick=()=>{$('#menu').classList.remove('show');s
 function over(title,score,msg,coins,dia,delay=600){on=false;window.__show=true;saveBest(score);setTimeout(()=>endGame(title,score,msg,coins,dia),delay)}
 
 const G=.0022;
-let px,pvx,cx,ps,as,lvl,sc,ball,L,bnc,phase,pt,srv,swing,cswing,msg,mt,trail,tpx;
-let smashPow=0,smashCd=0,smashFlash=0; // forward smash mechanic
-let pdy=0,pdyv=0; // paddle forward/back position (0=normal, negative=lunge forward)
-let windTrail=[],_prevPdy=0,_mouseOnCanvas=false;
-let _msx=W/2,_msy=380; // מיקום עכבר במסך (canvas coords)
+let px=0,pvx=0,cx=0,ps=0,as=0,lvl=0,sc=0,ball=null,L=-1,bnc=[0,0],phase='serve',pt=0,srv=0,swing=0,cswing=0,msg='',mt=0,trail=[],tpx=0,msgBig=false;
+let smashCd=0,smashFlash=0;
+let pdy=0,pdyv=0; // phone: paddle forward/back offset (negative = lunge forward)
 const lerp=(a,b,t)=>a+(b-a)*t;
 const gy=y=>128+250*y, hw=y=>(120+200*y)*.92, kk=y=>hw(y);
 function P(x,y,h){return{x:W/2+x*hw(y),y:gy(y)-h*kk(y),s:kk(y)}}
-function launch(by,fy,tx,ty,T,hit){
-  const mult=hit===1?cpuSpeedMult:ballSpeedMult;
-  const Tm=Math.max(6,Math.round(T/mult));
-  const b=ball;
-  b.vx=(tx-b.x)/Tm;b.vy=(ty-b.y)/Tm;b.vh=(.5*G*Tm*Tm-b.h)/Tm;
-  // simulate path and ensure ball clears net (y=0.5, need h>0.08)
-  if(hit===0){// player shot — check net clearance and boost arc if needed
-    const netT=(b.y-.5)/(-b.vy)||0;
-    if(netT>0&&netT<Tm){
-      const hAtNet=b.h+b.vh*netT-.5*G*netT*netT;
-      if(hAtNet<0.1){// will hit net — boost vh so it clears
-        const needed=0.15;// min height at net
-        b.vh=b.vh+(needed-hAtNet)/Math.max(netT,1);
-      }
-    }
-  }
-  L=hit;bnc=[0,0];b.ok=true}
-function start(){px=0;pvx=0;tpx=0;cx=0;ps=0;as=0;lvl=0;sc=0;trail=[];msg='';mt=0;smashPow=0;smashCd=0;pdy=0;pdyv=0;cpuSpeedMult=1.0;trollTimer=0;windTrail=[];_prevPdy=0;newPoint(0)}
-function newPoint(who){srv=who;phase='serve';pt=0;ball={x:who?cx:px,y:who?.04:1.0,h:.25,vx:0,vy:0,vh:0};L=-1;bnc=[0,0];trail=[]}
-// swipe tracking — velocity sampled every frame via pointermove
+
+/* ================= controls =================
+   Computer ('mouse'): the paddle IS the mouse. Its centre is drawn exactly on the cursor,
+   no clicking needed. A hit happens when the ball touches the paddle on screen, and the
+   shot comes from how the mouse is moving at that moment (fast forward = smash).
+   Phone ('touch'): drag + swipes, unchanged. */
+let ctl=(window.matchMedia&&matchMedia('(pointer:fine)').matches)?'mouse':'touch';
+const PH=.2;    // paddle height above the table
+const PSZ=.105; // paddle size
+let psx=W/2,psy=350; // computer: paddle centre in canvas pixels (= the cursor)
+// depth of a paddle whose centre is drawn at screen y (exact inverse of P(x,z,PH).y)
+const zOf=sy=>(sy-(128-PH*.92*120))/(250-PH*.92*200);
+let ptrail=[],burst=[],rings=[],hitsP=0;
+const hist=[]; // recent cursor samples, for paddle speed
+function pushHist(x,y,t){hist.push({x,y,t});if(hist.length>14)hist.shift()}
+function paddleVel(){ // canvas px per 1/60 s
+  if(hist.length<2)return{x:0,y:0};
+  const a=hist[hist.length-1];
+  if(performance.now()-a.t>70)return{x:0,y:0};
+  let o=hist[hist.length-2];
+  for(let i=hist.length-2;i>=0;i--){o=hist[i];if(a.t-o.t>=60)break}
+  const dt=Math.max(4,a.t-o.t);
+  return{x:(a.x-o.x)/dt*16.667,y:(a.y-o.y)/dt*16.667};
+}
+function pScreen(){ // player paddle centre on screen, radius, depth
+  if(ctl==='mouse'){const z=clamp(zOf(psy),.35,1.9);return{x:psx,y:psy,r:kk(z)*PSZ,z}}
+  const z=1.04+pdy,q=P(px,z,PH);return{x:q.x,y:q.y,r:q.s*PSZ,z}
+}
+function segDist(ax,ay,bx,by){const dx=bx-ax,dy=by-ay,l=dx*dx+dy*dy;const t=l>0?clamp(-(ax*dx+ay*dy)/l,0,1):0;return Math.hypot(ax+dx*t,ay+dy*t)}
+
+// computer: follow the mouse anywhere in the window, buttons never needed
+addEventListener('pointermove',e=>{
+  if(e.pointerType!=='mouse')return;
+  ctl='mouse';
+  const cp=cpos(e);psx=clamp(cp.x,0,W);psy=clamp(cp.y,0,H);
+  pushHist(psx,psy,e.timeStamp||performance.now());
+},{passive:true});
+
+// phone: drag to move, swipe for special shots (same as before)
 let _ly=null,_lx=null,_vy=0,_vx=0,_lid=null;
-let swipeDir=null; // 'up'|'down'|'left'|'right' — set on fast move, cleared after hit
-let swipeStr=0;    // strength 0..1
-let swipePending=false; // swipe registered, waiting for ball to come in range
+let swipeDir=null; // 'up'|'down'|'left'|'right'
+let swipeStr=0,swipePending=false;
 cv.addEventListener('pointermove',e=>{
+  if(e.pointerType==='mouse')return;
   const cp=cpos(e);
   tpx=clamp((cp.x-W/2)/hw(1),-1.15,1.15);
-  const isTouch=e.pointerType==='touch';
-  // for touch, only track active pointer; for mouse, always track
-  if(isTouch&&e.pointerId!==_lid)return;
+  if(e.pointerId!==_lid)return;
   const nx=e.clientX,ny=e.clientY;
-  // only compute velocity if we have a valid previous position
-  if(_lx!==null){
-    const dx=nx-_lx,dy=ny-_ly;
-    _vx=_vx*.4+dx*.6;_vy=_vy*.4+dy*.6;
-  }
+  if(_lx!==null){const dx=nx-_lx,dy=ny-_ly;_vx=_vx*.4+dx*.6;_vy=_vy*.4+dy*.6}
   _lx=nx;_ly=ny;
-  // Y position controls paddle depth (forward/back) for all pointer types
   const screenFrac=clamp(cp.y/H,0,1);
-  if(!swipeDir){
-    const targetPdy=clamp((screenFrac-.55)*1.1,-.38,.08);
-    pdy=targetPdy; // מיידי — העכבר הוא המחבט
-  }
-  // detect fast swipe for smash — only when pointer was already tracked
-  if(_lx!==null){
-    const spd=Math.sqrt(_vx*_vx+_vy*_vy);
-    if(spd>8){
-      const ax=Math.abs(_vx),ay=Math.abs(_vy);
-      if(ay>ax*.5&&_vy<-8){
-        const str=Math.min((-_vy-8)/10,1);
-        if(!swipeDir){swipeDir='up';swipeStr=str;swipePending=true;pdy=-0.30-str*.08;pdyv=0.03;swing=10;tone(920,.14,'square',.28);tone(580,.08,'square',.14);smashFlash=12;}
-      } else if(ay>ax*.7&&_vy>9){
-        if(!swipeDir){swipeDir='down';swipeStr=Math.min((_vy-9)/10,1);swipePending=true;}
-      } else if(ax>ay*.7&&ax>9){
-        const d=_vx>0?'right':'left';
-        if(!swipeDir){swipeDir=d;swipeStr=Math.min((ax-9)/12,1);swipePending=true;}
-      }
+  if(!swipeDir)pdy=lerp(pdy,clamp((screenFrac-.55)*1.1,-.38,.08),.18);
+  const spd=Math.sqrt(_vx*_vx+_vy*_vy);
+  if(spd>8){
+    const ax=Math.abs(_vx),ay=Math.abs(_vy);
+    if(ay>ax*.5&&_vy<-8){
+      const str=Math.min((-_vy-8)/10,1);
+      if(!swipeDir){swipeDir='up';swipeStr=str;swipePending=true;pdy=-0.30-str*.08;pdyv=0.03;swing=10;tone(920,.14,'square',.28);tone(580,.08,'square',.14);smashFlash=12}
+    } else if(ay>ax*.7&&_vy>9){
+      if(!swipeDir){swipeDir='down';swipeStr=Math.min((_vy-9)/10,1);swipePending=true}
+    } else if(ax>ay*.7&&ax>9){
+      const d=_vx>0?'right':'left';
+      if(!swipeDir){swipeDir=d;swipeStr=Math.min((ax-9)/12,1);swipePending=true}
     }
   }
 });
-cv.addEventListener('mouseenter',()=>{_mouseOnCanvas=true});
-cv.addEventListener('mouseleave',()=>{_mouseOnCanvas=false;});
-// document mousemove — מחבט = עכבר בדיוק
-// screenY = 128 + 250*(1.04+pdy) - 0.2*(120+200*(1.04+pdy))*0.92
-// = 128 + 250*1.04 + 250*pdy - 0.184*(120+200*1.04+200*pdy)
-// = קבוע + pdy*(250 - 0.184*200) = קבוע + pdy*213.2
-// קבוע = 128+260 - 0.184*(120+208) = 388 - 0.184*328 = 388-60.35 = 327.65
-document.addEventListener('mousemove',e=>{
-  if(!_mouseOnCanvas)return;
-  const cp=cpos(e);
-  _msx=cp.x; _msy=cp.y;
-  if(!swipeDir) pdy=clamp((cp.y-327.648)/213.2,-.40,.08);
-  tpx=clamp((cp.x-W/2)/hw(1.04+pdy),-1.15,1.15);
-});
 cv.addEventListener('pointerdown',e=>{
-  tpx=clamp((cpos(e).x-W/2)/hw(1),-1.15,1.15);
-  _lid=e.pointerId;_lx=null;_ly=null;_vx=0;_vy=0;swipeDir=null;swipeStr=0;swipePending=false;
-  if(phase==='serve'&&srv===0)serveP()});
-cv.addEventListener('pointerup',e=>{
-  if(e.pointerId===_lid){_lid=null;_lx=null;_ly=null;_vx=0;_vy=0}});
-addEventListener('keydown',e=>{if(e.code==='Space'&&phase==='serve'&&srv===0)serveP()});
-function serveP(){swing=12;ball.x=px;ball.y=1.0;ball.h=.25;launch(1,1,rnd(-.5,.5),rnd(.2,.35),42,0);phase='play';tone(520,.05,'square',.08)}
+  if(e.pointerType==='mouse'){ctl='mouse';const cp=cpos(e);psx=clamp(cp.x,0,W);psy=clamp(cp.y,0,H);pushHist(psx,psy,e.timeStamp||performance.now())}
+  else{ctl='touch';tpx=clamp((cpos(e).x-W/2)/hw(1),-1.15,1.15);_lid=e.pointerId;_lx=null;_ly=null;_vx=0;_vy=0;swipeDir=null;swipeStr=0;swipePending=false}
+  if(on&&phase==='serve'&&srv===0)serveP()});
+const endTouch=e=>{if(e.pointerId===_lid){_lid=null;_lx=null;_ly=null;_vx=0;_vy=0}};
+cv.addEventListener('pointerup',endTouch);cv.addEventListener('pointercancel',endTouch);
+
+// keyboard: Space serves. Computer: arrows/WASD move the paddle. Phone mode keeps W/S/A/D shots.
+addEventListener('keydown',e=>{
+  if(keys[e.code])return;
+  keys[e.code]=1;
+  if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();
+  if(e.code==='Space'&&on&&phase==='serve'&&srv===0){serveP();return}
+  if(ctl!=='touch'||!on||phase!=='play'||swipeDir)return;
+  if(e.code==='KeyW'||e.code==='ArrowUp'){swipeDir='up';swipeStr=0.8;swipePending=true;pdy=-0.35;pdyv=0.03;swing=10;tone(920,.14,'square',.28);tone(580,.08,'square',.14);smashFlash=12}
+  else if(e.code==='KeyS'||e.code==='ArrowDown'){swipeDir='down';swipeStr=0.7;swipePending=true}
+  else if(e.code==='KeyA'){swipeDir='left';swipeStr=0.7;swipePending=true}
+  else if(e.code==='KeyD'){swipeDir='right';swipeStr=0.7;swipePending=true}
+});
+addEventListener('keyup',e=>{keys[e.code]=0});
+addEventListener('blur',()=>{for(const k in keys)keys[k]=0});
+
+function launch(by,fy,tx,ty,T,hit){
+  const mult=hit===1?cpuSpeedMult:ballSpeedMult;
+  let Tm=Math.max(6,Math.round(T/mult));
+  const b=ball;
+  // never into the net (net is .2 high): if the arc is too low there, fly a little longer
+  if((b.y-.5)*(ty-.5)<0){
+    for(let i=0;i<90;i++){
+      const vh=(.5*G*Tm*Tm-b.h)/Tm,tn=Tm*(b.y-.5)/(b.y-ty),hn=b.h+vh*tn-.5*G*tn*tn;
+      if(hn>=.23)break;Tm++;
+    }
+  }
+  b.vx=(tx-b.x)/Tm;b.vy=(ty-b.y)/Tm;b.vh=(.5*G*Tm*Tm-b.h)/Tm;
+  L=hit;bnc=[0,0];b.ok=true}
+function start(){px=0;pvx=0;tpx=0;cx=0;ps=0;as=0;lvl=0;sc=0;trail=[];msg='';mt=0;msgBig=false;smashCd=0;smashFlash=0;pdy=0;pdyv=0;cpuSpeedMult=1.0;trollTimer=0;ptrail=[];burst=[];rings=[];hitsP=0;swing=0;cswing=0;newPoint(0)}
+function newPoint(who){srv=who;phase='serve';pt=0;ball={x:who?cx:px,y:who?.04:1.0,h:.25,vx:0,vy:0,vh:0};L=-1;bnc=[0,0];trail=[];if(!who)placeServeBall()}
+function placeServeBall(){ // hold the ball next to the paddle while serving
+  if(ctl!=='mouse'){ball.x=px;ball.y=1.0;ball.h=.25+Math.sin(pt*.1)*.03;return}
+  const pp=pScreen(),zb=clamp(pp.z,.62,1.45),side=psx>W/2?-1:1;
+  ball.y=zb;ball.h=PH+.05+Math.sin(pt*.1)*.02;
+  ball.x=clamp((psx+side*pp.r*1.3-W/2)/hw(zb),-1.3,1.3);
+}
+function serveP(){swing=12;placeServeBall();launch(ball.y,ball.y,rnd(-.5,.5),rnd(.2,.35),42,0);phase='play';tone(520,.05,'square',.08)}
 function serveC(){cswing=12;ball.x=cx;ball.y=.04;ball.h=.25;launch(0,0,rnd(-.6,.6),rnd(.65,.8),44-lvl,1);phase='play';tone(400,.05,'square',.08)}
-function score(w,why){if(w===0){ps++;sc+=10;tone(900,.2)}else{as++;tone(130,.3)}msg=(w===0?'נקודה! ':'נקודה למחשב ')+why;mt=70;phase='dead';pt=0;
+function score(w,why){if(w===0){ps++;sc+=10;tone(900,.2)}else{as++;tone(130,.3)}msg=(w===0?'נקודה! ':'נקודה למחשב ')+why;msgBig=false;mt=70;phase='dead';pt=0;
   if(ps>=7){sc+=50;lvl++;ps=0;as=0;msg='עולים רמה! 🔥';mt=90}else if(as>=7){over('המחשב ניצח',sc,'רמה '+(lvl+1)+' · '+ps+':'+as,Math.floor(sc/10),lvl>=2?1:0);return}
   srv=1-w}
-function upd(){if(!isFinite(tpx))tpx=0;if(!isFinite(px))px=0;
-  const kx=(keys.ArrowRight||keys.KeyD?1:0)-(keys.ArrowLeft||keys.KeyA?1:0);if(kx)tpx=clamp(tpx+kx*.035,-1.15,1.15);
-  // keyboard Y movement (desktop fallback)
-  const ky=(keys.KeyW||keys.ArrowUp?-1:0)+(keys.KeyS||keys.ArrowDown?1:0);
-  if(ky!==0){// keyboard overrides touch Y
-    if(ky<0){pdyv=Math.max(pdyv-.018,-.06)}
-    else{pdyv=Math.min(pdyv+.014,.04)}
-    pdy=clamp(pdy+pdyv,-.40,.08);
-  } else if(!_mouseOnCanvas){
-    // auto-return to 0 only when mouse is off canvas and no touch
-    pdy=lerp(pdy,0,.09);
-    if(Math.abs(pdy)<.005)pdy=0;
+
+// computer hit: shot comes from how the mouse moves at the moment of contact
+function mouseShot(b,pp,bs){
+  const v=paddleVel(),fwd=-v.y,aim=clamp(v.x/15,-1,1),pow=clamp((fwd-2.5)/13,0,1);
+  const off=clamp((bs.x-pp.x)/(pp.r||1),-1.4,1.4); // where on the paddle it touched
+  let tx=clamp(b.x*.35+aim*.6+off*.16+rnd(-.07,.07),-.86,.86),ty,T;
+  if(pow>.6){ // smash
+    ty=rnd(.07,.16);T=Math.round(25-pow*11);swing=22;
+    msg=tt('הנחתה! 💥','SMASH! 💥');msgBig=true;mt=50;smashCd=3;smashFlash=12;
+    tone(920,.14,'square',.28);tone(580,.08,'square',.14);
+    for(let i=0;i<24;i++){const a=-Math.PI/2+rnd(-1.15,1.15),s=rnd(5,13);burst.push({x:bs.x,y:bs.y,vx:Math.cos(a)*s+aim*4,vy:Math.sin(a)*s,life:Math.round(rnd(12,22)),max:22})}
+  }else if(pow>.18){ // drive
+    ty=rnd(.12,.3);T=Math.round(38-pow*22);swing=16;tone(560+pow*300,.06,'square',.11);
+  }else{ // block
+    ty=rnd(.2,.36);T=44;swing=12;tone(520,.05,'square',.09);
   }
+  rings.push({x:bs.x,y:bs.y,r0:pp.r*.6,life:14,max:14,big:pow>.6});
+  hitsP++;
+  b.h=Math.max(.06,b.h);
+  launch(b.y,b.y,tx,ty,T,0);
+}
+
+function upd(){if(!isFinite(tpx))tpx=0;if(!isFinite(px))px=0;
+  const kx=(keys.ArrowRight||keys.KeyD?1:0)-(keys.ArrowLeft||keys.KeyA?1:0);
+  const ky=(keys.KeyS||keys.ArrowDown?1:0)-(keys.KeyW||keys.ArrowUp?1:0);
+  if(ctl==='mouse'){
+    if(kx||ky){psx=clamp(psx+kx*9,0,W);psy=clamp(psy+ky*7,0,H);pushHist(psx,psy,performance.now())}
+    const z=clamp(zOf(psy),.35,1.9),npx=(psx-W/2)/hw(z);
+    pvx=npx-px;px=npx;tpx=px;
+  }else{
+    if(kx)tpx=clamp(tpx+kx*.035,-1.15,1.15);
+    if(ky!==0){
+      if(ky<0){pdyv=Math.max(pdyv-.018,-.06)}else{pdyv=Math.min(pdyv+.014,.04)}
+      pdy=clamp(pdy+pdyv,-.40,.08);
+    }else if(_lid===null){// finger lifted: paddle returns
+      pdy=lerp(pdy,0,.09);if(Math.abs(pdy)<.005)pdy=0;
+    }
+    const op=px;px+=clamp(tpx-px,-.18,.18);pvx=px-op;
+  }
+  const pp=pScreen(),pp0=ptrail.length?ptrail[ptrail.length-1]:pp;
+  if(Math.hypot(pp.x-pp0.x,pp.y-pp0.y)>220)ptrail=[];
+  ptrail.push({x:pp.x,y:pp.y});if(ptrail.length>9)ptrail.shift();
   if(smashCd>0)smashCd--;
   if(smashFlash>0)smashFlash--;
   if(trollTimer>0){trollTimer--;if(trollTimer===0){cpuSpeedMult=1.0;$('#trollMsg').textContent=''}}
-  const op=px;px=_mouseOnCanvas?tpx:px+clamp(tpx-px,-.18,.18);pvx=px-op;
-  // wind swoosh — arc trails when paddle moves fast sideways (like original game)
-  if(Math.abs(pvx)>.045){const q=P(px,1.04+pdy,.2);const n=Math.floor(Math.abs(pvx)*80);for(let i=0;i<n;i++)windTrail.push({x:q.x+rnd(-18,18),y:q.y+rnd(-28,28),vx:pvx*rnd(60,110)+rnd(-8,8),vy:rnd(-30,10),life:rnd(8,14),maxLife:14,dir:pvx>0?1:-1});}
-  windTrail=windTrail.filter(p=>{p.x+=p.vx*.06;p.y+=p.vy*.06;p.life--;return p.life>0;});if(swing>0)swing--;if(cswing>0)cswing--;if(mt>0)mt--;
+  burst=burst.filter(p=>{p.x+=p.vx;p.y+=p.vy;p.vx*=.9;p.vy*=.9;return --p.life>0});
+  rings=rings.filter(r=>--r.life>0);
+  if(swing>0)swing--;if(cswing>0)cswing--;if(mt>0)mt--;
   const csp=(.011+lvl*.0035)*diffMult;
-  if(phase==='serve'){pt++;ball.x=srv?cx:px;ball.y=srv?.04:1.0;ball.h=.25+Math.sin(pt*.1)*.03;if(srv===1){cx+=clamp(rnd(-.4,.4)-cx,-.01,.01);if(pt>70)serveC()}else if(pt>400)serveP();return}
+  if(phase==='serve'){pt++;
+    if(srv===1){ball.x=cx;ball.y=.04;ball.h=.25+Math.sin(pt*.1)*.03;cx+=clamp(rnd(-.4,.4)-cx,-.01,.01);if(pt>70)serveC()}
+    else{placeServeBall();if(pt>400)serveP()}
+    return}
   if(phase==='dead'){pt++;ball.vh-=G;ball.h+=ball.vh;ball.x+=ball.vx*.5;ball.y+=ball.vy*.5;if(ball.h<0){ball.h=0;ball.vh=Math.abs(ball.vh)*.5}if(pt>70){newPoint(srv)}return}
   const b=ball;trail.push({x:b.x,y:b.y,h:b.h});if(trail.length>9)trail.shift();
   // cpu movement
-  let tgt=0;if(b.vy<0||b.y<.5){const t=Math.max(0,(b.y-.02)/Math.max(.004,-b.vy));tgt=clamp(b.x+b.vx*t*.9+Math.sin(pt*.05)*.0,-1.1,1.1)}
+  let tgt=0;if(b.vy<0||b.y<.5){const t=Math.max(0,(b.y-.02)/Math.max(.004,-b.vy));tgt=clamp(b.x+b.vx*t*.9,-1.1,1.1)}
   cx+=clamp(tgt-cx,-csp,csp);pt++;
+  const bs0=P(b.x,b.y,b.h);
   const py=b.y;b.x+=b.vx;b.y+=b.vy;b.h+=b.vh;b.vh-=G;
   // net
   if((py-.5)*(b.y-.5)<=0&&b.h<.2){b.vy*=-.2;b.vx*=.3;score(L===0?1:0,'הכדור פגע ברשת');return}
   // table bounce
-  const on=Math.abs(b.x)<=1&&b.y>=0&&b.y<=1;
-  if(b.h<=0&&b.vh<0){if(on){b.h=0;b.vh=-b.vh*.82;const side=b.y<.5?1:0;tone(260+side*40,.04,'sine',.08);
+  const onT=Math.abs(b.x)<=1&&b.y>=0&&b.y<=1;
+  if(b.h<=0&&b.vh<0){if(onT){b.h=0;b.vh=-b.vh*.82;const side=b.y<.5?1:0;tone(260+side*40,.04,'sine',.08);
       // side: 1 = cpu half, 0 = player half
-      const mine=(L===0?1:0);// half belonging to hitter's opponent? hitter 0 hits to cpu half(side1)
       const oppSide=L===0?1:0;
       if(side===oppSide){bnc[1]++;if(bnc[1]>=2){score(L,'שני קפיצות אצל היריב');return}}
       else{score(L===0?1:0,L===0?'הכדור נחת בצד שלך':'הכדור נחת בצד שלו');return}}
     else if(b.h<-.02){// off table
-      const opp=L===0?1:0;if(bnc[1]>=1)score(L,'הכדור יצא');else score(1-L,'הכדור יצא');return}}
-  // player hit — paddle Y is controlled by touch, so check around pdy position
-  const hitY=1.04+pdy;
-  if(L===1&&b.vy>0&&b.y>hitY-.35&&b.y<hitY+.4&&b.h<1.0&&bnc[1]>=1&&Math.abs(b.x-px)<.55){
-    const lunge=-pdy;
-    const sd=swipeDir,ss=swipeStr;
-    const isSmash=sd==='up'||lunge>.08;
-    const isSlice=sd==='down';
-    const isAngleR=sd==='right';
-    const isAngleL=sd==='left';
-    const sp=Math.abs(pvx)*20+lunge*60+(isSmash?ss*40:0);
-    let spd2=Math.round(clamp(46-sp*1.4,isSmash?10:isSlice?36:26,48));
-    swing=isSmash?22:isSlice?6:14;
-    let tx,ty;
-    if(isSmash){
-      tx=clamp((sd==='up'?pvx*4:0)+rnd(-.1,.1),-.85,.85);
-      ty=clamp(.05+rnd(0,.12),.05,.17);// lands deep in opponent's court
-      spd2=4+Math.round((1-ss)*2);// 4-6 frames — BLAZING fast
-      tone(920,.14,'square',.28);tone(580,.08,'square',.14);msg='הנחתה! 💥';mt=50;smashCd=3;
-      smashFlash=12;
-    } else if(isSlice){
-      // slice: float slowly, very low arc
-      tx=clamp((b.x-px)*-1.4+pvx*3+rnd(-.1,.1),-.8,.8);
-      ty=clamp(.06+rnd(0,.03),.04,.1);spd2=Math.round(spd2*1.5);
-      tone(280,.1,'sine',.1);msg='סלייס ✂️';mt=28;
-    } else if(isAngleR){
-      tx=clamp(.6+ss*.2+rnd(0,.1),.4,.88);
-      ty=clamp(.18+rnd(0,.08),.1,.3);spd2=Math.round(spd2*.85);
-      tone(700,.07,'square',.1);msg='זווית! 📐';mt=22;
-    } else if(isAngleL){
-      tx=clamp(-.6-ss*.2-rnd(0,.1),-.88,-.4);
-      ty=clamp(.18+rnd(0,.08),.1,.3);spd2=Math.round(spd2*.85);
-      tone(700,.07,'square',.1);msg='זווית! 📐';mt=22;
-    } else {
-      tx=clamp((b.x-px)*-1.6+pvx*5+rnd(-.1,.1),-.85,.85);
-      ty=clamp(.2+rnd(0,.1)-Math.abs(pvx)*.4,.08,.4);
-      tone(560,.05,'square',.09);
+      if(bnc[1]>=1)score(L,'הכדור יצא');else score(1-L,'הכדור יצא');return}}
+  // player hit
+  if(ctl==='mouse'){
+    // the ball touches the paddle on screen (swept, so fast moves can't skip through)
+    if(L===1&&b.vy>0&&b.y>.52){
+      const bs1=P(b.x,b.y,b.h),br=Math.max(4,bs1.s*.036);
+      let ax=bs0.x-pp0.x,ay=bs0.y-pp0.y;const bx=bs1.x-pp.x,by=bs1.y-pp.y;
+      if(Math.hypot(pp.x-pp0.x,pp.y-pp0.y)>140){ax=bs0.x-pp.x;ay=bs0.y-pp.y}
+      if(segDist(ax,ay,bx,by)<pp.r*1.1+br+5){mouseShot(b,pp,bs1);return}
     }
-    b.h=Math.max(.05,b.h);launch(b.y,b.y,tx,ty,spd2,0);
-    if(isSmash)pdyv=0.08;else pdyv*=-.5;// smash snaps back fast
-    swipeDir=null;swipeStr=0;
-    return}
+  }else{
+    // phone: forgiving hit zone around the paddle
+    const hitY=1.04+pdy;
+    if(L===1&&b.vy>0&&b.y>hitY-.35&&b.y<hitY+.4&&b.h<1.0&&bnc[1]>=1&&Math.abs(b.x-px)<.55){
+      const lunge=-pdy;
+      const sd=swipeDir,ss=swipeStr;
+      const isSmash=sd==='up'||lunge>.08;
+      const isSlice=sd==='down';
+      const isAngleR=sd==='right';
+      const isAngleL=sd==='left';
+      const sp=Math.abs(pvx)*20+lunge*60+(isSmash?ss*40:0);
+      let spd2=Math.round(clamp(46-sp*1.4,isSmash?10:isSlice?36:26,48));
+      swing=isSmash?22:isSlice?6:14;
+      let tx,ty;
+      if(isSmash){
+        tx=clamp((sd==='up'?pvx*4:0)+rnd(-.1,.1),-.85,.85);
+        ty=clamp(.05+rnd(0,.12),.05,.17);
+        spd2=4+Math.round((1-ss)*2);
+        tone(920,.14,'square',.28);tone(580,.08,'square',.14);msg=tt('הנחתה! 💥','SMASH! 💥');msgBig=true;mt=50;smashCd=3;
+        smashFlash=12;
+      } else if(isSlice){
+        tx=clamp((b.x-px)*-1.4+pvx*3+rnd(-.1,.1),-.8,.8);
+        ty=clamp(.06+rnd(0,.03),.04,.1);spd2=Math.round(spd2*1.5);
+        tone(280,.1,'sine',.1);msg='סלייס ✂️';msgBig=false;mt=28;
+      } else if(isAngleR){
+        tx=clamp(.6+ss*.2+rnd(0,.1),.4,.88);
+        ty=clamp(.18+rnd(0,.08),.1,.3);spd2=Math.round(spd2*.85);
+        tone(700,.07,'square',.1);msg='זווית! 📐';msgBig=false;mt=22;
+      } else if(isAngleL){
+        tx=clamp(-.6-ss*.2-rnd(0,.1),-.88,-.4);
+        ty=clamp(.18+rnd(0,.08),.1,.3);spd2=Math.round(spd2*.85);
+        tone(700,.07,'square',.1);msg='זווית! 📐';msgBig=false;mt=22;
+      } else {
+        tx=clamp((b.x-px)*-1.6+pvx*5+rnd(-.1,.1),-.85,.85);
+        ty=clamp(.2+rnd(0,.1)-Math.abs(pvx)*.4,.08,.4);
+        tone(560,.05,'square',.09);
+      }
+      const bq=P(b.x,b.y,b.h);rings.push({x:bq.x,y:bq.y,r0:pp.r*.6,life:14,max:14,big:isSmash});hitsP++;
+      b.h=Math.max(.05,b.h);launch(b.y,b.y,tx,ty,spd2,0);
+      if(isSmash)pdyv=0.08;else pdyv*=-.5;
+      swipeDir=null;swipeStr=0;
+      return}
+  }
   // cpu hit
   if(L===0&&b.vy<0&&b.y<.12&&b.y>-.08&&b.h<.6&&bnc[1]>=1&&Math.abs(b.x-cx)<.28+lvl*.025){
     if(Math.random()<.12-lvl*.025&&!ball.cpuMiss){ball.cpuMiss=1}
     if(!ball.cpuMiss){cswing=14;const T=Math.round(clamp(46-lvl*2,34,46));const tx=clamp(rnd(-.8,.8),-.85,.85),ty=rnd(.62,.84);b.h=Math.max(.05,b.h);launch(b.y,b.y,tx,ty,T,1);tone(430,.05,'square',.09);return}}
   if(b.y<-.5||b.y>1.6||b.h<-.8){score(L===0?(bnc[1]>=1?0:1):(bnc[1]>=1?1:0),'פספוס')}
 }
-function paddleD(x,y,h,col,face,sw,flip){
-  // עבור המחבט של השחקן (flip=false) ועכבר על קנבס — ציור ישירות על העכבר
-  const q=(_mouseOnCanvas&&!flip)?{x:_msx,y:_msy,s:P(x,y,h).s}:P(x,y,h);
-  const r=q.s*(flip?.10:.12);ctx.save();ctx.translate(q.x,q.y);const swRot=sw>0?Math.min(sw/14,1.3)*(flip?.9:-.9):0;ctx.rotate(swRot+(flip?0:pvx*1.2));
-  ctx.fillStyle='rgba(0,0,0,.28)';ctx.beginPath();ctx.ellipse(6,q.s*.3,r*.9,r*.28,0,0,7);ctx.fill();
-  ctx.fillStyle='#c98a4d';rr(-r*.16,r*.7,r*.32,r*.95,r*.1);ctx.fill();ctx.fillStyle='#a56d35';ctx.fillRect(-r*.16,r*1.25,r*.32,r*.1);
-  ctx.fillStyle='#e8d2a8';ctx.beginPath();ctx.arc(0,0,r*1.06,0,7);ctx.fill();
-  const g=ctx.createRadialGradient(-r*.3,-r*.35,r*.1,0,0,r);g.addColorStop(0,face[0]);g.addColorStop(1,face[1]);ctx.fillStyle=g;ctx.beginPath();ctx.arc(0,0,r,0,7);ctx.fill();
-  ctx.strokeStyle='rgba(255,255,255,.35)';ctx.lineWidth=Math.max(1,r*.05);ctx.beginPath();ctx.arc(-r*.1,-r*.1,r*.7,3.6,5.2);ctx.stroke();ctx.restore()}
+
+/* ================= drawing ================= */
+function drawPaddle(x,y,r,rot,face){
+  ctx.save();ctx.translate(x,y);ctx.rotate(rot);
+  // handle
+  const hg=ctx.createLinearGradient(-r*.18,0,r*.18,0);hg.addColorStop(0,'#9a5f2a');hg.addColorStop(.5,'#e3ad70');hg.addColorStop(1,'#9a5f2a');
+  ctx.fillStyle=hg;rr(-r*.18,r*.8,r*.36,r*.98,r*.14);ctx.fill();
+  ctx.fillStyle='rgba(60,30,10,.25)';ctx.fillRect(-r*.18,r*1.22,r*.36,r*.08);
+  // wooden edge
+  ctx.fillStyle='#f3e0bb';ctx.beginPath();ctx.arc(0,0,r*1.08,0,7);ctx.fill();
+  ctx.lineWidth=Math.max(1,r*.035);ctx.strokeStyle='rgba(110,60,20,.45)';ctx.stroke();
+  // rubber
+  const g=ctx.createRadialGradient(-r*.35,-r*.4,r*.06,0,0,r);g.addColorStop(0,face[0]);g.addColorStop(1,face[1]);
+  ctx.fillStyle=g;ctx.beginPath();ctx.arc(0,0,r,0,7);ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,.42)';ctx.lineWidth=Math.max(1,r*.07);ctx.lineCap='round';ctx.beginPath();ctx.arc(0,0,r*.74,3.65,5.1);ctx.stroke();
+  ctx.restore();
+}
 function drawBall(b){const q=P(b.x,b.y,b.h),s0=P(b.x,b.y,0),r=Math.max(4,q.s*.036);
   ctx.fillStyle='rgba(0,0,0,.28)';ctx.beginPath();ctx.ellipse(s0.x,s0.y,r*1.1,r*.45,0,0,7);ctx.fill();
   ctx.fillStyle='#ff8a2a33';trail.forEach((t,i)=>{const p=P(t.x,t.y,t.h);ctx.globalAlpha=i/trail.length*.35;ctx.beginPath();ctx.arc(p.x,p.y,r*(.5+i/trail.length*.5),0,7);ctx.fill()});ctx.globalAlpha=1;
   const g=ctx.createRadialGradient(q.x-r*.35,q.y-r*.4,r*.1,q.x,q.y,r);g.addColorStop(0,'#fff');g.addColorStop(.5,'#ffe2b8');g.addColorStop(1,'#ff9a3a');ctx.fillStyle=g;ctx.beginPath();ctx.arc(q.x,q.y,r,0,7);ctx.fill()}
+// air swoosh behind the paddle when it moves fast
+function drawSwoosh(pp){
+  const n=ptrail.length;if(n<3)return;
+  const a=ptrail[n-1],o=ptrail[Math.max(0,n-5)];
+  const sp=Math.hypot(a.x-o.x,a.y-o.y)/Math.min(4,n-1);
+  if(sp<5)return;
+  const k=clamp((sp-5)/16,0,1);
+  ctx.save();ctx.lineCap='round';ctx.lineJoin='round';
+  for(let i=1;i<n;i++){const p0=ptrail[i-1],p1=ptrail[i],f=i/(n-1);
+    ctx.globalAlpha=k*.5*f*f;ctx.strokeStyle='#e4f7ff';ctx.lineWidth=pp.r*2*(.3+.7*f);
+    ctx.beginPath();ctx.moveTo(p0.x,p0.y);ctx.lineTo(p1.x,p1.y);ctx.stroke()}
+  const dx=a.x-o.x,dy=a.y-o.y,l=Math.hypot(dx,dy)||1,ux=dx/l,uy=dy/l,nx=-uy,ny=ux,len=Math.min(l*1.7,pp.r*5);
+  ctx.strokeStyle='#fff';ctx.shadowColor='#8fe3ff';ctx.shadowBlur=8;
+  for(const s of[-1.15,-.4,.4,1.15]){
+    const out=Math.abs(s)>1;ctx.globalAlpha=k*(out?.55:.85);ctx.lineWidth=out?1.5:2.5;
+    const sx=a.x+nx*pp.r*s-ux*pp.r*1.1,sy=a.y+ny*pp.r*s-uy*pp.r*1.1,ll=len*(.6+.4*Math.abs(s));
+    ctx.beginPath();ctx.moveTo(sx,sy);ctx.lineTo(sx-ux*ll,sy-uy*ll);ctx.stroke()}
+  ctx.restore();
+}
+function drawFX(){
+  if(!burst.length&&!rings.length)return;
+  ctx.save();ctx.lineCap='round';
+  for(const r of rings){const f=r.life/r.max;ctx.globalAlpha=f*.9;ctx.strokeStyle=r.big?'#ffe08a':'#fff';ctx.lineWidth=(r.big?4:2.5)*f+1;ctx.beginPath();ctx.arc(r.x,r.y,r.r0+(1-f)*(r.big?60:30),0,7);ctx.stroke()}
+  ctx.shadowColor='#bdf0ff';ctx.shadowBlur=10;ctx.strokeStyle='#fff';
+  for(const p of burst){const f=p.life/p.max;ctx.globalAlpha=f;ctx.lineWidth=1.5+f*2.5;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.x-p.vx*2.2,p.y-p.vy*2.2);ctx.stroke()}
+  ctx.restore();
+}
 function drw(){
   // room
   const bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#0d4a63');bg.addColorStop(.55,'#126b7e');bg.addColorStop(1,'#0a3446');ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
@@ -364,28 +449,35 @@ function drw(){
   const sh=ctx.createLinearGradient(0,a.y,0,d.y);sh.addColorStop(0,'rgba(255,255,255,.25)');sh.addColorStop(.5,'rgba(255,255,255,0)');ctx.fillStyle=sh;ctx.fill();
   ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b2.x,b2.y);ctx.lineTo(c.x,c.y);ctx.lineTo(d.x,d.y);ctx.closePath();ctx.stroke();
   const m1=P(0,0,0),m2=P(0,1,0);ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(m1.x,m1.y);ctx.lineTo(m2.x,m2.y);ctx.stroke();
-  // cpu side objects
-  paddleD(cx,.0,.2,'',['#3a3a3a','#101010'],cswing,true);
+  // cpu side
+  {const q=P(cx,0,PH);drawPaddle(q.x,q.y,q.s*.12,cswing>0?Math.min(cswing/14,1.3)*.9:0,['#3a3a3a','#101010'])}
   if(ball&&ball.y<.5)drawBall(ball);
   // net
   const n1=P(-1.06,.5,0),n2=P(1.06,.5,0),h=.2*kk(.5);ctx.fillStyle='rgba(255,255,255,.2)';ctx.fillRect(n1.x,n1.y-h,n2.x-n1.x,h);
   ctx.strokeStyle='rgba(255,255,255,.35)';ctx.lineWidth=1;for(let x=n1.x;x<n2.x;x+=8){ctx.beginPath();ctx.moveTo(x,n1.y-h);ctx.lineTo(x,n1.y);ctx.stroke()}for(let y=n1.y-h;y<n1.y;y+=8){ctx.beginPath();ctx.moveTo(n1.x,y);ctx.lineTo(n2.x,y);ctx.stroke()}
   ctx.fillStyle='#fff';ctx.fillRect(n1.x,n1.y-h-2,n2.x-n1.x,4);ctx.fillStyle='#ccc';ctx.fillRect(n1.x-3,n1.y-h-4,6,h+8);ctx.fillRect(n2.x-3,n2.y-h-4,6,h+8);
-  if(ball&&ball.y>=.5&&ball.y<1)drawBall(ball);
-  // wind trail
-  windTrail.forEach(p=>{const a=p.life/p.maxLife;ctx.save();ctx.globalAlpha=a*.9;ctx.shadowColor='#60cfff';ctx.shadowBlur=12;const tail=p.vx*.35;ctx.strokeStyle=`rgba(120,210,255,${a})`;ctx.lineWidth=1.5+a*3;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.x-tail,p.y-p.vy*.2);ctx.stroke();ctx.globalAlpha=a*.3;ctx.strokeStyle='#ffffff';ctx.lineWidth=3+a*4;ctx.stroke();ctx.restore();});
-  paddleD(px,1.04+pdy,.2,'',['#ff4d5e','#b3122a'],swing,false);
-  if(ball&&ball.y>=1)drawBall(ball);
+  // player side: paddle shadow on the table, then ball/paddle in depth order
+  const pp=pScreen();
+  {const z=pp.z,xt=(pp.x-W/2)/hw(z);if(Math.abs(xt)<=1.02&&z>=.5&&z<=1.01){ctx.fillStyle='rgba(0,0,0,.2)';ctx.beginPath();ctx.ellipse(pp.x,gy(z),pp.r*.95,pp.r*.32,0,0,7);ctx.fill()}}
+  const near=ball&&ball.y>=.5;
+  if(near&&ball.y<=pp.z)drawBall(ball);
+  drawSwoosh(pp);
+  const n=ptrail.length,tilt=n>2?clamp((ptrail[n-1].x-ptrail[n-3].x)*.012,-.5,.5):0;
+  drawPaddle(pp.x,pp.y,pp.r,tilt+(swing>0?-Math.min(swing/14,1)*.75:0),['#ff4d5e','#b3122a']);
+  if(near&&ball.y>pp.z)drawBall(ball);
+  drawFX();
+  // HUD
   ctx.fillStyle='rgba(8,30,50,.45)';rr(W/2-96,10,192,50,16);ctx.fill();
-  T(ps+'',W/2-48,36,34);T(':',W/2,34,30,'#fff9');T(as+'',W/2+48,36,34);T('רמה '+(lvl+1),W/2,H-14,15,'#fffc');
-  if(phase==='serve'&&srv===0)T('לחצו/רווח להגשה',W/2,H-44,20,'#ffd23f');
-  // forward lunge indicator
-  if(pdy<-.03){const lunge=Math.min(-pdy/.40,1);const gc=ctx.createLinearGradient(0,0,80,0);gc.addColorStop(0,'#ff9900');gc.addColorStop(1,'#ff3300');ctx.fillStyle='rgba(0,0,0,.45)';rr(W/2-52,H-30,104,14,6);ctx.fill();ctx.fillStyle=gc;ctx.shadowBlur=8;ctx.shadowColor='#ff6600';rr(W/2-50,H-28,100*lunge,10,5);ctx.fill();ctx.shadowBlur=0;if(lunge>.45)T('💥',W/2,H-46,18)}
-  // smash screen flash — big orange-white burst
-  if(smashFlash>0){const a=smashFlash/10;ctx.save();ctx.globalAlpha=a*.45;ctx.fillStyle='#ff8800';ctx.fillRect(0,0,W,H);ctx.globalAlpha=a*.2;ctx.fillStyle='#ffffff';ctx.fillRect(0,0,W,H);ctx.restore()}
-  if(mt>0&&smashCd>0&&msg==='הנחתה! 💥'){ctx.save();ctx.font='bold 32px Arial';ctx.textAlign='center';ctx.shadowBlur=18;ctx.shadowColor='#ff4400';ctx.fillStyle='#fff';ctx.fillText('הנחתה! 💥',W/2,165);ctx.restore()}
-  if(mt>0&&msg)T(msg,W/2,h*0+170,26,'#ffd23f')}
-wire(start);run(upd,drw,'#0b3d4f');window.__s={step:upd,start:()=>{start();on=true},get on(){return on},get score(){return sc},get ball(){return ball},get ps(){return ps},get as(){return as},get lvl(){return lvl},get phase(){return phase},set tpx(v){tpx=v},get px(){return px},serveP};
+  T(ps+'',W/2-48,36,34);T(':',W/2,34,30,'#fff9');T(as+'',W/2+48,36,34);T(tt('רמה ','Level ')+(lvl+1),W/2,H-14,15,'#fffc');
+  if(phase==='serve'&&srv===0)T(ctl==='mouse'?tt('לחצו להגשה','Click to serve'):tt('לחצו/רווח להגשה','Tap to serve'),W/2,H-44,20,'#ffd23f');
+  // smash flash
+  if(smashFlash>0){const f=smashFlash/12;ctx.save();ctx.globalAlpha=f*.22;ctx.fillStyle='#ff8800';ctx.fillRect(0,0,W,H);ctx.globalAlpha=f*.12;ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H);ctx.restore()}
+  if(mt>0&&msg){
+    if(msgBig){ctx.save();ctx.font='bold 34px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.shadowBlur=18;ctx.shadowColor='#ff4400';ctx.fillStyle='#fff';ctx.fillText(msg,W/2,165);ctx.restore()}
+    else T(msg,W/2,170,26,'#ffd23f');
+  }
+}
+wire(start);run(upd,drw,'#0b3d4f');window.__s={step:upd,start:()=>{start();on=true},get on(){return on},get score(){return sc},get ball(){return ball},get ps(){return ps},get as(){return as},get lvl(){return lvl},get phase(){return phase},set tpx(v){tpx=v},get px(){return px},serveP,get ctl(){return ctl},get psx(){return psx},get psy(){return psy},pScreen,P,get hitsP(){return hitsP},get L(){return L},get pdy(){return pdy},get msg(){return msg}};
 
 if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 </script>
