@@ -109,15 +109,8 @@ let cpuSpeedMult=1.0;  // CPU speed multiplier (troll target — not the player)
 let diffMult=1.0;      // difficulty: scales CPU base speed permanently
 let trollTimer=0;      // frames left for troll effect on cpu
 
-// settings panel
-// show settings only for admin / mini-admin
-function checkSettAccess(){
-  if(window.AG&&(AG.isAdmin()||(AG.isMini&&AG.isMini()))){
-    $('#settBtn').style.display='';
-  }
-}
-checkSettAccess();
-if(window.AG&&AG.onChange)AG.onChange(checkSettAccess);
+// settings panel — always visible
+$('#settBtn').style.display='';
 $('#settBtn').onclick=()=>$('#settM').classList.add('show');
 $('#settClose').onclick=()=>$('#settM').classList.remove('show');
 // speed chips
@@ -261,9 +254,9 @@ function upd(){if(!isFinite(tpx))tpx=0;if(!isFinite(px))px=0;
   if(trollTimer>0){trollTimer--;if(trollTimer===0){cpuSpeedMult=1.0;$('#trollMsg').textContent=''}}
   const op=px;px+=clamp(tpx-px,-.18,.18);pvx=px-op;
   // wind burst when lunging forward (pdy going negative = paddle rushing forward)
-  const pdySpeed=pdy-(_prevPdy||0);_prevPdy=pdy;
-  if(pdySpeed<-.004&&pdy<-.05){const q=P(px,1.04+pdy,.2);for(let i=0;i<6;i++)windTrail.push({x:q.x+rnd(-22,22),y:q.y+rnd(-10,10),vx:rnd(-18,18),vy:rnd(-55,-15),life:1,maxLife:rnd(14,24)});}
-  windTrail=windTrail.filter(p=>{p.x+=p.vx*.05;p.y+=p.vy*.05;p.life--;return p.life>0;});if(swing>0)swing--;if(cswing>0)cswing--;if(mt>0)mt--;
+  const pdySpeed=pdy-_prevPdy;_prevPdy=pdy;
+  if(pdySpeed<-.005&&pdy<-.04){const q=P(px,1.04+pdy,.2);for(let i=0;i<14;i++)windTrail.push({x:q.x+rnd(-40,40),y:q.y+rnd(-18,18),vx:rnd(-28,28),vy:rnd(-80,-20),life:rnd(14,22),maxLife:rnd(14,22)});}
+  windTrail=windTrail.filter(p=>{p.x+=p.vx*.07;p.y+=p.vy*.07;p.life--;return p.life>0;});if(swing>0)swing--;if(cswing>0)cswing--;if(mt>0)mt--;
   const csp=(.011+lvl*.0035)*diffMult;
   if(phase==='serve'){pt++;ball.x=srv?cx:px;ball.y=srv?.04:1.0;ball.h=.25+Math.sin(pt*.1)*.03;if(srv===1){cx+=clamp(rnd(-.4,.4)-cx,-.01,.01);if(pt>70)serveC()}else if(pt>400)serveP();return}
   if(phase==='dead'){pt++;ball.vh-=G;ball.h+=ball.vh;ball.x+=ball.vx*.5;ball.y+=ball.vy*.5;if(ball.h<0){ball.h=0;ball.vh=Math.abs(ball.vh)*.5}if(pt>70){newPoint(srv)}return}
@@ -366,7 +359,7 @@ function drw(){
   ctx.fillStyle='#fff';ctx.fillRect(n1.x,n1.y-h-2,n2.x-n1.x,4);ctx.fillStyle='#ccc';ctx.fillRect(n1.x-3,n1.y-h-4,6,h+8);ctx.fillRect(n2.x-3,n2.y-h-4,6,h+8);
   if(ball&&ball.y>=.5&&ball.y<1)drawBall(ball);
   // wind trail
-  windTrail.forEach(p=>{const a=p.life/p.maxLife;ctx.save();ctx.globalAlpha=a*.7;ctx.strokeStyle=`rgba(255,255,255,${a})`;ctx.lineWidth=1.5+a*2.5;ctx.shadowColor='#ffffff';ctx.shadowBlur=10;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.x,p.y+8*(1-a));ctx.stroke();ctx.restore();});
+  windTrail.forEach(p=>{const a=p.life/p.maxLife;ctx.save();ctx.globalAlpha=a*.85;ctx.shadowColor='#aae8ff';ctx.shadowBlur=14;ctx.strokeStyle=`rgba(180,230,255,${a})`;ctx.lineWidth=2.5+a*3.5;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.x+p.vx*.4,p.y+p.vy*.4);ctx.stroke();ctx.globalAlpha=a*.4;ctx.strokeStyle=`rgba(255,255,255,${a})`;ctx.lineWidth=6+a*5;ctx.stroke();ctx.restore();});
   paddleD(px,1.04+pdy,.2,'',['#ff4d5e','#b3122a'],swing,false);
   if(ball&&ball.y>=1)drawBall(ball);
   ctx.fillStyle='rgba(8,30,50,.45)';rr(W/2-96,10,192,50,16);ctx.fill();
