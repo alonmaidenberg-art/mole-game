@@ -49,6 +49,7 @@ body{overflow:hidden;position:fixed;inset:0;width:100%;background:#0e2338}
 <div id="rot">📱↔️<br>סובבו את הטלפון לרוחב</div>
 <div class="ov show" id="menu"><div class="ovc" style="max-width:440px"><div style="font-size:56px">🧱</div><h2>שוברי לבנים</h2><div class="lb">גררו את המחבט ושברו את כל הלבנים. יש 3 חיים</div><button class="btn" id="go">▶ שחק</button><div style="opacity:.8;margin-top:10px;font-size:15px">שיא: <b id="best">0</b></div></div></div>
 <div class="ov" id="end"><div class="ovc"><h2 id="eT">נגמר</h2><div style="font-size:48px;font-weight:900;color:#ffd05a" id="eS"></div><p id="eM"></p><button class="btn" id="again">🔁 שוב</button><button class="btn alt" id="menu2">תפריט</button></div></div>
+<script src="../lib/real2d.js"></script>
 <script>
 'use strict';
 const $=s=>document.querySelector(s);
@@ -88,7 +89,35 @@ function upd(){if(mx!==null)pad.x+=clamp(mx-pad.x,-14,14);const k=(keys.ArrowRig
   bricks=bricks.filter(b=>!b.dead);
   if(!bricks.length){lvl++;mk();resetBall();score+=50}
   if(ball.y>H+10){lives--;tone(120,.3,'sawtooth');if(lives<=0)over('נגמרו החיים',score,'שלב '+lvl,Math.floor(score/12),lvl>=4?1:0);else resetBall()}}
-function drw(){for(const b of bricks){ctx.fillStyle=b.hp>1?'#aaa':b.c;rr(b.x,b.y,b.w,b.h,5);ctx.fill()}ctx.fillStyle='#fff';rr(pad.x-pw/2,H-30,pw,12,6);ctx.fill();ctx.beginPath();ctx.arc(ball.x,ball.y,7,0,7);ctx.fill();T('⭐ '+score+'   ❤️'.repeat(0)+'   שלב '+lvl+'   '+'❤️'.repeat(lives),W/2,22,20);if(ball.stuck)T('גע/רווח כדי לשגר',W/2,H/2+60,22,'#ffd05a')}
+function drw(){
+  // backdrop with depth instead of a flat fill
+  const bgg=ctx.createLinearGradient(0,0,0,H);
+  bgg.addColorStop(0,'#1d4670');bgg.addColorStop(.55,'#163554');bgg.addColorStop(1,'#0e2338');
+  ctx.fillStyle=bgg;ctx.fillRect(0,0,W,H);
+  ctx.save();ctx.globalAlpha=.07;ctx.fillStyle='#8fd8ff';
+  for(let i=0;i<7;i++)ctx.fillRect(i*(W/7)+10,0,2,H);
+  ctx.restore();
+  // bricks: bevelled, lit from above, with a soft drop shadow
+  for(const b of bricks){
+    const col=b.hp>1?'#b9c2cc':b.c;
+    R2.block(ctx,b.x,b.y,b.w,b.h,6,col);
+    if(b.hp>1){ctx.save();ctx.globalAlpha=.5;ctx.strokeStyle='#fff';ctx.lineWidth=1.5;
+      R2.round(ctx,b.x+2,b.y+2,b.w-4,b.h-4,5);ctx.stroke();ctx.restore()}
+  }
+  // paddle: glossy capsule
+  {const px=pad.x-pw/2,py=H-30;
+   ctx.save();R2.shadow(ctx,10,'rgba(0,0,0,.45)',0,4);
+   const pg=ctx.createLinearGradient(0,py,0,py+12);
+   pg.addColorStop(0,'#ffffff');pg.addColorStop(.5,'#cfe4f5');pg.addColorStop(1,'#8fb4d4');
+   ctx.fillStyle=pg;R2.round(ctx,px,py,pw,12,6);ctx.fill();ctx.restore();
+   ctx.save();ctx.globalAlpha=.75;ctx.fillStyle='#fff';
+   R2.round(ctx,px+3,py+2,pw-6,4,2);ctx.fill();ctx.restore()}
+  // ball: shaded sphere with a glow
+  R2.glow(ctx,ball.x,ball.y,20,'rgba(190,230,255,.75)',.45);
+  R2.ball(ctx,ball.x,ball.y,7,'#eaf4ff',{shadow:false});
+  R2.vignette(ctx,W,H,.3);
+  T('⭐ '+score+'   שלב '+lvl+'   '+'❤️'.repeat(lives),W/2,22,20);
+  if(ball.stuck)T('גע/רווח כדי לשגר',W/2,H/2+60,22,'#ffd05a')}
 wire(start);run(upd,drw,'#163554');window.__s={step:upd,start:()=>{start();on=true},launch,get b(){return bricks},get on(){return on},get ball(){return ball},get pad(){return pad}};
 
 if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));

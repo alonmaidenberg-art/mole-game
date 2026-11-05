@@ -49,6 +49,7 @@ body{overflow:hidden;position:fixed;inset:0;width:100%;background:#0e2338}
 <div id="rot">📱↔️<br>סובבו את הטלפון לרוחב</div>
 <div class="ov show" id="menu"><div class="ovc" style="max-width:440px"><div style="font-size:56px">🚦</div><h2>כיכר התנועה</h2><div class="lb">לחצו (או רווח) כדי לשלוח את המכונית הבאה לכיכר. חכו שהמקום יתפנה! נגיעה בין מכוניות = התנגשות. 3 ניסיונות</div><button class="btn" id="go">▶ שחק</button><div style="opacity:.8;margin-top:10px;font-size:15px">שיא: <b id="best">0</b></div></div></div>
 <div class="ov" id="end"><div class="ovc"><h2 id="eT">נגמר</h2><div style="font-size:48px;font-weight:900;color:#ffd05a" id="eS"></div><p id="eM"></p><button class="btn" id="again">🔁 שוב</button><button class="btn alt" id="menu2">תפריט</button></div></div>
+<script src="../lib/real2d.js"></script>
 <script>
 'use strict';
 const $=s=>document.querySelector(s);
@@ -69,7 +70,7 @@ function rr(x,y,w,h,r){ctx.beginPath();ctx.roundRect?ctx.roundRect(x,y,w,h,r):ct
 function B(x,y,w,h,col,txt,fn,fs=22,tc='#fff'){ctx.fillStyle=col;rr(x,y,w,h,12);ctx.fill();if(txt!=null){ctx.fillStyle=tc;ctx.font='bold '+fs+'px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(txt,x+w/2,y+h/2+1)}if(fn)hits.push({x,y,w,h,fn})}
 function T(t,x,y,fs=22,c='#fff',al='center'){ctx.fillStyle=c;ctx.font='bold '+fs+'px system-ui';ctx.textAlign=al;ctx.textBaseline='middle';ctx.fillText(t,x,y)}
 cv.addEventListener('pointerdown',e=>{const p=cpos(e);for(let i=hits.length-1;i>=0;i--){const h=hits[i];if(p.x>=h.x&&p.x<=h.x+h.w&&p.y>=h.y&&p.y<=h.y+h.h){h.fn(p);break}}});
-function run(upd,drw,bg){let last=performance.now(),acc=0;function l(n){requestAnimationFrame(l);acc+=Math.min(100,n-last);last=n;while(acc>=1000/60){acc-=1000/60;if(on)upd()}hits=[];ctx.fillStyle=bg||'#111';ctx.fillRect(0,0,W,H);if(on||window.__show)drw()}requestAnimationFrame(l)}
+function run(upd,drw,bg){let last=performance.now(),acc=0;const _bg=bg||'#111';let _grd=null;function l(n){requestAnimationFrame(l);acc+=Math.min(100,n-last);last=n;while(acc>=1000/60){acc-=1000/60;if(on)upd()}hits=[];if(window.R2){if(!_grd){_grd=ctx.createLinearGradient(0,0,0,H);_grd.addColorStop(0,R2.lighten(_bg,.17));_grd.addColorStop(.55,_bg);_grd.addColorStop(1,R2.darken(_bg,.27))}ctx.fillStyle=_grd}else ctx.fillStyle=_bg;ctx.fillRect(0,0,W,H);if(on||window.__show)drw();if(window.R2&&!window.__flatBg)R2.vignette(ctx,W,H,.2)}requestAnimationFrame(l)}
 function wire(start){$('#go').onclick=()=>{$('#menu').classList.remove('show');start();on=true};$('#again').onclick=()=>{$('#end').classList.remove('show');start();on=true};$('#menu2').onclick=()=>{on=false;$('#end').classList.remove('show');$('#menu').classList.add('show')}}
 function over(title,score,msg,coins,dia,delay=600){on=false;window.__show=true;saveBest(score);setTimeout(()=>endGame(title,score,msg,coins,dia),delay)}
 
