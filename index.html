@@ -110,6 +110,8 @@ body.cmp .new{top:-5px;font-size:9.5px;padding:2px 6px}
   <div id="admIn"><p>הכניסו את הקוד הסודי</p><input id="admC" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="AG-XXXX-XXXX-XXXX"><div class="err" id="admE"></div><button class="mb" id="admOk">אישור</button></div>
   <div id="admPanel" style="display:none"><p>מצב אדמין פעיל ✅<br><small>במשחק הבלוקים יש כפתור ערכת אדמין בתיק.</small></p>
     <button class="mb" id="a1">+10,000 🪙</button><button class="mb" id="a2">+500 💎</button><button class="mb alt" id="a3">אפס ארנק</button><button class="mb alt" id="a4">יציאה ממצב אדמין</button></div>
+  <div id="miniPanel" style="display:none"><p>מצב צוות פעיל ⭐</p>
+    <button class="mb" id="m1">+1,000 🪙</button><button class="mb" id="m2">+10 💎</button><button class="mb alt" id="m3">יציאה ממצב צוות</button></div>
   <button class="mb alt" id="admX">סגור</button></div></div>
 <script src="hub.js"></script>
 <script>
@@ -256,14 +258,15 @@ function showNote(x){$('noteT').textContent=x.noteTitle||x.name;$('noteP').textC
 function $(i){return document.getElementById(i)}
 function wal(){$('wc').textContent=AG.coins().toLocaleString('he-IL');$('wd').textContent=AG.diamonds().toLocaleString('he-IL')}
 wal();AG.onChange(wal);
-function admView(){var on=AG.isAdmin();$('admIn').style.display=on?'none':'block';$('admPanel').style.display=on?'block':'none'}
+function admView(){var on=AG.isAdmin(),mini=AG.isMini&&AG.isMini();$('admIn').style.display=(on||mini)?'none':'block';$('admPanel').style.display=on?'block':'none';$('miniPanel').style.display=(!on&&mini)?'block':'none'}
 $('keyB').onclick=function(){$('admE').textContent='';$('admC').value='';admView();$('admM').classList.add('show')};
 $('admX').onclick=function(){$('admM').classList.remove('show')};
-$('admOk').onclick=function(){var code=$('admC').value;AG.tryAdmin(code).then(function(ok){if(ok){admView()}else{// Try mini-admin code too
-AG.tryMini(code).then(function(okM){if(okM){$('admM').classList.remove('show');AG.toast&&AG.toast('ברוכים הבאים לצוות ⭐')}else{$('admE').textContent='הקוד לא נכון'}})}})};
+$('admOk').onclick=function(){var code=$('admC').value;AG.tryAdmin(code).then(function(ok){if(ok){admView()}else{AG.tryMini(code).then(function(okM){if(okM){admView()}else{$('admE').textContent='הקוד לא נכון'}})}})};
 $('a1').onclick=function(){AG.add(10000,0)};$('a2').onclick=function(){AG.add(0,500)};
 $('a3').onclick=function(){if(confirm('לאפס מטבעות ויהלומים?')){AG.spend(AG.coins(),AG.diamonds())}};
 $('a4').onclick=function(){AG.adminLogout();admView()};
+$('m1').onclick=function(){AG.add(1000,0)};$('m2').onclick=function(){AG.add(0,10)};
+$('m3').onclick=function(){AG.miniLogout();admView()};
 </script>
 </body>
 </html>
