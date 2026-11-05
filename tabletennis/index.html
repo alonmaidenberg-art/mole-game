@@ -223,19 +223,17 @@ cv.addEventListener('pointermove',e=>{
 });
 cv.addEventListener('mouseenter',()=>{_mouseOnCanvas=true});
 cv.addEventListener('mouseleave',()=>{_mouseOnCanvas=false;});
-// document mousemove — עובד תמיד בלי לחיצה
+// document mousemove — מחבט עוקב אחרי עכבר בדיוק (היפוך פרספקטיבה)
 document.addEventListener('mousemove',e=>{
   if(!_mouseOnCanvas)return;
   const r=cv.getBoundingClientRect();
-  // מיקום יחסי לcanvas בין 0-1
-  const fx=clamp((e.clientX-r.left)/r.width,0,1);
-  const fy=clamp((e.clientY-r.top)/r.height,0,1);
-  // X: -1.15 עד 1.15
-  tpx=clamp((fx-.5)*2.3,-1.15,1.15);
-  // Y: למעלה=קדימה, למטה=רגיל
-  if(!swipeDir){
-    pdy=clamp((fy-.55)*1.1,-.38,.08);
-  }
+  const sx=(e.clientX-r.left)/r.width*W; // pixel בתוך canvas
+  const sy=(e.clientY-r.top)/r.height*H;
+  // pdy מתוך Y: gy(1.04+pdy)=sy → pdy = sy/250 - 128/250 - 1.04
+  const newPdy=clamp((sy-128)/250-1.04,-.40,.08);
+  if(!swipeDir) pdy=newPdy;
+  // tpx מתוך X: W/2 + tpx*hw(1.04+pdy) = sx
+  tpx=clamp((sx-W/2)/hw(1.04+pdy),-1.15,1.15);
 });
 cv.addEventListener('pointerdown',e=>{
   tpx=clamp((cpos(e).x-W/2)/hw(1),-1.15,1.15);
