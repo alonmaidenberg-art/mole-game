@@ -253,10 +253,9 @@ function upd(){if(!isFinite(tpx))tpx=0;if(!isFinite(px))px=0;
   if(smashFlash>0)smashFlash--;
   if(trollTimer>0){trollTimer--;if(trollTimer===0){cpuSpeedMult=1.0;$('#trollMsg').textContent=''}}
   const op=px;px+=clamp(tpx-px,-.18,.18);pvx=px-op;
-  // wind burst when lunging forward (pdy going negative = paddle rushing forward)
-  const pdySpeed=pdy-_prevPdy;_prevPdy=pdy;
-  if(pdySpeed<-.005&&pdy<-.04){const q=P(px,1.04+pdy,.2);for(let i=0;i<14;i++)windTrail.push({x:q.x+rnd(-40,40),y:q.y+rnd(-18,18),vx:rnd(-28,28),vy:rnd(-80,-20),life:rnd(14,22),maxLife:rnd(14,22)});}
-  windTrail=windTrail.filter(p=>{p.x+=p.vx*.07;p.y+=p.vy*.07;p.life--;return p.life>0;});if(swing>0)swing--;if(cswing>0)cswing--;if(mt>0)mt--;
+  // wind swoosh — arc trails when paddle moves fast sideways (like original game)
+  if(Math.abs(pvx)>.045){const q=P(px,1.04+pdy,.2);const n=Math.floor(Math.abs(pvx)*80);for(let i=0;i<n;i++)windTrail.push({x:q.x+rnd(-18,18),y:q.y+rnd(-28,28),vx:pvx*rnd(60,110)+rnd(-8,8),vy:rnd(-30,10),life:rnd(8,14),maxLife:14,dir:pvx>0?1:-1});}
+  windTrail=windTrail.filter(p=>{p.x+=p.vx*.06;p.y+=p.vy*.06;p.life--;return p.life>0;});if(swing>0)swing--;if(cswing>0)cswing--;if(mt>0)mt--;
   const csp=(.011+lvl*.0035)*diffMult;
   if(phase==='serve'){pt++;ball.x=srv?cx:px;ball.y=srv?.04:1.0;ball.h=.25+Math.sin(pt*.1)*.03;if(srv===1){cx+=clamp(rnd(-.4,.4)-cx,-.01,.01);if(pt>70)serveC()}else if(pt>400)serveP();return}
   if(phase==='dead'){pt++;ball.vh-=G;ball.h+=ball.vh;ball.x+=ball.vx*.5;ball.y+=ball.vy*.5;if(ball.h<0){ball.h=0;ball.vh=Math.abs(ball.vh)*.5}if(pt>70){newPoint(srv)}return}
@@ -359,7 +358,7 @@ function drw(){
   ctx.fillStyle='#fff';ctx.fillRect(n1.x,n1.y-h-2,n2.x-n1.x,4);ctx.fillStyle='#ccc';ctx.fillRect(n1.x-3,n1.y-h-4,6,h+8);ctx.fillRect(n2.x-3,n2.y-h-4,6,h+8);
   if(ball&&ball.y>=.5&&ball.y<1)drawBall(ball);
   // wind trail
-  windTrail.forEach(p=>{const a=p.life/p.maxLife;ctx.save();ctx.globalAlpha=a*.85;ctx.shadowColor='#aae8ff';ctx.shadowBlur=14;ctx.strokeStyle=`rgba(180,230,255,${a})`;ctx.lineWidth=2.5+a*3.5;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.x+p.vx*.4,p.y+p.vy*.4);ctx.stroke();ctx.globalAlpha=a*.4;ctx.strokeStyle=`rgba(255,255,255,${a})`;ctx.lineWidth=6+a*5;ctx.stroke();ctx.restore();});
+  windTrail.forEach(p=>{const a=p.life/p.maxLife;ctx.save();ctx.globalAlpha=a*.9;ctx.shadowColor='#60cfff';ctx.shadowBlur=12;const tail=p.vx*.35;ctx.strokeStyle=`rgba(120,210,255,${a})`;ctx.lineWidth=1.5+a*3;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.x-tail,p.y-p.vy*.2);ctx.stroke();ctx.globalAlpha=a*.3;ctx.strokeStyle='#ffffff';ctx.lineWidth=3+a*4;ctx.stroke();ctx.restore();});
   paddleD(px,1.04+pdy,.2,'',['#ff4d5e','#b3122a'],swing,false);
   if(ball&&ball.y>=1)drawBall(ball);
   ctx.fillStyle='rgba(8,30,50,.45)';rr(W/2-96,10,192,50,16);ctx.fill();
