@@ -135,11 +135,23 @@ let pdy=0,pdyv=0; // paddle forward/back position (0=normal, negative=lunge forw
 const lerp=(a,b,t)=>a+(b-a)*t;
 const gy=y=>128+250*y, hw=y=>(120+200*y)*.92, kk=y=>hw(y);
 function P(x,y,h){return{x:W/2+x*hw(y),y:gy(y)-h*kk(y),s:kk(y)}}
-function launch(by,fy,tx,ty,T,hit){// aim ball from (bx,by,h) so it first lands at (tx,ty) after T frames
-  // apply speed multiplier: player shots use ballSpeedMult, cpu shots use cpuSpeedMult
+function launch(by,fy,tx,ty,T,hit){
   const mult=hit===1?cpuSpeedMult:ballSpeedMult;
   const Tm=Math.max(6,Math.round(T/mult));
-  const b=ball;b.vx=(tx-b.x)/Tm;b.vy=(ty-b.y)/Tm;b.vh=(.5*G*Tm*Tm-b.h)/Tm;L=hit;bnc=[0,0];b.ok=true}
+  const b=ball;
+  b.vx=(tx-b.x)/Tm;b.vy=(ty-b.y)/Tm;b.vh=(.5*G*Tm*Tm-b.h)/Tm;
+  // simulate path and ensure ball clears net (y=0.5, need h>0.08)
+  if(hit===0){// player shot — check net clearance and boost arc if needed
+    const netT=(b.y-.5)/(-b.vy)||0;
+    if(netT>0&&netT<Tm){
+      const hAtNet=b.h+b.vh*netT-.5*G*netT*netT;
+      if(hAtNet<0.1){// will hit net — boost vh so it clears
+        const needed=0.15;// min height at net
+        b.vh=b.vh+(needed-hAtNet)/Math.max(netT,1);
+      }
+    }
+  }
+  L=hit;bnc=[0,0];b.ok=true}
 function start(){px=0;pvx=0;tpx=0;cx=0;ps=0;as=0;lvl=0;sc=0;trail=[];msg='';mt=0;smashPow=0;smashCd=0;pdy=0;pdyv=0;cpuSpeedMult=1.0;trollTimer=0;newPoint(0)}
 function newPoint(who){srv=who;phase='serve';pt=0;ball={x:who?cx:px,y:who?.04:1.0,h:.25,vx:0,vy:0,vh:0};L=-1;bnc=[0,0];trail=[]}
 // swipe tracking — velocity sampled every frame via pointermove
