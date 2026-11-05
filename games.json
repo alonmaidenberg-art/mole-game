@@ -664,5 +664,29 @@
     "url": "wormio/",
     "icon": "wormio/icons/icon-192.png",
     "tag": "ארקייד"
+  },
+  {
+    "id": "wave",
+    "name": "גל",
+    "description": "אתה גל בים — בלע גלים קטנים, גדל, והימנע מגלים גדולים!",
+    "url": "wave/",
+    "icon": "wave/icons/icon-192.png",
+    "tag": "ארקייד"
+  },
+  {
+    "id": "wire",
+    "name": "חוט",
+    "description": "הובל את החוט המתקצר מ-A ל-B — בלי לגעת בקירות!",
+    "url": "wire/",
+    "icon": "wire/icons/icon-192.png",
+    "tag": "אתגר"
+  },
+  {
+    "id": "roles",
+    "name": "תפקידים",
+    "description": "כל סיבוב — תפקיד אחר עם יכולת מיוחדת! ספורטאי, גנב, קוסם ועוד",
+    "url": "roles/",
+    "icon": "roles/icons/icon-192.png",
+    "tag": "אסטרטגיה"
   }
 ]

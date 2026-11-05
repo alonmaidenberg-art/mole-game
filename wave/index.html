@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>גל</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#001a2e">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #001a2e; display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; touch-action: none; }
+  canvas { display: block; max-width: 100vw; max-height: 100vh; }
+</style>
+</head>
+<body>
+<script src="/hub.js"></script>
+<canvas id="c"></canvas>
+<script>
+(function(){
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+
+const W = 800, H = 450;
+canvas.width = W;
+canvas.height = H;
+
+// Scale canvas to fit screen
+function resize() {
+  const scale = Math.min(window.innerWidth / W, window.innerHeight / H);
+  canvas.style.width = (W * scale) + 'px';
+  canvas.style.height = (H * scale) + 'px';
+}
+resize();
+window.addEventListener('resize', resize);
+
+// Game state
+let state = 'title'; // title, playing, dead, gameover, win
+let lives = 3;
+let score = 0;
+let highScore = 0;
+try { highScore = parseInt(localStorage.getItem('wave_hs') || '0'); } catch(e) {}
+
+// Player
+const PLAYER_START_R = 18;
+const player = { x: W/2, y: H/2, r: PLAYER_START_R, vx: 0, vy: 0, angle: 0 };
+
+// Target position for drag control
+let targetX = W/2, targetY = H/2;
+let isDragging = false;
+
+// Waves (AI)
+const NUM_WAVES = 20;
+let waves = [];
+
+// Ocean colors
+const BG_COLORS = ['#001a2e','#002040','#001830'];
+const WAVE_COLORS = [
+  '#1a8fe3','#1472c2','#0d5ca0','#2ba0e8','#0a4a8a',
+  '#3bb3f0','#56c8f5','#0e6fba','#1b90e5','#4dc0f8',
+  '#7dd4f8','#a0e0ff','#1555a0','#0a3070','#5ac5f5'
+];
+
+function randWaveColor() {
+  return WAVE_COLORS[Math.floor(Math.random() * WAVE_COLORS.length)];
+}
+
+function spawnWave(avoidPlayer) {
+  let x, y, tries = 0;
+  do {
+    x = 40 + Math.random() * (W - 80);
+    y = 40 + Math.random() * (H - 80);
+    tries++;
+  } while (avoidPlayer && tries < 20 && Math.hypot(x - player.x, y - player.y) < 150);
+
+  const r = 8 + Math.random() * 50;
+  const speed = 0.4 + Math.random() * 1.0;
+  const angle = Math.random() * Math.PI * 2;
+  return {
+    x, y, r,
+    vx: Math.cos(angle) * speed,
+    vy: Math.sin(angle) * speed,
+    color: randWaveColor(),
+    phase: Math.random() * Math.PI * 2,
+    wobble: 0.5 + Math.random() * 1.5,
+    alive: true
+  };
+}
+
+function initWaves() {
+  waves = [];
+  for (let i = 0; i < NUM_WAVES; i++) {
+    waves.push(spawnWave(true));
+  }
+}
+
+function resetPlayer() {
+  player.x = W/2;
+  player.y = H/2;
+  player.r = PLAYER_START_R;
+  player.vx = 0;
+  player.vy = 0;
+  targetX = W/2;
+  targetY = H/2;
+}
+
+function startGame() {
+  state = 'playing';
+  lives = 3;
+  score = 0;
+  resetPlayer();
+  initWaves();
+}
+
+// Draw a wavy circle
+function drawWaveCircle(cx, cy, r, color, phase, wobble, alpha) {
+  ctx.save();
+  ctx.globalAlpha = alpha !== undefined ? alpha : 1;
+
+  // Glow
+  ctx.shadowColor = color;
+  ctx.shadowBlur = r * 0.6;
+
+  ctx.beginPath();
+  const steps = 40;
+  for (let i = 0; i <= steps; i++) {
+    const angle = (i / steps) * Math.PI * 2;
+    const wave = 1 + Math.sin(angle * 4 + phase) * wobble * 0.06;
+    const px = cx + Math.cos(angle) * r * wave;
+    const py = cy + Math.sin(angle) * r * wave;
+    if (i === 0) ctx.moveTo(px, py);
+    else ctx.lineTo(px, py);
+  }
+  ctx.closePath();
+
+  // Fill with gradient
+  const grad = ctx.createRadialGradient(cx - r*0.3, cy - r*0.3, 0, cx, cy, r * 1.2);
+  grad.addColorStop(0, lighten(color, 60));
+  grad.addColorStop(0.5, color);
+  grad.addColorStop(1, darken(color, 40));
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // Highlight
+  ctx.shadowBlur = 0;
+  ctx.beginPath();
+  ctx.arc(cx - r*0.3, cy - r*0.35, r * 0.25, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(255,255,255,0.25)';
+  ctx.fill();
+
+  ctx.restore();
+}
+
+function lighten(hex, amt) {
+  const n = parseInt(hex.replace('#',''), 16);
+  const r = Math.min(255, (n >> 16) + amt);
+  const g = Math.min(255, ((n >> 8) & 0xff) + amt);
+  const b = Math.min(255, (n & 0xff) + amt);
+  return `rgb(${r},${g},${b})`;
+}
+function darken(hex, amt) {
+  const n = parseInt(hex.replace('#',''), 16);
+  const r = Math.max(0, (n >> 16) - amt);
+  const g = Math.max(0, ((n >> 8) & 0xff) - amt);
+  const b = Math.max(0, (n & 0xff) - amt);
+  return `rgb(${r},${g},${b})`;
+}
+
+// Draw ocean background
+let bgTime = 0;
+function drawBackground() {
+  // Deep ocean gradient
+  const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+  bgGrad.addColorStop(0, '#001228');
+  bgGrad.addColorStop(0.5, '#001e3c');
+  bgGrad.addColorStop(1, '#001530');
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, W, H);
+
+  // Caustics / light rays
+  ctx.save();
+  ctx.globalAlpha = 0.04;
+  for (let i = 0; i < 8; i++) {
+    const x = (i / 8) * W + Math.sin(bgTime * 0.3 + i) * 30;
+    const grad = ctx.createLinearGradient(x, 0, x + 60, H);
+    grad.addColorStop(0, '#4dc0f8');
+    grad.addColorStop(1, 'transparent');
+    ctx.fillStyle = grad;
+    ctx.fillRect(x, 0, 40, H);
+  }
+  ctx.restore();
+
+  // Bubble particles
+  ctx.save();
+  ctx.globalAlpha = 0.15;
+  for (let i = 0; i < 15; i++) {
+    const bx = ((i * 73 + bgTime * 0.5) % W);
+    const by = H - ((bgTime * (0.3 + i * 0.05) + i * 40) % H);
+    ctx.beginPath();
+    ctx.arc(bx, by, 2 + (i % 3), 0, Math.PI * 2);
+    ctx.fillStyle = '#7dd4f8';
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
+// HUD
+function drawHUD() {
+  // Lives
+  ctx.save();
+  ctx.font = 'bold 16px Arial';
+  ctx.fillStyle = '#fff';
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'top';
+
+  for (let i = 0; i < lives; i++) {
+    drawWaveCircle(W - 20 - i * 30, 20, 10, '#1a8fe3', bgTime, 1.5, 0.9);
+  }
+
+  // Score
+  ctx.fillStyle = 'rgba(255,255,255,0.9)';
+  ctx.font = 'bold 20px Arial';
+  ctx.textAlign = 'left';
+  ctx.fillText('ניקוד: ' + score, 15, 10);
+
+  // High score
+  ctx.font = '14px Arial';
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.fillText('שיא: ' + highScore, 15, 36);
+
+  ctx.restore();
+}
+
+// Death flash
+let flashTimer = 0;
+
+function drawFlash() {
+  if (flashTimer > 0) {
+    ctx.save();
+    ctx.globalAlpha = flashTimer / 20 * 0.5;
+    ctx.fillStyle = '#ff4444';
+    ctx.fillRect(0, 0, W, H);
+    ctx.restore();
+    flashTimer--;
+  }
+}
+
+// Title screen
+function drawTitle() {
+  drawBackground();
+
+  ctx.save();
+  ctx.textAlign = 'center';
+
+  // Animated waves demo
+  for (let i = 0; i < 5; i++) {
+    const wx = W/2 + Math.cos(bgTime * 0.02 + i * 1.2) * 150;
+    const wy = H/2 + 50 + Math.sin(bgTime * 0.015 + i * 0.8) * 60;
+    const wr = 15 + i * 12;
+    drawWaveCircle(wx, wy, wr, WAVE_COLORS[i], bgTime * 0.05 + i, 1.5);
+  }
+  drawWaveCircle(W/2, H/2, 25, '#56c8f5', bgTime * 0.05, 2);
+
+  // Title
+  ctx.font = 'bold 72px Arial';
+  ctx.fillStyle = 'rgba(255,255,255,0.95)';
+  ctx.shadowColor = '#1a8fe3';
+  ctx.shadowBlur = 20;
+  ctx.fillText('גל', W/2, H/2 - 80);
+
+  ctx.shadowBlur = 0;
+  ctx.font = '22px Arial';
+  ctx.fillStyle = 'rgba(200,230,255,0.9)';
+  ctx.fillText('אכול גלים קטנים יותר ממך', W/2, H/2 - 25);
+  ctx.fillText('הישמר מגלים גדולים!', W/2, H/2 + 10);
+
+  ctx.font = 'bold 20px Arial';
+  ctx.fillStyle = 'rgba(255,255,255,0.8)';
+  const pulse = 0.7 + Math.sin(bgTime * 0.08) * 0.3;
+  ctx.globalAlpha = pulse;
+  ctx.fillText('לחץ לשחק', W/2, H/2 + 60);
+
+  ctx.restore();
+}
+
+// Game over screen
+function drawGameOver() {
+  drawBackground();
+
+  ctx.save();
+  ctx.textAlign = 'center';
+
+  ctx.font = 'bold 48px Arial';
+  ctx.fillStyle = '#ff6666';
+  ctx.shadowColor = '#ff0000';
+  ctx.shadowBlur = 20;
+  ctx.fillText('נגמרו החיים!', W/2, H/2 - 60);
+
+  ctx.shadowBlur = 0;
+  ctx.font = 'bold 28px Arial';
+  ctx.fillStyle = '#fff';
+  ctx.fillText('ניקוד: ' + score, W/2, H/2);
+
+  if (score >= highScore && score > 0) {
+    ctx.fillStyle = '#ffd700';
+    ctx.font = 'bold 22px Arial';
+    ctx.fillText('🏆 שיא חדש!', W/2, H/2 + 36);
+  } else {
+    ctx.fillStyle = 'rgba(200,230,255,0.7)';
+    ctx.font = '20px Arial';
+    ctx.fillText('שיא: ' + highScore, W/2, H/2 + 36);
+  }
+
+  ctx.font = 'bold 20px Arial';
+  ctx.fillStyle = 'rgba(255,255,255,0.8)';
+  const pulse = 0.7 + Math.sin(bgTime * 0.08) * 0.3;
+  ctx.globalAlpha = pulse;
+  ctx.fillText('לחץ לנסות שוב', W/2, H/2 + 90);
+
+  ctx.restore();
+}
+
+// Win screen
+function drawWin() {
+  drawBackground();
+
+  ctx.save();
+  ctx.textAlign = 'center';
+
+  ctx.font = 'bold 48px Arial';
+  ctx.fillStyle = '#56c8f5';
+  ctx.shadowColor = '#1a8fe3';
+  ctx.shadowBlur = 25;
+  ctx.fillText('ניצחת! 🌊', W/2, H/2 - 60);
+
+  ctx.shadowBlur = 0;
+  ctx.font = 'bold 28px Arial';
+  ctx.fillStyle = '#fff';
+  ctx.fillText('ניקוד: ' + score, W/2, H/2);
+
+  ctx.font = 'bold 20px Arial';
+  ctx.fillStyle = 'rgba(255,255,255,0.8)';
+  const pulse = 0.7 + Math.sin(bgTime * 0.08) * 0.3;
+  ctx.globalAlpha = pulse;
+  ctx.fillText('לחץ לשחק שוב', W/2, H/2 + 60);
+
+  ctx.restore();
+}
+
+// Dead (lost a life) screen
+let deadTimer = 0;
+function drawDead() {
+  drawBackground();
+
+  ctx.save();
+  ctx.textAlign = 'center';
+
+  ctx.font = 'bold 42px Arial';
+  ctx.fillStyle = '#ff8888';
+  ctx.shadowColor = '#ff4444';
+  ctx.shadowBlur = 15;
+  ctx.fillText('נאכלת!', W/2, H/2 - 30);
+
+  ctx.shadowBlur = 0;
+  ctx.font = '22px Arial';
+  ctx.fillStyle = '#fff';
+  ctx.fillText('נותרו ' + lives + ' חיים', W/2, H/2 + 20);
+
+  ctx.restore();
+
+  deadTimer--;
+  if (deadTimer <= 0) {
+    if (lives <= 0) {
+      state = 'gameover';
+    } else {
+      resetPlayer();
+      state = 'playing';
+    }
+  }
+}
+
+// Game update
+function update() {
+  bgTime++;
+
+  if (state === 'playing') {
+    // Move player toward target
+    const dx = targetX - player.x;
+    const dy = targetY - player.y;
+    const dist = Math.hypot(dx, dy);
+
+    if (dist > 2) {
+      const speed = Math.min(dist * 0.08, 5);
+      player.vx += (dx / dist) * speed * 0.3;
+      player.vy += (dy / dist) * speed * 0.3;
+    }
+
+    // Friction
+    player.vx *= 0.88;
+    player.vy *= 0.88;
+
+    player.x += player.vx;
+    player.y += player.vy;
+
+    // Bounce off walls
+    if (player.x - player.r < 0) { player.x = player.r; player.vx *= -0.5; }
+    if (player.x + player.r > W) { player.x = W - player.r; player.vx *= -0.5; }
+    if (player.y - player.r < 0) { player.y = player.r; player.vy *= -0.5; }
+    if (player.y + player.r > H) { player.y = H - player.r; player.vy *= -0.5; }
+
+    player.angle += 0.03;
+
+    // Update waves
+    for (const w of waves) {
+      if (!w.alive) continue;
+      w.x += w.vx;
+      w.y += w.vy;
+      w.phase += 0.05;
+
+      // Bounce walls
+      if (w.x - w.r < 0) { w.x = w.r; w.vx = Math.abs(w.vx); }
+      if (w.x + w.r > W) { w.x = W - w.r; w.vx = -Math.abs(w.vx); }
+      if (w.y - w.r < 0) { w.y = w.r; w.vy = Math.abs(w.vy); }
+      if (w.y + w.r > H) { w.y = H - w.r; w.vy = -Math.abs(w.vy); }
+
+      // Check collision with player
+      const d = Math.hypot(w.x - player.x, w.y - player.y);
+      const minD = w.r + player.r;
+
+      if (d < minD * 0.85) {
+        if (w.r < player.r * 0.9) {
+          // Eat it!
+          const eatArea = Math.PI * w.r * w.r;
+          const playerArea = Math.PI * player.r * player.r;
+          player.r = Math.sqrt((playerArea + eatArea * 0.3) / Math.PI);
+          player.r = Math.min(player.r, 80); // cap size
+
+          w.alive = false;
+          score++;
+          if (score > highScore) {
+            highScore = score;
+            try { localStorage.setItem('wave_hs', highScore); } catch(e) {}
+          }
+
+          // Spawn new wave
+          setTimeout(() => {
+            waves.push(spawnWave(true));
+          }, 1000);
+
+          // Win condition
+          if (waves.filter(ww => ww.alive).length === 0) {
+            state = 'win';
+          }
+
+        } else if (w.r > player.r * 1.1) {
+          // Eaten by bigger wave!
+          lives--;
+          flashTimer = 20;
+          state = 'dead';
+          deadTimer = 90;
+          break;
+        }
+      }
+    }
+  }
+}
+
+// Draw
+function draw() {
+  drawBackground();
+
+  if (state === 'title') {
+    drawTitle();
+    return;
+  }
+
+  if (state === 'gameover') {
+    drawGameOver();
+    return;
+  }
+
+  if (state === 'win') {
+    drawWin();
+    return;
+  }
+
+  // Draw waves
+  for (const w of waves) {
+    if (!w.alive) continue;
+    // Show if bigger or similar (danger indicator)
+    const isBigger = w.r > player.r * 1.1;
+    const isSmaller = w.r < player.r * 0.9;
+
+    drawWaveCircle(w.x, w.y, w.r, w.color, w.phase, w.wobble);
+
+    // Danger indicator on big waves
+    if (isBigger && Math.hypot(w.x - player.x, w.y - player.y) < 200) {
+      ctx.save();
+      ctx.font = 'bold 14px Arial';
+      ctx.fillStyle = 'rgba(255,100,100,0.9)';
+      ctx.textAlign = 'center';
+      ctx.fillText('⚠', w.x, w.y - w.r - 5);
+      ctx.restore();
+    }
+  }
+
+  // Draw player
+  drawWaveCircle(player.x, player.y, player.r, '#56c8f5', player.angle, 2);
+
+  // Player indicator arrow
+  if (isDragging) {
+    ctx.save();
+    ctx.globalAlpha = 0.4;
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([4,4]);
+    ctx.beginPath();
+    ctx.moveTo(player.x, player.y);
+    ctx.lineTo(targetX, targetY);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  drawHUD();
+  drawFlash();
+
+  if (state === 'dead') {
+    drawDead();
+  }
+}
+
+// Game loop
+function loop() {
+  update();
+  draw();
+  requestAnimationFrame(loop);
+}
+
+// Input handling
+function getCanvasPos(e) {
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = W / rect.width;
+  const scaleY = H / rect.height;
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  return {
+    x: (clientX - rect.left) * scaleX,
+    y: (clientY - rect.top) * scaleY
+  };
+}
+
+canvas.addEventListener('mousedown', (e) => {
+  if (state === 'title') { startGame(); return; }
+  if (state === 'gameover' || state === 'win') { startGame(); return; }
+  if (state === 'playing') {
+    isDragging = true;
+    const pos = getCanvasPos(e);
+    targetX = pos.x;
+    targetY = pos.y;
+  }
+});
+
+canvas.addEventListener('mousemove', (e) => {
+  if (isDragging && state === 'playing') {
+    const pos = getCanvasPos(e);
+    targetX = pos.x;
+    targetY = pos.y;
+  }
+});
+
+canvas.addEventListener('mouseup', () => { isDragging = false; });
+
+canvas.addEventListener('touchstart', (e) => {
+  e.preventDefault();
+  if (state === 'title') { startGame(); return; }
+  if (state === 'gameover' || state === 'win') { startGame(); return; }
+  if (state === 'playing') {
+    isDragging = true;
+    const pos = getCanvasPos(e);
+    targetX = pos.x;
+    targetY = pos.y;
+  }
+}, { passive: false });
+
+canvas.addEventListener('touchmove', (e) => {
+  e.preventDefault();
+  if (isDragging && state === 'playing') {
+    const pos = getCanvasPos(e);
+    targetX = pos.x;
+    targetY = pos.y;
+  }
+}, { passive: false });
+
+canvas.addEventListener('touchend', () => { isDragging = false; });
+
+// hub.js integration
+if (typeof AG !== 'undefined') {
+  if (AG.miniAdmin) AG.miniAdmin('wave');
+}
+
+// Start loop
+loop();
+})();
+</script>
+</body>
+</html>
