@@ -132,6 +132,7 @@ const G=.0022;
 let px,pvx,cx,ps,as,lvl,sc,ball,L,bnc,phase,pt,srv,swing,cswing,msg,mt,trail,tpx;
 let smashPow=0,smashCd=0,smashFlash=0; // forward smash mechanic
 let pdy=0,pdyv=0; // paddle forward/back position (0=normal, negative=lunge forward)
+let windTrail=[]; // wind effect particles when paddle moves fast
 const lerp=(a,b,t)=>a+(b-a)*t;
 const gy=y=>128+250*y, hw=y=>(120+200*y)*.92, kk=y=>hw(y);
 function P(x,y,h){return{x:W/2+x*hw(y),y:gy(y)-h*kk(y),s:kk(y)}}
@@ -219,7 +220,10 @@ function upd(){if(!isFinite(tpx))tpx=0;if(!isFinite(px))px=0;
   if(smashCd>0)smashCd--;
   if(smashFlash>0)smashFlash--;
   if(trollTimer>0){trollTimer--;if(trollTimer===0){cpuSpeedMult=1.0;$('#trollMsg').textContent=''}}
-  const op=px;px+=clamp(tpx-px,-.18,.18);pvx=px-op;if(swing>0)swing--;if(cswing>0)cswing--;if(mt>0)mt--;
+  const op=px;px+=clamp(tpx-px,-.18,.18);pvx=px-op;
+  // wind trail particles when paddle moves fast
+  if(Math.abs(pvx)>.015){const q=P(px,1.04+pdy,.2);for(let i=0;i<3;i++)windTrail.push({x:q.x+rnd(-18,18),y:q.y+rnd(-14,14),vx:-pvx*W*rnd(.4,.9),vy:rnd(-18,18),life:1,maxLife:rnd(10,20)});}
+  windTrail=windTrail.filter(p=>{p.x+=p.vx*.016;p.y+=p.vy*.016;p.life--;return p.life>0;});if(swing>0)swing--;if(cswing>0)cswing--;if(mt>0)mt--;
   const csp=.011+lvl*.0035;
   if(phase==='serve'){pt++;ball.x=srv?cx:px;ball.y=srv?.04:1.0;ball.h=.25+Math.sin(pt*.1)*.03;if(srv===1){cx+=clamp(rnd(-.4,.4)-cx,-.01,.01);if(pt>70)serveC()}else if(pt>400)serveP();return}
   if(phase==='dead'){pt++;ball.vh-=G;ball.h+=ball.vh;ball.x+=ball.vx*.5;ball.y+=ball.vy*.5;if(ball.h<0){ball.h=0;ball.vh=Math.abs(ball.vh)*.5}if(pt>70){newPoint(srv)}return}
@@ -321,6 +325,8 @@ function drw(){
   ctx.strokeStyle='rgba(255,255,255,.35)';ctx.lineWidth=1;for(let x=n1.x;x<n2.x;x+=8){ctx.beginPath();ctx.moveTo(x,n1.y-h);ctx.lineTo(x,n1.y);ctx.stroke()}for(let y=n1.y-h;y<n1.y;y+=8){ctx.beginPath();ctx.moveTo(n1.x,y);ctx.lineTo(n2.x,y);ctx.stroke()}
   ctx.fillStyle='#fff';ctx.fillRect(n1.x,n1.y-h-2,n2.x-n1.x,4);ctx.fillStyle='#ccc';ctx.fillRect(n1.x-3,n1.y-h-4,6,h+8);ctx.fillRect(n2.x-3,n2.y-h-4,6,h+8);
   if(ball&&ball.y>=.5&&ball.y<1)drawBall(ball);
+  // wind trail
+  windTrail.forEach(p=>{const a=p.life/p.maxLife;ctx.save();ctx.globalAlpha=a*.55;ctx.strokeStyle=`hsl(${200+a*60},90%,80%)`;ctx.lineWidth=2+a*3;ctx.shadowColor='#88ddff';ctx.shadowBlur=6;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.x+p.vx*.04,p.y+p.vy*.04);ctx.stroke();ctx.restore();});
   paddleD(px,1.04+pdy,.2,'',['#ff4d5e','#b3122a'],swing,false);
   if(ball&&ball.y>=1)drawBall(ball);
   ctx.fillStyle='rgba(8,30,50,.45)';rr(W/2-96,10,192,50,16);ctx.fill();
