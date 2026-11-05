@@ -164,7 +164,7 @@ const G=.0022;
 let px,pvx,cx,ps,as,lvl,sc,ball,L,bnc,phase,pt,srv,swing,cswing,msg,mt,trail,tpx;
 let smashPow=0,smashCd=0,smashFlash=0; // forward smash mechanic
 let pdy=0,pdyv=0; // paddle forward/back position (0=normal, negative=lunge forward)
-let windTrail=[],_prevPdy=0; // wind effect particles when paddle moves fast
+let windTrail=[],_prevPdy=0,_mouseOnCanvas=false; // wind effect particles when paddle moves fast
 const lerp=(a,b,t)=>a+(b-a)*t;
 const gy=y=>128+250*y, hw=y=>(120+200*y)*.92, kk=y=>hw(y);
 function P(x,y,h){return{x:W/2+x*hw(y),y:gy(y)-h*kk(y),s:kk(y)}}
@@ -202,13 +202,14 @@ cv.addEventListener('pointermove',e=>{
   _vx=_vx*.4+dx*.6;_vy=_vy*.4+dy*.6;
   _lx=nx;_ly=ny;
   // drag Y on screen moves paddle forward/back freely (touch only)
-  if(isTouch){
+  // both touch and mouse control Y freely
+  {
     const screenFrac=clamp(cp.y/H,0,1);
     if(!swipeDir){
       const targetPdy=clamp((screenFrac-.55)*1.1,-.38,.08);
       pdy=lerp(pdy,targetPdy,.18);
     }
-    // detect fast swipe for smash
+    // detect fast swipe for smash (touch and mouse)
     const spd=Math.sqrt(_vx*_vx+_vy*_vy);
     if(spd>8){
       const ax=Math.abs(_vx),ay=Math.abs(_vy);
@@ -221,6 +222,20 @@ cv.addEventListener('pointermove',e=>{
         const d=_vx>0?'right':'left';
         if(!swipeDir){swipeDir=d;swipeStr=Math.min((ax-9)/12,1);swipePending=true;}
       }
+    }
+  }
+});
+cv.addEventListener('mouseenter',()=>{_mouseOnCanvas=true});
+cv.addEventListener('mouseleave',()=>{_mouseOnCanvas=false});
+// also track mouse movement even without click (desktop)
+cv.addEventListener('mousemove',e=>{
+  if(e.buttons===0){// mouse moving freely (no click)
+    const cp=cpos(e);
+    tpx=clamp((cp.x-W/2)/hw(1),-1.15,1.15);
+    const screenFrac=clamp(cp.y/H,0,1);
+    if(!swipeDir){
+      const targetPdy=clamp((screenFrac-.55)*1.1,-.38,.08);
+      pdy=lerp(pdy,targetPdy,.18);
     }
   }
 });
@@ -244,8 +259,8 @@ function upd(){if(!isFinite(tpx))tpx=0;if(!isFinite(px))px=0;
     if(ky<0){pdyv=Math.max(pdyv-.018,-.06)}
     else{pdyv=Math.min(pdyv+.014,.04)}
     pdy=clamp(pdy+pdyv,-.40,.08);
-  } else {
-    // auto-return to 0: spring back when no input
+  } else if(!_mouseOnCanvas){
+    // auto-return to 0 only when mouse is off canvas and no touch
     pdy=lerp(pdy,0,.09);
     if(Math.abs(pdy)<.005)pdy=0;
   }
