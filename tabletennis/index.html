@@ -223,16 +223,22 @@ cv.addEventListener('pointermove',e=>{
 });
 cv.addEventListener('mouseenter',()=>{_mouseOnCanvas=true});
 cv.addEventListener('mouseleave',()=>{_mouseOnCanvas=false;});
-// document mousemove — מחבט עוקב אחרי עכבר בדיוק (היפוך פרספקטיבה)
+// document mousemove — מחבט עוקב אחרי עכבר בדיוק
 document.addEventListener('mousemove',e=>{
   if(!_mouseOnCanvas)return;
   const r=cv.getBoundingClientRect();
-  const sx=(e.clientX-r.left)/r.width*W; // pixel בתוך canvas
+  const sx=(e.clientX-r.left)/r.width*W;
   const sy=(e.clientY-r.top)/r.height*H;
-  // pdy מתוך Y: gy(1.04+pdy)=sy → pdy = sy/250 - 128/250 - 1.04
-  const newPdy=clamp((sy-128)/250-1.04,-.40,.08);
-  if(!swipeDir) pdy=newPdy;
-  // tpx מתוך X: W/2 + tpx*hw(1.04+pdy) = sx
+  // המחבט מצויר ב P(px, 1.04+pdy, 0.2) → screenY = gy(1.04+pdy) - 0.2*kk(1.04+pdy)
+  // הפוך: מ-sy מצא pdy בינארית (פשוט — נסה ערכים)
+  let best=0,bestD=9999;
+  for(let t=-.40;t<=.08;t+=.005){
+    const yy=1.04+t;
+    const sy2=128+250*yy - 0.2*(120+200*yy)*.92;
+    const d=Math.abs(sy2-sy);
+    if(d<bestD){bestD=d;best=t;}
+  }
+  if(!swipeDir) pdy=best;
   tpx=clamp((sx-W/2)/hw(1.04+pdy),-1.15,1.15);
 });
 cv.addEventListener('pointerdown',e=>{
@@ -334,7 +340,7 @@ function upd(){if(!isFinite(tpx))tpx=0;if(!isFinite(px))px=0;
     if(!ball.cpuMiss){cswing=14;const T=Math.round(clamp(46-lvl*2,34,46));const tx=clamp(rnd(-.8,.8),-.85,.85),ty=rnd(.62,.84);b.h=Math.max(.05,b.h);launch(b.y,b.y,tx,ty,T,1);tone(430,.05,'square',.09);return}}
   if(b.y<-.5||b.y>1.6||b.h<-.8){score(L===0?(bnc[1]>=1?0:1):(bnc[1]>=1?1:0),'פספוס')}
 }
-function paddleD(x,y,h,col,face,sw,flip){const q=P(x,y,h),r=q.s*(flip?.14:.17);ctx.save();ctx.translate(q.x,q.y);const swRot=sw>0?Math.min(sw/14,1.3)*(flip?.9:-.9):0;ctx.rotate(swRot+(flip?0:pvx*1.2));
+function paddleD(x,y,h,col,face,sw,flip){const q=P(x,y,h),r=q.s*(flip?.10:.12);ctx.save();ctx.translate(q.x,q.y);const swRot=sw>0?Math.min(sw/14,1.3)*(flip?.9:-.9):0;ctx.rotate(swRot+(flip?0:pvx*1.2));
   ctx.fillStyle='rgba(0,0,0,.28)';ctx.beginPath();ctx.ellipse(6,q.s*.3,r*.9,r*.28,0,0,7);ctx.fill();
   ctx.fillStyle='#c98a4d';rr(-r*.16,r*.7,r*.32,r*.95,r*.1);ctx.fill();ctx.fillStyle='#a56d35';ctx.fillRect(-r*.16,r*1.25,r*.32,r*.1);
   ctx.fillStyle='#e8d2a8';ctx.beginPath();ctx.arc(0,0,r*1.06,0,7);ctx.fill();
