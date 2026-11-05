@@ -223,7 +223,16 @@ cv.addEventListener('pointermove',e=>{
 });
 cv.addEventListener('mouseenter',()=>{_mouseOnCanvas=true});
 cv.addEventListener('mouseleave',()=>{_mouseOnCanvas=false});
-// mouse enter/leave handled via mouseenter/mouseleave above
+// document-level mousemove — always fires on desktop regardless of canvas focus
+document.addEventListener('mousemove',e=>{
+  if(!_mouseOnCanvas)return;
+  const cp=cpos(e);
+  tpx=clamp((cp.x-W/2)/hw(1),-1.15,1.15);
+  if(!swipeDir){
+    const screenFrac=clamp(cp.y/H,0,1);
+    pdy=clamp((screenFrac-.55)*1.1,-.38,.08);
+  }
+});
 cv.addEventListener('pointerdown',e=>{
   tpx=clamp((cpos(e).x-W/2)/hw(1),-1.15,1.15);
   _lid=e.pointerId;_lx=null;_ly=null;_vx=0;_vy=0;swipeDir=null;swipeStr=0;swipePending=false;
