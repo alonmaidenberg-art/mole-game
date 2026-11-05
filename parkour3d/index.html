@@ -45,7 +45,7 @@ body{overflow:hidden;position:fixed;inset:0;width:100%;background:#0e2338}
 </style>
 </head>
 <body>
-<script src="../lib/three.min.js"></script><canvas id="cv"></canvas><div id="hud"></div><button class="tb" id="bL" style="left:8px">◀</button><button class="tb" id="bR" style="left:90px">▶</button><button class="tb" id="bF" style="left:49px;bottom:94px">▲</button><button class="tb" id="bJ" style="right:8px;width:90px;height:90px">⤒</button>
+<script src="../lib/three.min.js"></script><script src="../lib/real3d.js"></script><canvas id="cv"></canvas><div id="hud"></div><button class="tb" id="bL" style="left:8px">◀</button><button class="tb" id="bR" style="left:90px">▶</button><button class="tb" id="bF" style="left:49px;bottom:94px">▲</button><button class="tb" id="bJ" style="right:8px;width:90px;height:90px">⤒</button>
 <div class="ov show" id="menu"><div class="ovc" style="max-width:440px"><div style="font-size:56px">🧗</div><h2>פארקור 3D</h2><div class="lb">קפצו בין הפלטפורמות, אספו כוכבים והגיעו לדגל. אפשר קפיצה כפולה!</div><div class="chips" id="lv"></div><div style="opacity:.75;font-size:12.5px;margin-top:8px"><b>חצים/WASD</b> תנועה · <b>רווח</b> קפיצה (פעמיים באוויר)<br>בטלפון: כפתורים על המסך</div><button class="btn" id="go">▶ שחק</button><div style="opacity:.8;margin-top:10px;font-size:15px">שיא: <b id="best">0</b></div></div></div>
 <div class="ov" id="end"><div class="ovc"><h2 id="eT">נגמר</h2><div style="font-size:48px;font-weight:900;color:#ffd05a" id="eS"></div><p id="eM"></p><button class="btn" id="again">🔁 שוב</button><button class="btn alt" id="menu2">תפריט</button></div></div>
 <script>
@@ -63,7 +63,7 @@ function endGame(title,score,msg,coins,dia){$('#eT').textContent=title;$('#eS').
 function saveBest(s){if(s>best){best=s;store.set(BK,s);$('#best').textContent=s}}
 function runLoop(stepFn,active){let last=performance.now(),acc=0;function l(n){requestAnimationFrame(l);acc+=Math.min(100,n-last);last=n;while(acc>=1000/60){acc-=1000/60;if(active())stepFn()}R.render(scene,cam)}requestAnimationFrame(l)}
 
-scene.background=new THREE.Color(0xffc48a);scene.fog=new THREE.Fog(0xffc48a,40,150);scene.add(new THREE.HemisphereLight(0xfff0dd,0x6a5aa0,.95));const dl=new THREE.DirectionalLight(0xfff2cc,.7);dl.position.set(10,30,20);scene.add(dl);
+R3.upgrade(R);R3.autoMaterials();R3.shadowAll();R3.env(R,scene,'dusk');R3.sky(scene,'dusk',{radius:600,fogNear:90,fogFar:420});const SUN=R3.sun(scene,{position:[60,110,40],intensity:1.1,ambient:.5,skyColor:0xffd3b0,groundColor:0x4a3a6a,shadowRadius:60,far:320});
 const M=c=>new THREE.MeshLambertMaterial({color:c});
 const sun=new THREE.Mesh(new THREE.SphereGeometry(18,16,12),new THREE.MeshBasicMaterial({color:0xffe9a8}));sun.position.set(-40,30,-150);scene.add(sun);
 for(let i=0;i<30;i++){const c=new THREE.Mesh(new THREE.BoxGeometry(rnd(4,10),rnd(1,2),rnd(3,6)),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.7}));c.position.set(rnd(-80,80),rnd(-25,10),rnd(-300,10));scene.add(c)}

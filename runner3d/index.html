@@ -46,7 +46,7 @@ body{overflow:hidden;position:fixed;inset:0;width:100%;background:#0e2338}
 </style>
 </head>
 <body>
-<script src="../lib/three.min.js"></script><canvas id="cv"></canvas><div id="hud"></div>
+<script src="../lib/three.min.js"></script><script src="../lib/real3d.js"></script><canvas id="cv"></canvas><div id="hud"></div>
 <div class="ov show" id="menu"><div class="ovc" style="max-width:440px"><div style="font-size:56px">🏃</div><h2>ריצה 3D</h2><div class="lb">רצו, קפצו, החליקו ואספו מטבעות. המהירות עולה לאט לאט</div><div style="opacity:.75;font-size:12.5px;margin-top:8px"><b>◀ ▶</b> החלפת נתיב · <b>▲/רווח</b> קפיצה · <b>▼</b> החלקה<br>בטלפון: החלק באצבע</div><button class="btn" id="go">▶ שחק</button><div style="opacity:.8;margin-top:10px;font-size:15px">שיא: <b id="best">0</b></div></div></div>
 <div class="ov" id="end"><div class="ovc"><h2 id="eT">נגמר</h2><div style="font-size:48px;font-weight:900;color:#ffd05a" id="eS"></div><p id="eM"></p><button class="btn" id="again">🔁 שוב</button><button class="btn alt" id="menu2">תפריט</button></div></div>
 <script>
@@ -64,7 +64,7 @@ function endGame(title,score,msg,coins,dia){$('#eT').textContent=title;$('#eS').
 function saveBest(s){if(s>best){best=s;store.set(BK,s);$('#best').textContent=s}}
 function runLoop(stepFn,active){let last=performance.now(),acc=0;function l(n){requestAnimationFrame(l);acc+=Math.min(100,n-last);last=n;while(acc>=1000/60){acc-=1000/60;if(active())stepFn()}R.render(scene,cam)}requestAnimationFrame(l)}
 
-scene.background=new THREE.Color(0x8fd0ff);scene.fog=new THREE.Fog(0x8fd0ff,30,110);
+R3.upgrade(R);R3.autoMaterials();R3.shadowAll();R3.env(R,scene,'day');R3.sky(scene,'day',{radius:560,fogNear:80,fogFar:340});const SUN=R3.sun(scene,{position:[50,100,60],intensity:1.15,ambient:.45,skyColor:0xbfdcff,groundColor:0x5f7a52,shadowRadius:55,far:300});
 scene.add(new THREE.HemisphereLight(0xffffff,0x6a8a5a,.85));const dl=new THREE.DirectionalLight(0xffffff,.7);dl.position.set(5,12,6);scene.add(dl);
 const LANES=[-2.2,0,2.2];const M=(c)=>new THREE.MeshLambertMaterial({color:c});
 const ground=[];for(let i=0;i<14;i++){const g=new THREE.Mesh(new THREE.BoxGeometry(8,.4,10),M(i%2?0x6a6a7a:0x75758a));g.position.set(0,-.2,-i*10+10);scene.add(g);ground.push(g)}

@@ -46,7 +46,7 @@ body{overflow:hidden;position:fixed;inset:0;width:100%;background:#0e2338}
 </style>
 </head>
 <body>
-<script src="../lib/three.min.js"></script><canvas id="cv"></canvas><div id="hud"></div>
+<script src="../lib/three.min.js"></script><script src="../lib/real3d.js"></script><canvas id="cv"></canvas><div id="hud"></div>
 <div class="ov show" id="menu"><div class="ovc" style="max-width:440px"><div style="font-size:56px">🏗️</div><h2>מגדל 3D</h2><div class="lb">לחצו בזמן הנכון כדי להניח קוביה. מה שחורג נחתך!</div><div style="opacity:.75;font-size:12.5px;margin-tp0:8px">לחיצה / רווח / נגיעה במסך</div><button class="btn" id="go">▶ שחק</button><div style="opacity:.8;margin-top:10px;font-size:15px">שיא: <b id="best">0</b></div></div></div>
 <div class="ov" id="end"><div class="ovc"><h2 id="eT">נגמר</h2><div style="font-size:48px;font-weight:900;color:#ffd05a" id="eS"></div><p id="eM"></p><button class="btn" id="again">🔁 שוב</button><button class="btn alt" id="menu2">תפריט</button></div></div>
 <script>
@@ -64,7 +64,7 @@ function endGame(title,score,msg,coins,dia){$('#eT').textContent=title;$('#eS').
 function saveBest(s){if(s>best){best=s;store.set(BK,s);$('#best').textContent=s}}
 function runLoop(stepFn,active){let last=performance.now(),acc=0;function l(n){requestAnimationFrame(l);acc+=Math.min(100,n-last);last=n;while(acc>=1000/60){acc-=1000/60;if(active())stepFn()}R.render(scene,cam)}requestAnimationFrame(l)}
 
-scene.background=new THREE.Color(0x5a8ae8);scene.fog=new THREE.Fog(0x5a8ae8,25,70);scene.add(new THREE.HemisphereLight(0xffffff,0x445577,.9));const dl=new THREE.DirectionalLight(0xffffff,.8);dl.position.set(6,14,8);scene.add(dl);
+R3.upgrade(R);R3.autoMaterials();R3.shadowAll();R3.env(R,scene,'dusk');R3.sky(scene,'dusk',{radius:620,fogNear:150,fogFar:600});const SUN=R3.sun(scene,{position:[50,120,70],intensity:1.1,ambient:.5,skyColor:0xbfd0ff,groundColor:0x3a4166,shadowRadius:40,far:400});
 const H=.7;let blocks,cur,tp0,dir,axis,spd,score,state='menu',camY,debris,perfectRun,cut;
 const col=i=>new THREE.Color().setHSL((i*.035)%1,.7,.58);
 function addBlock(x,z,w,d,y,i){const m=new THREE.Mesh(new THREE.BoxGeometry(w,H,d),new THREE.MeshLambertMaterial({color:col(i)}));m.position.set(x,y,z);scene.add(m);return m}
