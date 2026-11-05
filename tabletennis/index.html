@@ -161,9 +161,9 @@ cv.addEventListener('pointermove',e=>{
       if(!swipeDir||swipeDir!=='up'){
         swipeDir='up';swipeStr=str;
         // instant big lunge — paddle slams forward dramatically
-        pdy=-0.28-str*.12;// jump straight to deep lunge (not gradual)
-        pdyv=0;// velocity 0 so it stays there until hit, then rebounds
-        swing=4;// brief visual flash
+        pdy=-0.22-str*.08;// lunge forward fast
+        pdyv=0.025;// already springing back — whoosh feeling
+        swing=8;
       }
     } else if(ay>ax*.7&&_vy>9){// fast DOWN = slice
       if(!swipeDir){swipeDir='down';swipeStr=Math.min((_vy-9)/10,1);}
@@ -229,15 +229,14 @@ function upd(){if(!isFinite(tpx))tpx=0;if(!isFinite(px))px=0;
     const isAngleL=sd==='left';
     const sp=Math.abs(pvx)*20+lunge*60+(isSmash?ss*40:0);
     let spd2=Math.round(clamp(46-sp*1.4,isSmash?10:isSlice?36:26,48));
-    swing=isSmash?32:isSlice?6:14;// bigger swing animation for smash
+    swing=isSmash?22:isSlice?6:14;
     let tx,ty;
     if(isSmash){
-      // smash: direction = where finger was moving horizontally, or straight
-      tx=clamp((sd==='up'?pvx*4:0)+rnd(-.08,.08),-.8,.8);
-      ty=clamp(.04+rnd(0,.03)-ss*.02,.02,.08);// super flat, barely clears net
-      tone(920,.12,'square',.22);tone(680,.06,'square',.12);msg='הנחתה! 💥';mt=50;smashCd=3;
-      // screen flash effect
-      smashFlash=10;
+      tx=clamp((sd==='up'?pvx*4:0)+rnd(-.06,.06),-.8,.8);
+      ty=clamp(.04+rnd(0,.02),.02,.07);
+      spd2=5+Math.round((1-ss)*3);// 5-8 frames — BLAZING fast like Poki
+      tone(920,.14,'square',.28);tone(580,.08,'square',.14);msg='הנחתה! 💥';mt=50;smashCd=3;
+      smashFlash=12;
     } else if(isSlice){
       // slice: float slowly, very low arc
       tx=clamp((b.x-px)*-1.4+pvx*3+rnd(-.1,.1),-.8,.8);
@@ -257,7 +256,8 @@ function upd(){if(!isFinite(tpx))tpx=0;if(!isFinite(px))px=0;
       tone(560,.05,'square',.09);
     }
     b.h=Math.max(.05,b.h);launch(b.y,b.y,tx,ty,spd2,0);
-    pdyv*=-.5;swipeDir=null;swipeStr=0;
+    if(isSmash)pdyv=0.08;else pdyv*=-.5;// smash snaps back fast
+    swipeDir=null;swipeStr=0;
     return}
   // cpu hit
   if(L===0&&b.vy<0&&b.y<.12&&b.y>-.08&&b.h<.6&&bnc[1]>=1&&Math.abs(b.x-cx)<.28+lvl*.025){
