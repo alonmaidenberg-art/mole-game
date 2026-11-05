@@ -148,24 +148,33 @@ let swipeDir=null; // 'up'|'down'|'left'|'right' — set on fast move, cleared a
 let swipeStr=0;    // strength 0..1
 let swipePending=false; // swipe registered, waiting for ball to come in range
 cv.addEventListener('pointermove',e=>{
-  tpx=clamp((cpos(e).x-W/2)/hw(1),-1.15,1.15);
+  const cp=cpos(e);
+  tpx=clamp((cp.x-W/2)/hw(1),-1.15,1.15);
   if(e.pointerId!==_lid)return;
   const nx=e.clientX,ny=e.clientY,dx=nx-_lx,dy=ny-_ly;
   _vx=_vx*.4+dx*.6;_vy=_vy*.4+dy*.6;
   _lx=nx;_ly=ny;
-  // detect swipe direction while moving — trigger immediately on fast drag
+  // drag Y on screen moves paddle forward/back freely
+  // screen Y maps: top of canvas = forward (negative pdy), bottom = back
+  const screenFrac=clamp(cp.y/H,0,1);// 0=top 1=bottom
+  if(!swipeDir){// only free-move when not mid-swipe
+    const targetPdy=clamp((screenFrac-.55)*1.1,-.38,.08);
+    pdy=lerp(pdy,targetPdy,.18);// smooth follow
+  }
+  // detect fast swipe for smash
   const spd=Math.sqrt(_vx*_vx+_vy*_vy);
-  if(spd>9){
+  if(spd>8){
     const ax=Math.abs(_vx),ay=Math.abs(_vy);
-    if(ay>ax*.7&&_vy<-9){// fast UP = smash
-      const str=Math.min((-_vy-9)/12,1);
+    if(ay>ax*.5&&_vy<-8){// fast UP = smash
+      const str=Math.min((-_vy-8)/10,1);
       if(!swipeDir){
         swipeDir='up';swipeStr=str;swipePending=true;
-        pdy=-0.22-str*.08;pdyv=0.025;swing=8;
+        pdy=-0.30-str*.08;pdyv=0.03;swing=10;
+        tone(920,.14,'square',.28);tone(580,.08,'square',.14);smashFlash=12;
       }
-    } else if(ay>ax*.7&&_vy>9){// fast DOWN = slice
+    } else if(ay>ax*.7&&_vy>9){
       if(!swipeDir){swipeDir='down';swipeStr=Math.min((_vy-9)/10,1);swipePending=true;}
-    } else if(ax>ay*.7&&ax>9){// fast SIDE = angle
+    } else if(ax>ay*.7&&ax>9){
       const d=_vx>0?'right':'left';
       if(!swipeDir){swipeDir=d;swipeStr=Math.min((ax-9)/12,1);swipePending=true;}
     }
@@ -185,13 +194,16 @@ function score(w,why){if(w===0){ps++;sc+=10;tone(900,.2)}else{as++;tone(130,.3)}
   srv=1-w}
 function upd(){if(!isFinite(tpx))tpx=0;if(!isFinite(px))px=0;
   const kx=(keys.ArrowRight||keys.KeyD?1:0)-(keys.ArrowLeft||keys.KeyA?1:0);if(kx)tpx=clamp(tpx+kx*.035,-1.15,1.15);
-  // forward/back paddle movement (W/S or ArrowUp/ArrowDown)
+  // keyboard Y movement (desktop fallback)
   const ky=(keys.KeyW||keys.ArrowUp?-1:0)+(keys.KeyS||keys.ArrowDown?1:0);
-  if(ky<0){pdyv=Math.max(pdyv-.018,-.06)}// lunge forward (toward net = lower y)
-  else if(ky>0){pdyv=Math.min(pdyv+.014,.04)}// step back
-  else{pdyv*=.7}// friction
-  pdy=clamp(pdy+pdyv,-.40,.08);// pdy: negative = lunged forward toward net (-.40 for big smash)
-  if(ky===0&&Math.abs(pdy)<.005)pdy=0;
+  if(ky!==0){// keyboard overrides touch Y
+    if(ky<0){pdyv=Math.max(pdyv-.018,-.06)}
+    else{pdyv=Math.min(pdyv+.014,.04)}
+    pdy=clamp(pdy+pdyv,-.40,.08);
+  } else {
+    pdy=clamp(pdy,-.40,.08);// touch controls pdy directly via lerp above
+  }
+  if(ky===0&&!_lid&&Math.abs(pdy)<.005)pdy=0;
   if(smashCd>0)smashCd--;
   if(smashFlash>0)smashFlash--;
   if(trollTimer>0){trollTimer--;if(trollTimer===0){cpuSpeedMult=1.0;$('#trollMsg').textContent=''}}
@@ -216,9 +228,9 @@ function upd(){if(!isFinite(tpx))tpx=0;if(!isFinite(px))px=0;
       else{score(L===0?1:0,L===0?'הכדור נחת בצד שלך':'הכדור נחת בצד שלו');return}}
     else if(b.h<-.02){// off table
       const opp=L===0?1:0;if(bnc[1]>=1)score(L,'הכדור יצא');else score(1-L,'הכדור יצא');return}}
-  // player hit — wider window so swipe always connects
+  // player hit — paddle Y is controlled by touch, so check around pdy position
   const hitY=1.04+pdy;
-  if(L===1&&b.vy>0&&b.y>hitY-.3&&b.y<hitY+.35&&b.h<.9&&bnc[1]>=1&&Math.abs(b.x-px)<.5){
+  if(L===1&&b.vy>0&&b.y>hitY-.35&&b.y<hitY+.4&&b.h<1.0&&bnc[1]>=1&&Math.abs(b.x-px)<.55){
     const lunge=-pdy;
     const sd=swipeDir,ss=swipeStr;
     const isSmash=sd==='up'||lunge>.08;
