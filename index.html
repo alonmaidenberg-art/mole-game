@@ -215,7 +215,7 @@ $('lbB').onclick=lbOpen;
     var b=document.createElement('div');b.style.cssText='flex:1;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap';b.textContent=e.n;
     var c=document.createElement('div');c.style.cssText='font-weight:900;color:#ffd23f';c.textContent=e.s.toLocaleString(EN?'en-US':'he-IL');
     r.append(a,b,c);
-    if(AG.isAdmin()||(AG.isMini&&AG.isMini())){var x=document.createElement('button');x.textContent='✖';x.style.cssText='border:0;background:none;color:#ff7b95;font-size:16px;cursor:pointer';x.onclick=function(){del(e.n)};r.append(x)}
+    if(AG.isAdmin()){var x=document.createElement('button');x.textContent='✖';x.style.cssText='border:0;background:none;color:#ff7b95;font-size:16px;cursor:pointer';x.onclick=function(){del(e.n)};r.append(x)}
     return r}
   function paint(){var L=$('gbList');L.textContent='';var id=sel.value,arr=id==='_all'?overall():(G&&G[id])||[];
     if(!G){L.textContent=T('טוען…','Loading…');return}
@@ -246,7 +246,7 @@ $('lbB').onclick=lbOpen;
       if(!ch)return {b:b,ch:0};return jbPut(b).then(function(){return {b:b,ch:ch}})})
      .then(function(o){G=o.b.g;fill();paint();msg(o.ch?T('נשלח! עודכנו '+o.ch+' שיאים 🎉','Sent! '+o.ch+' records updated 🎉'):T('הכול כבר מעודכן','Everything is up to date'))})
      .catch(function(e){msg(e==='banned'?T('הכינוי הזה נחסם','This nickname is blocked'):T('משהו השתבש, נסו שוב','Something went wrong, try again'))})}
-  function del(name){if(!AG.isAdmin()&&!(AG.isMini&&AG.isMini())){msg(T('רק אדמין יכול למחוק','Admins only'));return}var ban=confirm(T('לחסום את הכינוי גם להמשך?','Also block this nickname from now on?')),nl=name.toLowerCase();
+  function del(name){if(!AG.isAdmin()){msg(T('רק אדמין יכול למחוק','Admins only'));return}var ban=confirm(T('לחסום את הכינוי גם להמשך?','Also block this nickname from now on?')),nl=name.toLowerCase();
     jbGet().then(function(b){Object.keys(b.g).forEach(function(id){b.g[id]=b.g[id].filter(function(e){return e.n.toLowerCase()!==nl})});if(ban&&b.banned.indexOf(nl)<0)b.banned.push(nl);return jbPut(b)})
      .then(function(b){G=b.g;fill();paint();msg(T('נמחק','Deleted'))}).catch(function(){msg(T('משהו השתבש','Something went wrong'))})}
   $('gbB').onclick=function(){try{nm.value=localStorage.getItem('ag_name')||''}catch(e){}$('gbM').classList.add('show');msg('');G=null;paint();load()};
