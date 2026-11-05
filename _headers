@@ -760,3 +760,12 @@
 
 /wire/manifest.webmanifest
   Cache-Control: no-cache
+
+/roles/sw.js
+  Cache-Control: no-cache
+
+/roles/index.html
+  Cache-Control: no-cache
+
+/roles/manifest.webmanifest
+  Cache-Control: no-cache
