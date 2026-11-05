@@ -732,3 +732,12 @@
 
 /wormio/manifest.webmanifest
   Cache-Control: no-cache
+
+/magnet/sw.js
+  Cache-Control: no-cache
+
+/magnet/index.html
+  Cache-Control: no-cache
+
+/magnet/manifest.webmanifest
+  Cache-Control: no-cache

@@ -664,5 +664,13 @@
     "url": "wormio/",
     "icon": "wormio/icons/icon-192.png",
     "tag": "ארקייד"
+  },
+  {
+    "id": "magnet",
+    "name": "מגנטיקה",
+    "description": "משכו את הכדור המתכתי למטרה עם כוח מגנטי! רמות מאתגרות עם מכשולים ופורטלים.",
+    "url": "magnet/",
+    "icon": "magnet/icons/icon-192.png",
+    "tag": "פאזל"
   }
 ]
