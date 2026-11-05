@@ -42,12 +42,14 @@ body{overflow:hidden;position:fixed;inset:0;width:100%;background:#0e2338}
 .tb{position:fixed;bottom:max(10px,env(safe-area-inset-bottom));z-index:6;width:74px;height:74px;border-radius:50%;border:3px solid rgba(255,255,255,.5);background:rgba(20,12,60,.55);color:#fff;font-size:26px;font-weight:900;touch-action:none;display:none}
 .tb.on{background:rgba(255,160,40,.85)}
 #rot{position:fixed;inset:0;background:#112840;z-index:50;display:none;align-items:center;justify-content:center;text-align:center;font-size:24px;font-weight:800;padding:20px}@media (orientation:portrait) and (pointer:coarse){#rot{display:flex}}
+#smashBtn{position:fixed;right:max(14px,env(safe-area-inset-right));bottom:max(14px,env(safe-area-inset-bottom));width:80px;height:80px;border-radius:50%;border:3px solid rgba(255,100,0,.7);background:rgba(30,10,0,.7);color:#fff;font-size:14px;font-weight:900;line-height:1.2;display:none;align-items:center;justify-content:center;text-align:center;z-index:7;touch-action:none;user-select:none;-webkit-user-select:none}#smashBtn.active{background:rgba(255,80,0,.85);border-color:#fff;box-shadow:0 0 18px #ff6600}
 </style>
 </head>
 <body>
 <canvas id="cv"></canvas><div id="hud"></div>
+<div id="smashBtn">💥<br>הנחתה</div>
 <div id="rot">📱↔️<br>סובבו את הטלפון לרוחב</div>
-<div class="ov show" id="menu"><div class="ovc" style="max-width:440px"><div style="font-size:56px">🏓</div><h2>פינג-פונג</h2><div class="lb">הזיזו את המחבט ימינה/שמאלה (←→), קדימה/אחורה (↑↓ / W S). הנחתה: הקידמה מהירה כשהכדור מגיע! המחשב משתפר בכל ניצחון. הראשון ל-7.</div><button class="btn" id="go">▶ שחק</button><div style="opacity:.8;margin-top:10px;font-size:15px">שיא: <b id="best">0</b></div></div></div>
+<div class="ov show" id="menu"><div class="ovc" style="max-width:440px"><div style="font-size:56px">🏓</div><h2>פינג-פונג</h2><div class="lb">גררו את המחבט ימינה/שמאלה. לחצו 💥 (או W/↑) להנחתה – הכדור יצא שטוח ומהיר! המחשב משתפר בכל ניצחון. הראשון ל-7.</div><button class="btn" id="go">▶ שחק</button><div style="opacity:.8;margin-top:10px;font-size:15px">שיא: <b id="best">0</b></div></div></div>
 <div class="ov" id="end"><div class="ovc"><h2 id="eT">נגמר</h2><div style="font-size:48px;font-weight:900;color:#ffd05a" id="eS"></div><p id="eM"></p><button class="btn" id="again">🔁 שוב</button><button class="btn alt" id="menu2">תפריט</button></div></div>
 <script>
 'use strict';
@@ -82,7 +84,7 @@ const gy=y=>128+250*y, hw=y=>(120+200*y)*.92, kk=y=>hw(y);
 function P(x,y,h){return{x:W/2+x*hw(y),y:gy(y)-h*kk(y),s:kk(y)}}
 function launch(by,fy,tx,ty,T,hit){// aim ball from (bx,by,h) so it first lands at (tx,ty) after T frames
   const b=ball;b.vx=(tx-b.x)/T;b.vy=(ty-b.y)/T;b.vh=(.5*G*T*T-b.h)/T;L=hit;bnc=[0,0];b.ok=true}
-function start(){px=0;pvx=0;tpx=0;cx=0;ps=0;as=0;lvl=0;sc=0;trail=[];msg='';mt=0;smashPow=0;smashCd=0;pdy=0;pdyv=0;newPoint(0)}
+function start(){px=0;pvx=0;tpx=0;cx=0;ps=0;as=0;lvl=0;sc=0;trail=[];msg='';mt=0;smashPow=0;smashCd=0;pdy=0;pdyv=0;newPoint(0);setTimeout(()=>{if(typeof updateSmashBtn!=='undefined')updateSmashBtn()},50)}
 function newPoint(who){srv=who;phase='serve';pt=0;ball={x:who?cx:px,y:who?.04:1.0,h:.25,vx:0,vy:0,vh:0};L=-1;bnc=[0,0];trail=[]}
 cv.addEventListener('pointermove',e=>{tpx=clamp((cpos(e).x-W/2)/hw(1),-1.15,1.15)});cv.addEventListener('pointerdown',e=>{tpx=clamp((cpos(e).x-W/2)/hw(1),-1.15,1.15);if(phase==='serve'&&srv===0)serveP()});
 addEventListener('keydown',e=>{if(e.code==='Space'&&phase==='serve'&&srv===0)serveP()});
@@ -186,6 +188,12 @@ function drw(){
   if(pdy<-.03){const lunge=-pdy/.18;const gc=ctx.createLinearGradient(0,0,80,0);gc.addColorStop(0,'#ff9900');gc.addColorStop(1,'#ff3300');ctx.fillStyle='rgba(0,0,0,.45)';rr(W/2-52,H-30,104,14,6);ctx.fill();ctx.fillStyle=gc;ctx.shadowBlur=8;ctx.shadowColor='#ff6600';rr(W/2-50,H-28,100*lunge,10,5);ctx.fill();ctx.shadowBlur=0;if(lunge>.45)T('💥',W/2,H-46,18)}
   if(mt>0&&smashCd>0&&msg==='הנחתה! 💥')T(msg,W/2,170,28,'#ff4444');
   if(mt>0&&msg)T(msg,W/2,h*0+170,26,'#ffd23f')}
+// smash button touch handling
+const smashBtn=$('#smashBtn');
+smashBtn.addEventListener('pointerdown',e=>{e.preventDefault();keys['KeyW']=1;smashBtn.classList.add('active')});
+for(const ev of['pointerup','pointerleave','pointercancel'])smashBtn.addEventListener(ev,e=>{keys['KeyW']=0;smashBtn.classList.remove('active')});
+// show smash button only during gameplay on touch devices
+function updateSmashBtn(){const show=on&&('ontouchstart' in window||navigator.maxTouchPoints>0);smashBtn.style.display=show?'flex':'none'}
 wire(start);run(upd,drw,'#0b3d4f');window.__s={step:upd,start:()=>{start();on=true},get on(){return on},get score(){return sc},get ball(){return ball},get ps(){return ps},get as(){return as},get lvl(){return lvl},get phase(){return phase},set tpx(v){tpx=v},get px(){return px},serveP};
 
 if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
