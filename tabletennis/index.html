@@ -220,12 +220,12 @@ function upd(){if(!isFinite(tpx))tpx=0;if(!isFinite(px))px=0;
   if(smashFlash>0)smashFlash--;
   if(trollTimer>0){trollTimer--;if(trollTimer===0){cpuSpeedMult=1.0;$('#trollMsg').textContent=''}}
   const op=px;px+=clamp(tpx-px,-.09,.09);pvx=px-op;if(swing>0)swing--;if(cswing>0)cswing--;if(mt>0)mt--;
-  const csp=.011+lvl*.0035;
+  const csp=.028+lvl*.006;
   if(phase==='serve'){pt++;ball.x=srv?cx:px;ball.y=srv?.04:1.0;ball.h=.25+Math.sin(pt*.1)*.03;if(srv===1){cx+=clamp(rnd(-.4,.4)-cx,-.01,.01);if(pt>70)serveC()}else if(pt>400)serveP();return}
   if(phase==='dead'){pt++;ball.vh-=G;ball.h+=ball.vh;ball.x+=ball.vx*.5;ball.y+=ball.vy*.5;if(ball.h<0){ball.h=0;ball.vh=Math.abs(ball.vh)*.5}if(pt>70){newPoint(srv)}return}
   const b=ball;trail.push({x:b.x,y:b.y,h:b.h});if(trail.length>9)trail.shift();
   // cpu movement
-  let tgt=0;if(b.vy<0||b.y<.5){const t=Math.max(0,(b.y-.02)/Math.max(.004,-b.vy));tgt=clamp(b.x+b.vx*t*.9+Math.sin(pt*.05)*.0,-1.1,1.1)}
+  let tgt=0;if(b.vy<0||b.y<.5){const t=Math.max(0,(b.y-.02)/Math.max(.004,-b.vy));tgt=clamp(b.x+b.vx*t*1.05,-1.1,1.1)}
   cx+=clamp(tgt-cx,-csp,csp);pt++;
   const py=b.y;b.x+=b.vx;b.y+=b.vy;b.h+=b.vh;b.vh-=G;
   // net
