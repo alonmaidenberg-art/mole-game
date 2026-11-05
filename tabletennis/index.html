@@ -47,8 +47,25 @@ body{overflow:hidden;position:fixed;inset:0;width:100%;background:#0e2338}
 <body>
 <canvas id="cv"></canvas><div id="hud"></div>
 <div id="rot">📱↔️<br>סובבו את הטלפון לרוחב</div>
-<div class="ov show" id="menu"><div class="ovc" style="max-width:440px"><div style="font-size:56px">🏓</div><h2>פינג-פונג</h2><div class="lb">גררו את המחבט ימינה/שמאלה.<br>🔥 <b>סוויש קדימה</b> = הנחתה 💥<br>⬇️ <b>סוויש למטה</b> = סלייס ✂️ (איטי נמוך)<br>➡️ <b>סוויש ימינה/שמאלה</b> = זווית חדה 📐<br>על מחשב: W/↑ קדימה. הראשון ל-7.</div><button class="btn" id="go">▶ שחק</button><div style="opacity:.8;margin-top:10px;font-size:15px">שיא: <b id="best">0</b></div></div></div>
+<div class="ov show" id="menu"><div class="ovc" style="max-width:440px"><div style="font-size:56px">🏓</div><h2>פינג-פונג</h2><div class="lb">גררו את המחבט ימינה/שמאלה.<br>🔥 <b>סוויש קדימה</b> = הנחתה 💥<br>⬇️ <b>סוויש למטה</b> = סלייס ✂️ (איטי נמוך)<br>➡️ <b>סוויש ימינה/שמאלה</b> = זווית חדה 📐<br>על מחשב: W/↑ קדימה. הראשון ל-7.</div><button class="btn" id="go">▶ שחק</button><button class="btn alt" id="settBtn" style="margin-top:8px">⚙️ הגדרות</button><div style="opacity:.8;margin-top:10px;font-size:15px">שיא: <b id="best">0</b></div></div></div>
 <div class="ov" id="end"><div class="ovc"><h2 id="eT">נגמר</h2><div style="font-size:48px;font-weight:900;color:#ffd05a" id="eS"></div><p id="eM"></p><button class="btn" id="again">🔁 שוב</button><button class="btn alt" id="menu2">תפריט</button></div></div>
+<div class="ov" id="settM"><div class="ovc" style="max-width:400px;text-align:center">
+  <h2>⚙️ הגדרות</h2>
+  <div style="margin:12px 0;font-weight:700">מהירות כדור</div>
+  <div class="chips" style="justify-content:center">
+    <button class="chip" data-sp="0.7" id="spSlow">🐢 איטי</button>
+    <button class="chip on" data-sp="1.0" id="spNorm">⚡ רגיל</button>
+    <button class="chip" data-sp="1.4" id="spFast">🚀 מהיר</button>
+    <button class="chip" data-sp="2.0" id="spCrazy">💀 מטורף</button>
+  </div>
+  <div style="margin:16px 0;font-weight:700">טרולים 🎭</div>
+  <div class="chips" style="justify-content:center">
+    <button class="chip" id="trFast">🚀 מהרתי את היריב</button>
+    <button class="chip" id="trSlow">🐢 האטתי את היריב</button>
+  </div>
+  <div id="trollMsg" style="min-height:22px;color:#ffd05a;font-weight:800;margin:8px 0;font-size:14px"></div>
+  <button class="btn" id="settClose" style="margin-top:8px">סגור</button>
+</div></div>
 <script>
 'use strict';
 const $=s=>document.querySelector(s);
@@ -61,6 +78,35 @@ addEventListener('keydown',e=>{keys[e.code]=1;if(['Space','ArrowUp','ArrowDown',
 function cpos(e){const r=cv.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width*W,y:(e.clientY-r.top)/r.height*H}}
 function holdBtn(id,fn){const b=$(id);b.addEventListener('pointerdown',e=>{e.preventDefault();fn(1);b.classList.add('on')});for(const t of['pointerup','pointerleave','pointercancel'])b.addEventListener(t,e=>{fn(0);b.classList.remove('on')})}
 const BK='tabletennis'+'_best';let best=+store.get(BK,0);$('#best').textContent=best;
+
+// settings & trolls
+let ballSpeedMult=1.0; // player's ball speed multiplier (from settings)
+let cpuSpeedMult=1.0;  // CPU speed multiplier (troll target — not the player)
+let trollTimer=0;      // frames left for troll effect on cpu
+
+// settings panel
+$('#settBtn').onclick=()=>$('#settM').classList.add('show');
+$('#settClose').onclick=()=>$('#settM').classList.remove('show');
+// speed chips
+document.querySelectorAll('#settM .chip[data-sp]').forEach(b=>{
+  b.onclick=()=>{
+    document.querySelectorAll('#settM .chip[data-sp]').forEach(c=>c.classList.remove('on'));
+    b.classList.add('on');
+    ballSpeedMult=parseFloat(b.dataset.sp);
+  }
+});
+// troll buttons
+$('#trFast').onclick=()=>{
+  cpuSpeedMult=2.2;trollTimer=420;// 7 seconds at 60fps — CPU gets fast (harder to track)
+  $('#trollMsg').textContent='😈 היריב קיבל טורבו! הוא יהיה מהיר מדי לעצמו…';
+  setTimeout(()=>{if(trollTimer<=0)$('#trollMsg').textContent=''},500);
+};
+$('#trSlow').onclick=()=>{
+  cpuSpeedMult=0.3;trollTimer=420;
+  $('#trollMsg').textContent='😂 היריב קופא! הוא זז לאט…';
+  setTimeout(()=>{if(trollTimer<=0)$('#trollMsg').textContent=''},500);
+};
+
 function endGame(title,score,msg,coins,dia){$('#eT').textContent=title;$('#eS').textContent=score;let m=msg||'';if(window.AG&&coins>0){AG.add(coins,dia||0);m+=' +'+coins+' 🪙'+(dia?' +'+dia+' 💎':'')}$('#eM').textContent=m;$('#end').classList.add('show')}
 function saveBest(s){if(s>best){best=s;store.set(BK,s);$('#best').textContent=s}}
 
@@ -81,8 +127,11 @@ const lerp=(a,b,t)=>a+(b-a)*t;
 const gy=y=>128+250*y, hw=y=>(120+200*y)*.92, kk=y=>hw(y);
 function P(x,y,h){return{x:W/2+x*hw(y),y:gy(y)-h*kk(y),s:kk(y)}}
 function launch(by,fy,tx,ty,T,hit){// aim ball from (bx,by,h) so it first lands at (tx,ty) after T frames
-  const b=ball;b.vx=(tx-b.x)/T;b.vy=(ty-b.y)/T;b.vh=(.5*G*T*T-b.h)/T;L=hit;bnc=[0,0];b.ok=true}
-function start(){px=0;pvx=0;tpx=0;cx=0;ps=0;as=0;lvl=0;sc=0;trail=[];msg='';mt=0;smashPow=0;smashCd=0;pdy=0;pdyv=0;newPoint(0)}
+  // apply speed multiplier: player shots use ballSpeedMult, cpu shots use cpuSpeedMult
+  const mult=hit===1?cpuSpeedMult:ballSpeedMult;
+  const Tm=Math.max(6,Math.round(T/mult));
+  const b=ball;b.vx=(tx-b.x)/Tm;b.vy=(ty-b.y)/Tm;b.vh=(.5*G*Tm*Tm-b.h)/Tm;L=hit;bnc=[0,0];b.ok=true}
+function start(){px=0;pvx=0;tpx=0;cx=0;ps=0;as=0;lvl=0;sc=0;trail=[];msg='';mt=0;smashPow=0;smashCd=0;pdy=0;pdyv=0;cpuSpeedMult=1.0;trollTimer=0;newPoint(0)}
 function newPoint(who){srv=who;phase='serve';pt=0;ball={x:who?cx:px,y:who?.04:1.0,h:.25,vx:0,vy:0,vh:0};L=-1;bnc=[0,0];trail=[]}
 // swipe tracking — velocity sampled every frame via pointermove
 let _ly=0,_lx=0,_vy=0,_vx=0,_lid=null;
@@ -131,6 +180,7 @@ function upd(){if(!isFinite(tpx))tpx=0;if(!isFinite(px))px=0;
   pdy=clamp(pdy+pdyv,-.18,.08);// pdy: negative = lunged forward toward net
   if(ky===0&&Math.abs(pdy)<.005)pdy=0;
   if(smashCd>0)smashCd--;else smashCd=0;
+  if(trollTimer>0){trollTimer--;if(trollTimer===0){cpuSpeedMult=1.0;$('#trollMsg').textContent=''}}
   const op=px;px+=clamp(tpx-px,-.09,.09);pvx=px-op;if(swing>0)swing--;if(cswing>0)cswing--;if(mt>0)mt--;
   const csp=.011+lvl*.0035;
   if(phase==='serve'){pt++;ball.x=srv?cx:px;ball.y=srv?.04:1.0;ball.h=.25+Math.sin(pt*.1)*.03;if(srv===1){cx+=clamp(rnd(-.4,.4)-cx,-.01,.01);if(pt>70)serveC()}else if(pt>400)serveP();return}
