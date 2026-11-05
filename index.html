@@ -259,7 +259,8 @@ wal();AG.onChange(wal);
 function admView(){var on=AG.isAdmin();$('admIn').style.display=on?'none':'block';$('admPanel').style.display=on?'block':'none'}
 $('keyB').onclick=function(){$('admE').textContent='';$('admC').value='';admView();$('admM').classList.add('show')};
 $('admX').onclick=function(){$('admM').classList.remove('show')};
-$('admOk').onclick=function(){AG.tryAdmin($('admC').value).then(function(ok){if(ok){admView()}else{$('admE').textContent='הקוד לא נכון'}})};
+$('admOk').onclick=function(){var code=$('admC').value;AG.tryAdmin(code).then(function(ok){if(ok){admView()}else{// Try mini-admin code too
+AG.tryMini(code).then(function(okM){if(okM){$('admM').classList.remove('show');AG.toast&&AG.toast('ברוכים הבאים לצוות ⭐')}else{$('admE').textContent='הקוד לא נכון'}})}})};
 $('a1').onclick=function(){AG.add(10000,0)};$('a2').onclick=function(){AG.add(0,500)};
 $('a3').onclick=function(){if(confirm('לאפס מטבעות ויהלומים?')){AG.spend(AG.coins(),AG.diamonds())}};
 $('a4').onclick=function(){AG.adminLogout();admView()};
