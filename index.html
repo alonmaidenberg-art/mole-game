@@ -215,7 +215,7 @@ $('lbB').onclick=lbOpen;
     var b=document.createElement('div');b.style.cssText='flex:1;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap';b.textContent=e.n;
     var c=document.createElement('div');c.style.cssText='font-weight:900;color:#ffd23f';c.textContent=e.s.toLocaleString(EN?'en-US':'he-IL');
     r.append(a,b,c);
-    if(AG.isAdmin()){var x=document.createElement('button');x.textContent='✖';x.style.cssText='border:0;background:none;color:#ff7b95;font-size:16px;cursor:pointer';x.onclick=function(){del(e.n)};r.append(x)}
+    if(AG.isAdmin()||(AG.isMini&&AG.isMini())){var x=document.createElement('button');x.textContent='✖';x.style.cssText='border:0;background:none;color:#ff7b95;font-size:16px;cursor:pointer';x.onclick=function(){del(e.n)};r.append(x)}
     return r}
   function paint(){var L=$('gbList');L.textContent='';var id=sel.value,arr=id==='_all'?overall():(G&&G[id])||[];
     if(!G){L.textContent=T('טוען…','Loading…');return}
@@ -237,7 +237,7 @@ $('lbB').onclick=lbOpen;
     if(!n){msg(T('הכינוי לא מתאים, נסו אחר','That nickname is not allowed'));return}
     if(!JB_BIN){msg(T('לוח התוצאות עוד לא הופעל','The leaderboard is not switched on yet'));return}
     var sc=localBests();if(!Object.keys(sc).length){msg(T('עוד אין לך שיאים. שחקו קודם!','You have no records yet. Play first!'));return}
-    try{localStorage.setItem('ag_name',n);var so=JSON.parse(localStorage.getItem('ag_shop')||'{}');var bd=(so.eq||{}).badge;if(bd===undefined&&so.own&&so.own.crown)bd='👑';if(bd&&n.indexOf(bd)<0)n=bd+n}catch(e){}
+    try{localStorage.setItem('ag_name',n);var so=JSON.parse(localStorage.getItem('ag_shop')||'{}');var bd=(so.eq||{}).badge;if(bd===undefined&&so.own&&so.own.crown)bd='👑';if(bd&&n.indexOf(bd)<0)n=bd+n;if(!bd&&AG.isMini&&AG.isMini()&&n.indexOf('⭐')<0)n='⭐'+n}catch(e){}
     msg(T('שולח…','Sending…'));
     jbGet().then(function(b){if(b.banned.indexOf(n.toLowerCase())>-1){throw 'banned'}var ch=0,k=0;
       Object.keys(sc).forEach(function(id){if(++k>90||!/^[a-z0-9]{2,20}$/.test(id))return;var v=Math.floor(+sc[id]);if(!isFinite(v)||v<=0||v>1e9)return;var arr=b.g[id]||(b.g[id]=[]);
@@ -246,7 +246,7 @@ $('lbB').onclick=lbOpen;
       if(!ch)return {b:b,ch:0};return jbPut(b).then(function(){return {b:b,ch:ch}})})
      .then(function(o){G=o.b.g;fill();paint();msg(o.ch?T('נשלח! עודכנו '+o.ch+' שיאים 🎉','Sent! '+o.ch+' records updated 🎉'):T('הכול כבר מעודכן','Everything is up to date'))})
      .catch(function(e){msg(e==='banned'?T('הכינוי הזה נחסם','This nickname is blocked'):T('משהו השתבש, נסו שוב','Something went wrong, try again'))})}
-  function del(name){if(!AG.isAdmin()){msg(T('רק אדמין יכול למחוק','Admins only'));return}var ban=confirm(T('לחסום את הכינוי גם להמשך?','Also block this nickname from now on?')),nl=name.toLowerCase();
+  function del(name){if(!AG.isAdmin()&&!(AG.isMini&&AG.isMini())){msg(T('רק אדמין יכול למחוק','Admins only'));return}var ban=confirm(T('לחסום את הכינוי גם להמשך?','Also block this nickname from now on?')),nl=name.toLowerCase();
     jbGet().then(function(b){Object.keys(b.g).forEach(function(id){b.g[id]=b.g[id].filter(function(e){return e.n.toLowerCase()!==nl})});if(ban&&b.banned.indexOf(nl)<0)b.banned.push(nl);return jbPut(b)})
      .then(function(b){G=b.g;fill();paint();msg(T('נמחק','Deleted'))}).catch(function(){msg(T('משהו השתבש','Something went wrong'))})}
   $('gbB').onclick=function(){try{nm.value=localStorage.getItem('ag_name')||''}catch(e){}$('gbM').classList.add('show');msg('');G=null;paint();load()};
