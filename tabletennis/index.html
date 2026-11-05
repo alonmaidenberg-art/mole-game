@@ -188,28 +188,31 @@ function launch(by,fy,tx,ty,T,hit){
 function start(){px=0;pvx=0;tpx=0;cx=0;ps=0;as=0;lvl=0;sc=0;trail=[];msg='';mt=0;smashPow=0;smashCd=0;pdy=0;pdyv=0;cpuSpeedMult=1.0;trollTimer=0;windTrail=[];_prevPdy=0;newPoint(0)}
 function newPoint(who){srv=who;phase='serve';pt=0;ball={x:who?cx:px,y:who?.04:1.0,h:.25,vx:0,vy:0,vh:0};L=-1;bnc=[0,0];trail=[]}
 // swipe tracking — velocity sampled every frame via pointermove
-let _ly=0,_lx=0,_vy=0,_vx=0,_lid=null;
+let _ly=null,_lx=null,_vy=0,_vx=0,_lid=null;
 let swipeDir=null; // 'up'|'down'|'left'|'right' — set on fast move, cleared after hit
 let swipeStr=0;    // strength 0..1
 let swipePending=false; // swipe registered, waiting for ball to come in range
 cv.addEventListener('pointermove',e=>{
   const cp=cpos(e);
   tpx=clamp((cp.x-W/2)/hw(1),-1.15,1.15);
-  // touch: only track active pointer for swipes
   const isTouch=e.pointerType==='touch';
+  // for touch, only track active pointer; for mouse, always track
   if(isTouch&&e.pointerId!==_lid)return;
-  const nx=e.clientX,ny=e.clientY,dx=nx-_lx,dy=ny-_ly;
-  _vx=_vx*.4+dx*.6;_vy=_vy*.4+dy*.6;
+  const nx=e.clientX,ny=e.clientY;
+  // only compute velocity if we have a valid previous position
+  if(_lx!==null){
+    const dx=nx-_lx,dy=ny-_ly;
+    _vx=_vx*.4+dx*.6;_vy=_vy*.4+dy*.6;
+  }
   _lx=nx;_ly=ny;
-  // drag Y on screen moves paddle forward/back freely (touch only)
-  // both touch and mouse control Y freely
-  {
-    const screenFrac=clamp(cp.y/H,0,1);
-    if(!swipeDir){
-      const targetPdy=clamp((screenFrac-.55)*1.1,-.38,.08);
-      pdy=lerp(pdy,targetPdy,.18);
-    }
-    // detect fast swipe for smash (touch and mouse)
+  // Y position controls paddle depth (forward/back) for all pointer types
+  const screenFrac=clamp(cp.y/H,0,1);
+  if(!swipeDir){
+    const targetPdy=clamp((screenFrac-.55)*1.1,-.38,.08);
+    pdy=lerp(pdy,targetPdy,.18);
+  }
+  // detect fast swipe for smash — only when pointer was already tracked
+  if(_lx!==null){
     const spd=Math.sqrt(_vx*_vx+_vy*_vy);
     if(spd>8){
       const ax=Math.abs(_vx),ay=Math.abs(_vy);
@@ -227,24 +230,13 @@ cv.addEventListener('pointermove',e=>{
 });
 cv.addEventListener('mouseenter',()=>{_mouseOnCanvas=true});
 cv.addEventListener('mouseleave',()=>{_mouseOnCanvas=false});
-// also track mouse movement even without click (desktop)
-cv.addEventListener('mousemove',e=>{
-  if(e.buttons===0){// mouse moving freely (no click)
-    const cp=cpos(e);
-    tpx=clamp((cp.x-W/2)/hw(1),-1.15,1.15);
-    const screenFrac=clamp(cp.y/H,0,1);
-    if(!swipeDir){
-      const targetPdy=clamp((screenFrac-.55)*1.1,-.38,.08);
-      pdy=lerp(pdy,targetPdy,.18);
-    }
-  }
-});
+// mouse enter/leave handled via mouseenter/mouseleave above
 cv.addEventListener('pointerdown',e=>{
   tpx=clamp((cpos(e).x-W/2)/hw(1),-1.15,1.15);
-  _lid=e.pointerId;_lx=e.clientX;_ly=e.clientY;_vx=0;_vy=0;swipeDir=null;swipeStr=0;swipePending=false;
+  _lid=e.pointerId;_lx=null;_ly=null;_vx=0;_vy=0;swipeDir=null;swipeStr=0;swipePending=false;
   if(phase==='serve'&&srv===0)serveP()});
 cv.addEventListener('pointerup',e=>{
-  if(e.pointerId===_lid){_lid=null;_vx=0;_vy=0}});
+  if(e.pointerId===_lid){_lid=null;_lx=null;_ly=null;_vx=0;_vy=0}});
 addEventListener('keydown',e=>{if(e.code==='Space'&&phase==='serve'&&srv===0)serveP()});
 function serveP(){swing=12;ball.x=px;ball.y=1.0;ball.h=.25;launch(1,1,rnd(-.5,.5),rnd(.2,.35),42,0);phase='play';tone(520,.05,'square',.08)}
 function serveC(){cswing=12;ball.x=cx;ball.y=.04;ball.h=.25;launch(0,0,rnd(-.6,.6),rnd(.65,.8),44-lvl,1);phase='play';tone(400,.05,'square',.08)}
