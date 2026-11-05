@@ -18,9 +18,14 @@ canvas{display:block;touch-action:none}
 const c=document.getElementById('c');
 const ctx=c.getContext('2d');
 const W=800,H=450;
-c.width=W;c.height=H;
-const scale=Math.min(innerWidth/W,innerHeight/H);
-c.style.width=W*scale+'px';c.style.height=H*scale+'px';
+function resize(){
+  // render at real pixel density so edges stay sharp instead of being upscaled
+  const scale=Math.min(innerWidth/W,innerHeight/H),dpr=Math.min(devicePixelRatio||1,2);
+  c.style.width=Math.floor(W*scale)+'px';c.style.height=Math.floor(H*scale)+'px';
+  c.width=Math.floor(W*scale*dpr);c.height=Math.floor(H*scale*dpr);
+  ctx.setTransform(scale*dpr,0,0,scale*dpr,0,0);
+}
+resize();addEventListener('resize',resize);
 
 // Roles definition
 const ROLES=[

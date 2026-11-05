@@ -58,6 +58,7 @@ h1{margin:6px 0;font-size:30px;text-align:center}
 </div>
 <div class="ov" id="end"><div class="ovc"><h2 id="eT">נגמר!</h2><div id="eM" style="font-size:20px;margin-bottom:8px"></div><button class="btn" id="again">🔁 שוב</button><button class="btn alt" id="menuB">תפריט</button></div></div>
 </main>
+<script src="../lib/real2d.js"></script>
 <script>
 'use strict';
 const $=s=>document.querySelector(s);
@@ -65,7 +66,8 @@ const store={get(k,d){try{const v=localStorage.getItem(k);return v===null?d:v}ca
 let _ac=null;function tone(f,d=.1,t='triangle',v=.07){try{_ac=_ac||new (window.AudioContext||window.webkitAudioContext)();const o=_ac.createOscillator(),g=_ac.createGain();o.type=t;o.frequency.value=f;g.gain.value=v;o.connect(g);g.connect(_ac.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,_ac.currentTime+d);o.stop(_ac.currentTime+d+.02)}catch(e){}}
 
 const N=18,CS=20;let sp=+store.get('s_sp',2),wm=store.get('s_w','wall'),best=+store.get('s_best',0);
-const cv=$('#cv'),ctx=cv.getContext('2d');cv.width=cv.height=N*CS;
+const cv=$('#cv'),ctx=cv.getContext('2d');
+R2.sharp(cv,ctx,N*CS,N*CS);
 function opt(id,v){[...$(id).children].forEach(c=>c.classList.toggle('on',c.dataset.v===String(v)))}
 function chips(id,cb){[...$(id).children].forEach(c=>c.onclick=()=>{cb(c.dataset.v);opt(id,c.dataset.v)})}
 chips('#mSp',v=>{sp=+v;store.set('s_sp',v)});chips('#mW',v=>{wm=v;store.set('s_w',v)});opt('#mSp',sp);opt('#mW',wm);$('#best').textContent=$('#bs').textContent=best;

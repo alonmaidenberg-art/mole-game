@@ -26,9 +26,15 @@ canvas.height = H;
 
 // Scale canvas to fit screen
 function resize() {
+  // render at the screen's real pixel density, otherwise an 800px canvas is
+  // stretched across the display and every edge looks pixelated
   const scale = Math.min(window.innerWidth / W, window.innerHeight / H);
-  canvas.style.width = (W * scale) + 'px';
-  canvas.style.height = (H * scale) + 'px';
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  canvas.style.width = Math.floor(W * scale) + 'px';
+  canvas.style.height = Math.floor(H * scale) + 'px';
+  canvas.width = Math.floor(W * scale * dpr);
+  canvas.height = Math.floor(H * scale * dpr);
+  ctx.setTransform(scale * dpr, 0, 0, scale * dpr, 0, 0);
 }
 resize();
 window.addEventListener('resize', resize);
