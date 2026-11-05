@@ -17,6 +17,7 @@
   ];
   window.AG_SHOP={items:ITEMS,read:rd,write:wr};
   function isAdm(){return !!(window.AG&&AG.isAdmin&&AG.isAdmin())}
+  function isMini(){return !!(window.AG&&AG.isMini&&AG.isMini())||isAdm()}
   try{fetch((window.AG&&AG.root?AG.root:'/')+'shop.json?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.json()}).then(function(j){(j.items||[]).forEach(function(n){var i=ITEMS.findIndex(function(x){return x.id===n.id});if(i>=0)ITEMS[i]=n;else ITEMS.push(n)});if(ov)draw()}).catch(function(){})}catch(e){}
   function deal(){var list=ITEMS.filter(function(i){return i.k==='p'&&!i.admin&&!rd().own[i.id]&&(i.c||0)>0});if(!list.length)return null;var d=Math.floor(Date.now()/86400000);return list[d%list.length]}
   function price(i){var dl=deal();return dl&&dl.id===i.id?Math.round(i.c*.6):i.c}
@@ -58,8 +59,12 @@
   function equip(it){var o=rd();if(it.th){o.eq.theme=o.eq.theme===it.th?'':it.th}else if(it.grp){o.eq[it.grp]=o.eq[it.grp]===it.id?'':it.id}else if(it.badge){o.eq.badge=o.eq.badge===it.badge?'':it.badge}else{o.eq[it.id]=o.eq[it.id]===0?1:0}wr(o);applyTheme();draw()}
   function draw(){if(!ov)return;var o=rd(),box=ov.firstChild;box.textContent='';
     var h=document.createElement('div');h.style.cssText='display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px';
-    var t=document.createElement('b');t.style.fontSize='22px';t.textContent='🛒 '+T('החנות','Shop');var w=document.createElement('span');w.style.cssText='font-weight:900;background:#fff;border-radius:999px;padding:4px 12px';w.textContent='🪙 '+(window.AG?AG.coins():0)+'  💎 '+(window.AG?AG.diamonds():0);
-    var x=document.createElement('button');x.textContent='✕';x.style.cssText='border:0;background:#fff;border-radius:50%;width:34px;height:34px;font-size:16px;cursor:pointer;color:#0b4553';x.onclick=close;h.append(t,w,x);box.append(h);
+    var t=document.createElement('b');t.style.fontSize='22px';t.textContent='🛒 '+T('החנות','Shop')+(isMini()?' '+(isAdm()?'👑':'⭐'):'');var w=document.createElement('span');w.style.cssText='font-weight:900;background:#fff;border-radius:999px;padding:4px 12px';w.textContent='🪙 '+(window.AG?AG.coins():0)+'  💎 '+(window.AG?AG.diamonds():0);
+    var x=document.createElement('button');x.textContent='✕';x.style.cssText='border:0;background:#fff;border-radius:50%;width:34px;height:34px;font-size:16px;cursor:pointer;color:#0b4553';x.onclick=close;
+    // code entry button (not shown to full admins - they already have it)
+    if(!isMini()){var kb=document.createElement('button');kb.textContent='🔑';kb.title=T('הזן קוד','Enter code');kb.style.cssText='border:0;background:#e6f7f4;border-radius:50%;width:34px;height:34px;font-size:16px;cursor:pointer;color:#0b4553';
+      kb.onclick=function(){var code=prompt(T('הזן קוד צוות:','Enter team code:'));if(!code)return;AG.tryMini(code).then(function(ok){if(ok){toast(T('ברוכים הבאים לצוות! ⭐','Welcome to the team! ⭐'));draw()}else toast(T('קוד שגוי','Wrong code'))})};h.append(t,w,kb,x)}
+    else h.append(t,w,x);box.append(h);
     var g=document.createElement('div');g.style.cssText='display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px';
     ITEMS.filter(function(it){return !it.admin||isAdm()}).forEach(function(it){var c=document.createElement('div');c.style.cssText='background:#fff;border-radius:16px;padding:10px;display:flex;gap:10px;align-items:center;box-shadow:0 3px 10px rgba(20,150,140,.15)';
       var e=document.createElement('div');e.style.cssText='font-size:32px;flex:none';e.textContent=it.e;
@@ -71,7 +76,21 @@
         if(o.own[it.id]&&!it.admin&&(it.c||it.dm)){var rb=document.createElement('button');rb.textContent=T('↩ בטל','↩ Undo');rb.title=T('החזר '+(Math.floor((it.c||0)*.7))+' 🪙 (70%)','Refund '+(Math.floor((it.c||0)*.7))+' 🪙 (70%)');rb.style.cssText='flex:none;border:0;border-radius:10px;padding:5px 8px;font:800 12px system-ui,Arial;cursor:pointer;background:#ffe0e0;color:#a00;margin-top:4px';rb.onclick=function(){if(confirm(T('לבטל את הרכישה ולקבל בחזרה '+Math.floor((it.c||0)*.7)+' 🪙?','Refund and get back '+Math.floor((it.c||0)*.7)+' 🪙?')))refund(it)};m.append(rb)}}
       else{var dl=deal(),isd=dl&&dl.id===it.id;b.textContent=(it.c?(isd?price(it)+' 🪙':it.c+' 🪙'):it.dm+' 💎');b.onclick=function(){buy(it)};if(isd){var tg=document.createElement('div');tg.textContent=T('מבצע היום -40%','Today -40%');tg.style.cssText='font-size:11px;font-weight:900;color:#fff;background:#ff3d71;border-radius:8px;padding:1px 6px;margin-top:3px;display:inline-block';m.append(tg)}}
       c.append(e,m,b);g.append(c)});
-    box.append(g)}
+    box.append(g);
+    // mini-admin panel
+    if(isMini()){
+      var mp=document.createElement('div');mp.style.cssText='margin-top:12px;padding:10px;background:linear-gradient(135deg,#1a0a3a,#2d1060);border-radius:14px;color:#fff;border:1.5px solid rgba(255,220,80,.4)';
+      var ml=document.createElement('div');ml.style.cssText='font:900 14px system-ui;color:#ffd23f;margin-bottom:8px';ml.textContent=(isAdm()?'👑 ':'⭐ ')+(isAdm()?T('אדמין ראשי','Head Admin'):T('צוות / עוזר','Team / Staff'));
+      var mbtns=document.createElement('div');mbtns.style.cssText='display:flex;gap:6px;flex-wrap:wrap';
+      function mBtn(label,fn){var b=document.createElement('button');b.textContent=label;b.style.cssText='border:0;border-radius:10px;padding:7px 12px;font:800 13px system-ui;cursor:pointer;background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.25)';b.onclick=fn;return b}
+      mbtns.appendChild(mBtn(T('+1000 🪙','+ 1000 🪙'),function(){if(window.AG){AG.add(1000,0);toast(T('נוספו 1000 מטבעות ✅','Added 1000 coins ✅'));draw()}}));
+      mbtns.appendChild(mBtn(T('+10 💎','+ 10 💎'),function(){if(window.AG){AG.add(0,10);toast(T('נוספו 10 יהלומים ✅','Added 10 diamonds ✅'));draw()}}));
+      if(isAdm()){// full admin only
+        mbtns.appendChild(mBtn(T('+ 10000 🪙','+ 10000 🪙'),function(){if(window.AG){AG.add(10000,0);toast(T('נוספו 10,000 🪙','Added 10,000 🪙'));draw()}}));
+        mbtns.appendChild(mBtn(T('+ 100 💎','+ 100 💎'),function(){if(window.AG){AG.add(0,100);toast(T('נוספו 100 💎','Added 100 💎'));draw()}}));
+        mbtns.appendChild(mBtn(T('🗑 אפס ארנק','🗑 Reset wallet'),function(){if(confirm(T('לאפס את הארנק?','Reset wallet?')))try{localStorage.removeItem('ag_wallet');toast(T('אופס ✅','Reset ✅'));draw()}catch(e){}}));
+      }
+      mp.append(ml,mbtns);box.append(mp)}}
   function close(){if(ov){ov.remove();ov=null}}
   function open(){if(ov){close();return}ov=document.createElement('div');ov.style.cssText='position:fixed;inset:0;z-index:2147483500;background:rgba(190,250,240,.92);display:flex;align-items:center;justify-content:center;padding:12px;overflow:auto;backdrop-filter:blur(6px)';
     var box=document.createElement('div');box.style.cssText='width:100%;max-width:640px;max-height:94vh;max-height:94dvh;overflow:auto;background:linear-gradient(180deg,#dffcf6,#fff);border:2px solid #fff;border-radius:22px;padding:14px;color:#0b4553;font-family:system-ui,Arial,sans-serif;box-shadow:0 10px 40px rgba(20,150,140,.35)';

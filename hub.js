@@ -2,6 +2,10 @@
 (function(){
   'use strict';
   var HASH='a28e690a3b6d041970a632d16ad8d54a2ae463d1319f7990a490a5ffd8431884';
+  // Mini-admin: staff/team members get limited perks but not full admin
+  // Hash of "alon-games|TEAM2026"
+  var MINI_HASH='1fda172f00dfce9a09790df5406d90dac425df32f03a595541cad87f8fe76c6f';
+  var KM='ag_mini'; // localStorage key for mini-admin
   var script=document.currentScript;
   var ROOT=new URL('./',script&&script.src?script.src:location.href).href;
 
@@ -24,11 +28,23 @@
     played:function(){try{return JSON.parse(localStorage.getItem('ag_played')||'[]').length}catch(e){return 0}},
     coins:function(){return rd().c},
     diamonds:function(){return rd().d},
-    add:function(c,d){c=c||0;d=d||0;if((c>0||d>0)&&localStorage.getItem(KA)!==HASH&&!allow(Math.max(0,c),Math.max(0,d)))return;if(c>0&&AG.coinMult)c=Math.floor(c*AG.coinMult());var w=rd();w.c=Math.max(0,w.c+c);w.d=Math.max(0,w.d+d);wr(w)},
+    add:function(c,d){c=c||0;d=d||0;if((c>0||d>0)&&localStorage.getItem(KA)!==HASH&&localStorage.getItem(KM)!==MINI_HASH&&!allow(Math.max(0,c),Math.max(0,d)))return;if(c>0&&AG.coinMult)c=Math.floor(c*AG.coinMult());var w=rd();w.c=Math.max(0,w.c+c);w.d=Math.max(0,w.d+d);wr(w)},
     tampered:function(){return tampered},
     spend:function(c,d){var w=rd();c=c||0;d=d||0;if(w.c<c||w.d<d)return false;w.c-=c;w.d-=d;wr(w);return true},
     onChange:function(f){subs.push(f)},
     isAdmin:function(){try{return localStorage.getItem(KA)===HASH}catch(e){return false}},
+    isMini:function(){try{return localStorage.getItem(KM)===MINI_HASH}catch(e){return false}},
+    tryMini:function(code){
+      code=String(code||'').trim().toUpperCase();
+      var data=new TextEncoder().encode('alon-games|'+code);
+      if(!(window.crypto&&crypto.subtle))return Promise.resolve(false);
+      return crypto.subtle.digest('SHA-256',data).then(function(b){
+        var h=Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,'0')}).join('');
+        if(h===MINI_HASH){try{localStorage.setItem(KM,MINI_HASH)}catch(e){}return true}
+        if(h===HASH){try{localStorage.setItem(KA,HASH)}catch(e){}return true}// full admin code also works
+        return false});
+    },
+    miniLogout:function(){try{localStorage.removeItem(KM)}catch(e){}},
     tryAdmin:function(code){
       code=String(code||'').trim().toUpperCase();
       var data=new TextEncoder().encode('alon-games|'+code);
