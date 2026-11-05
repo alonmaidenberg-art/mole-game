@@ -148,7 +148,7 @@ const G=.0022;
 let px,pvx,cx,ps,as,lvl,sc,ball,L,bnc,phase,pt,srv,swing,cswing,msg,mt,trail,tpx;
 let smashPow=0,smashCd=0,smashFlash=0; // forward smash mechanic
 let pdy=0,pdyv=0; // paddle forward/back position (0=normal, negative=lunge forward)
-let windTrail=[]; // wind effect particles when paddle moves fast
+let windTrail=[],_prevPdy=0; // wind effect particles when paddle moves fast
 const lerp=(a,b,t)=>a+(b-a)*t;
 const gy=y=>128+250*y, hw=y=>(120+200*y)*.92, kk=y=>hw(y);
 function P(x,y,h){return{x:W/2+x*hw(y),y:gy(y)-h*kk(y),s:kk(y)}}
