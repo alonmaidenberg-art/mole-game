@@ -157,7 +157,8 @@ const G=.0022;
 let px,pvx,cx,ps,as,lvl,sc,ball,L,bnc,phase,pt,srv,swing,cswing,msg,mt,trail,tpx;
 let smashPow=0,smashCd=0,smashFlash=0; // forward smash mechanic
 let pdy=0,pdyv=0; // paddle forward/back position (0=normal, negative=lunge forward)
-let windTrail=[],_prevPdy=0,_mouseOnCanvas=false; // wind effect particles when paddle moves fast
+let windTrail=[],_prevPdy=0,_mouseOnCanvas=false;
+let _msx=W/2,_msy=380; // מיקום עכבר במסך (canvas coords)
 const lerp=(a,b,t)=>a+(b-a)*t;
 const gy=y=>128+250*y, hw=y=>(120+200*y)*.92, kk=y=>hw(y);
 function P(x,y,h){return{x:W/2+x*hw(y),y:gy(y)-h*kk(y),s:kk(y)}}
@@ -230,7 +231,8 @@ cv.addEventListener('mouseleave',()=>{_mouseOnCanvas=false;});
 // קבוע = 128+260 - 0.184*(120+208) = 388 - 0.184*328 = 388-60.35 = 327.65
 document.addEventListener('mousemove',e=>{
   if(!_mouseOnCanvas)return;
-  const cp=cpos(e); // cp.x, cp.y בקואורדינטות canvas (0..W, 0..H)
+  const cp=cpos(e);
+  _msx=cp.x; _msy=cp.y;
   if(!swipeDir) pdy=clamp((cp.y-327.648)/213.2,-.40,.08);
   tpx=clamp((cp.x-W/2)/hw(1.04+pdy),-1.15,1.15);
 });
@@ -333,7 +335,10 @@ function upd(){if(!isFinite(tpx))tpx=0;if(!isFinite(px))px=0;
     if(!ball.cpuMiss){cswing=14;const T=Math.round(clamp(46-lvl*2,34,46));const tx=clamp(rnd(-.8,.8),-.85,.85),ty=rnd(.62,.84);b.h=Math.max(.05,b.h);launch(b.y,b.y,tx,ty,T,1);tone(430,.05,'square',.09);return}}
   if(b.y<-.5||b.y>1.6||b.h<-.8){score(L===0?(bnc[1]>=1?0:1):(bnc[1]>=1?1:0),'פספוס')}
 }
-function paddleD(x,y,h,col,face,sw,flip){const q=P(x,y,h),r=q.s*(flip?.10:.12);ctx.save();ctx.translate(q.x,q.y);const swRot=sw>0?Math.min(sw/14,1.3)*(flip?.9:-.9):0;ctx.rotate(swRot+(flip?0:pvx*1.2));
+function paddleD(x,y,h,col,face,sw,flip){
+  // עבור המחבט של השחקן (flip=false) ועכבר על קנבס — ציור ישירות על העכבר
+  const q=(_mouseOnCanvas&&!flip)?{x:_msx,y:_msy,s:P(x,y,h).s}:P(x,y,h);
+  const r=q.s*(flip?.10:.12);ctx.save();ctx.translate(q.x,q.y);const swRot=sw>0?Math.min(sw/14,1.3)*(flip?.9:-.9):0;ctx.rotate(swRot+(flip?0:pvx*1.2));
   ctx.fillStyle='rgba(0,0,0,.28)';ctx.beginPath();ctx.ellipse(6,q.s*.3,r*.9,r*.28,0,0,7);ctx.fill();
   ctx.fillStyle='#c98a4d';rr(-r*.16,r*.7,r*.32,r*.95,r*.1);ctx.fill();ctx.fillStyle='#a56d35';ctx.fillRect(-r*.16,r*1.25,r*.32,r*.1);
   ctx.fillStyle='#e8d2a8';ctx.beginPath();ctx.arc(0,0,r*1.06,0,7);ctx.fill();
