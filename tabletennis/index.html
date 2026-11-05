@@ -47,7 +47,7 @@ body{overflow:hidden;position:fixed;inset:0;width:100%;background:#0e2338}
 <body>
 <canvas id="cv"></canvas><div id="hud"></div>
 <div id="rot">📱↔️<br>סובבו את הטלפון לרוחב</div>
-<div class="ov show" id="menu"><div class="ovc" style="max-width:440px"><div style="font-size:56px">🏓</div><h2>פינג-פונג</h2><div class="lb">הזיזו את המחבט ימינה ושמאלה (גרירה / חצים), והחזירו את הכדור אחרי שהוא קופץ אצלכם. המחשב משתפר בכל ניצחון! הראשון ל-7 נקודות.</div><button class="btn" id="go">▶ שחק</button><div style="opacity:.8;margin-top:10px;font-size:15px">שיא: <b id="best">0</b></div></div></div>
+<div class="ov show" id="menu"><div class="ovc" style="max-width:440px"><div style="font-size:56px">🏓</div><h2>פינג-פונג</h2><div class="lb">הזיזו את המחבט ימינה ושמאלה (חצים). לחצו W / ↑ כדי לטעון הנחתה מסוחררת! המחשב משתפר בכל ניצחון. הראשון ל-7 נקודות.</div><button class="btn" id="go">▶ שחק</button><div style="opacity:.8;margin-top:10px;font-size:15px">שיא: <b id="best">0</b></div></div></div>
 <div class="ov" id="end"><div class="ovc"><h2 id="eT">נגמר</h2><div style="font-size:48px;font-weight:900;color:#ffd05a" id="eS"></div><p id="eM"></p><button class="btn" id="again">🔁 שוב</button><button class="btn alt" id="menu2">תפריט</button></div></div>
 <script>
 'use strict';
@@ -75,12 +75,13 @@ function over(title,score,msg,coins,dia,delay=600){on=false;window.__show=true;s
 
 const G=.0022;
 let px,pvx,cx,ps,as,lvl,sc,ball,L,bnc,phase,pt,srv,swing,cswing,msg,mt,trail,tpx;
+let smashPow=0,smashCd=0; // forward smash mechanic
 const lerp=(a,b,t)=>a+(b-a)*t;
 const gy=y=>128+250*y, hw=y=>(120+200*y)*.92, kk=y=>hw(y);
 function P(x,y,h){return{x:W/2+x*hw(y),y:gy(y)-h*kk(y),s:kk(y)}}
 function launch(by,fy,tx,ty,T,hit){// aim ball from (bx,by,h) so it first lands at (tx,ty) after T frames
   const b=ball;b.vx=(tx-b.x)/T;b.vy=(ty-b.y)/T;b.vh=(.5*G*T*T-b.h)/T;L=hit;bnc=[0,0];b.ok=true}
-function start(){px=0;pvx=0;tpx=0;cx=0;ps=0;as=0;lvl=0;sc=0;trail=[];msg='';mt=0;newPoint(0)}
+function start(){px=0;pvx=0;tpx=0;cx=0;ps=0;as=0;lvl=0;sc=0;trail=[];msg='';mt=0;smashPow=0;smashCd=0;newPoint(0)}
 function newPoint(who){srv=who;phase='serve';pt=0;ball={x:who?cx:px,y:who?.04:1.0,h:.25,vx:0,vy:0,vh:0};L=-1;bnc=[0,0];trail=[]}
 cv.addEventListener('pointermove',e=>{tpx=clamp((cpos(e).x-W/2)/hw(1),-1.15,1.15)});cv.addEventListener('pointerdown',e=>{tpx=clamp((cpos(e).x-W/2)/hw(1),-1.15,1.15);if(phase==='serve'&&srv===0)serveP()});
 addEventListener('keydown',e=>{if(e.code==='Space'&&phase==='serve'&&srv===0)serveP()});
@@ -91,6 +92,17 @@ function score(w,why){if(w===0){ps++;sc+=10;tone(900,.2)}else{as++;tone(130,.3)}
   srv=1-w}
 function upd(){if(!isFinite(tpx))tpx=0;if(!isFinite(px))px=0;
   const kx=(keys.ArrowRight||keys.KeyD?1:0)-(keys.ArrowLeft||keys.KeyA?1:0);if(kx)tpx=clamp(tpx+kx*.035,-1.15,1.15);
+  // smash charge: hold W or ArrowUp to charge, release triggers smash
+  if(smashCd>0)smashCd--;
+  if((keys.KeyW||keys.ArrowUp)&&smashCd===0){smashPow=Math.min(smashPow+2,30)}
+  else if(smashPow>0&&smashCd===0){smashCd=40;const charged=smashPow;smashPow=0;
+    // try to hit if ball is near
+    const b=ball;if(b&&phase==='play'&&L===1&&b.vy>0&&b.y>.75&&b.y<1.3&&b.h<.7&&bnc[1]>=1&&Math.abs(b.x-px)<.45){
+      const sp=Math.abs(pvx)*20+charged/10;const T=Math.round(clamp(28-sp*2-charged,16,34));swing=18;
+      const tx=clamp((b.x-px)*-2.2+pvx*7+rnd(-.05,.05),-.85,.85),ty=clamp(.12+rnd(0,.1)-Math.abs(pvx)*.8-charged*.006,.05,.28);
+      b.h=Math.max(.05,b.h);launch(b.y,b.y,tx,ty,T,0);tone(820,.08,'square',.14);
+      msg='הנחתה! 💥';mt=28}}
+  else if(!keys.KeyW&&!keys.ArrowUp)smashPow=Math.max(0,smashPow-1);
   const op=px;px+=clamp(tpx-px,-.09,.09);pvx=px-op;if(swing>0)swing--;if(cswing>0)cswing--;if(mt>0)mt--;
   const csp=.011+lvl*.0035;
   if(phase==='serve'){pt++;ball.x=srv?cx:px;ball.y=srv?.04:1.0;ball.h=.25+Math.sin(pt*.1)*.03;if(srv===1){cx+=clamp(rnd(-.4,.4)-cx,-.01,.01);if(pt>70)serveC()}else if(pt>400)serveP();return}
@@ -162,6 +174,9 @@ function drw(){
   ctx.fillStyle='rgba(8,30,50,.45)';rr(W/2-96,10,192,50,16);ctx.fill();
   T(ps+'',W/2-48,36,34);T(':',W/2,34,30,'#fff9');T(as+'',W/2+48,36,34);T('רמה '+(lvl+1),W/2,H-14,15,'#fffc');
   if(phase==='serve'&&srv===0)T('לחצו/רווח להגשה',W/2,H-44,20,'#ffd23f');
+  // smash charge meter
+  if(smashPow>0){const mx=W/2-50,my=H-28,mw=100,mh=10;ctx.fillStyle='rgba(0,0,0,.5)';rr(mx-2,my-2,mw+4,mh+4,6);ctx.fill();const pct=smashPow/30;const gc=ctx.createLinearGradient(mx,0,mx+mw,0);gc.addColorStop(0,'#ff9900');gc.addColorStop(1,'#ff3300');ctx.fillStyle=gc;ctx.shadowBlur=10;ctx.shadowColor='#ff6600';rr(mx,my,mw*pct,mh,5);ctx.fill();ctx.shadowBlur=0;T('🔥 טעינת הנחתה',W/2,H-46,16,'#ff9900')}
+  if(smashCd>0&&smashCd<30)T('הנחתה! 💥',W/2,H-46,16,'#ff4444');
   if(mt>0&&msg)T(msg,W/2,h*0+170,26,'#ffd23f')}
 wire(start);run(upd,drw,'#0b3d4f');window.__s={step:upd,start:()=>{start();on=true},get on(){return on},get score(){return sc},get ball(){return ball},get ps(){return ps},get as(){return as},get lvl(){return lvl},get phase(){return phase},set tpx(v){tpx=v},get px(){return px},serveP};
 
