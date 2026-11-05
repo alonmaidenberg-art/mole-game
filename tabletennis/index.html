@@ -146,6 +146,7 @@ function newPoint(who){srv=who;phase='serve';pt=0;ball={x:who?cx:px,y:who?.04:1.
 let _ly=0,_lx=0,_vy=0,_vx=0,_lid=null;
 let swipeDir=null; // 'up'|'down'|'left'|'right' — set on fast move, cleared after hit
 let swipeStr=0;    // strength 0..1
+let swipePending=false; // swipe registered, waiting for ball to come in range
 cv.addEventListener('pointermove',e=>{
   tpx=clamp((cpos(e).x-W/2)/hw(1),-1.15,1.15);
   if(e.pointerId!==_lid)return;
@@ -156,26 +157,23 @@ cv.addEventListener('pointermove',e=>{
   const spd=Math.sqrt(_vx*_vx+_vy*_vy);
   if(spd>9){
     const ax=Math.abs(_vx),ay=Math.abs(_vy);
-    if(ay>ax*.7&&_vy<-9){// fast UP = smash — slam paddle forward instantly like a punch
-      const str=Math.min((-_vy-9)/14,1);
-      if(!swipeDir||swipeDir!=='up'){
-        swipeDir='up';swipeStr=str;
-        // instant big lunge — paddle slams forward dramatically
-        pdy=-0.22-str*.08;// lunge forward fast
-        pdyv=0.025;// already springing back — whoosh feeling
-        swing=8;
+    if(ay>ax*.7&&_vy<-9){// fast UP = smash
+      const str=Math.min((-_vy-9)/12,1);
+      if(!swipeDir){
+        swipeDir='up';swipeStr=str;swipePending=true;
+        pdy=-0.22-str*.08;pdyv=0.025;swing=8;
       }
     } else if(ay>ax*.7&&_vy>9){// fast DOWN = slice
-      if(!swipeDir){swipeDir='down';swipeStr=Math.min((_vy-9)/10,1);}
+      if(!swipeDir){swipeDir='down';swipeStr=Math.min((_vy-9)/10,1);swipePending=true;}
     } else if(ax>ay*.7&&ax>9){// fast SIDE = angle
       const d=_vx>0?'right':'left';
-      if(!swipeDir){swipeDir=d;swipeStr=Math.min((ax-9)/12,1);}
+      if(!swipeDir){swipeDir=d;swipeStr=Math.min((ax-9)/12,1);swipePending=true;}
     }
   }
 });
 cv.addEventListener('pointerdown',e=>{
   tpx=clamp((cpos(e).x-W/2)/hw(1),-1.15,1.15);
-  _lid=e.pointerId;_lx=e.clientX;_ly=e.clientY;_vx=0;_vy=0;swipeDir=null;swipeStr=0;
+  _lid=e.pointerId;_lx=e.clientX;_ly=e.clientY;_vx=0;_vy=0;swipeDir=null;swipeStr=0;swipePending=false;
   if(phase==='serve'&&srv===0)serveP()});
 cv.addEventListener('pointerup',e=>{
   if(e.pointerId===_lid){_lid=null;_vx=0;_vy=0}});
@@ -218,9 +216,9 @@ function upd(){if(!isFinite(tpx))tpx=0;if(!isFinite(px))px=0;
       else{score(L===0?1:0,L===0?'הכדור נחת בצד שלך':'הכדור נחת בצד שלו');return}}
     else if(b.h<-.02){// off table
       const opp=L===0?1:0;if(bnc[1]>=1)score(L,'הכדור יצא');else score(1-L,'הכדור יצא');return}}
-  // player hit
+  // player hit — wider window so swipe always connects
   const hitY=1.04+pdy;
-  if(L===1&&b.vy>0&&b.y>hitY-.2&&b.y<hitY+.2&&b.h<.7&&bnc[1]>=1&&Math.abs(b.x-px)<.38){
+  if(L===1&&b.vy>0&&b.y>hitY-.3&&b.y<hitY+.35&&b.h<.9&&bnc[1]>=1&&Math.abs(b.x-px)<.5){
     const lunge=-pdy;
     const sd=swipeDir,ss=swipeStr;
     const isSmash=sd==='up'||lunge>.08;
