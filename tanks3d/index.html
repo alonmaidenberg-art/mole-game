@@ -65,9 +65,11 @@ function saveBest(s){if(s>best){best=s;store.set(BK,s);$('#best').textContent=s}
 function runLoop(stepFn,active){let last=performance.now(),acc=0;function l(n){requestAnimationFrame(l);acc+=Math.min(100,n-last);last=n;while(acc>=1000/60){acc-=1000/60;if(active())stepFn()}R.render(scene,cam)}requestAnimationFrame(l)}
 
 R3.upgrade(R);R3.autoMaterials();R3.shadowAll();R3.env(R,scene,'day');R3.sky(scene,'day',{radius:600,fogNear:120,fogFar:480});const SUN=R3.sun(scene,{position:[70,110,50],intensity:1.2,ambient:.42,skyColor:0xc3e0ff,groundColor:0x6a6a42,shadowRadius:70,far:340});
+const _tg=R3.grass(41);
+const FIELDM=new THREE.MeshStandardMaterial({map:R3.tex(_tg,1.5,1.5),roughnessMap:R3.greyTex(_tg),color:0xdff0c4,roughness:.95,metalness:0,envMapIntensity:.22});
 const AX=22,AZ=14,M=c=>new THREE.MeshLambertMaterial({color:c});
 const floor=new THREE.Mesh(new THREE.BoxGeometry(AX*2+2,.5,AZ*2+2),M(0x7ab85a));floor.position.y=-.25;scene.add(floor);
-for(let i=-AX;i<AX;i+=4)for(let j=-AZ;j<AZ;j+=4)if(((i+j)/4)%2===0){const t=new THREE.Mesh(new THREE.BoxGeometry(4,.02,4),M(0x86c466));t.position.set(i+2,.01,j+2);scene.add(t)}
+for(let i=-AX;i<AX;i+=4)for(let j=-AZ;j<AZ;j+=4)if(((i+j)/4)%2===0){const t=new THREE.Mesh(new THREE.BoxGeometry(4,.02,4),FIELDM);t.position.set(i+2,.01,j+2);scene.add(t)}
 const bd=new THREE.Mesh(new THREE.BoxGeometry(AX*2+3,1.2,.8),M(0x8a6a4a));for(const [x,z,r] of[[0,-AZ-1,0],[0,AZ+1,0],[-AX-1,0,1],[AX+1,0,1]]){const w=bd.clone();w.position.set(x,.6,z);if(r){w.rotation.y=Math.PI/2;w.scale.x=(AZ*2+3)/(AX*2+3)}scene.add(w)}
 const WALLS=[[-8,-4,3,3],[8,4,3,3],[0,0,2,6],[-14,6,3,2],[14,-6,3,2]];const walls=WALLS.map(([x,z,w,d])=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,2,d),M(0x9a9aa8));m.position.set(x,1,z);scene.add(m);return{x,z,w,d}});
 function mkTank(c1,c2){const g=new THREE.Group();const b=new THREE.Mesh(new THREE.BoxGeometry(1.8,.7,2.4),M(c1));b.position.y=.55;const t=new THREE.Group();const tb=new THREE.Mesh(new THREE.BoxGeometry(1.1,.5,1.2),M(c2));tb.position.y=1.15;const bar=new THREE.Mesh(new THREE.BoxGeometry(.25,.25,1.6),M(0x333));bar.position.set(0,1.15,1);t.add(tb,bar);g.add(b,t);g.userData.turret=t;scene.add(g);return g}

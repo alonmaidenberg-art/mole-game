@@ -65,9 +65,12 @@ function saveBest(s){if(s>best){best=s;store.set(BK,s);$('#best').textContent=s}
 function runLoop(stepFn,active){let last=performance.now(),acc=0;function l(n){requestAnimationFrame(l);acc+=Math.min(100,n-last);last=n;while(acc>=1000/60){acc-=1000/60;if(active())stepFn()}R.render(scene,cam)}requestAnimationFrame(l)}
 
 R3.upgrade(R);R3.autoMaterials();R3.shadowAll();R3.env(R,scene,'day');R3.sky(scene,'day',{radius:560,fogNear:80,fogFar:340});const SUN=R3.sun(scene,{position:[50,100,60],intensity:1.15,ambient:.45,skyColor:0xbfdcff,groundColor:0x5f7a52,shadowRadius:55,far:300});
+const _rc=R3.concrete(5),_ra=R3.asphalt(9);
+const TRACK=[new THREE.MeshStandardMaterial({map:R3.tex(_rc,2,2.4),roughnessMap:R3.greyTex(_rc),color:0x9aa0ae,roughness:.93,metalness:0,envMapIntensity:.3}),
+             new THREE.MeshStandardMaterial({map:R3.tex(_ra,2,2.4),roughnessMap:R3.greyTex(_ra),color:0xb6bcc8,roughness:.95,metalness:0,envMapIntensity:.25})];
 scene.add(new THREE.HemisphereLight(0xffffff,0x6a8a5a,.85));const dl=new THREE.DirectionalLight(0xffffff,.7);dl.position.set(5,12,6);scene.add(dl);
 const LANES=[-2.2,0,2.2];const M=(c)=>new THREE.MeshLambertMaterial({color:c});
-const ground=[];for(let i=0;i<14;i++){const g=new THREE.Mesh(new THREE.BoxGeometry(8,.4,10),M(i%2?0x6a6a7a:0x75758a));g.position.set(0,-.2,-i*10+10);scene.add(g);ground.push(g)}
+const ground=[];for(let i=0;i<14;i++){const g=new THREE.Mesh(new THREE.BoxGeometry(8,.4,10),TRACK[i%2]);g.position.set(0,-.2,-i*10+10);scene.add(g);ground.push(g)}
 for(const x of[-1.1,1.1]){for(let i=0;i<14;i++){}}
 const side=[];for(let i=0;i<30;i++){const h=rnd(3,12),b=new THREE.Mesh(new THREE.BoxGeometry(rnd(3,6),h,rnd(3,6)),M([0xe86a5a,0x5a8ae8,0xf2c24a,0x7ad07a,0xb48ae8][i%5]));b.position.set((i%2?1:-1)*rnd(7,12),h/2,-Math.floor(i/2)*9);scene.add(b);side.push(b)}
 const P=new THREE.Group();const body=new THREE.Mesh(new THREE.BoxGeometry(.9,1.1,.6),M(0xe8433f));body.position.y=.95;const head=new THREE.Mesh(new THREE.SphereGeometry(.38,16,12),M(0xf0c8a0));head.position.y=1.85;const legL=new THREE.Mesh(new THREE.BoxGeometry(.3,.6,.3),M(0x223));const legR=legL.clone();legL.position.set(-.22,.3,0);legR.position.set(.22,.3,0);P.add(body,head,legL,legR);scene.add(P);

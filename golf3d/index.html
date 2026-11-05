@@ -64,8 +64,12 @@ function saveBest(s){if(s>best){best=s;store.set(BK,s);$('#best').textContent=s}
 function runLoop(stepFn,active){let last=performance.now(),acc=0;function l(n){requestAnimationFrame(l);acc+=Math.min(100,n-last);last=n;while(acc>=1000/60){acc-=1000/60;if(active())stepFn()}R.render(scene,cam)}requestAnimationFrame(l)}
 
 R3.upgrade(R);R3.autoMaterials();R3.shadowAll();R3.env(R,scene,'day');R3.sky(scene,'day',{radius:620,fogNear:140,fogFar:520});const SUN=R3.sun(scene,{position:[80,120,60],intensity:1.2,ambient:.42,skyColor:0xc3e0ff,groundColor:0x5f7a46,shadowRadius:70,far:360});
+const _gc=R3.grass(11),_gc2=R3.grass(21);
+const TURF_FAR=new THREE.MeshStandardMaterial({map:R3.tex(_gc,70,70),roughnessMap:R3.greyTex(_gc),roughness:.96,metalness:0,envMapIntensity:.25});
+const GREENM=[new THREE.MeshStandardMaterial({map:R3.tex(_gc2,1.1,1.1),roughnessMap:R3.greyTex(_gc2),color:0xcfe8bb,roughness:.88,metalness:0,envMapIntensity:.22}),
+              new THREE.MeshStandardMaterial({map:R3.tex(_gc2,1.1,1.1),roughnessMap:R3.greyTex(_gc2),color:0xe6f3d8,roughness:.88,metalness:0,envMapIntensity:.22})];
 const M=c=>new THREE.MeshLambertMaterial({color:c});
-const gr=new THREE.Mesh(new THREE.PlaneGeometry(400,400),M(0x7ac05a));gr.rotation.x=-Math.PI/2;gr.position.y=-.4;scene.add(gr);
+const gr=new THREE.Mesh(new THREE.PlaneGeometry(400,400),TURF_FAR);gr.rotation.x=-Math.PI/2;gr.position.y=-.4;scene.add(gr);
 const HOLES=[
 {f:[[0,0,4,16]],s:[0,6],h:[0,-6],par:2,o:[]},
 {f:[[0,0,4,16]],s:[0,6],h:[0,-6],par:3,o:[[0,0,2,1]]},
@@ -80,7 +84,7 @@ function build(){clearObjs();const H=HOLES[hi];floors=H.f;const cells=new Set();
   for(const [cx,cz,w,d] of H.f)for(let x=Math.round(cx-w/2);x<cx+w/2;x++)for(let z=Math.round(cz-d/2);z<cz+d/2;z++)cells.add(x+','+z);
   walls=[];for(const k of cells){const [x,z]=k.split(',').map(Number);const n=[[0,-1],[0,1],[-1,0],[1,0]];for(const [dx,dz] of n)if(!cells.has((x+dx)+','+(z+dz))){walls.push(dx?[x+.5+dx*.5+dx*.2,z+.5,.4,1.4]:[x+.5,z+.5+dz*.5+dz*.2,1.4,.4])}}
   for(const o of H.o)walls.push(o.slice());
-  for(const k of cells){const [x,z]=k.split(',').map(Number);const m=new THREE.Mesh(new THREE.BoxGeometry(1,.4,1),M((x+z)%2?0x3fa84a:0x45b351));m.position.set(x+.5,-.2,z+.5);add(m)}
+  for(const k of cells){const [x,z]=k.split(',').map(Number);const m=new THREE.Mesh(new THREE.BoxGeometry(1,.4,1),GREENM[(x+z)%2?0:1]);m.position.set(x+.5,-.2,z+.5);add(m)}
   for(const w of walls){const m=new THREE.Mesh(new THREE.BoxGeometry(w[2],.6,w[3]),M(0x8a5a30));m.position.set(w[0],.3,w[1]);add(m)}
   for(const o of H.o){const m=new THREE.Mesh(new THREE.BoxGeometry(o[2],.6,o[3]),M(0xe8433f));m.position.set(o[0],.3,o[1]);add(m)}
   moving=null;if(H.mv){const m=new THREE.Mesh(new THREE.BoxGeometry(H.mv[2],.6,H.mv[3]),M(0x5a6aff));m.position.set(0,.3,0);add(m);moving={m,w:H.mv[2],d:H.mv[3]}}

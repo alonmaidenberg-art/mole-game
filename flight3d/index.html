@@ -64,9 +64,13 @@ function saveBest(s){if(s>best){best=s;store.set(BK,s);$('#best').textContent=s}
 function runLoop(stepFn,active){let last=performance.now(),acc=0;function l(n){requestAnimationFrame(l);acc+=Math.min(100,n-last);last=n;while(acc>=1000/60){acc-=1000/60;if(active())stepFn()}R.render(scene,cam)}requestAnimationFrame(l)}
 
 R3.upgrade(R);R3.autoMaterials();R3.shadowAll();R3.env(R,scene,'day');R3.sky(scene,'day',{radius:900,fogNear:200,fogFar:900});const SUN=R3.sun(scene,{position:[120,180,90],intensity:1.15,ambient:.45,skyColor:0xbfdcff,groundColor:0x6a7a52,shadowRadius:120,far:600});
+const _fg=R3.grass(31);
+const LAND=new THREE.MeshStandardMaterial({map:R3.tex(_fg,120,180),roughnessMap:R3.greyTex(_fg),roughness:.97,metalness:0,envMapIntensity:.22});
+const FIELD=[new THREE.MeshStandardMaterial({map:R3.tex(_fg,40,3),color:0xd4e8b4,roughness:.96,metalness:0,envMapIntensity:.2}),
+             new THREE.MeshStandardMaterial({map:R3.tex(_fg,40,3),color:0xeef0c0,roughness:.96,metalness:0,envMapIntensity:.2})];
 const M=c=>new THREE.MeshLambertMaterial({color:c});
-const gr=new THREE.Mesh(new THREE.PlaneGeometry(600,900),M(0x6ab04a));gr.rotation.x=-Math.PI/2;gr.position.set(0,-14,-300);scene.add(gr);
-const stripes=[];for(let i=0;i<14;i++){const s=new THREE.Mesh(new THREE.PlaneGeometry(600,30),M(i%2?0x62a844:0x72bb52));s.rotation.x=-Math.PI/2;s.position.set(0,-13.9,-i*60+30);scene.add(s);stripes.push(s)}
+const gr=new THREE.Mesh(new THREE.PlaneGeometry(600,900),LAND);gr.rotation.x=-Math.PI/2;gr.position.set(0,-14,-300);scene.add(gr);
+const stripes=[];for(let i=0;i<14;i++){const s=new THREE.Mesh(new THREE.PlaneGeometry(600,30),FIELD[i%2]);s.rotation.x=-Math.PI/2;s.position.set(0,-13.9,-i*60+30);scene.add(s);stripes.push(s)}
 const sun=new THREE.Mesh(new THREE.SphereGeometry(10,16,12),new THREE.MeshBasicMaterial({color:0xfff2a0}));sun.position.set(60,60,-220);scene.add(sun);
 const plane=new THREE.Group();const fu=new THREE.Mesh(new THREE.CylinderGeometry(.5,.35,4,10),M(0xf2f2f2));fu.rotation.x=Math.PI/2;const wing=new THREE.Mesh(new THREE.BoxGeometry(6,.12,1.2),M(0xe8433f));wing.position.z=.2;const tail=new THREE.Mesh(new THREE.BoxGeometry(2,.1,.8),M(0xe8433f));tail.position.z=1.7;const fin=new THREE.Mesh(new THREE.BoxGeometry(.1,1,.8),M(0xe8433f));fin.position.set(0,.5,1.7);const cp=new THREE.Mesh(new THREE.SphereGeometry(.45,10,8),M(0x9fd8ff));cp.position.set(0,.35,-.3);const pr=new THREE.Mesh(new THREE.BoxGeometry(2.2,.1,.1),M(0x333));pr.position.z=-2.1;plane.add(fu,wing,tail,fin,cp,pr);scene.add(plane);
 let state='menu',px,py,vx,vy,speed,dist,obs,rings,score,hp,frame,got,tdrag=null,bank,combo,tilt={x:0,y:0};
