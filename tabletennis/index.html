@@ -47,7 +47,7 @@ body{overflow:hidden;position:fixed;inset:0;width:100%;background:#0e2338}
 <body>
 <canvas id="cv"></canvas><div id="hud"></div>
 <div id="rot">📱↔️<br>סובבו את הטלפון לרוחב</div>
-<div class="ov show" id="menu"><div class="ovc" style="max-width:440px"><div style="font-size:56px">🏓</div><h2>פינג-פונג</h2><div class="lb">הזיזו את המחבט ימינה ושמאלה (חצים). לחצו W / ↑ כדי לטעון הנחתה מסוחררת! המחשב משתפר בכל ניצחון. הראשון ל-7 נקודות.</div><button class="btn" id="go">▶ שחק</button><div style="opacity:.8;margin-top:10px;font-size:15px">שיא: <b id="best">0</b></div></div></div>
+<div class="ov show" id="menu"><div class="ovc" style="max-width:440px"><div style="font-size:56px">🏓</div><h2>פינג-פונג</h2><div class="lb">הזיזו את המחבט ימינה/שמאלה (←→), קדימה/אחורה (↑↓ / W S). הנחתה: הקידמה מהירה כשהכדור מגיע! המחשב משתפר בכל ניצחון. הראשון ל-7.</div><button class="btn" id="go">▶ שחק</button><div style="opacity:.8;margin-top:10px;font-size:15px">שיא: <b id="best">0</b></div></div></div>
 <div class="ov" id="end"><div class="ovc"><h2 id="eT">נגמר</h2><div style="font-size:48px;font-weight:900;color:#ffd05a" id="eS"></div><p id="eM"></p><button class="btn" id="again">🔁 שוב</button><button class="btn alt" id="menu2">תפריט</button></div></div>
 <script>
 'use strict';
@@ -76,12 +76,13 @@ function over(title,score,msg,coins,dia,delay=600){on=false;window.__show=true;s
 const G=.0022;
 let px,pvx,cx,ps,as,lvl,sc,ball,L,bnc,phase,pt,srv,swing,cswing,msg,mt,trail,tpx;
 let smashPow=0,smashCd=0; // forward smash mechanic
+let pdy=0,pdyv=0; // paddle forward/back position (0=normal, negative=lunge forward)
 const lerp=(a,b,t)=>a+(b-a)*t;
 const gy=y=>128+250*y, hw=y=>(120+200*y)*.92, kk=y=>hw(y);
 function P(x,y,h){return{x:W/2+x*hw(y),y:gy(y)-h*kk(y),s:kk(y)}}
 function launch(by,fy,tx,ty,T,hit){// aim ball from (bx,by,h) so it first lands at (tx,ty) after T frames
   const b=ball;b.vx=(tx-b.x)/T;b.vy=(ty-b.y)/T;b.vh=(.5*G*T*T-b.h)/T;L=hit;bnc=[0,0];b.ok=true}
-function start(){px=0;pvx=0;tpx=0;cx=0;ps=0;as=0;lvl=0;sc=0;trail=[];msg='';mt=0;smashPow=0;smashCd=0;newPoint(0)}
+function start(){px=0;pvx=0;tpx=0;cx=0;ps=0;as=0;lvl=0;sc=0;trail=[];msg='';mt=0;smashPow=0;smashCd=0;pdy=0;pdyv=0;newPoint(0)}
 function newPoint(who){srv=who;phase='serve';pt=0;ball={x:who?cx:px,y:who?.04:1.0,h:.25,vx:0,vy:0,vh:0};L=-1;bnc=[0,0];trail=[]}
 cv.addEventListener('pointermove',e=>{tpx=clamp((cpos(e).x-W/2)/hw(1),-1.15,1.15)});cv.addEventListener('pointerdown',e=>{tpx=clamp((cpos(e).x-W/2)/hw(1),-1.15,1.15);if(phase==='serve'&&srv===0)serveP()});
 addEventListener('keydown',e=>{if(e.code==='Space'&&phase==='serve'&&srv===0)serveP()});
@@ -92,17 +93,14 @@ function score(w,why){if(w===0){ps++;sc+=10;tone(900,.2)}else{as++;tone(130,.3)}
   srv=1-w}
 function upd(){if(!isFinite(tpx))tpx=0;if(!isFinite(px))px=0;
   const kx=(keys.ArrowRight||keys.KeyD?1:0)-(keys.ArrowLeft||keys.KeyA?1:0);if(kx)tpx=clamp(tpx+kx*.035,-1.15,1.15);
-  // smash charge: hold W or ArrowUp to charge, release triggers smash
-  if(smashCd>0)smashCd--;
-  if((keys.KeyW||keys.ArrowUp)&&smashCd===0){smashPow=Math.min(smashPow+2,30)}
-  else if(smashPow>0&&smashCd===0){smashCd=40;const charged=smashPow;smashPow=0;
-    // try to hit if ball is near
-    const b=ball;if(b&&phase==='play'&&L===1&&b.vy>0&&b.y>.75&&b.y<1.3&&b.h<.7&&bnc[1]>=1&&Math.abs(b.x-px)<.45){
-      const sp=Math.abs(pvx)*20+charged/10;const T=Math.round(clamp(28-sp*2-charged,16,34));swing=18;
-      const tx=clamp((b.x-px)*-2.2+pvx*7+rnd(-.05,.05),-.85,.85),ty=clamp(.12+rnd(0,.1)-Math.abs(pvx)*.8-charged*.006,.05,.28);
-      b.h=Math.max(.05,b.h);launch(b.y,b.y,tx,ty,T,0);tone(820,.08,'square',.14);
-      msg='הנחתה! 💥';mt=28}}
-  else if(!keys.KeyW&&!keys.ArrowUp)smashPow=Math.max(0,smashPow-1);
+  // forward/back paddle movement (W/S or ArrowUp/ArrowDown)
+  const ky=(keys.KeyW||keys.ArrowUp?-1:0)+(keys.KeyS||keys.ArrowDown?1:0);
+  if(ky<0){pdyv=Math.max(pdyv-.018,-.06)}// lunge forward (toward net = lower y)
+  else if(ky>0){pdyv=Math.min(pdyv+.014,.04)}// step back
+  else{pdyv*=.7}// friction
+  pdy=clamp(pdy+pdyv,-.18,.08);// pdy: negative = lunged forward toward net
+  if(ky===0&&Math.abs(pdy)<.005)pdy=0;
+  if(smashCd>0)smashCd--;else smashCd=0;
   const op=px;px+=clamp(tpx-px,-.09,.09);pvx=px-op;if(swing>0)swing--;if(cswing>0)cswing--;if(mt>0)mt--;
   const csp=.011+lvl*.0035;
   if(phase==='serve'){pt++;ball.x=srv?cx:px;ball.y=srv?.04:1.0;ball.h=.25+Math.sin(pt*.1)*.03;if(srv===1){cx+=clamp(rnd(-.4,.4)-cx,-.01,.01);if(pt>70)serveC()}else if(pt>400)serveP();return}
@@ -124,11 +122,21 @@ function upd(){if(!isFinite(tpx))tpx=0;if(!isFinite(px))px=0;
       else{score(L===0?1:0,L===0?'הכדור נחת בצד שלך':'הכדור נחת בצד שלו');return}}
     else if(b.h<-.02){// off table
       const opp=L===0?1:0;if(bnc[1]>=1)score(L,'הכדור יצא');else score(1-L,'הכדור יצא');return}}
-  // player hit
-  if(L===1&&b.vy>0&&b.y>.9&&b.y<1.2&&b.h<.6&&bnc[1]>=1&&Math.abs(b.x-px)<.3){
-    const sp=Math.abs(pvx)*20;const T=Math.round(clamp(46-sp*2,34,48));swing=14;
-    const tx=clamp((b.x-px)*-1.6+pvx*5+rnd(-.1,.1),-.85,.85),ty=clamp(.2+rnd(0,.16)-Math.abs(pvx)*.5,.1,.4);
-    b.h=Math.max(.05,b.h);launch(b.y,b.y,tx,ty,T,0);tone(560,.05,'square',.09);return}
+  // player hit – pdy<-.06 = smash (fast flat), pdy normal = regular
+  const hitY=1.04+pdy; // paddle actual Y position
+  if(L===1&&b.vy>0&&b.y>hitY-.18&&b.y<hitY+.18&&b.h<.65&&bnc[1]>=1&&Math.abs(b.x-px)<.35){
+    const lunge=-pdy; // 0..0.18, positive = more lunge
+    const sp=Math.abs(pvx)*20+lunge*60;
+    const isSmash=lunge>.08;
+    const T=Math.round(clamp(46-sp*1.5,isSmash?14:28,48));
+    swing=isSmash?20:14;
+    const tx=clamp((b.x-px)*-1.6+pvx*5+rnd(-.1,.1),-.85,.85);
+    const ty=clamp(.2+rnd(0,.1)-Math.abs(pvx)*.4-lunge*.8,.05,.4);
+    b.h=Math.max(.05,b.h);launch(b.y,b.y,tx,ty,T,0);
+    if(isSmash){tone(860,.08,'square',.13);msg='הנחתה! 💥';mt=35;smashCd=1}
+    else tone(560,.05,'square',.09);
+    pdyv*=-.5;// rebound back after hit
+    return}
   // cpu hit
   if(L===0&&b.vy<0&&b.y<.12&&b.y>-.08&&b.h<.6&&bnc[1]>=1&&Math.abs(b.x-cx)<.28+lvl*.025){
     if(Math.random()<.12-lvl*.025&&!ball.cpuMiss){ball.cpuMiss=1}
@@ -169,14 +177,14 @@ function drw(){
   ctx.strokeStyle='rgba(255,255,255,.35)';ctx.lineWidth=1;for(let x=n1.x;x<n2.x;x+=8){ctx.beginPath();ctx.moveTo(x,n1.y-h);ctx.lineTo(x,n1.y);ctx.stroke()}for(let y=n1.y-h;y<n1.y;y+=8){ctx.beginPath();ctx.moveTo(n1.x,y);ctx.lineTo(n2.x,y);ctx.stroke()}
   ctx.fillStyle='#fff';ctx.fillRect(n1.x,n1.y-h-2,n2.x-n1.x,4);ctx.fillStyle='#ccc';ctx.fillRect(n1.x-3,n1.y-h-4,6,h+8);ctx.fillRect(n2.x-3,n2.y-h-4,6,h+8);
   if(ball&&ball.y>=.5&&ball.y<1)drawBall(ball);
-  paddleD(px,1.04,.2,'',['#ff4d5e','#b3122a'],swing,false);
+  paddleD(px,1.04+pdy,.2,'',['#ff4d5e','#b3122a'],swing,false);
   if(ball&&ball.y>=1)drawBall(ball);
   ctx.fillStyle='rgba(8,30,50,.45)';rr(W/2-96,10,192,50,16);ctx.fill();
   T(ps+'',W/2-48,36,34);T(':',W/2,34,30,'#fff9');T(as+'',W/2+48,36,34);T('רמה '+(lvl+1),W/2,H-14,15,'#fffc');
   if(phase==='serve'&&srv===0)T('לחצו/רווח להגשה',W/2,H-44,20,'#ffd23f');
-  // smash charge meter
-  if(smashPow>0){const mx=W/2-50,my=H-28,mw=100,mh=10;ctx.fillStyle='rgba(0,0,0,.5)';rr(mx-2,my-2,mw+4,mh+4,6);ctx.fill();const pct=smashPow/30;const gc=ctx.createLinearGradient(mx,0,mx+mw,0);gc.addColorStop(0,'#ff9900');gc.addColorStop(1,'#ff3300');ctx.fillStyle=gc;ctx.shadowBlur=10;ctx.shadowColor='#ff6600';rr(mx,my,mw*pct,mh,5);ctx.fill();ctx.shadowBlur=0;T('🔥 טעינת הנחתה',W/2,H-46,16,'#ff9900')}
-  if(smashCd>0&&smashCd<30)T('הנחתה! 💥',W/2,H-46,16,'#ff4444');
+  // forward lunge indicator
+  if(pdy<-.03){const lunge=-pdy/.18;const gc=ctx.createLinearGradient(0,0,80,0);gc.addColorStop(0,'#ff9900');gc.addColorStop(1,'#ff3300');ctx.fillStyle='rgba(0,0,0,.45)';rr(W/2-52,H-30,104,14,6);ctx.fill();ctx.fillStyle=gc;ctx.shadowBlur=8;ctx.shadowColor='#ff6600';rr(W/2-50,H-28,100*lunge,10,5);ctx.fill();ctx.shadowBlur=0;if(lunge>.45)T('💥',W/2,H-46,18)}
+  if(mt>0&&smashCd>0&&msg==='הנחתה! 💥')T(msg,W/2,170,28,'#ff4444');
   if(mt>0&&msg)T(msg,W/2,h*0+170,26,'#ffd23f')}
 wire(start);run(upd,drw,'#0b3d4f');window.__s={step:upd,start:()=>{start();on=true},get on(){return on},get score(){return sc},get ball(){return ball},get ps(){return ps},get as(){return as},get lvl(){return lvl},get phase(){return phase},set tpx(v){tpx=v},get px(){return px},serveP};
 
