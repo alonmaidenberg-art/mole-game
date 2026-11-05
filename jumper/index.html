@@ -84,7 +84,9 @@ function upd(){const k=(keys.ArrowRight||keys.KeyD?1:0)-(keys.ArrowLeft||keys.Ke
   let top=Math.min(...pl.map(q=>q.y));while(top>cam-60){top-=rnd(50,80+Math.min(20,score/80));mkPl(top)}pl=pl.filter(q=>q.y<cam+H+60);
   if(p.y>cam+H+40){over('נפלת!',score,'',Math.floor(score/25),score>=500?1:0)}}
 function drw(){ctx.fillStyle='#ffffff18';for(let i=0;i<20;i++)ctx.fillRect((i*137)%W,((i*91-cam*.2)%H+H)%H,3,3);
-  for(const q of pl){const y=q.y-cam;ctx.fillStyle=q.t==='m'?'#5a8aff':q.t==='s'?'#ffd05a':'#5ff7d6';rr(q.x-q.w/2,y,q.w,12,6);ctx.fill();if(q.t==='s'){T('⬆',q.x,y+6,12,'#000')}}
+  for(const q of pl){const y=q.y-cam;const col=q.t==='m'?'#5a8aff':q.t==='s'?'#ffd05a':'#5ff7d6';
+    R2.block(ctx,q.x-q.w/2,y,q.w,12,6,col);
+    if(q.t==='s'){T('⬆',q.x,y+6,12,'#000')}}
   ctx.font='36px serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#fff';ctx.fillText('🐸',p.x,p.y-cam-14);T('⭐ '+score,70,26,24)}
 wire(start);run(upd,drw,'#1a3a6a');window.__s={step:upd,start:()=>{start();on=true},get on(){return on},get p(){return p},get score(){return score}};
 

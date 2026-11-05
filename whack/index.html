@@ -81,7 +81,19 @@ function hit(p){for(const t of ts)if(!t.d&&Math.hypot(p.x-t.x,p.y-t.y)<t.r*t.k+8
 function upd(){fr++;if(fr%Math.max(22,60-Math.floor(fr/90))===0)ts.push({x:rnd(50,W-50),y:rnd(70,H-50),r:rnd(26,40),k:.3,a:0,life:Math.max(70,150-fr/25)});
   for(const t of ts){t.a++;t.k=t.a<20?t.a/20:1-Math.max(0,(t.a-t.life*.5))/(t.life*.5)*.8;if(t.a>=t.life&&!t.d){t.d=2;lives--;combo=0;tone(110,.3,'sawtooth');if(lives<=0){over('פספסתם יותר מדי!',sc,'',Math.floor(sc/10),sc>=200?1:0);return}}}
   ts=ts.filter(t=>!t.d)}
-function drw(){for(const t of ts){const r=t.r*Math.max(.1,t.k);ctx.fillStyle='#ff4d6d';ctx.beginPath();ctx.arc(t.x,t.y,r,0,7);ctx.fill();ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(t.x,t.y,r*.6,0,7);ctx.fill();ctx.fillStyle='#ff4d6d';ctx.beginPath();ctx.arc(t.x,t.y,r*.25,0,7);ctx.fill()}
+function drw(){for(const t of ts){const r=t.r*Math.max(.1,t.k);
+    ctx.save();R2.shadow(ctx,11,'rgba(0,0,0,.42)',0,5);
+    const og=ctx.createRadialGradient(t.x-r*.3,t.y-r*.36,r*.08,t.x,t.y,r);
+    og.addColorStop(0,'#ff93a6');og.addColorStop(.62,'#ff4d6d');og.addColorStop(1,'#a8102a');
+    ctx.fillStyle=og;ctx.beginPath();ctx.arc(t.x,t.y,r,0,7);ctx.fill();ctx.restore();
+    const wg=ctx.createRadialGradient(t.x-r*.18,t.y-r*.2,r*.05,t.x,t.y,r*.6);
+    wg.addColorStop(0,'#ffffff');wg.addColorStop(1,'#d9e2ea');
+    ctx.fillStyle=wg;ctx.beginPath();ctx.arc(t.x,t.y,r*.6,0,7);ctx.fill();
+    const ig=ctx.createRadialGradient(t.x-r*.09,t.y-r*.1,r*.03,t.x,t.y,r*.25);
+    ig.addColorStop(0,'#ff93a6');ig.addColorStop(1,'#c71935');
+    ctx.fillStyle=ig;ctx.beginPath();ctx.arc(t.x,t.y,r*.25,0,7);ctx.fill();
+    ctx.save();ctx.globalAlpha=.45;ctx.fillStyle='#fff';
+    ctx.beginPath();ctx.ellipse(t.x-r*.33,t.y-r*.4,r*.2,r*.12,-.5,0,7);ctx.fill();ctx.restore()}
   T('⭐ '+sc,90,28,24);T('❤️'.repeat(lives),W-70,28,20);if(combo>2)T('קומבו ×'+combo,W/2,28,22,'#ffd23f')}
 wire(start);run(upd,drw,'#193654');window.__s={step:upd,start:()=>{start();on=true},get on(){return on},get score(){return sc},get ts(){return ts},hit};
 
