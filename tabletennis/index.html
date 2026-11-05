@@ -47,7 +47,7 @@ body{overflow:hidden;position:fixed;inset:0;width:100%;background:#0e2338}
 <body>
 <canvas id="cv"></canvas><div id="hud"></div>
 <div id="rot">📱↔️<br>סובבו את הטלפון לרוחב</div>
-<div class="ov show" id="menu"><div class="ovc" style="max-width:440px"><div style="font-size:56px">🏓</div><h2>פינג-פונג</h2><div class="lb">גררו את המחבט ימינה/שמאלה. לגרירה מהירה קדימה = הנחתה 💥! על מחשב: W/↑. המחשב משתפר בכל ניצחון. הראשון ל-7.</div><button class="btn" id="go">▶ שחק</button><div style="opacity:.8;margin-top:10px;font-size:15px">שיא: <b id="best">0</b></div></div></div>
+<div class="ov show" id="menu"><div class="ovc" style="max-width:440px"><div style="font-size:56px">🏓</div><h2>פינג-פונג</h2><div class="lb">גררו את המחבט ימינה/שמאלה.<br>🔥 <b>סוויש קדימה</b> = הנחתה 💥<br>⬇️ <b>סוויש למטה</b> = סלייס ✂️ (איטי נמוך)<br>➡️ <b>סוויש ימינה/שמאלה</b> = זווית חדה 📐<br>על מחשב: W/↑ קדימה. הראשון ל-7.</div><button class="btn" id="go">▶ שחק</button><div style="opacity:.8;margin-top:10px;font-size:15px">שיא: <b id="best">0</b></div></div></div>
 <div class="ov" id="end"><div class="ovc"><h2 id="eT">נגמר</h2><div style="font-size:48px;font-weight:900;color:#ffd05a" id="eS"></div><p id="eM"></p><button class="btn" id="again">🔁 שוב</button><button class="btn alt" id="menu2">תפריט</button></div></div>
 <script>
 'use strict';
@@ -84,22 +84,34 @@ function launch(by,fy,tx,ty,T,hit){// aim ball from (bx,by,h) so it first lands 
   const b=ball;b.vx=(tx-b.x)/T;b.vy=(ty-b.y)/T;b.vh=(.5*G*T*T-b.h)/T;L=hit;bnc=[0,0];b.ok=true}
 function start(){px=0;pvx=0;tpx=0;cx=0;ps=0;as=0;lvl=0;sc=0;trail=[];msg='';mt=0;smashPow=0;smashCd=0;pdy=0;pdyv=0;newPoint(0)}
 function newPoint(who){srv=who;phase='serve';pt=0;ball={x:who?cx:px,y:who?.04:1.0,h:.25,vx:0,vy:0,vh:0};L=-1;bnc=[0,0];trail=[]}
-// track drag velocity for swipe-forward smash
-let _ly=0,_vy=0,_lid=null;
+// track drag velocity for directional swipe shots
+let _ly=0,_lx=0,_vy=0,_vx=0,_lid=null;
+let swipeShot=null; // pending swipe shot to apply on next hit
 cv.addEventListener('pointermove',e=>{
   tpx=clamp((cpos(e).x-W/2)/hw(1),-1.15,1.15);
   if(e.pointerId===_lid){
-    const cy=e.clientY,dy=cy-_ly;_vy=_vy*.5+dy*.5;_ly=cy}});
+    const cx2=e.clientX,cy=e.clientY;
+    const dx=cx2-_lx,dy=cy-_ly;
+    _vx=_vx*.5+dx*.5;_vy=_vy*.5+dy*.5;
+    _lx=cx2;_ly=cy}});
 cv.addEventListener('pointerdown',e=>{
   tpx=clamp((cpos(e).x-W/2)/hw(1),-1.15,1.15);
-  _lid=e.pointerId;_ly=e.clientY;_vy=0;
+  _lid=e.pointerId;_lx=e.clientX;_ly=e.clientY;_vx=0;_vy=0;swipeShot=null;
   if(phase==='serve'&&srv===0)serveP()});
 cv.addEventListener('pointerup',e=>{
   if(e.pointerId===_lid){
-    // fast swipe UP (negative dy = moving toward top of screen = "forward" on table)
-    if(_vy<-6){const lunge=Math.min((-_vy-6)/8,1);// 0..1 based on swipe speed
-      pdyv=-0.04-lunge*.02;// kick paddle forward
-    }_lid=null;_vy=0}});
+    const ax=Math.abs(_vx),ay=Math.abs(_vy),spd=Math.sqrt(_vx*_vx+_vy*_vy);
+    if(spd>5){
+      if(_vy<-6&&ay>ax*.6){// swipe UP = הנחתה (smash forward)
+        const lunge=Math.min((-_vy-6)/8,1);pdyv=-0.04-lunge*.02;swipeShot='smash';}
+      else if(_vy>7&&ay>ax*.6){// swipe DOWN = סלייס (slow low slice)
+        swipeShot='slice';}
+      else if(ax>ay*.6&&ax>7){// swipe LEFT/RIGHT = זווית חדה (sharp angle)
+        swipeShot=_vx>0?'right':'left';}
+      else if(_vy<-4&&ax>5){// diagonal up = הנחתה עם כיוון
+        const lunge=Math.min((-_vy-4)/8,.8);pdyv=-0.03-lunge*.02;
+        swipeShot=_vx>0?'diag-right':'diag-left';}}
+    _lid=null;_vx=0;_vy=0}});
 addEventListener('keydown',e=>{if(e.code==='Space'&&phase==='serve'&&srv===0)serveP()});
 function serveP(){swing=12;ball.x=px;ball.y=1.0;ball.h=.25;launch(1,1,rnd(-.5,.5),rnd(.2,.35),42,0);phase='play';tone(520,.05,'square',.08)}
 function serveC(){cswing=12;ball.x=cx;ball.y=.04;ball.h=.25;launch(0,0,rnd(-.6,.6),rnd(.65,.8),44-lvl,1);phase='play';tone(400,.05,'square',.08)}
@@ -142,15 +154,24 @@ function upd(){if(!isFinite(tpx))tpx=0;if(!isFinite(px))px=0;
   if(L===1&&b.vy>0&&b.y>hitY-.18&&b.y<hitY+.18&&b.h<.65&&bnc[1]>=1&&Math.abs(b.x-px)<.35){
     const lunge=-pdy; // 0..0.18, positive = more lunge
     const sp=Math.abs(pvx)*20+lunge*60;
-    const isSmash=lunge>.08;
-    const T=Math.round(clamp(46-sp*1.5,isSmash?14:28,48));
+    const isSmash=(lunge>.08)||(swipeShot==='smash')||(swipeShot==='diag-right')||(swipeShot==='diag-left');
+    const isSlice=swipeShot==='slice';
+    const isAngleR=swipeShot==='right'||swipeShot==='diag-right';
+    const isAngleL=swipeShot==='left'||swipeShot==='diag-left';
+    let T2=Math.round(clamp(46-sp*1.5,isSmash?14:28,48));
     swing=isSmash?20:14;
-    const tx=clamp((b.x-px)*-1.6+pvx*5+rnd(-.1,.1),-.85,.85);
-    const ty=clamp(.2+rnd(0,.1)-Math.abs(pvx)*.4-lunge*.8,.05,.4);
-    b.h=Math.max(.05,b.h);launch(b.y,b.y,tx,ty,T,0);
+    // base target x from paddle movement, then override with swipe direction
+    let tx=clamp((b.x-px)*-1.6+pvx*5+rnd(-.1,.1),-.85,.85);
+    let ty=clamp(.2+rnd(0,.1)-Math.abs(pvx)*.4-lunge*.8,.05,.4);
+    if(isAngleR){tx=clamp(.55+rnd(0,.2),.35,.85);T2=Math.round(T2*.9)}// sharp right
+    if(isAngleL){tx=clamp(-.55-rnd(0,.2),-.85,-.35);T2=Math.round(T2*.9)}// sharp left
+    if(isSlice){ty=clamp(.07+rnd(0,.05),.04,.12);T2=Math.round(T2*1.4);swing=8}// low & slow
+    b.h=Math.max(.05,b.h);launch(b.y,b.y,tx,ty,T2,0);
     if(isSmash){tone(860,.08,'square',.13);msg='הנחתה! 💥';mt=35;smashCd=1}
+    else if(isSlice){tone(300,.08,'sine',.1);msg='סלייס ✂️';mt=28}
+    else if(isAngleR||isAngleL){tone(680,.06,'square',.1);msg='זווית! 📐';mt=22}
     else tone(560,.05,'square',.09);
-    pdyv*=-.5;// rebound back after hit
+    pdyv*=-.5;swipeShot=null;// rebound back after hit
     return}
   // cpu hit
   if(L===0&&b.vy<0&&b.y<.12&&b.y>-.08&&b.h<.6&&bnc[1]>=1&&Math.abs(b.x-cx)<.28+lvl*.025){
