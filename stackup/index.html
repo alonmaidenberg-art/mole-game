@@ -83,8 +83,8 @@ function drop(){if(!on)return;const t=st[st.length-1];const l=Math.max(cur.x,t.x
   sc++;sp=3+sc*.18;nw();dir=sc%2?-1:1;if(dir<0)cur.x=W}
 cv.addEventListener('pointerdown',drop);addEventListener('keydown',e=>{if(e.code==='Space')drop()});
 function upd(){cur.x+=sp*(dir>=0?1:-1);if(cur.x+cur.w>W+20&&dir>0)dir=-1;if(cur.x<-20&&dir<0)dir=1;const ty=Math.max(0,st.length-6)*30;cam+=(ty-cam)*.1}
-function drw(){st.forEach((b,i)=>{ctx.fillStyle='hsl('+(i*28%360)+',70%,55%)';ctx.fillRect(b.x,H-30-(i+1)*30+cam,b.w,28)});
-  ctx.fillStyle='hsl('+(st.length*28%360)+',70%,65%)';ctx.fillRect(cur.x,H-30-(st.length+1)*30+cam,cur.w,28);
+function drw(){st.forEach((b,i)=>{R2.block(ctx,b.x,H-30-(i+1)*30+cam,b.w,28,5,'hsl('+(i*28%360)+',70%,55%)')});
+  R2.block(ctx,cur.x,H-30-(st.length+1)*30+cam,cur.w,28,5,'hsl('+(st.length*28%360)+',70%,65%)');
   T('🏗️ '+sc,90,28,26);T(msg,W/2,70,24,'#ffd23f')}
 wire(start);run(upd,drw,'#1a2a4a');window.__s={step:upd,start:()=>{start();on=true},get on(){return on},get score(){return sc},drop,get cur(){return cur},get st(){return st}};
 

@@ -85,7 +85,12 @@ function upd(){fr++;if(!fly){ang+=.045;pos()}else{px+=vx;py+=vy;tr.push({x:px,y:
   if(fly)fly=Math.min(fly+.2,50);
   if(py<-30||py>H+30||px<cam-40){if(!window.__nd){over('אבדת בחלל',sc,'',sc*4,sc>=8?1:0)}return}}
   cam=Math.max(cam,cur.x-180);const last=pl[pl.length-1];while(last&&pl[pl.length-1].x<cam+W+300){mkPlanet(pl[pl.length-1].x+rnd(190,280))}pl=pl.filter(p=>p.x>cam-200)}
-function drw(){ctx.save();ctx.translate(-cam,0);for(const p of pl){ctx.fillStyle=p.c;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,7);ctx.fill();ctx.strokeStyle='#fff3';ctx.lineWidth=2;ctx.beginPath();ctx.arc(p.x,p.y,p.r+22,0,7);ctx.stroke();if(p===cur&&!fly){}}
+function drw(){ctx.save();ctx.translate(-cam,0);
+  for(const p of pl){
+    R2.glow(ctx,p.x,p.y,p.r*1.9,R2.alpha(p.c,.5),.35);
+    R2.ball(ctx,p.x,p.y,p.r,p.c,{shadow:false});
+    ctx.save();ctx.strokeStyle='rgba(255,255,255,.2)';ctx.lineWidth=2;ctx.setLineDash([7,9]);
+    ctx.beginPath();ctx.arc(p.x,p.y,p.r+22,0,7);ctx.stroke();ctx.restore()}
   ctx.strokeStyle='#fff6';ctx.lineWidth=3;ctx.beginPath();tr.forEach((q,i)=>i?ctx.lineTo(q.x,q.y):ctx.moveTo(q.x,q.y));ctx.stroke();ctx.font='34px serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('🚀',px,py);ctx.restore();T('⭐ '+sc,W/2,26,26)}
 wire(start);run(upd,drw,'#0d0a30');window.__s={step:upd,start:()=>{start();on=true},get on(){return on},get score(){return sc},release,get fly(){return fly},get px(){return px},get py(){return py},get pl(){return pl},get cur(){return cur},get ang(){return ang}};
 
