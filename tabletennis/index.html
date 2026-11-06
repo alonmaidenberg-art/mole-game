@@ -273,7 +273,7 @@ function launch(by,fy,tx,ty,T,hit){
 function start(){px=0;pvx=0;tpx=0;cx=0;ps=0;as=0;lvl=0;sc=0;trail=[];msg='';mt=0;msgBig=false;smashCd=0;smashFlash=0;pdy=0;pdyv=0;cpuSpeedMult=1.0;trollTimer=0;ptrail=[];burst=[];rings=[];hitsP=0;swing=0;cswing=0;newPoint(NET?NET.role:0)}
 function newPoint(who){srv=who;phase='serve';pt=0;ball={x:who?cx:px,y:who?.04:1.0,h:.25,vx:0,vy:0,vh:0};L=-1;bnc=[0,0];trail=[];if(!who)placeServeBall()}
 function placeServeBall(){ // hold the ball next to the paddle while serving
-  if(ctl!=='mouse'){ball.x=px;ball.y=1.0;ball.h=.25+Math.sin(pt*.1)*.03;return}
+  if(ctl!=='mouse'){ball.x=clamp(px+(px>.5?-.24:.24),-1.2,1.2);ball.y=1.0;ball.h=.42+Math.sin(pt*.1)*.04;return}
   const pp=pScreen(),zb=clamp(pp.z,.62,1.9),side=psx>W/2?-1:1;
   ball.y=zb;ball.h=PH+.05+Math.sin(pt*.1)*.02;
   ball.x=clamp((psx+side*pp.r*1.3-W/2)/hw(zb),-2.4,2.4);
@@ -335,7 +335,7 @@ function upd(){if(!isFinite(tpx))tpx=0;if(!isFinite(px))px=0;
   const csp=(.011+lvl*.0035)*diffMult;
   if(phase==='serve'){pt++;
     if(srv===1){if(NET){cx+=(ncx-cx)*.5;ball.x=cx;ball.y=.04;ball.h=.25+Math.sin(pt*.1)*.03}else{ball.x=cx;ball.y=.04;ball.h=.25+Math.sin(pt*.1)*.03;cx+=clamp(rnd(-.4,.4)-cx,-.01,.01);if(pt>70)serveC()}}
-    else{placeServeBall();if(pt>400)serveP()}
+    else{placeServeBall();if(pt>(NET?300:400))serveP()}
     return}
   if(phase==='dead'){pt++;ball.vh-=G;ball.h+=ball.vh;ball.x+=ball.vx*.5;ball.y+=ball.vy*.5;if(ball.h<0){ball.h=0;ball.vh=Math.abs(ball.vh)*.5}if(pt>70){newPoint(srv)}return}
   const b=ball;trail.push({x:b.x,y:b.y,h:b.h});if(trail.length>9)trail.shift();
@@ -413,7 +413,8 @@ function upd(){if(!isFinite(tpx))tpx=0;if(!isFinite(px))px=0;
   if(!NET&&L===0&&b.vy<0&&b.y<.12&&b.y>-.08&&b.h<.6&&bnc[1]>=1&&Math.abs(b.x-cx)<.28+lvl*.025){
     if(Math.random()<.12-lvl*.025&&!ball.cpuMiss){ball.cpuMiss=1}
     if(!ball.cpuMiss){cswing=14;const T=Math.round(clamp(46-lvl*2,34,46));const tx=clamp(rnd(-.8,.8),-.85,.85),ty=rnd(.62,.84);b.h=Math.max(.05,b.h);launch(b.y,b.y,tx,ty,T,1);tone(430,.05,'square',.09);return}}
-  if(!auth){if(b.y<-.6||b.h<-.9){b.vx=b.vy=b.vh=0}return}
+  if(!auth){if(b.y<-.6||b.h<-.9){b.vx=b.vy=b.vh=0;stuck++;if(stuck%90===60)netSend({t:'sync?'})}return}
+  stuck=0;
   if(b.y<-.5||b.y>1.6||b.h<-.8){score(L===0?(bnc[1]>=1?0:1):(bnc[1]>=1?1:0),'פספוס')}
 }
 
@@ -1001,8 +1002,8 @@ function drw(){
   // HUD
   ctx.fillStyle='rgba(6,20,32,.42)';rr(W/2-96,10,192,50,18);ctx.fill();
   T(ps+'',W/2-48,36,34);T(':',W/2,34,30,'#fff9');T(as+'',W/2+48,36,34);if(NET){T(tt('אתה','You'),W/2-48,72,13,'#fffc');T(NET.name,W/2+48,72,13,'#fffc')}else T(tt('רמה ','Level ')+(lvl+1),W/2,H-14,15,'#fffc');
-  if(NET&&phase==='serve'&&srv===1)T(NET.name+tt(' מגיש…',' is serving…'),W/2,H-44,20,'#ffd23f');
-  if(phase==='serve'&&srv===0)T(ctl==='mouse'?tt('לחצו להגשה','Click to serve'):tt('לחצו/רווח להגשה','Tap to serve'),W/2,H-44,20,'#ffd23f');
+  if(NET&&phase==='serve'&&srv===1)T(NET.name+tt(' מגיש…',' is serving…'),W/2,160,20,'#ffd23f');
+  if(phase==='serve'&&srv===0){const k=1+Math.sin(pt*.12)*.08;T(ctl==='mouse'?tt('👆 לחצו להגשה','👆 Click to serve'):tt('👆 גע במסך להגשה','👆 Tap to serve'),W/2,160,Math.round(24*k),'#ffd23f')}
   if(smashFlash>0){const f=smashFlash/12;ctx.save();ctx.globalAlpha=f*.2;ctx.fillStyle=th.glow;ctx.fillRect(VB.x0,VB.y0,vw,vh);ctx.globalAlpha=f*.1;ctx.fillStyle='#fff';ctx.fillRect(VB.x0,VB.y0,vw,vh);ctx.restore()}
   if(mt>0&&msg){
     if(msgBig){ctx.save();ctx.font='bold 34px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.shadowBlur=18;ctx.shadowColor=th.glow;ctx.fillStyle='#fff';ctx.fillText(msg,W/2,165);ctx.restore()}
@@ -1013,7 +1014,7 @@ function drw(){
 /* ================= online: play a friend =================
    Uses the site's room system (🌐). Each player's own computer decides whether THEY hit the ball,
    so the mouse paddle feels exactly like in a normal game. The picture is mirrored for the friend. */
-let NET=null,ncx=0,lagMs=60;
+let NET=null,ncx=0,lagMs=60,stuck=0;
 function netSend(d){try{if(NET&&window.AG&&AG.net&&AG.net.match)AG.net.matchSend(d)}catch(e){}}
 function netGo(role,name){
   NET={role:role,name:name||tt('חבר','Friend'),skin:null};ncx=0;
@@ -1031,7 +1032,9 @@ function netMsg(d){
     ball.x=-d.x;ball.y=1-d.y;ball.h=d.h;ball.vx=-d.vx;ball.vy=-d.vy;ball.vh=d.vh;ball.cpuMiss=0;
     for(let i=Math.min(9,Math.round(lagMs/16.7));i>0;i--){ball.x+=ball.vx;ball.y+=ball.vy;ball.h+=ball.vh;ball.vh-=G;if(ball.h<0&&ball.vh<0){ball.h=0;ball.vh=-ball.vh*.82}}
     L=1;bnc=[0,0];trail=[];phase='play';cswing=14;tone(430,.05,'square',.09);return}
-  if(d.t==='pt'){if(on)score(d.w,'',true);return}
+  if(d.t==='pt'){stuck=0;if(on)score(d.w,'',true);return}
+  if(d.t==='sync?'){netSend({t:'sync',ps,as,srv,ph:phase});return}
+  if(d.t==='sync'){if(on&&phase==='play'&&L===0&&stuck>0){stuck=0;ps=d.as;as=d.ps;srv=1-d.srv;newPoint(srv)}return}
   if(d.t==='again'){$('#end').classList.remove('show');start();on=true;return}
 }
 setInterval(()=>{if(NET&&on){netSend({t:'p',x:+px.toFixed(3),s:mySkin.id})}},50);
