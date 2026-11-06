@@ -457,15 +457,22 @@ function portalOpen(callback){
   tframe();
 }
 
-/* intercept game card clicks */
-document.addEventListener('click',function(e){
-  var link=e.target.closest('a[href]');
-  if(!link)return;
-  var href=link.getAttribute('href');
-  if(!href||href.startsWith('http')||href.startsWith('#')||href.startsWith('mailto'))return;
-  e.preventDefault();
-  portalOpen(function(){window.location.href=link.href;});
-},true);
+/* intercept game card clicks — only on the hub page (index.html / root) */
+var isHub=location.pathname==='/'||location.pathname==='/index.html'||location.pathname.endsWith('/mole-game/')||/^\/[^/]*\/?$/.test(location.pathname);
+if(isHub){
+  document.addEventListener('click',function(e){
+    var link=e.target.closest('a[href]');
+    if(!link)return;
+    var href=link.getAttribute('href');
+    if(!href)return;
+    // skip external, hash, mailto
+    if(href.startsWith('http')||href.startsWith('#')||href.startsWith('mailto')||href.startsWith('?'))return;
+    // only intercept relative links that look like game folders (contain a word then /)
+    if(!/^[a-z0-9_-]+\/?$/.test(href))return;
+    e.preventDefault();
+    portalOpen(function(){window.location.href=link.href;});
+  },true);
+}
 
 /* reverse portal when coming back */
 window.addEventListener('pageshow',function(e){
