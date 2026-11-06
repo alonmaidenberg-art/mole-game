@@ -149,3 +149,36 @@
   function go(){check();setInterval(check,1500);addEventListener('resize',check)}
   if(document.readyState==='complete')go();else addEventListener('load',go)
 })();
+
+/* first visit: ask for the player's name before playing (c) Alon Maidenberg 2026 */
+(function(){
+  var EN=window.AG_LANG==='en',T=function(h,e){return EN?e:h};
+  var BAD=/(fuck|shit|bitch|cunt|dick|porn|nazi|hitler|rape|sex|nigg|http|www|\.com|זונה|שרמוט|כוס|זין|מניאק|הומו|נאצי|היטלר|אנס|סקס)/i;
+  function get(){try{return (localStorage.getItem('ag_name')||'').trim()}catch(e){return 'x'}}
+  function ok(n){n=n.replace(/[\u0000-\u001f<>&"'`\\]/g,'').replace(/\s+/g,' ').trim();return n.length>=2&&n.length<=14&&!BAD.test(n.replace(/[\s._-]/g,''))?n:''}
+  function show(){
+    if(get()||document.getElementById('ag-name'))return;
+    if(document.getElementById('ag-loader'))return setTimeout(show,300);
+    var ov=document.createElement('div');ov.id='ag-name';
+    ov.style.cssText='position:fixed;inset:0;z-index:2147483400;background:rgba(10,5,30,.8);display:flex;align-items:center;justify-content:center;padding:16px;font-family:system-ui,Arial,sans-serif;direction:'+(EN?'ltr':'rtl');
+    var c=document.createElement('div');c.style.cssText='width:100%;max-width:360px;background:#fff;color:#0b4553;border-radius:26px;padding:22px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.45)';
+    c.innerHTML='<div style="font-size:50px;line-height:1">👋</div><h2 style="margin:8px 0 4px;font-size:25px">'+T('ברוכים הבאים!','Welcome!')+'</h2>'+
+      '<p style="margin:0 0 12px;opacity:.8;line-height:1.5">'+T('למשחקים של אלון מידנברג. איך קוראים לך?','to Alon Maidenberg\'s games. What\'s your name?')+'</p>';
+    var i=document.createElement('input');i.maxLength=14;i.autocomplete='off';i.placeholder=T('השם שלך','Your name');
+    i.style.cssText='width:100%;box-sizing:border-box;padding:13px;border-radius:15px;border:3px solid #bfe9e2;font:800 20px system-ui;text-align:center;color:#0b4553;outline:none';
+    var m=document.createElement('p');m.style.cssText='min-height:20px;margin:8px 0 0;font-weight:800;color:#d33;font-size:14px';
+    var b=document.createElement('button');b.type='button';b.textContent=T('▶ יאללה, לשחק!','▶ Let\'s play!');
+    b.style.cssText='display:block;width:100%;margin-top:6px;border:0;border-radius:16px;padding:14px;font:900 20px system-ui;cursor:pointer;color:#06322b;background:linear-gradient(180deg,#5ff7d6,#1fc9a6);box-shadow:0 4px 0 #0d7a66';
+    function go(){var n=ok(i.value);if(!n){m.textContent=i.value.trim().length<2?T('כתבו שם – לפחות 2 אותיות','Type a name – at least 2 letters'):T('בחרו שם אחר, בבקשה','Please pick another name');i.focus();return}
+      try{localStorage.setItem('ag_name',n)}catch(e){}ov.remove();try{dispatchEvent(new Event('ag-name'))}catch(e){}
+      var nb=document.getElementById('meN');if(nb&&window.AGAv&&AGAv.mine())nb.textContent=n}
+    b.onclick=go;i.addEventListener('keydown',function(e){if(e.key==='Enter')go()});
+    c.appendChild(i);c.appendChild(m);c.appendChild(b);
+    var l=document.createElement('button');l.type='button';l.textContent=T('🔑 יש לי כבר חשבון – התחברות','🔑 I already have an account – log in');
+    l.style.cssText='margin-top:12px;border:0;background:none;color:#13a37a;font:800 15px system-ui;cursor:pointer;text-decoration:underline';
+    l.onclick=function(){if(window.AGAcct){ov.remove();AGAcct.open('login');var w=setInterval(function(){if(!document.querySelector('[style*="2147483300"]')){clearInterval(w);if(!get())show()}},500)}};
+    c.appendChild(l);c.appendChild(Object.assign(document.createElement('p'),{textContent:T('השם יופיע בשיאים ובמשחק עם חברים.','Your name shows on the leaderboard and when playing friends.'),style:'margin:10px 0 0;font-size:12.5px;opacity:.6'}));
+    ov.appendChild(c);document.body.appendChild(ov);setTimeout(function(){i.focus()},60)}
+  function start(){setTimeout(show,250)}
+  if(document.readyState==='complete')start();else addEventListener('load',start);
+})();
