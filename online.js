@@ -6,7 +6,7 @@
   function ls(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){}return null}
   function ss(k,v){try{if(v===undefined)return sessionStorage.getItem(k);if(v===null)sessionStorage.removeItem(k);else sessionStorage.setItem(k,v)}catch(e){}return null}
   var SIG=ls('ag_sig')||'https://ntfy.sh';
-  var ICE={iceServers:[{urls:['stun:stun.l.google.com:19302','stun:stun1.l.google.com:19302']},
+  var ICE={iceServers:[{urls:['stun:stun.l.google.com:19302','stun:stun1.l.google.com:19302','stun:stun.cloudflare.com:3478']},
     {urls:['turn:openrelay.metered.ca:80','turn:openrelay.metered.ca:443','turn:openrelay.metered.ca:443?transport=tcp'],username:'openrelayproject',credential:'openrelayproject'}]};
   if(ls('ag_ice')==='local')ICE={iceServers:[]};
   var ID=location.pathname.replace(/\/index\.html$/,'').replace(/\/+$/,'').split('/').pop()||'hub';
@@ -33,7 +33,7 @@
     es.onmessage=function(ev){
       try{var o=JSON.parse(ev.data);if(o.event!=='message')return;if(seen[o.id])return;seen[o.id]=1;
         var m=JSON.parse(o.message);var b=chunks[m.c]||(chunks[m.c]={n:m.n,p:{},k:0});if(!b.p[m.i]){b.p[m.i]=m.d;b.k++}
-        if(b.k===b.n){var s='';for(var i=0;i<b.n;i++)s+=b.p[i];delete chunks[m.c];fn(JSON.parse(s))}}catch(e){}};
+        if(b.k===b.n){var s='';for(var i=0;i<b.n;i++)s+=b.p[i];delete chunks[m.c];var age=o.time?Date.now()/1000-o.time:0;fn(JSON.parse(s),age)}}catch(e){}};
   }
   function topic(code){return 'agr-'+code.toLowerCase()+'-v1'}
   function gather(pc){return new Promise(function(res){
@@ -67,9 +67,9 @@
 
   var hbT=null;
   function startHost(){
-    listen(topic(room.code),function(m){
+    listen(topic(room.code),function(m,age){
       if(!room||!room.host)return;
-      if(m.t==='hello'&&m.g!==room.gid)offerTo(m);
+      if(m.t==='hello'&&m.g!==room.gid){if(age>12)return;offerTo(m)}
       else if(m.t==='answer'&&m.to===room.gid){var L=room.links[m.from];if(L&&L.n===m.n&&L.pc.signalingState==='have-local-offer')L.pc.setRemoteDescription({type:'answer',sdp:m.sdp}).catch(function(){})}
     });
     clearInterval(hbT);hbT=setInterval(function(){if(room&&room.host){pruneMembers()}},4000);
@@ -90,15 +90,22 @@
   function sendMembers(){var l=room.members.map(function(m){return{gid:m.gid,name:m.name}});Object.keys(room.links).forEach(function(k){var d=room.links[k].dc;if(d.readyState==='open')d.send(JSON.stringify({t:'members',list:l,from:room.gid,to:k}))});emit()}
 
   function startGuest(){
-    var n=rid(6),pc=null,tries=0;
+    var n=rid(6),pc=null,tries=0,total=0,offerAt=0,lastHello=0;
     function connect(){
       if(!room||room.host)return;
       if(room.link&&room.link.dc&&room.link.dc.readyState==='open')return;
-      if(tries>0&&tries%5===0)n=rid(6);tries++;post(topic(room.code),{t:'hello',g:room.gid,n:n,name:room.name});
+      var now=Date.now(),cs=room.link&&room.link.pc&&(room.link.pc.connectionState||room.link.pc.iceConnectionState);
+      // an offer arrived and the connection is still being built: give it time instead of starting over
+      if(offerAt&&now-offerAt<15000&&cs!=='failed'&&cs!=='closed')return;
+      // no answer for a while, or it failed: start a fresh attempt
+      if(offerAt||tries>=4){n=rid(6);tries=0;offerAt=0}
+      // slow down after many tries so the free signalling service doesn't block us
+      if(now-lastHello<(total>12?8000:3000))return;
+      tries++;total++;lastHello=now;post(topic(room.code),{t:'hello',g:room.gid,n:n,name:room.name});
     }
-    listen(topic(room.code),function(m){
+    listen(topic(room.code),function(m,age){
       if(!room||room.host)return;
-      if(m.t==='offer'&&m.to===room.gid&&m.n===n){
+      if(m.t==='offer'&&m.to===room.gid&&m.n===n&&!(age>20)){offerAt=Date.now();
         if(room.link){try{room.link.pc.close()}catch(e){}}
         pc=new RTCPeerConnection(ICE);room.link={pc:pc,dc:null};
         pc.ondatachannel=function(e){var dc=e.channel;room.link.dc=dc;
@@ -109,7 +116,7 @@
           post(topic(room.code),{t:'answer',to:m.from,from:room.gid,n:n,sdp:pc.localDescription.sdp})}).catch(function(){});
       }
     });
-    clearInterval(hbT);hbT=setInterval(function(){connect()},3500);connect();
+    clearInterval(hbT);hbT=setInterval(function(){connect()},1000);connect();
   }
 
   /* ---------- messaging ---------- */
