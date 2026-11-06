@@ -281,7 +281,7 @@ function placeServeBall(){ // hold the ball next to the paddle while serving
 function serveP(){swing=12;placeServeBall();launch(ball.y,ball.y,rnd(-.5,.5),rnd(.2,.35),42,0);phase='play';tone(520,.05,'square',.08)}
 function serveC(){cswing=12;ball.x=cx;ball.y=.04;ball.h=.25;launch(0,0,rnd(-.6,.6),rnd(.65,.8),44-lvl,1);phase='play';tone(400,.05,'square',.08)}
 function score(w,why){if(w===0){ps++;sc+=10;tone(900,.2)}else{as++;tone(130,.3)}msg=(w===0?'נקודה! ':'נקודה למחשב ')+why;msgBig=false;mt=70;phase='dead';pt=0;
-  if(ps>=7){sc+=50;lvl++;ps=0;as=0;const gems=1+(lvl>=4?1:0)+(lvl>=7?1:0);if(window.AG&&AG.add)AG.add(15,gems);msg=tt('ניצחת! +','You win! +')+gems+' 💎';msgBig=true;mt=120;tone(880,.12,'triangle',.2);tone(1180,.14,'triangle',.16);tone(1480,.16,'triangle',.12)}else if(as>=7){over('המחשב ניצח',sc,'רמה '+(lvl+1)+' · '+ps+':'+as,Math.floor(sc/10),lvl>=2?1:0);return}
+  if(ps>=7){sc+=50;lvl++;ps=0;as=0;const gems=10+(lvl>=4?1:0)+(lvl>=7?1:0);if(window.AG&&AG.add)AG.add(15,gems);msg=tt('ניצחת! +','You win! +')+gems+' 💎';msgBig=true;mt=120;tone(880,.12,'triangle',.2);tone(1180,.14,'triangle',.16);tone(1480,.16,'triangle',.12)}else if(as>=7){over('המחשב ניצח',sc,'רמה '+(lvl+1)+' · '+ps+':'+as,Math.floor(sc/10),lvl>=2?1:0);return}
   srv=1-w}
 
 // computer hit: shot comes from how the mouse moves at the moment of contact
@@ -797,31 +797,31 @@ function paintMoon(g,rx,ry){
 }
 const SKINS=[
   {id:'classic',n:tt('קלאסי','Classic'),p:0},
-  {id:'panda', n:tt('פנדה 🐼','Panda 🐼'),      p:12, paint:paintPanda},
-  {id:'tiger', n:tt('טיגריס 🐯','Tiger 🐯'),    p:14, paint:paintTiger},
-  {id:'melon', n:tt('אבטיח 🍉','Watermelon 🍉'),p:14, paint:paintMelon},
-  {id:'soccer',n:tt('כדורגל ⚽','Soccer ⚽'),   p:16, paint:paintSoccer},
-  {id:'fire',  n:tt('אש 🔥','Fire 🔥'),         p:6, paint:paintFire},
-  {id:'galaxy',n:tt('גלקסיה 🌌','Galaxy 🌌'),   p:28, paint:paintGalaxy},
-  {id:'rainbow',n:tt('קשת 🌈','Rainbow 🌈'),    p:36,paint:paintRainbow},
-  {id:'gold',  n:tt('זהב 👑','Gold 👑'),        p:75,paint:paintGold},
-  {id:'cat',   n:tt('חתול 🐱','Cat 🐱'),         p:6, paint:paintCat},
-  {id:'frog',  n:tt('צפרדע 🐸','Frog 🐸'),       p:6, paint:paintFrog},
-  {id:'heart', n:tt('לב ❤️','Heart ❤️'),         p:8, paint:paintHeart},
-  {id:'target',n:tt('מטרה 🎯','Target 🎯'),      p:8, paint:paintTarget},
-  {id:'cow',   n:tt('פרה 🐄','Cow 🐄'),          p:8, paint:paintCow},
-  {id:'bee',   n:tt('דבורה 🐝','Bee 🐝'),        p:9, paint:paintBee},
-  {id:'chess', n:tt('שחמט ♟️','Chess ♟️'),       p:12, paint:paintChess},
-  {id:'cookie',n:tt('עוגייה 🍪','Cookie 🍪'),    p:12, paint:paintCookie},
-  {id:'zebra', n:tt('זברה 🦓','Zebra 🦓'),       p:14, paint:paintZebra},
-  {id:'basket',n:tt('כדורסל 🏀','Basketball 🏀'),p:16, paint:paintBasket},
-  {id:'pizza', n:tt('פיצה 🍕','Pizza 🍕'),       p:18, paint:paintPizza},
-  {id:'earth', n:tt('כדור הארץ 🌍','Earth 🌍'),  p:20, paint:paintEarth},
-  {id:'ice',   n:tt('קרח 🧊','Ice 🧊'),          p:20, paint:paintIce},
-  {id:'moon',  n:tt('ירח 🌙','Moon 🌙'),         p:25, paint:paintMoon},
-  {id:'unicorn',n:tt('חד-קרן 🦄','Unicorn 🦄'),  p:32, paint:paintUnicorn},
-  {id:'neon',  n:tt('ניאון 🤖','Neon 🤖'),       p:45,paint:paintNeon},
-  {id:'dragon',n:tt('דרקון 🐉','Dragon 🐉'),     p:55,paint:paintDragon}
+  {id:'panda', n:tt('פנדה 🐼','Panda 🐼'),      p:150, paint:paintPanda},
+  {id:'tiger', n:tt('טיגריס 🐯','Tiger 🐯'),    p:150, paint:paintTiger},
+  {id:'melon', n:tt('אבטיח 🍉','Watermelon 🍉'),p:150, paint:paintMelon},
+  {id:'soccer',n:tt('כדורגל ⚽','Soccer ⚽'),   p:150, paint:paintSoccer},
+  {id:'fire',  n:tt('אש 🔥','Fire 🔥'),         p:150, paint:paintFire},
+  {id:'galaxy',n:tt('גלקסיה 🌌','Galaxy 🌌'),   p:200, paint:paintGalaxy},
+  {id:'rainbow',n:tt('קשת 🌈','Rainbow 🌈'),    p:200,paint:paintRainbow},
+  {id:'gold',  n:tt('זהב 👑','Gold 👑'),        p:200,paint:paintGold},
+  {id:'cat',   n:tt('חתול 🐱','Cat 🐱'),         p:90, paint:paintCat},
+  {id:'frog',  n:tt('צפרדע 🐸','Frog 🐸'),       p:90, paint:paintFrog},
+  {id:'heart', n:tt('לב ❤️','Heart ❤️'),         p:90, paint:paintHeart},
+  {id:'target',n:tt('מטרה 🎯','Target 🎯'),      p:90, paint:paintTarget},
+  {id:'cow',   n:tt('פרה 🐄','Cow 🐄'),          p:90, paint:paintCow},
+  {id:'bee',   n:tt('דבורה 🐝','Bee 🐝'),        p:90, paint:paintBee},
+  {id:'chess', n:tt('שחמט ♟️','Chess ♟️'),       p:90, paint:paintChess},
+  {id:'cookie',n:tt('עוגייה 🍪','Cookie 🍪'),    p:90, paint:paintCookie},
+  {id:'zebra', n:tt('זברה 🦓','Zebra 🦓'),       p:150, paint:paintZebra},
+  {id:'basket',n:tt('כדורסל 🏀','Basketball 🏀'),p:150, paint:paintBasket},
+  {id:'pizza', n:tt('פיצה 🍕','Pizza 🍕'),       p:150, paint:paintPizza},
+  {id:'earth', n:tt('כדור הארץ 🌍','Earth 🌍'),  p:150, paint:paintEarth},
+  {id:'ice',   n:tt('קרח 🧊','Ice 🧊'),          p:150, paint:paintIce},
+  {id:'moon',  n:tt('ירח 🌙','Moon 🌙'),         p:200, paint:paintMoon},
+  {id:'unicorn',n:tt('חד-קרן 🦄','Unicorn 🦄'),  p:200, paint:paintUnicorn},
+  {id:'neon',  n:tt('ניאון 🤖','Neon 🤖'),       p:200,paint:paintNeon},
+  {id:'dragon',n:tt('דרקון 🐉','Dragon 🐉'),     p:200,paint:paintDragon}
 ];
 const skinById=id=>SKINS.find(s=>s.id===id)||SKINS[0];
 function ownedSkins(){try{const a=JSON.parse(store.get('tt_owned','["classic"]'));return Array.isArray(a)?a:['classic']}catch(e){return['classic']}}
