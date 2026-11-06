@@ -90,6 +90,7 @@
   var adm=false;try{adm=localStorage.getItem('ag_adm')!==null&&window.AG&&AG.isAdmin()}catch(e){}
   if(!isHub||(window.AG&&AG.isAdmin&&AG.isAdmin())){var fx=document.createElement('script');fx.src=base+'fx.js';(document.head||document.documentElement).appendChild(fx)}
   if(!/\/boss\//.test(location.pathname)){var sh=document.createElement('script');sh.src=base+'shop.js?v=2';(document.head||document.documentElement).appendChild(sh)}
+  if(!window.AGAv){var av_=document.createElement('script');av_.src=base+'avatar.js';(document.head||document.documentElement).appendChild(av_)}
   var on_=document.createElement('script');on_.src=base+'online.js';(document.head||document.documentElement).appendChild(on_);
   if(/[?&](boss|story)=?/.test(location.search)||/\/boss\/?$/.test(location.pathname.replace(/index\.html$/,''))){var bm=document.createElement('script');bm.src=base+'bossmode.js';(document.head||document.documentElement).appendChild(bm)}
   function btn(){

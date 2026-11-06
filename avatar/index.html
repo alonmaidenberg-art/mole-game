@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta name="author" content="Alon Maidenberg - אלון מידנברג"><meta name="copyright" content="© 2026 אלון מידנברג. כל הזכויות שמורות.">
+<!-- © 2026 Alon Maidenberg (אלון מידנברג). All rights reserved. Copying, republishing or modifying this page without written permission is not allowed. -->
+<meta name="robots" content="noai, noimageai">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>סטודיו הדמויות – אלון מידנברג</title>
+<meta name="description" content="מעצבים דמות משלכם – גוף, צבע, עיניים, כובעים ועוד – והיא מופיעה בכל המשחקים של אלון.">
+<meta name="theme-color" content="#193552">
+<link rel="icon" type="image/svg+xml" href="../assets/hub.svg">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;color:#fff;font-family:system-ui,-apple-system,"Segoe UI",Arial,"Noto Sans Hebrew",sans-serif}
+body{background:radial-gradient(700px 500px at 80% -10%,#3e9fd6 0,transparent 60%),radial-gradient(600px 500px at 0% 110%,#0f6b6b 0,transparent 55%),#193552;min-height:100vh;min-height:100dvh}
+main{max-width:980px;margin:0 auto;padding:max(52px,calc(env(safe-area-inset-top) + 46px)) 16px 40px}
+h1{margin:0 0 4px;font-size:clamp(26px,6vw,38px);text-align:center;background:linear-gradient(90deg,#ffe27a,#ff9fd6,#7ae0ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{text-align:center;opacity:.8;margin:0 0 16px}
+.wrap{display:grid;grid-template-columns:340px 1fr;gap:18px;align-items:start}
+@media (max-width:760px){.wrap{grid-template-columns:1fr}}
+.card{background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.12);border-radius:24px;padding:14px}
+.stage{position:sticky;top:12px;text-align:center}
+@media (max-width:760px){.stage{position:static}}
+#pv{width:100%;max-width:300px;aspect-ratio:1;border-radius:26px;display:block;margin:0 auto;box-shadow:0 10px 30px rgba(0,0,0,.35);touch-action:none}
+.nm{display:flex;gap:8px;margin-top:12px}
+.nm input{flex:1;min-width:0;padding:11px 12px;border-radius:14px;border:2px solid #fff;background:rgba(255,255,255,.85);color:#0b4553;font:800 18px system-ui;text-align:center}
+.wal{display:flex;gap:8px;justify-content:center;margin-top:10px;font-weight:800}
+.wal span{background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.15);border-radius:999px;padding:5px 14px}
+.row{display:flex;gap:8px;margin-top:10px}
+.b{flex:1;margin:0!important;border:0;border-radius:16px;padding:12px 8px;font:900 16px system-ui;cursor:pointer;color:#06322b;background:linear-gradient(180deg,#5ff7d6,#1fc9a6);box-shadow:0 5px 0 #0d7a66}
+.b:active{transform:translateY(3px);box-shadow:0 2px 0 #0d7a66}
+.b.alt{background:rgba(255,255,255,.1);color:#fff;box-shadow:none;border:2px solid rgba(255,255,255,.25)}
+#saved{min-height:20px;margin-top:8px;font-weight:800;color:#13a37a;opacity:0;transition:opacity .3s}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:none!important;min-width:0!important;border:2px solid rgba(255,255,255,.18);background:#112b46;color:#fff;border-radius:14px;padding:9px 13px;font:800 15px system-ui;cursor:pointer;white-space:nowrap}
+.tab.on{background:#ffd05a;color:#2a1c00;border-color:#fff}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px;margin-top:10px}
+.op{position:relative;border:3px solid #fff;background:rgba(255,255,255,.7);border-radius:18px;padding:6px 4px 8px;cursor:pointer;color:#0b4553;box-shadow:0 3px 10px rgba(20,150,140,.15);font:800 13px system-ui;text-align:center}
+.op canvas{width:100%;aspect-ratio:1;display:block;border-radius:14px}
+.op.on{border-color:#ffb800;background:#fff3c4;box-shadow:0 0 0 3px rgba(255,184,0,.35)}
+.op .pr{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);white-space:nowrap;color:#fff;background:rgba(10,8,30,.82);border-radius:999px;padding:2px 8px;font-size:12px}
+.op.lock canvas{filter:saturate(.35) brightness(.75)}
+.op .lk{position:absolute;top:30%;left:50%;transform:translate(-50%,-50%);font-size:26px;filter:drop-shadow(0 2px 3px #000)}
+.op .t{display:block;margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ov{position:fixed;inset:0;background:rgba(10,5,30,.8);display:none;align-items:center;justify-content:center;z-index:50;padding:16px}.ov.show{display:flex}
+.ovc{width:100%;max-width:340px;background:linear-gradient(160deg,#2e639b,#193552);border:2px solid rgba(255,255,255,.2);border-radius:26px;padding:20px;text-align:center}
+.ovc canvas{width:150px;height:150px;border-radius:20px}
+.hint{opacity:.75;font-size:13px;text-align:center;margin-top:12px;line-height:1.6}
+</style>
+</head>
+<body>
+<main>
+  <h1>🎨 סטודיו הדמויות</h1>
+  <p class="sub">מעצבים דמות משלכם, והיא מופיעה באתר ובשרתים עם חברים</p>
+  <div class="wrap">
+    <div class="card stage">
+      <canvas id="pv" width="600" height="600" aria-label="הדמות שלי"></canvas>
+      <div class="nm"><input id="name" maxlength="14" placeholder="השם שלך" autocomplete="off"></div>
+      <div class="wal"><span>🪙 <b id="wc">0</b></span><span>💎 <b id="wd">0</b></span></div>
+      <div class="row"><button class="b alt btn" id="rnd">🎲 אקראי</button><button class="b alt btn" id="dl">⬇️ תמונה</button></div>
+      <div id="saved">✔ נשמר</div>
+    </div>
+    <div class="card">
+      <div class="tabs" id="tabs"></div>
+      <div class="grid" id="grid"></div>
+      <div class="hint">🔒 חלקים נעולים קונים במטבעות ובמשחקים מרוויחים עוד.<br>מה שקניתם נשאר שלכם, ואפשר להחליף מתי שרוצים.</div>
+    </div>
+  </div>
+</main>
+<div class="ov" id="buy"><div class="ovc"><canvas id="bc" width="300" height="300"></canvas><h2 id="bT" style="margin:10px 0 4px"></h2><p id="bP" style="font-size:22px;font-weight:900;color:#ffd05a;margin:4px 0"></p><p id="bM" style="min-height:20px;margin:4px 0;color:#ff9a9a;font-weight:800"></p><button class="b" id="bY">🛒 קנה ולבש</button><button class="b alt btn" id="bN" style="margin-top:10px;width:100%">לא עכשיו</button></div></div>
+<script src="../hub.js"></script>
+<script src="../avatar.js"></script>
+<script>
+'use strict';
+const $=s=>document.querySelector(s);
+const A=window.AGAv,CATS=A.CATS;
+const EN=window.AG_LANG==='en',T=(h,e)=>EN?e:h;
+let cfg=A.dec(A.mine()||'00000000'),tab=0,pending=null,blink=0,look=0,t0=performance.now();
+function ls(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){}return null}
+// first visit: a random free character so it already looks like someone
+if(!A.mine()){CATS.forEach(c=>{const fr=c.o.map((o,i)=>i).filter(i=>A.free(c.o[i]));cfg[c.id]=fr[Math.floor(Math.random()*fr.length)]});A.setMine(A.enc(cfg))}
+function save(){A.setMine(A.enc(cfg));const s=$('#saved');s.style.opacity=1;clearTimeout(save.t);save.t=setTimeout(()=>s.style.opacity=0,1100)}
+function wallet(){if(!window.AG)return;$('#wc').textContent=AG.coins();$('#wd').textContent=AG.diamonds()}
+function label(c,o){return o.n||(c.id==='col'?'':'')}
+function priceTxt(o){return o.d?o.d+' 💎':o.c+' 🪙'}
+function tiles(){const c=CATS[tab],g=$('#grid');g.innerHTML='';
+  c.o.forEach((o,i)=>{const b=document.createElement('button');b.type='button';const has=A.owned(c.id,i);b.className='op'+(cfg[c.id]===i?' on':'')+(has?'':' lock');
+    const cv=document.createElement('canvas');cv.width=cv.height=180;const tc=Object.assign({},cfg);tc[c.id]=i;
+    A.draw(cv.getContext('2d'),tc,90,90,180,{still:true,bg:true});b.appendChild(cv);
+    if(!has){const p=document.createElement('span');p.className='pr';p.textContent='🔒 '+priceTxt(o);b.appendChild(p);}
+    const n=document.createElement('span');n.className='t';n.textContent=o.n||(c.id==='col'?T('צבע ','Colour ')+(i+1):'');b.appendChild(n);
+    b.onclick=()=>{if(A.owned(c.id,i)){cfg[c.id]=i;save();tiles();pop()}else ask(c,i)};g.appendChild(b)})}
+function tabsUI(){const w=$('#tabs');w.innerHTML='';CATS.forEach((c,i)=>{const b=document.createElement('button');b.type='button';b.className='tab chip'+(i===tab?' on':'');b.textContent=c.e+' '+c.n;b.onclick=()=>{tab=i;tabsUI();tiles()};w.appendChild(b)})}
+function ask(c,i){const o=c.o[i];pending={c,i};const tc=Object.assign({},cfg);tc[c.id]=i;
+  const x=$('#bc').getContext('2d');x.clearRect(0,0,300,300);A.draw(x,tc,150,150,300,{still:true});
+  $('#bT').textContent=(o.n||T('צבע חדש','New colour'));$('#bP').textContent=priceTxt(o);$('#bM').textContent='';$('#buy').classList.add('show')}
+$('#bN').onclick=()=>{$('#buy').classList.remove('show');pending=null};
+$('#bY').onclick=()=>{if(!pending||!window.AG)return;const o=pending.c.o[pending.i],c=o.c||0,d=o.d||0;
+  if(AG.coins()<c||AG.diamonds()<d||!AG.spend(c,d)){$('#bM').textContent=d?T('אין מספיק 💎 – שחקו עוד ותרוויחו!','Not enough 💎 – play more to earn some!'):T('אין מספיק 🪙 – שחקו עוד ותרוויחו!','Not enough 🪙 – play more to earn some!');return}
+  A.own(pending.c.id,pending.i);cfg[pending.c.id]=pending.i;save();wallet();tiles();$('#buy').classList.remove('show');pending=null;pop(true)};
+let popT=0,party=0;function pop(big){popT=1;if(big)party=1}
+$('#rnd').onclick=()=>{CATS.forEach(c=>{const ok=c.o.map((o,i)=>i).filter(i=>A.owned(c.id,i));cfg[c.id]=ok[Math.floor(Math.random()*ok.length)]});save();tiles();pop()};
+$('#dl').onclick=()=>{const c=document.createElement('canvas');c.width=c.height=1024;A.draw(c.getContext('2d'),cfg,512,512,1024,{still:true});const nm=($('#name').value||'').trim();
+  const g=c.getContext('2d');if(nm){g.font='900 72px system-ui,Arial';g.textAlign='center';g.lineWidth=12;g.strokeStyle='rgba(0,0,0,.55)';g.strokeText(nm,512,980);g.fillStyle='#fff';g.fillText(nm,512,980)}
+  const a=document.createElement('a');a.href=c.toDataURL('image/png');a.download=(nm||T('הדמות-שלי','my-character'))+'.png';document.body.appendChild(a);a.click();a.remove()};
+const nmI=$('#name');nmI.value=ls('ag_name')||'';nmI.addEventListener('input',()=>{ls('ag_name',nmI.value.trim().slice(0,14));save()});
+const pv=$('#pv'),px=pv.getContext('2d');
+pv.addEventListener('pointermove',e=>{const r=pv.getBoundingClientRect();look=Math.max(-1,Math.min(1,((e.clientX-r.left)/r.width-.5)*2.4))});
+pv.addEventListener('pointerleave',()=>look=0);pv.addEventListener('pointerdown',()=>pop());
+let nextBlink=1.5;
+function frame(n){requestAnimationFrame(frame);const t=(n-t0)/1000;if(t>nextBlink){blink=.13;nextBlink=t+2+Math.random()*3}
+  if(blink>0)blink-=1/60;popT*=.9;party*=.985;
+  px.setTransform(1,0,0,1,0,0);px.clearRect(0,0,600,600);
+  A.draw(px,cfg,300,300,600,{t,blink:blink>0,look,bg:true});
+  if(popT>.02){px.save();px.globalAlpha=popT;px.strokeStyle='#fff';px.lineWidth=8;px.beginPath();px.arc(300,300,240+(1-popT)*80,0,7);px.stroke();px.restore()}
+  if(party>.05){for(let i=0;i<40;i++){const a=i*2.4+t*.4,r=(1-party)*420+i*3;px.fillStyle=['#ff5d8f','#3fc1ff','#ffd23f','#58f29b','#a855f7'][i%5];px.globalAlpha=party;px.fillRect(300+Math.cos(a)*r,300+Math.sin(a)*r-(1-party)*60,10,6)}px.globalAlpha=1}}
+if(EN){document.title='Character studio – Alon Maidenberg';$('h1').textContent='🎨 Character studio';$('.sub').textContent='Design your own character – it shows on the site and in rooms with friends';nmI.placeholder='Your name';$('#rnd').textContent='🎲 Random';$('#dl').textContent='⬇️ Picture';$('#saved').textContent='✔ Saved';$('#bY').textContent='🛒 Buy & wear';$('#bN').textContent='Not now';$('.hint').innerHTML='🔒 Locked parts cost coins – play games to earn more.<br>What you buy stays yours; switch any time.'}
+tabsUI();tiles();wallet();if(window.AG&&AG.onChange)AG.onChange(wallet);setInterval(wallet,2000);requestAnimationFrame(frame);
+</script>
+</body>
+</html>

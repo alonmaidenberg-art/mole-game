@@ -13,6 +13,7 @@
   var GAMES={};try{GAMES=JSON.parse(ss('ag_gnames')||'{}')}catch(e){}
   function rid(n){var s='',c='abcdefghijklmnopqrstuvwxyz0123456789';for(var i=0;i<n;i++)s+=c[Math.floor(Math.random()*c.length)];return s}
   function rcode(){var s='',c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';for(var i=0;i<5;i++)s+=c[Math.floor(Math.random()*c.length)];return s}
+  function myAv(){return (ls('ag_av')||'').slice(0,12)}
   function myName(){return (ls('ag_name')||'').trim()||T('שחקן','Player')+' '+(1+Math.floor(Math.random()*99))}
 
   var st=null,room=null,subs=[],gameH=null,pendingChal=null,es=null,seen={},chunks={};
@@ -73,7 +74,7 @@
     get room(){return room},get connected(){return !!room&&(room.host||(!!room.hostAt&&Date.now()-room.hostAt<15000))},
     get members(){return room?room.members:[]},get me(){return room?room.gid:null},
     on:function(f){subs.push(f)},
-    create:function(){leave(true);room={code:rcode(),host:true,gid:'h'+rid(5),name:myName(),members:[],links:{}};room.members=[{gid:room.gid,name:room.name}];save();startHost();emit();return room.code},
+    create:function(){leave(true);room={code:rcode(),host:true,gid:'h'+rid(5),name:myName(),members:[],links:{}};room.members=[{gid:room.gid,name:room.name,av:myAv()}];save();startHost();emit();return room.code},
     join:function(code){code=String(code||'').toUpperCase().replace(/[^A-Z0-9]/g,'');if(code.length!==5)return false;leave(true);room={code:code,host:false,gid:'g'+rid(5),name:myName(),members:[],link:null};save();startGuest();emit();return true},
     leave:function(){leave(false)},
     send:function(to,msg){msg.from=room.gid;msg.to=to;route(msg)},
@@ -97,7 +98,7 @@
     if(!room||m.from===room.gid)return;
     if(room.host&&(m.t==='hello'||m.t==='hb')){
       room.seenAt=room.seenAt||{};room.seenAt[m.from]=Date.now();
-      var known=room.members.some(function(x){return x.gid===m.from});setMember(m.from,m.name||'?');
+      var known=room.members.some(function(x){return x.gid===m.from});setMember(m.from,m.name||'?',m.av);
       if(!known||m.t==='hello')sendMembers();return}
     if(!room.host&&m.t==='members'){
       var was=net.connected;room.members=m.list||[];
@@ -111,17 +112,17 @@
     clearInterval(hbT);hbT=setInterval(function(){if(room&&room.host){pruneMembers();sendMembers()}},4000);
   }
   function bubble(n,t){var d=document.createElement('div');d.textContent=n+': '+t;d.style.cssText='position:fixed;left:50%;top:70px;transform:translateX(-50%) translateY(-10px);z-index:2147483300;background:linear-gradient(135deg,rgba(255,255,255,.95),rgba(220,255,248,.9));color:#0b4553;border-radius:18px;padding:8px 16px;font:900 17px system-ui,Arial;box-shadow:0 8px 24px rgba(10,120,130,.3);opacity:0;transition:all .3s;max-width:90vw;text-align:center;pointer-events:none';document.body.appendChild(d);requestAnimationFrame(function(){d.style.opacity='1';d.style.transform='translateX(-50%) translateY(0)'});setTimeout(function(){d.style.opacity='0'},2600);setTimeout(function(){d.remove()},3000)}
-  function setMember(g,n){var f=room.members.filter(function(m){return m.gid===g})[0];if(f)f.name=n;else room.members.push({gid:g,name:n})}
+  function setMember(g,n,av){av=String(av||'').replace(/[^0-9a-z]/g,'').slice(0,12);var f=room.members.filter(function(m){return m.gid===g})[0];if(f){f.name=n;if(av)f.av=av}else room.members.push({gid:g,name:n,av:av})}
   function dropMember(g){room.members=room.members.filter(function(m){return m.gid!==g})}
   function pruneMembers(){var now=Date.now();room.members=room.members.filter(function(m){return m.gid===room.gid||(room.seenAt&&now-(room.seenAt[m.gid]||0)<15000)})}
-  function sendMembers(){if(!room)return;mqPub({t:'members',from:room.gid,to:'*',list:room.members.map(function(m){return{gid:m.gid,name:m.name}})});emit()}
+  function sendMembers(){if(!room)return;mqPub({t:'members',from:room.gid,to:'*',list:room.members.map(function(m){return{gid:m.gid,name:m.name,av:m.gid===room.gid?myAv():m.av}})});emit()}
   function startGuest(){
     relayStart(room.code,onRelay);
     var last=false;
     function tick(){
       if(!room||room.host)return;
       var c=net.connected;if(c!==last){last=c;emit()}
-      mqPub({t:c?'hb':'hello',from:room.gid,name:room.name});
+      mqPub({t:c?'hb':'hello',from:room.gid,name:room.name,av:myAv()});
     }
     clearInterval(hbT);hbT=setInterval(tick,2500);tick();
   }
@@ -188,7 +189,7 @@
     var cr=el('div','display:flex;flex-wrap:wrap;gap:4px;margin:6px 0');['👍','😂','😮','🔥','👏','😡','GG','🙏'].concat([T('בואו!','Come on!'),T('עוד משחק?','Another?'),T('סבבה','Cool')]).forEach(function(q){var cb=el('button','border:0;border-radius:12px;padding:6px 10px;font:800 14px system-ui;cursor:pointer;background:#fff;color:#0b4553',q);cb.onclick=function(){net.say(q)};cr.appendChild(cb)});panel.appendChild(cr);
     panel.appendChild(el('div','font-weight:800;margin-top:6px',T('בשרת:','In the room:')));
     room.members.forEach(function(m){
-      var r=el('div','display:flex;align-items:center;justify-content:space-between;padding:4px 2px');r.appendChild(el('span','',(m.gid===room.gid?'⭐ ':'👤 ')+m.name));
+      var r=el('div','display:flex;align-items:center;justify-content:space-between;padding:4px 2px');var nmS=el('span','display:flex;align-items:center;gap:7px',''),avc=m.gid===room.gid?myAv():m.av;if(window.AGAv&&avc){var im=document.createElement('img');im.src=AGAv.url(String(avc).replace(/[^0-9a-z]/g,''),56);im.style.cssText='width:28px;height:28px;border-radius:50%';nmS.appendChild(im)}else nmS.appendChild(document.createTextNode(m.gid===room.gid?'⭐':'👤'));nmS.appendChild(document.createTextNode(m.name+(m.gid===room.gid?T(' (אתה)',' (you)'):'')));r.appendChild(nmS);
       if(m.gid!==room.gid&&gameH&&!match)r.appendChild(b('⚔ '+T('אתגר','Challenge'),function(){net.challenge(m.gid,gameH.id);toast(T('נשלחה הזמנה – מחכים…','Invite sent – waiting…'));panelOpen=false;panel.style.display='none'},'#ff9a3a'));
       panel.appendChild(r)});
     if(isScoreGame()&&!gameH)panel.appendChild(b(T('🎉 מסיבה: כולם משחקים את זה','🎉 Party: everyone plays this'),function(){net.partyStart();panelOpen=false;panel.style.display='none'},'#7fe3a0'));

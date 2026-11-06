@@ -36,6 +36,7 @@ a.card img{width:72px;height:72px;border-radius:16px;flex:none;background:#0003}
 footer{text-align:center;margin-top:34px;opacity:.55;font-size:13px}
 .wal{display:flex;gap:8px;justify-content:center;margin-top:12px;font-weight:800}
 .wal span{background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.15);border-radius:999px;padding:5px 14px;font-size:16px}
+.me{display:inline-flex;align-items:center;gap:10px;margin-top:14px;padding:6px 18px 6px 6px;border-radius:999px;background:rgba(255,255,255,.88);border:2px solid #fff;box-shadow:0 4px 14px rgba(20,150,140,.22);color:#0b4553;font-size:17px;text-decoration:none;text-align:start}.me img{width:46px;height:46px;border-radius:50%;background:#fff2}.me span{display:flex;flex-direction:column;line-height:1.2}.me small{opacity:.75;font-size:12px}.me:hover{background:#fff;transform:translateY(-1px)}.me small{color:#13a37a;font-weight:800}
 .key{background:none;border:0;color:#fff;opacity:.45;font-size:20px;cursor:pointer;padding:6px 10px}
 .mo{position:fixed;inset:0;background:rgba(10,5,30,.85);display:none;align-items:center;justify-content:center;z-index:50;padding:16px}.mo.show{display:flex}
 .mc{width:100%;max-width:360px;background:linear-gradient(160deg,#2e639b,#193552);border:2px solid rgba(255,255,255,.2);border-radius:24px;padding:20px;text-align:center}
@@ -88,6 +89,7 @@ body.cmp .new{top:-5px;font-size:9.5px;padding:2px 6px}
     <img src="assets/hub.svg" alt="" width="84" height="84">
     <h1>המשחקים של אלון מידנברג</h1>
     <p>בחרו משחק ותתחילו לשחק 🎮</p><div class="stat" id="stat"></div>
+    <a class="me" id="meB" href="avatar/" aria-label="הדמות שלי"><img id="meI" alt="" width="46" height="46"><span><b id="meN">הדמות שלי</b><small>🎨 עצבו דמות משלכם</small></span></a>
     <div class="wal"><span>🪙 <b id="wc">0</b></span><span>💎 <b id="wd">0</b></span><button class="key" id="keyB" aria-label="קוד אדמין">🔑</button></div>
   <div class="daily"><button id="dailyB">🎁 מתנה יומית</button> <button id="lbB" style="font:inherit;font-weight:900;font-size:16px;padding:10px 20px;border-radius:999px;border:2px solid rgba(255,255,255,.3);background:rgba(255,255,255,.08);color:#fff;cursor:pointer">🏆 השיאים שלי</button> <button id="gbB" style="font:inherit;font-weight:900;font-size:16px;padding:10px 20px;border-radius:999px;border:2px solid rgba(255,255,255,.3);background:rgba(255,255,255,.08);color:#fff;cursor:pointer">🌍 לוח תוצאות</button> <button id="achB" style="font:inherit;font-weight:900;font-size:16px;padding:10px 20px;border-radius:999px;border:2px solid rgba(255,255,255,.3);background:rgba(255,255,255,.08);color:#fff;cursor:pointer">🏅 הישגים</button></div>
     <div class="tools" style="display:flex;gap:8px"><input class="sr" id="sr" type="search" placeholder="🔍 חיפוש משחק…" autocomplete="off"><button class="sr" id="cmpB" type="button" style="width:auto;flex:none;cursor:pointer;font-weight:900" aria-label="תצוגה"></button></div>
@@ -269,5 +271,6 @@ $('a4').onclick=function(){AG.adminLogout();admView()};
 $('m1').onclick=function(){AG.add(1000,0)};$('m2').onclick=function(){AG.add(0,10)};
 $('m3').onclick=function(){AG.miniLogout();admView()};
 </script>
+<script>(function(){function upd(){if(!window.AGAv)return setTimeout(upd,120);document.getElementById('meI').src=AGAv.url(null,92);var n='';try{n=(localStorage.getItem('ag_name')||'').trim()}catch(e){}if(n&&AGAv.mine())document.getElementById('meN').textContent=n;if(!AGAv.mine())document.querySelector('#meB small').textContent='🎨 צרו דמות משלכם – חדש!'}upd();addEventListener('pageshow',upd)})();</script>
 </body>
 </html>
