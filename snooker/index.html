@@ -8,7 +8,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>סנוקר – אלון מידנברג</title>
-<meta name="description" content="סנוקר נגד מחשב או חבר.">
+<meta name="description" content="סנוקר נגד מחשב, חבר על אותו מסך, או חבר מרחוק.">
 <meta name="theme-color" content="#14703a">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png">
@@ -48,7 +48,7 @@ body{overflow:hidden;position:fixed;inset:0;width:100%;background:#0e2338}
 <body>
 <canvas id="cv"></canvas><div id="hud"></div>
 <div id="rot">📱↔️<br>סובבו את הטלפון לרוחב</div>
-<div class="ov show" id="menu"><div class="ovc" style="max-width:440px"><div style="font-size:56px">🎱</div><h2>סנוקר</h2><div class="lb">הכניסו אדום, אחר כך צבעוני, וצברו נקודות. מי שמקבל יותר ניצח</div><div class="chips" id="md"><button class="chip on" data-v="cpu">נגד מחשב</button><button class="chip" data-v="2p">שני שחקנים</button></div><div class="chips" style="margin-top:8px" id="lv"><button class="chip" data-v="1">קל</button><button class="chip on" data-v="2">רגיל</button><button class="chip" data-v="3">קשה</button></div><div style="opacity:.75;font-size:12.5px;margin-top:8px;line-height:1.6">לכוון ולירות: לחצו על הכדור הלבן, <b>גררו אחורה</b> ושחררו. ככל שמושכים יותר, הירייה חזקה יותר<br>פסילה (לבן נכנס / פגיעה שגויה) = 4 נקודות ליריב</div><button class="btn" id="go">▶ שחק</button><div style="opacity:.8;margin-top:10px;font-size:15px">שיא: <b id="best">0</b></div></div></div>
+<div class="ov show" id="menu"><div class="ovc" style="max-width:440px"><div style="font-size:56px">🎱</div><h2>סנוקר</h2><div class="lb">הכניסו אדום, אחר כך צבעוני, וצברו נקודות. מי שמקבל יותר ניצח</div><div class="chips" id="md"><button class="chip on" data-v="cpu">נגד מחשב</button><button class="chip" data-v="2p">שני שחקנים</button></div><div class="chips" style="margin-top:8px" id="lv"><button class="chip" data-v="1">קל</button><button class="chip on" data-v="2">רגיל</button><button class="chip" data-v="3">קשה</button></div><div style="opacity:.75;font-size:12.5px;margin-top:8px;line-height:1.6">לכוון ולירות: לחצו על הכדור הלבן, <b>גררו אחורה</b> ושחררו. ככל שמושכים יותר, הירייה חזקה יותר<br>פסילה (לבן נכנס / פגיעה שגויה) = 4 נקודות ליריב</div><button class="btn" id="go">▶ שחק</button><button class="btn alt" id="friendBtn" style="margin-top:8px">👥 שחק עם חבר מרחוק</button><div id="friendHint" style="display:none;text-align:right;font-size:14px;line-height:1.6;background:rgba(0,0,0,.25);border-radius:14px;padding:10px 12px;margin-top:8px"></div><div style="opacity:.8;margin-top:10px;font-size:15px">שיא: <b id="best">0</b></div></div></div>
 <div class="ov" id="end"><div class="ovc"><h2 id="eT">נגמר</h2><div style="font-size:48px;font-weight:900;color:#ffd05a" id="eS"></div><p id="eM"></p><button class="btn" id="again">🔁 שוב</button><button class="btn alt" id="menu2">תפריט</button></div></div>
 <script>
 'use strict';
@@ -74,14 +74,14 @@ function spot(b){const c=COL[b.t];b.x=c[2];b.y=c[3];b.vx=b.vy=0;b.in=false;let t
 function reset(){balls=[];for(const t of SEQ){const c=COL[t];balls.push({t,x:c[2],y:c[3],vx:0,vy:0,in:false,col:c[0],pts:c[1]})}
   for(let i=0;i<5;i++)for(let j=0;j<=i;j++)balls.push({t:'red',x:566+i*BR*1.75,y:(Y0+Y1)/2+(j-i/2)*BR*2.05,vx:0,vy:0,in:false,col:'#d42a2a',pts:1});
   cue={t:'cue',x:150,y:(Y0+Y1)/2+0,vx:0,vy:0,in:false,col:'#fff',pts:0};balls.push(cue);cur=0;sc=[0,0];need='red';phase='reds';seqI=0;state='aim';over=false;msg='';drag=null;aiT=0;announce(P()+' מתחיל')}
-const P=()=>mode==='2p'?'שחקן '+(cur+1):(cur===0?'אתה':'המחשב');
+const NM=i=>mode==='net'&&NET?(i===NET.role?'אתה':NET.name):mode==='2p'?'שחקן '+(i+1):(i===0?'אתה':'המחשב');const P=()=>NM(cur);
 function announce(m){msg=m;msgT=120}
 function moving(){return balls.some(b=>!b.in&&(Math.abs(b.vx)>.04||Math.abs(b.vy)>.04))}
-function shoot(a,p){cue.vx=Math.cos(a)*p;cue.vy=Math.sin(a)*p;state='roll';firstHit=null;potted=[];cuePot=false;tone(300,.06,'square',.08)}
+function shoot(a,p){shooter=cur;cue.vx=Math.cos(a)*p;cue.vy=Math.sin(a)*p;state='roll';firstHit=null;potted=[];cuePot=false;tone(300,.06,'square',.08)}
 function cp(e){const r=cv.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width*W,y:(e.clientY-r.top)/r.height*H}}
-cv.addEventListener('pointerdown',e=>{if(state!=='aim'||(mode==='cpu'&&cur===1))return;const p=cp(e);if(Math.hypot(p.x-cue.x,p.y-cue.y)<45)drag={x:p.x,y:p.y};});
-cv.addEventListener('pointermove',e=>{if(drag)drag=Object.assign(drag,{x:cp(e).x,y:cp(e).y})});
-addEventListener('pointerup',()=>{if(!drag)return;const dx=cue.x-drag.x,dy=cue.y-drag.y,d=Math.hypot(dx,dy);drag=null;if(d>10)shoot(Math.atan2(dy,dx),Math.min(26,d*.16))});
+cv.addEventListener('pointerdown',e=>{if(state!=='aim'||(mode==='cpu'&&cur===1)||(mode==='net'&&(!NET||cur!==NET.role)))return;const p=cp(e);if(Math.hypot(p.x-cue.x,p.y-cue.y)<45)drag={x:p.x,y:p.y};});
+cv.addEventListener('pointermove',e=>{if(drag){drag=Object.assign(drag,{x:cp(e).x,y:cp(e).y});const n=performance.now();if(mode==='net'&&n-aimT>70){aimT=n;netSend({t:'aim',x:+drag.x.toFixed(1),y:+drag.y.toFixed(1)})}}});
+addEventListener('pointerup',()=>{if(!drag)return;const dx=cue.x-drag.x,dy=cue.y-drag.y,d=Math.hypot(dx,dy);drag=null;netSend({t:'aim',x:null});if(d>10){const a=Math.atan2(dy,dx),pw=Math.min(26,d*.16);if(mode==='net')netSend({t:'s',a,p:pw,b:snap()});shoot(a,pw)}});
 function phys(){for(let s=0;s<5;s++){for(const b of balls){if(b.in)continue;b.x+=b.vx/5;b.y+=b.vy/5;
     for(const p of PK)if(Math.hypot(b.x-p[0],b.y-p[1])<PR){b.in=true;b.vx=b.vy=0;sink(b);break}if(b.in)continue;
     const mouthX=p=>false;if(b.x<X0+BR){if(!(b.y<Y0+PR-4||b.y>Y1-PR+4)){b.x=X0+BR;b.vx=Math.abs(b.vx)*.8}}if(b.x>X1-BR){if(!(b.y<Y0+PR-4||b.y>Y1-PR+4)){b.x=X1-BR;b.vx=-Math.abs(b.vx)*.8}}
@@ -90,11 +90,11 @@ function phys(){for(let s=0;s<5;s++){for(const b of balls){if(b.in)continue;b.x+
   for(const b of balls){b.vx*=.989;b.vy*=.989;if(Math.hypot(b.vx,b.vy)<.04){b.vx=b.vy=0}}}
 function sink(b){tone(200,.15,'sine',.08);if(b===cue)cuePot=true;else potted.push(b)}
 function legalFirst(t){if(phase==='reds')return need==='red'?t==='red':t!=='red';return t===SEQ[seqI]}
-function settle(){const reds=balls.filter(b=>b.t==='red'&&!b.in).length;let foul=false;
+function settle(){if(mode==='net'&&NET){if(shooter!==NET.role){state='wait';if(pend){applySt(pend);pend=null}return}}const reds=balls.filter(b=>b.t==='red'&&!b.in).length;let foul=false;
   if(cuePot||firstHit===null||!legalFirst(firstHit))foul=true;
   if(!foul){if(phase==='reds'){if(need==='red'){if(potted.some(b=>b.t!=='red'))foul=true}else{if(potted.some(b=>b.t==='red')||potted.length>1||potted.some(b=>b.t!==firstHit))foul=true}}else{if(potted.some(b=>b.t!==SEQ[seqI]))foul=true}}
   const opp=1-cur;
-  if(foul){sc[opp]+=4;announce('פסילה! 4 נקודות ל'+(mode==='2p'?'שחקן '+(opp+1):(opp===0?'אתה':'המחשב')));for(const b of potted)if(b.t!=='red'&&phase==='reds')spot(b);else if(b.t!=='red'&&phase==='seq'){spot(b)}
+  if(foul){sc[opp]+=4;announce('פסילה! 4 נקודות ל'+NM(opp));for(const b of potted)if(b.t!=='red'&&phase==='reds')spot(b);else if(b.t!=='red'&&phase==='seq'){spot(b)}
     if(cuePot||true){cue.in=false;cue.x=150;cue.y=(Y0+Y1)/2;cue.vx=cue.vy=0;let t=0;while(balls.some(o=>o!==cue&&!o.in&&Math.hypot(o.x-cue.x,o.y-cue.y)<BR*2)&&t++<40)cue.y+=BR*2.2}
     cur=opp;need=phase==='reds'?(balls.filter(b=>b.t==='red'&&!b.in).length?'red':'color'):'color'}
   else if(potted.length){let pts=0;for(const b of potted)pts+=b.pts;sc[cur]+=pts;announce(P()+' +'+pts);tone(800,.15);
@@ -105,8 +105,8 @@ function settle(){const reds=balls.filter(b=>b.t==='red'&&!b.in).length;let foul
   else{cur=1-cur;if(phase==='reds'&&need==='color')need='red';if(phase==='reds'&&need==='red'&&!balls.some(b=>b.t==='red'&&!b.in)){phase='seq';seqI=0}announce('התור עובר ל'+P())}
   if(phase==='reds'&&need==='red'&&!balls.some(b=>b.t==='red'&&!b.in)){phase='seq';seqI=0}
   if(phase==='seq'&&seqI>=SEQ.length){finish();return}
-  state='aim';aiT=50}
-function finish(){over=true;state='over';const w=sc[0]>sc[1]?0:sc[1]>sc[0]?1:-1;saveBest(sc[0]);setTimeout(()=>endGame(mode==='2p'?(w<0?'תיקו':w===0?'שחקן 1 ניצח!':'שחקן 2 ניצח!'):(w===0?'ניצחת! 🏆':w<0?'תיקו':'המחשב ניצח'),sc[0]+' : '+sc[1],'',mode==='cpu'?(w===0?20+lvl*10:6)+Math.floor(sc[0]/4):0,mode==='cpu'&&w===0&&lvl===3?1:0),800)}
+  state='aim';aiT=50;if(mode==='net'){const S=snap();applyPos(S.bl);netSend({t:'st',...S})}}
+function finish(){over=true;state='over';if(mode==='net'&&NET){netSend({t:'st',...snap(),fin:1});const me=NET.role,w=sc[me]>sc[1-me]?1:sc[me]<sc[1-me]?-1:0;saveBest(sc[me]);setTimeout(()=>endGame(w>0?'ניצחת! 🏆':w<0?NET.name+' ניצח':'תיקו',sc[me]+' : '+sc[1-me],'',w>0?25:8,w>0?2:0),800);return}const w=sc[0]>sc[1]?0:sc[1]>sc[0]?1:-1;saveBest(sc[0]);setTimeout(()=>endGame(mode==='2p'?(w<0?'תיקו':w===0?'שחקן 1 ניצח!':'שחקן 2 ניצח!'):(w===0?'ניצחת! 🏆':w<0?'תיקו':'המחשב ניצח'),sc[0]+' : '+sc[1],'',mode==='cpu'?(w===0?20+lvl*10:6)+Math.floor(sc[0]/4):0,mode==='cpu'&&w===0&&lvl===3?1:0),800)}
 function clear(x1,y1,x2,y2,ign){const dx=x2-x1,dy=y2-y1,l=Math.hypot(dx,dy)||1;for(const b of balls){if(b.in||ign.includes(b))continue;const t=((b.x-x1)*dx+(b.y-y1)*dy)/(l*l);if(t<0||t>1)continue;const px=x1+dx*t,py=y1+dy*t;if(Math.hypot(b.x-px,b.y-py)<BR*2-1)return false}return true}
 function ai(){const targets=balls.filter(b=>!b.in&&b!==cue&&(phase==='reds'?(need==='red'?b.t==='red':b.t!=='red'):b.t===SEQ[seqI]));let best=null,bs=1e9;
   for(const t of targets)for(const p of PK){const dx=p[0]-t.x,dy=p[1]-t.y,d=Math.hypot(dx,dy),ux=dx/d,uy=dy/d,gx=t.x-ux*BR*2,gy=t.y-uy*BR*2;if(gx<X0||gx>X1||gy<Y0||gy>Y1)continue;
@@ -119,14 +119,41 @@ function draw(){ctx.fillStyle='#2a1608';ctx.fillRect(0,0,W,H);ctx.fillStyle='#4a
   ctx.strokeStyle='rgba(255,255,255,.5)';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(190,Y0);ctx.lineTo(190,Y1);ctx.stroke();ctx.beginPath();ctx.arc(190,(Y0+Y1)/2,52,Math.PI/2,Math.PI*1.5);ctx.stroke();
   for(const p of PK){ctx.fillStyle='#000';ctx.beginPath();ctx.arc(p[0],p[1],PR,0,7);ctx.fill()}
   for(const b of balls){if(b.in)continue;ctx.fillStyle='rgba(0,0,0,.3)';ctx.beginPath();ctx.arc(b.x+2,b.y+3,BR,0,7);ctx.fill();const gr=ctx.createRadialGradient(b.x-3,b.y-3,1,b.x,b.y,BR);gr.addColorStop(0,'#fff');gr.addColorStop(.25,b.col);gr.addColorStop(1,b.col);ctx.fillStyle=b.t==='cue'?'#f4f4f4':gr;ctx.beginPath();ctx.arc(b.x,b.y,BR,0,7);ctx.fill();ctx.fillStyle='rgba(255,255,255,.7)';ctx.beginPath();ctx.arc(b.x-3,b.y-3,2.2,0,7);ctx.fill()}
-  if(drag&&state==='aim'){const dx=cue.x-drag.x,dy=cue.y-drag.y,d=Math.hypot(dx,dy),a=Math.atan2(dy,dx);ctx.strokeStyle='rgba(255,255,255,.7)';ctx.setLineDash([6,6]);ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(cue.x,cue.y);ctx.lineTo(cue.x+Math.cos(a)*400,cue.y+Math.sin(a)*400);ctx.stroke();ctx.setLineDash([]);
+  const DG=drag||(mode==='net'&&rdrag&&state==='aim'?rdrag:null);if(mode==='net'&&state==='aim'&&NET&&cur!==NET.role&&!rdrag){ctx.font='bold 17px system-ui';ctx.textAlign='center';ctx.fillStyle='#9fe8ff';ctx.fillText(NET.name+' מכוון…',W/2,H-12)}
+  if(mode==='net'&&state==='aim'&&NET&&cur===NET.role&&!drag&&msgT<=0){ctx.font='bold 17px system-ui';ctx.textAlign='center';ctx.fillStyle='#ffd05a';ctx.fillText('👆 התור שלך – גרור אחורה מהכדור הלבן',W/2,H-12)}
+  if(DG&&state==='aim'){const drag=DG;const dx=cue.x-drag.x,dy=cue.y-drag.y,d=Math.hypot(dx,dy),a=Math.atan2(dy,dx);ctx.strokeStyle='rgba(255,255,255,.7)';ctx.setLineDash([6,6]);ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(cue.x,cue.y);ctx.lineTo(cue.x+Math.cos(a)*400,cue.y+Math.sin(a)*400);ctx.stroke();ctx.setLineDash([]);
     ctx.strokeStyle='#c8914a';ctx.lineWidth=6;ctx.lineCap='round';const back=Math.min(d,160)+BR+4;ctx.beginPath();ctx.moveTo(cue.x-Math.cos(a)*back,cue.y-Math.sin(a)*back);ctx.lineTo(cue.x-Math.cos(a)*(back+160),cue.y-Math.sin(a)*(back+160));ctx.stroke();
     ctx.fillStyle='rgba(0,0,0,.5)';ctx.fillRect(W/2-100,H-26,200,10);ctx.fillStyle=d>150?'#ff5a5a':'#ffd05a';ctx.fillRect(W/2-100,H-26,Math.min(200,d*1.3),10)}
-  ctx.fillStyle='#fff';ctx.font='bold 22px system-ui';ctx.textAlign='left';ctx.fillText((mode==='2p'?'שחקן 1':'אתה')+': '+sc[0],16,28);ctx.textAlign='right';ctx.fillText((mode==='2p'?'שחקן 2':'מחשב')+': '+sc[1],W-16,28);ctx.textAlign='center';ctx.font='16px system-ui';ctx.fillStyle=cur===0?'#ffd05a':'#9fe8ff';ctx.fillText('תור: '+P()+' · '+(phase==='seq'?'הכניסו '+({yellow:'צהוב',green:'ירוק',brown:'חום',blue:'כחול',pink:'ורוד',black:'שחור'})[SEQ[seqI]||'black']:need==='red'?'הכניסו אדום':'הכניסו צבעוני'),W/2,24);
+  ctx.fillStyle='#fff';ctx.font='bold 22px system-ui';ctx.textAlign='left';ctx.fillText(NM(0)+': '+sc[0],16,28);ctx.textAlign='right';ctx.fillText((mode==='net'||mode==='2p'?NM(1):'מחשב')+': '+sc[1],W-16,28);ctx.textAlign='center';ctx.font='16px system-ui';ctx.fillStyle=cur===0?'#ffd05a':'#9fe8ff';ctx.fillText('תור: '+P()+' · '+(phase==='seq'?'הכניסו '+({yellow:'צהוב',green:'ירוק',brown:'חום',blue:'כחול',pink:'ורוד',black:'שחור'})[SEQ[seqI]||'black']:need==='red'?'הכניסו אדום':'הכניסו צבעוני'),W/2,24);
   if(msgT>0){ctx.globalAlpha=Math.min(1,msgT/30);ctx.font='bold 30px system-ui';ctx.fillStyle='#ffd05a';ctx.strokeStyle='#000';ctx.lineWidth=5;ctx.strokeText(msg,W/2,H-34);ctx.fillText(msg,W/2,H-34);ctx.globalAlpha=1}}
 let last=performance.now(),acc=0;function loop(n){requestAnimationFrame(loop);acc+=Math.min(100,n-last);last=n;while(acc>=1000/60){acc-=1000/60;step()}if(balls&&state!=='menu')draw();else{ctx.fillStyle='#2a1608';ctx.fillRect(0,0,W,H)}}
-$('#go').onclick=()=>{$('#menu').classList.remove('show');reset()};$('#again').onclick=()=>{$('#end').classList.remove('show');reset()};$('#menu2').onclick=()=>{state='menu';$('#end').classList.remove('show');$('#menu').classList.add('show')};
-window.__s={reset,step,shoot,get state(){return state},get sc(){return sc},get balls(){return balls},get cue(){return cue},get cur(){return cur}};requestAnimationFrame(loop);
+$('#go').onclick=()=>{if(mode==='net')mode=$('#md .chip.on').dataset.v;$('#menu').classList.remove('show');reset()};$('#again').onclick=()=>{if(mode==='net')netSend({t:'again'});$('#end').classList.remove('show');reset()};$('#menu2').onclick=()=>{if(mode==='net'){NET=null;mode='cpu';try{AG.net.endMatch()}catch(e){}}state='menu';$('#end').classList.remove('show');$('#menu').classList.add('show')};
+
+/* ---- online: play a friend on another phone (through the 🌐 rooms) ----
+   The player whose turn it is runs the real shot. The friend's phone plays the
+   same shot so they watch it roll, then takes the exact table from the shooter. */
+let NET=null,shooter=0,pend=null,rdrag=null,aimT=0;
+function netSend(d){try{if(NET&&window.AG&&AG.net&&AG.net.match)AG.net.matchSend(d)}catch(e){}}
+function snap(){return{bl:balls.map(b=>[+b.x.toFixed(2),+b.y.toFixed(2),b.in?1:0]),cur,sc:sc.slice(),need,phase,seqI,msg:msgT>0?msg:''}}
+function applyPos(bl){if(!bl||bl.length!==balls.length)return;bl.forEach((q,i)=>{const b=balls[i];b.x=q[0];b.y=q[1];b.in=!!q[2];b.vx=b.vy=0})}
+function applySt(d){applyPos(d.bl);cur=d.cur;sc=d.sc;need=d.need;phase=d.phase;seqI=d.seqI;if(d.msg)announce(d.msg);rdrag=null;
+  if(d.fin){over=true;state='over';const me=NET.role,w=sc[me]>sc[1-me]?1:sc[me]<sc[1-me]?-1:0;saveBest(sc[me]);setTimeout(()=>endGame(w>0?'ניצחת! 🏆':w<0?NET.name+' ניצח':'תיקו',sc[me]+' : '+sc[1-me],'',w>0?25:8,w>0?2:0),800);return}
+  state='aim'}
+function netMsg(d){if(!NET||!d||mode!=='net')return;
+  if(d.t==='aim'){rdrag=d.x==null?null:{x:d.x,y:d.y};return}
+  if(d.t==='s'){applyPos(d.b&&d.b.bl);rdrag=null;shoot(d.a,d.p);return}
+  if(d.t==='st'){if(state==='roll'&&!d.fin){pend=d;return}applySt(d);return}
+  if(d.t==='again'){$('#end').classList.remove('show');reset();return}}
+function netGo(role,name){NET={role,name:(name||'חבר').replace(/</g,'')};mode='net';pend=null;rdrag=null;
+  for(const id of['#menu','#end'])$(id).classList.remove('show');$('#friendHint').style.display='none';reset();announce('משחק נגד '+NET.name+' 🎱')}
+(function hook(n){if(!(window.AG&&AG.net)){if(n<100)setTimeout(()=>hook(n+1),150);return}
+  AG.net.game('snooker',{name:'סנוקר',start:netGo,msg:netMsg,end(){if(!NET)return;NET=null;mode='cpu';state='menu';$('#end').classList.remove('show');$('#menu').classList.add('show')}})})(0);
+$('#friendBtn').onclick=()=>{const n=window.AG&&AG.net,h=$('#friendHint');
+  if(n&&n.room&&n.connected){const other=n.members.filter(m=>m.gid!==n.me)[0];
+    if(other){n.challenge(other.gid,'snooker');h.style.display='block';h.innerHTML='📨 נשלחה הזמנה ל<b>'+other.name.replace(/</g,'')+'</b>. מחכים שיאשר…';return}}
+  h.style.display='block';h.innerHTML='<b>איך משחקים עם חבר:</b><br>1. לוחצים על 🌐 למעלה ← <b>צור שרת</b> ושולחים לחבר את הקוד.<br>2. החבר נכנס לסנוקר, לוחץ 🌐 ומכניס את הקוד.<br>3. כשכתוב <b>מחובר ✔</b> לוחצים שוב על <b>👥 שחק עם חבר מרחוק</b>.';
+  const ob=document.querySelector('button[aria-label="online"]');if(ob&&!(n&&n.room))ob.click()};
+window.__s={netMsg,get mode(){return mode},reset,step,shoot,get state(){return state},get sc(){return sc},get balls(){return balls},get cue(){return cue},get cur(){return cur}};requestAnimationFrame(loop);
 
 if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 </script>
