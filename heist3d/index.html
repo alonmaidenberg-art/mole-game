@@ -162,29 +162,29 @@ function gv(x,y,z){return inB(x,y,z)?V[idx(x,y,z)]:(y<0?1:0)}
 /* name, colour, hp (0 = indestructible), loot value */
 const MAT=[
  null,
- {n:'grass',  c:0x5fa83c, hp:3},
- {n:'dirt',   c:0x7d5c38, hp:3},
- {n:'road',   c:0x34343c, hp:9},
- {n:'conc',   c:0x9ba0a8, hp:11},
- {n:'brick',  c:0xb0573a, hp:8},
- {n:'plaster',c:0xe2d9c6, hp:5},
- {n:'wood',   c:0x8d5c2c, hp:5},
- {n:'glass',  c:0xa6dcef, hp:1},
- {n:'metal',  c:0x889098, hp:19},
- {n:'vault',  c:0x4d5866, hp:52},
- {n:'safe',   c:0xc9a52a, hp:26, loot:450},
- {n:'money',  c:0x3fcc5e, hp:1,  loot:85},
- {n:'floor',  c:0x6b6b74, hp:13},
- {n:'crate',  c:0xa98340, hp:4},
- {n:'counter',c:0x5c4231, hp:6},
- {n:'roof',   c:0x8c3b31, hp:7},
+ {n:'grass',  c:0x5fa83c, hp:7},
+ {n:'dirt',   c:0x7d5c38, hp:7},
+ {n:'road',   c:0x34343c, hp:16},
+ {n:'conc',   c:0x9ba0a8, hp:19},
+ {n:'brick',  c:0xb0573a, hp:15},
+ {n:'plaster',c:0xe2d9c6, hp:11},
+ {n:'wood',   c:0x8d5c2c, hp:11},
+ {n:'glass',  c:0xa6dcef, hp:6},
+ {n:'metal',  c:0x889098, hp:32},
+ {n:'vault',  c:0x4d5866, hp:88},
+ {n:'safe',   c:0xc9a52a, hp:42, loot:450},
+ {n:'money',  c:0x3fcc5e, hp:9,  loot:85},
+ {n:'floor',  c:0x6b6b74, hp:22},
+ {n:'crate',  c:0xa98340, hp:10},
+ {n:'counter',c:0x5c4231, hp:12},
+ {n:'roof',   c:0x8c3b31, hp:13},
  {n:'rock',   c:0x1e1e24, hp:0},
- {n:'lamp',   c:0xffeaa6, hp:2},
- {n:'trim',   c:0xd9caa0, hp:8},
- {n:'carpet', c:0x8b2b3c, hp:4},
- {n:'hedge',  c:0x2f7a34, hp:3},
- {n:'door',   c:0x6b4a24, hp:7},
- {n:'gold',   c:0xf2c53d, hp:30, loot:900}
+ {n:'lamp',   c:0xffeaa6, hp:6},
+ {n:'trim',   c:0xd9caa0, hp:15},
+ {n:'carpet', c:0x8b2b3c, hp:9},
+ {n:'hedge',  c:0x2f7a34, hp:7},
+ {n:'door',   c:0x6b4a24, hp:13},
+ {n:'gold',   c:0xf2c53d, hp:48, loot:900}
 ];
 const AIR=0,GRASS=1,DIRT=2,ROAD=3,CONC=4,BRICK=5,PLASTER=6,WOOD=7,GLASS=8,METAL=9,
       VAULT=10,SAFE=11,MONEY=12,FLOOR=13,CRATE=14,COUNTER=15,ROOF=16,ROCK=17,LAMP=18,
@@ -351,13 +351,55 @@ function stepParts(dt){
   pMesh.instanceColor.needsUpdate=true;
 }
 
+/* ════════ items: money bags you have to go and pick up ════════ */
+const items=[];
+function dropBag(x,y,z,val,fling){
+  if(items.length>70){addCash(val);lootGot+=val;return}
+  const g=new THREE.Group();
+  const B=(w,h,d,c,y2,z2)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshBasicMaterial({color:c}));m.position.set(0,y2,z2||0);g.add(m)};
+  B(.52,.54,.44,0xd8c98a,.29);            /* שק */
+  B(.3,.17,.26,0xb5a46a,.62);             /* קשר */
+  B(.36,.22,.46,0x3fcc5e,.3,.005);        /* שטרות */
+  g.position.set(x,y,z);scene.add(g);
+  const f=fling||3;
+  items.push({g,x,y,z,vx:(Math.random()-.5)*f,vy:3.4+Math.random()*2,vz:(Math.random()-.5)*f,val,bob:Math.random()*6,rest:false});
+}
+function clearItems(){for(const it of items)scene.remove(it.g);items.length=0}
+function stepItems(dt){
+  for(let i=items.length-1;i>=0;i--){
+    const it=items[i];
+    if(!it.rest){
+      it.vy-=26*dt;
+      it.x+=it.vx*dt;it.y+=it.vy*dt;it.z+=it.vz*dt;
+      if(solid(Math.floor(it.x),Math.floor(it.y),Math.floor(it.z))){
+        it.y=Math.floor(it.y)+1;it.vy=0;it.vx*=.4;it.vz*=.4;
+        if(Math.abs(it.vx)<.4&&Math.abs(it.vz)<.4)it.rest=true;
+      }
+      if(it.y<-4){it.y=GY+1;it.vy=0;it.rest=true}
+    }
+    it.bob+=dt*3;
+    it.g.position.set(it.x,it.y+(it.rest?.06+Math.sin(it.bob)*.08:0),it.z);
+    it.g.rotation.y+=dt*1.5;
+    if(Math.hypot(P.x-it.x,P.z-it.z,(P.y+.6-it.y)*.5)<1.8){
+      addCash(it.val);lootGot+=it.val;
+      tone(720,.07,'sine',.07);setTimeout(()=>tone(1020,.1,'sine',.06),55);
+      scene.remove(it.g);items.splice(i,1);
+    }
+  }
+}
+
 /* ════════ damage / destruction ════════ */
 let cash=0,lootTotal=0,lootGot=0;
 function addCash(v){cash+=v;$('#cash').textContent='💰 '+cash}
+/* כספות וזהב מפילים שק שצריך לאסוף; חבילות כסף נכנסות ישר לכיס */
+function collectMat(m,x,y,z,fling){
+  if(m===SAFE||m===GOLD)dropBag(x+.5,y+.7,z+.5,LOOT[m],fling);
+  else{addCash(LOOT[m]);lootGot+=LOOT[m];tone(760,.08,'sine',.07);setTimeout(()=>tone(1040,.09,'sine',.06),55)}
+}
 function breakAt(x,y,z,debris){
   const i=idx(x,y,z),m=V[i];
   if(!m)return;
-  if(LOOT[m]){addCash(LOOT[m]);lootGot+=LOOT[m];tone(760,.08,'sine',.07);setTimeout(()=>tone(1040,.09,'sine',.06),55)}
+  if(LOOT[m])collectMat(m,x,y,z,3);
   V[i]=0;DM[i]=0;touch(x,y,z);
   if(debris!==false)spawnDebris(x,y,z,m,m===GLASS?7:4,4.5);
 }
@@ -384,10 +426,10 @@ function explode(cx,cy,cz,r,power){
     const dx=x+.5-cx,dy=y+.5-cy,dz=z+.5-cz,d2=dx*dx+dy*dy+dz*dz;
     if(d2>r2)continue;
     const f=1-Math.sqrt(d2)/r;
-    const amt=power*f*f*2.2;
+    const amt=power*f*f*4.2;
     const mx=HP[m];
     if(DM[i]+amt>=mx){
-      if(LOOT[m]){addCash(LOOT[m]);lootGot+=LOOT[m]}
+      if(LOOT[m])collectMat(m,x,y,z,7);
       V[i]=0;DM[i]=0;touch(x,y,z);
       if(broke<70&&Math.random()<.5)spawnDebris(x,y,z,m,1,8);
       broke++;
@@ -402,7 +444,7 @@ function explode(cx,cy,cz,r,power){
     if(pd<r*.85)hurt();
     shake=Math.max(shake,1.3);
   }
-  for(const g of guards){const gd=Math.hypot(g.x-cx,g.y-cy,g.z-cz);if(gd<r+1.5)g.dead=true}
+  for(const g of guards){const gd=Math.hypot(g.x-cx,g.y-cy,g.z-cz);if(gd<r+1.5)downGuard(g,8)}
 }
 
 /* ════════ player ════════ */
@@ -461,9 +503,9 @@ function physics(dt){
 
 /* ════════ tools ════════ */
 const TOOLS=[
- {k:'melee', n:'פטיש',  ic:'🔨', rate:.30, dmg:4,  reach:4.4, inf:true},
- {k:'melee', n:'מקדח',  ic:'🪛', rate:.07, dmg:1.3, reach:4.0, inf:true},
- {k:'shot',  n:'רובה',  ic:'🔫', rate:.62, dmg:7,  reach:22, ammo:0, max:24},
+ {k:'melee', n:'פטיש',  ic:'🔨', rate:.28, dmg:3,  reach:4.4, inf:true},
+ {k:'melee', n:'מקדח',  ic:'🪛', rate:.06, dmg:1.5, reach:4.0, inf:true},
+ {k:'shot',  n:'רובה',  ic:'🔫', rate:.62, dmg:9,  reach:22, ammo:0, max:24},
  {k:'throw', n:'רימון', ic:'🧨', rate:.75, r:3.6,  pow:9,  fuse:1.5, ammo:0, max:9},
  {k:'place', n:'דינמיט',ic:'🧱', rate:.6,  r:5.2,  pow:16, fuse:3.4, ammo:0, max:6},
  {k:'fire',  n:'רקטה',  ic:'🚀', rate:1.0, r:4.4,  pow:22, ammo:0, max:5}
@@ -513,7 +555,7 @@ function useTool(){
     }
     for(const g of guards){
       const gx=g.x-P.x,gy=g.y+.9-(P.y+EYE),gz=g.z-P.z,gl=Math.hypot(gx,gy,gz);
-      if(gl<t.reach&&(gx*d.x+gy*d.y+gz*d.z)/gl>.975){g.stun=3.6;g.state='patrol';g.alert=0;noise(.12,.12,900)}
+      if(gl<16&&(gx*d.x+gy*d.y+gz*d.z)/gl>.965)downGuard(g,3);
     }
   }else if(t.k==='throw'){
     t.ammo--;vmSwingV=1;
@@ -581,7 +623,7 @@ function mkHuman(cols){
 function mkGuard(x,z,isCop){
   const g=mkHuman(isCop?[0x16254f,0xffe14d,0x0a1128]:[0x2b3a5c,0x394a70,0x15202e]);
   return {g,x,y:GY+1,z,vy:0,a:0,sp:isCop?5.6+lvl*.4:3.1+lvl*.22,cop:!!isCop,
-          t:Math.random()*9,home:{x,z},state:'patrol',alert:0,give:0,stuck:0,ox:x,oz:z,stun:0,dead:false,hitCd:0};
+          t:Math.random()*9,home:{x,z},state:'patrol',alert:0,give:0,stuck:0,ox:x,oz:z,down:false,hitCd:0};
 }
 const inBld=(x,z)=>x>=BLD.x0-1&&x<=BLD.x1+1&&z>=BLD.z0-1&&z<=BLD.z1+1;
 function guardSees(g){
@@ -591,10 +633,19 @@ function guardSees(g){
   const h=raycast(g.x,g.y+1.3,g.z,dx/d,dy/d,dz/d,d-.4);
   return !h;
 }
+/* שומר שנפל נשאר על הרצפה – לא קם ולא חוזר */
+function downGuard(g,fling){
+  if(g.down)return;
+  g.down=true;g.state='down';
+  g.g.rotation.set(0,g.a,Math.PI*.47);
+  g.g.position.set(g.x,g.y+.34,g.z);
+  dropBag(g.x,g.y+.9,g.z,220+lvl*45,fling||4);
+  noise(.22,.15,800);tone(150,.26,'sawtooth',.07,60);
+  banner('💰 הפיל שק כסף',1.1);
+}
 function stepGuard(g,dt){
-  if(g.dead){scene.remove(g.g);return}
+  if(g.down)return;
   g.t+=dt;g.hitCd=Math.max(0,g.hitCd-dt);
-  if(g.stun>0){g.stun-=dt;g.g.position.set(g.x,g.y,g.z);g.g.rotation.z=1.4;return}
   g.g.rotation.z=0;
   let tx,tz,sp=g.sp;
   if(!g.cop){
@@ -921,7 +972,7 @@ function startRaid(){
     const ang=(i/7)*Math.PI*2;
     guards.push(mkGuard(clamp(startPos.x+Math.cos(ang)*13,2,WX-3),clamp(exitZ+Math.sin(ang)*9,2,WZ-3),true));
   }
-  for(const g of guards)if(!g.cop){g.cop=true;g.state='chase';g.sp=5.3+lvl*.35}
+  for(const g of guards)if(!g.cop&&!g.down){g.cop=true;g.state='chase';g.sp=5.3+lvl*.35}
   $('#timer').classList.add('urgent');
 }
 function stepRaid(dt){
@@ -1091,7 +1142,7 @@ function startLevel(n){
   lvl=n;
   sirenStop();document.body.dataset.ph='fps';$('#banner').style.opacity=0;
   for(const p of proj){if(p.mesh)scene.remove(p.mesh)}proj.length=0;
-  parts.length=0;pMesh.count=0;
+  parts.length=0;pMesh.count=0;clearItems();
   if(getaway){scene.remove(getaway);getaway=null}
   genLevel(n);
   cash=0;lootGot=0;
@@ -1160,8 +1211,7 @@ function tick(dt){
   physics(STEP);
   bobT+=Math.hypot(P.vx,P.vz)*dt*2.2;
   for(const g of guards)stepGuard(g,dt);
-  guards=guards.filter(g=>!g.dead);
-  stepProj(dt);
+  stepProj(dt);stepItems(dt);
   if(state==='play'){
     playT+=dt;
     const sec=Math.floor(playT);
