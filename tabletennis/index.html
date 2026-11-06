@@ -48,8 +48,16 @@ body{overflow:hidden;position:fixed;inset:0;width:100%;background:#0e2338}
 <script src="../hub.js"></script>
 <canvas id="cv"></canvas><div id="hud"></div>
 <div id="rot">📱↔️<br>סובבו את הטלפון לרוחב</div>
-<div class="ov show" id="menu"><div class="ovc" style="max-width:440px"><div style="font-size:56px">🏓</div><h2>פינג-פונג</h2><div class="lb" id="howto">🖱️ המחבט דבוק לעכבר – פשוט מזיזים אותו אל הכדור, בלי ללחוץ.<br>מזיזים מהר = מכה חזקה 💥<br>הראשון ל-7 מנצח.</div><button class="btn" id="go">▶ שחק</button><button class="btn alt" id="settBtn" style="margin-top:8px;display:none">⚙️ הגדרות</button><div style="opacity:.8;margin-top:10px;font-size:15px">שיא: <b id="best">0</b></div></div></div>
+<div class="ov show" id="menu"><div class="ovc" style="max-width:440px"><div style="font-size:56px">🏓</div><h2>פינג-פונג</h2><div class="lb" id="howto">🖱️ המחבט דבוק לעכבר – פשוט מזיזים אותו אל הכדור, בלי ללחוץ.<br>מזיזים מהר = מכה חזקה 💥<br>הראשון ל-7 מנצח.</div><button class="btn" id="go">▶ שחק</button><button class="btn alt" id="shopBtn" style="margin-top:8px">🛍️ מחבטים</button><button class="btn alt" id="settBtn" style="margin-top:8px;display:none">⚙️ הגדרות</button><div style="opacity:.8;margin-top:10px;font-size:15px">שיא: <b id="best">0</b></div></div></div>
 <div class="ov" id="end"><div class="ovc"><h2 id="eT">נגמר</h2><div style="font-size:48px;font-weight:900;color:#ffd05a" id="eS"></div><p id="eM"></p><button class="btn" id="again">🔁 שוב</button><button class="btn alt" id="menu2">תפריט</button></div></div>
+<div class="ov" id="shopM"><div class="ovc" style="max-width:560px;text-align:center">
+  <h2>🛍️ חנות מחבטים</h2>
+  <div id="shopBal" style="font-weight:800;margin:4px 0 6px;font-size:18px"></div>
+  <div style="opacity:.75;font-size:14px;margin-bottom:12px">מרוויחים 💎 בכל ניצחון במשחק</div>
+  <div id="shopGrid" style="display:flex;flex-wrap:wrap;justify-content:center;gap:10px"></div>
+  <p id="shopMsg" style="min-height:22px;color:#ffd05a;font-weight:800;margin:10px 0 4px"></p>
+  <button class="btn" id="shopClose">סגור</button>
+</div></div>
 <div class="ov" id="settM"><div class="ovc" style="max-width:400px;text-align:center">
   <h2>⚙️ הגדרות</h2>
   <div style="margin:12px 0;font-weight:700">מהירות כדור</div>
@@ -270,7 +278,7 @@ function placeServeBall(){ // hold the ball next to the paddle while serving
 function serveP(){swing=12;placeServeBall();launch(ball.y,ball.y,rnd(-.5,.5),rnd(.2,.35),42,0);phase='play';tone(520,.05,'square',.08)}
 function serveC(){cswing=12;ball.x=cx;ball.y=.04;ball.h=.25;launch(0,0,rnd(-.6,.6),rnd(.65,.8),44-lvl,1);phase='play';tone(400,.05,'square',.08)}
 function score(w,why){if(w===0){ps++;sc+=10;tone(900,.2)}else{as++;tone(130,.3)}msg=(w===0?'נקודה! ':'נקודה למחשב ')+why;msgBig=false;mt=70;phase='dead';pt=0;
-  if(ps>=7){sc+=50;lvl++;ps=0;as=0;msg='עולים רמה! 🔥';mt=90}else if(as>=7){over('המחשב ניצח',sc,'רמה '+(lvl+1)+' · '+ps+':'+as,Math.floor(sc/10),lvl>=2?1:0);return}
+  if(ps>=7){sc+=50;lvl++;ps=0;as=0;const gems=1+(lvl>=4?1:0)+(lvl>=7?1:0);if(window.AG&&AG.add)AG.add(15,gems);msg=tt('ניצחת! +','You win! +')+gems+' 💎';msgBig=true;mt=120;tone(880,.12,'triangle',.2);tone(1180,.14,'triangle',.16);tone(1480,.16,'triangle',.12)}else if(as>=7){over('המחשב ניצח',sc,'רמה '+(lvl+1)+' · '+ps+':'+as,Math.floor(sc/10),lvl>=2?1:0);return}
   srv=1-w}
 
 // computer hit: shot comes from how the mouse moves at the moment of contact
@@ -497,9 +505,179 @@ document.querySelectorAll('#settM .chip[data-th]').forEach(b=>{
 });
 paintBG();addEventListener('resize',paintBG);
 
+/* ---------- paddle skins, bought with diamonds earned by winning ---------- */
+function paintPanda(g,rx,ry){
+  g.fillStyle='#f8f6f1';g.beginPath();g.ellipse(0,0,rx,ry,0,0,7);g.fill();
+  g.fillStyle='#17181c';
+  g.beginPath();g.arc(-rx*.6,-ry*.6,rx*.3,0,7);g.fill();
+  g.beginPath();g.arc(rx*.6,-ry*.6,rx*.3,0,7);g.fill();
+  g.save();g.translate(-rx*.34,-ry*.1);g.rotate(-.32);g.beginPath();g.ellipse(0,0,rx*.27,ry*.31,0,0,7);g.fill();g.restore();
+  g.save();g.translate(rx*.34,-ry*.1);g.rotate(.32);g.beginPath();g.ellipse(0,0,rx*.27,ry*.31,0,0,7);g.fill();g.restore();
+  g.fillStyle='#fff';
+  g.beginPath();g.arc(-rx*.31,-ry*.13,rx*.11,0,7);g.fill();
+  g.beginPath();g.arc(rx*.31,-ry*.13,rx*.11,0,7);g.fill();
+  g.fillStyle='#111';
+  g.beginPath();g.arc(-rx*.29,-ry*.11,rx*.055,0,7);g.fill();
+  g.beginPath();g.arc(rx*.33,-ry*.11,rx*.055,0,7);g.fill();
+  g.fillStyle='#17181c';g.beginPath();g.ellipse(0,ry*.22,rx*.14,ry*.1,0,0,7);g.fill();
+  g.strokeStyle='#17181c';g.lineWidth=Math.max(1,rx*.06);g.lineCap='round';
+  g.beginPath();g.moveTo(0,ry*.31);g.lineTo(0,ry*.41);g.stroke();
+  g.beginPath();g.arc(-rx*.17,ry*.41,rx*.18,0,Math.PI);g.stroke();
+  g.beginPath();g.arc(rx*.17,ry*.41,rx*.18,0,Math.PI);g.stroke();
+}
+function paintTiger(g,rx,ry){
+  const gr=g.createRadialGradient(-rx*.3,-ry*.35,rx*.05,0,0,ry*1.05);
+  gr.addColorStop(0,'#ffc166');gr.addColorStop(.6,'#f59120');gr.addColorStop(1,'#d2690d');
+  g.fillStyle=gr;g.beginPath();g.ellipse(0,0,rx,ry,0,0,7);g.fill();
+  g.fillStyle='#2a1708';
+  for(let i=0;i<8;i++){const t=-.86+i*.25;
+    g.save();g.translate(0,ry*t);g.rotate((i%2?1:-1)*.22);
+    g.beginPath();g.ellipse(0,0,rx*(.8-Math.abs(t)*.42),ry*.052,0,0,7);g.fill();g.restore()}
+  g.globalAlpha=.3;g.fillStyle='#fff';
+  g.beginPath();g.ellipse(-rx*.3,-ry*.38,rx*.3,ry*.17,-.55,0,7);g.fill();g.globalAlpha=1;
+}
+function paintMelon(g,rx,ry){
+  g.fillStyle='#2f8f3a';g.beginPath();g.ellipse(0,0,rx,ry,0,0,7);g.fill();
+  g.fillStyle='#c6eba0';g.beginPath();g.ellipse(0,0,rx*.9,ry*.9,0,0,7);g.fill();
+  const gr=g.createRadialGradient(-rx*.25,-ry*.3,rx*.05,0,0,ry*.8);
+  gr.addColorStop(0,'#ff8793');gr.addColorStop(1,'#dd2b43');
+  g.fillStyle=gr;g.beginPath();g.ellipse(0,0,rx*.79,ry*.79,0,0,7);g.fill();
+  g.fillStyle='#1d1a16';
+  for(const q of[[-.3,-.3],[.33,-.26],[-.08,.08],[.26,.32],[-.36,.3],[.04,-.52],[-.46,.02],[.46,.06]]){
+    g.save();g.translate(rx*q[0],ry*q[1]);g.rotate(q[0]*1.3);
+    g.beginPath();g.ellipse(0,0,rx*.057,ry*.088,0,0,7);g.fill();g.restore()}
+}
+function paintSoccer(g,rx,ry){
+  g.fillStyle='#f5f7f9';g.beginPath();g.ellipse(0,0,rx,ry,0,0,7);g.fill();
+  g.fillStyle='#15171c';
+  const pent=(cx,cy,R,rot)=>{g.beginPath();
+    for(let i=0;i<5;i++){const a=rot+i*Math.PI*2/5-Math.PI/2,px=cx+Math.cos(a)*R,py=cy+Math.sin(a)*R*1.14;
+      i?g.lineTo(px,py):g.moveTo(px,py)}
+    g.closePath();g.fill()};
+  pent(0,0,rx*.3,0);
+  for(let i=0;i<5;i++){const a=i*Math.PI*2/5-Math.PI/2;
+    pent(Math.cos(a)*rx*.74,Math.sin(a)*ry*.74,rx*.2,a+Math.PI/5)}
+}
+function paintGalaxy(g,rx,ry){
+  const gr=g.createRadialGradient(0,0,rx*.04,0,0,ry*1.05);
+  gr.addColorStop(0,'#8a4de0');gr.addColorStop(.45,'#331c7a');gr.addColorStop(1,'#080418');
+  g.fillStyle=gr;g.beginPath();g.ellipse(0,0,rx,ry,0,0,7);g.fill();
+  g.strokeStyle='rgba(185,150,255,.45)';g.lineWidth=Math.max(1,rx*.09);g.lineCap='round';
+  for(let s=0;s<2;s++){g.beginPath();
+    for(let t=0;t<44;t++){const a=t*.21+s*Math.PI,d=t/44*rx*.92;
+      const px=Math.cos(a)*d,py=Math.sin(a)*d*(ry/rx);t?g.lineTo(px,py):g.moveTo(px,py)}
+    g.stroke()}
+  g.fillStyle='#fff';
+  for(const q of[[-.42,-.5],[.3,-.62],[.56,.2],[-.6,.12],[.1,.56],[-.22,-.2],[.46,-.32],[-.5,.46],[.2,.3]]){
+    g.beginPath();g.arc(rx*q[0],ry*q[1],rx*.042,0,7);g.fill()}
+}
+function paintFire(g,rx,ry){
+  const gr=g.createRadialGradient(0,ry*.45,rx*.04,0,ry*.15,ry*1.45);
+  gr.addColorStop(0,'#fff5bc');gr.addColorStop(.28,'#ffb02e');gr.addColorStop(.62,'#f24822');gr.addColorStop(1,'#6d1006');
+  g.fillStyle=gr;g.beginPath();g.ellipse(0,0,rx,ry,0,0,7);g.fill();
+  g.globalAlpha=.45;g.fillStyle='#ffe9a0';
+  for(let i=0;i<3;i++){const o=(i-1)*rx*.44;
+    g.beginPath();g.moveTo(o,ry*.62);
+    g.quadraticCurveTo(o+rx*.24,ry*.04,o,-ry*.58);
+    g.quadraticCurveTo(o-rx*.24,ry*.04,o,ry*.62);g.fill()}
+  g.globalAlpha=1;
+}
+function paintGold(g,rx,ry){
+  const gr=g.createLinearGradient(-rx,-ry,rx,ry);
+  gr.addColorStop(0,'#fff7cf');gr.addColorStop(.24,'#ffd34d');gr.addColorStop(.5,'#a9780a');
+  gr.addColorStop(.74,'#ffe98a');gr.addColorStop(1,'#7d5a06');
+  g.fillStyle=gr;g.beginPath();g.ellipse(0,0,rx,ry,0,0,7);g.fill();
+  g.globalAlpha=.4;g.fillStyle='#fff';
+  g.beginPath();g.ellipse(-rx*.3,-ry*.36,rx*.33,ry*.19,-.6,0,7);g.fill();g.globalAlpha=1;
+}
+function paintRainbow(g,rx,ry){
+  const cols=['#ff4d4d','#ff9a2e','#ffe14d','#4dd36a','#3aa7ff','#8a5aff'],R=Math.max(rx,ry)*1.3;
+  for(let i=0;i<cols.length;i++){
+    g.fillStyle=cols[i];g.beginPath();g.moveTo(0,0);
+    g.arc(0,0,R,i*Math.PI*2/cols.length-Math.PI/2,(i+1)*Math.PI*2/cols.length-Math.PI/2);
+    g.closePath();g.fill()}
+  g.globalAlpha=.3;g.fillStyle='#fff';
+  g.beginPath();g.ellipse(-rx*.28,-ry*.34,rx*.32,ry*.18,-.6,0,7);g.fill();g.globalAlpha=1;
+}
+const SKINS=[
+  {id:'classic',n:tt('קלאסי','Classic'),p:0},
+  {id:'panda', n:tt('פנדה 🐼','Panda 🐼'),      p:3, paint:paintPanda},
+  {id:'tiger', n:tt('טיגריס 🐯','Tiger 🐯'),    p:4, paint:paintTiger},
+  {id:'melon', n:tt('אבטיח 🍉','Watermelon 🍉'),p:4, paint:paintMelon},
+  {id:'soccer',n:tt('כדורגל ⚽','Soccer ⚽'),   p:5, paint:paintSoccer},
+  {id:'fire',  n:tt('אש 🔥','Fire 🔥'),         p:6, paint:paintFire},
+  {id:'galaxy',n:tt('גלקסיה 🌌','Galaxy 🌌'),   p:8, paint:paintGalaxy},
+  {id:'rainbow',n:tt('קשת 🌈','Rainbow 🌈'),    p:10,paint:paintRainbow},
+  {id:'gold',  n:tt('זהב 👑','Gold 👑'),        p:15,paint:paintGold}
+];
+const skinById=id=>SKINS.find(s=>s.id===id)||SKINS[0];
+function ownedSkins(){try{const a=JSON.parse(store.get('tt_owned','["classic"]'));return Array.isArray(a)?a:['classic']}catch(e){return['classic']}}
+function ownSkin(id){const o=ownedSkins();if(o.indexOf(id)<0){o.push(id);store.set('tt_owned',JSON.stringify(o))}}
+let mySkin=skinById(store.get('tt_skin','classic'));
+function setSkin(id){mySkin=skinById(id);store.set('tt_skin',mySkin.id)}
+
+/* small preview of a skin, drawn the same way as the real paddle */
+function skinPreview(cv2,skin){
+  const g=cv2.getContext('2d'),d=Math.min(devicePixelRatio||1,2);
+  cv2.width=66*d;cv2.height=78*d;g.setTransform(d,0,0,d,0,0);
+  g.clearRect(0,0,66,78);
+  g.translate(33,33);
+  const rx=24,ry=28;
+  g.fillStyle='#f0e4c4';g.beginPath();g.ellipse(0,0,rx*1.1,ry*1.08,0,0,7);g.fill();
+  const gw=10,gg=g.createLinearGradient(-gw/2,0,gw/2,0);
+  gg.addColorStop(0,'#8a5420');gg.addColorStop(.45,'#d9a05e');gg.addColorStop(1,'#8a5420');
+  g.fillStyle=gg;g.fillRect(-gw/2,ry*.6,gw,30);
+  g.save();g.beginPath();g.ellipse(0,0,rx,ry,0,0,7);g.clip();
+  if(skin.paint)skin.paint(g,rx,ry);
+  else{const th=TH(),rg=g.createRadialGradient(-rx*.34,-ry*.4,2,0,0,ry*1.02);
+    rg.addColorStop(0,th.pad[0]);rg.addColorStop(1,th.pad[1]);
+    g.fillStyle=rg;g.beginPath();g.ellipse(0,0,rx,ry,0,0,7);g.fill()}
+  g.restore();
+  g.globalAlpha=.35;g.strokeStyle='#fff';g.lineWidth=2;g.lineCap='round';
+  g.beginPath();g.ellipse(0,0,rx*.72,ry*.72,0,3.55,4.95);g.stroke();g.globalAlpha=1;
+}
+function renderShop(){
+  const bal=(window.AG&&AG.diamonds)?AG.diamonds():0;
+  $('#shopBal').textContent=tt('יש לך: ','You have: ')+bal+' 💎';
+  const grid=$('#shopGrid');grid.innerHTML='';
+  const owned=ownedSkins();
+  for(const sk of SKINS){
+    const has=sk.p===0||owned.indexOf(sk.id)>=0,on=mySkin.id===sk.id;
+    const box=document.createElement('button');
+    box.className='chip'+(on?' on':'');
+    box.style.cssText='display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 10px;width:104px';
+    const cv2=document.createElement('canvas');
+    cv2.style.width='66px';cv2.style.height='78px';
+    box.appendChild(cv2);
+    const nm=document.createElement('div');
+    nm.style.cssText='font-size:13px;font-weight:800;line-height:1.2';nm.textContent=sk.n;
+    box.appendChild(nm);
+    const tag=document.createElement('div');
+    tag.style.cssText='font-size:13px;font-weight:800;opacity:.9';
+    tag.textContent=on?tt('✓ נבחר','✓ Selected'):has?tt('בחר','Select'):sk.p+' 💎';
+    box.appendChild(tag);
+    box.onclick=()=>{
+      const own=ownedSkins().indexOf(sk.id)>=0||sk.p===0;
+      if(own){setSkin(sk.id);$('#shopMsg').textContent=tt('הוחלף ל','Switched to ')+' '+sk.n;renderShop();tone(760,.09,'triangle',.12);return}
+      if(!window.AG||!AG.spend){$('#shopMsg').textContent=tt('החנות לא זמינה','Shop unavailable');return}
+      if(AG.diamonds()<sk.p){
+        $('#shopMsg').textContent=tt('חסרים לך ','You need ')+(sk.p-AG.diamonds())+tt(' יהלומים – נצחו עוד משחקים',' more 💎 – win more games');
+        tone(170,.18,'square',.12);return}
+      if(AG.spend(0,sk.p)){ownSkin(sk.id);setSkin(sk.id);
+        $('#shopMsg').textContent=tt('נקנה! ','Bought! ')+sk.n;
+        tone(880,.1,'triangle',.16);tone(1180,.12,'triangle',.14);renderShop()}
+    };
+    grid.appendChild(box);
+    skinPreview(cv2,sk);
+  }
+}
+$('#shopBtn').onclick=()=>{renderShop();$('#shopMsg').textContent='';$('#shopM').classList.add('show')};
+$('#shopClose').onclick=()=>$('#shopM').classList.remove('show');
+if(window.AG&&AG.onChange)AG.onChange(()=>{if($('#shopM').classList.contains('show'))renderShop()});
+
 /* ================= drawing ================= */
 // paddle: an elongated oval blade, like a real bat
-function drawPaddle(x,y,r,rot,face,grip,rim){
+function drawPaddle(x,y,r,rot,face,grip,rim,skin){
   const rx=r*.86,ry=r*1.16;
   ctx.save();ctx.translate(x,y);ctx.rotate(rot);
   ctx.fillStyle='rgba(0,0,0,.22)';ctx.beginPath();ctx.ellipse(r*.14,r*.3,rx*.98,ry*.34,0,0,7);ctx.fill();
@@ -510,10 +688,15 @@ function drawPaddle(x,y,r,rot,face,grip,rim){
   ctx.fillStyle='rgba(0,0,0,.18)';rr(-gw/2,ry*1.34,gw,ry*.14,gw*.3);ctx.fill();
   // blade rim
   ctx.fillStyle=rim;ctx.beginPath();ctx.ellipse(0,0,rx*1.1,ry*1.08,0,0,7);ctx.fill();
-  // rubber face
-  const g=ctx.createRadialGradient(-rx*.34,-ry*.4,r*.06,0,0,ry*1.02);
-  g.addColorStop(0,face[0]);g.addColorStop(1,face[1]);
-  ctx.fillStyle=g;ctx.beginPath();ctx.ellipse(0,0,rx,ry,0,0,7);ctx.fill();
+  // rubber face, or a bought skin painted inside the blade
+  if(skin&&skin.paint){
+    ctx.save();ctx.beginPath();ctx.ellipse(0,0,rx,ry,0,0,7);ctx.clip();
+    skin.paint(ctx,rx,ry);ctx.restore();
+  }else{
+    const g=ctx.createRadialGradient(-rx*.34,-ry*.4,r*.06,0,0,ry*1.02);
+    g.addColorStop(0,face[0]);g.addColorStop(1,face[1]);
+    ctx.fillStyle=g;ctx.beginPath();ctx.ellipse(0,0,rx,ry,0,0,7);ctx.fill();
+  }
   // soft highlight
   ctx.globalAlpha=.4;ctx.strokeStyle='#fff';ctx.lineWidth=Math.max(1.2,r*.075);ctx.lineCap='round';
   ctx.beginPath();ctx.ellipse(0,0,rx*.72,ry*.72,0,3.55,4.95);ctx.stroke();
@@ -595,7 +778,7 @@ function drw(){
   if(near&&ball.y<=pp.z)drawBall(ball);
   drawSwoosh(pp);
   const n=ptrail.length,tilt=n>2?clamp((ptrail[n-1].x-ptrail[n-3].x)*.01,-.3,.3):0;
-  drawPaddle(pp.x,pp.y,pp.r,tilt+(swing>0?-Math.min(swing/14,1)*.7:0),th.pad,th.grip,th.rim2);
+  drawPaddle(pp.x,pp.y,pp.r,tilt+(swing>0?-Math.min(swing/14,1)*.7:0),th.pad,th.grip,th.rim2,mySkin);
   if(near&&ball.y>pp.z)drawBall(ball);
   drawFX();
   // HUD
@@ -608,7 +791,7 @@ function drw(){
     else T(msg,W/2,170,26,'#ffd23f');
   }
 }
-wire(start);run(upd,drw,'#0b3d4f');window.__s={step:upd,start:()=>{start();on=true},get on(){return on},get score(){return sc},get ball(){return ball},get ps(){return ps},get as(){return as},get lvl(){return lvl},get phase(){return phase},set tpx(v){tpx=v},get px(){return px},serveP,get ctl(){return ctl},get psx(){return psx},get psy(){return psy},pScreen,P,get hitsP(){return hitsP},get L(){return L},get pdy(){return pdy},get msg(){return msg}};
+wire(start);run(upd,drw,'#0b3d4f');window.__s={step:upd,addPoint:()=>score(0,'test'),start:()=>{start();on=true},get on(){return on},get score(){return sc},get ball(){return ball},get ps(){return ps},get as(){return as},get lvl(){return lvl},get phase(){return phase},set tpx(v){tpx=v},get px(){return px},serveP,get ctl(){return ctl},get psx(){return psx},get psy(){return psy},pScreen,P,get hitsP(){return hitsP},get L(){return L},get pdy(){return pdy},get msg(){return msg}};
 
 if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 </script>
