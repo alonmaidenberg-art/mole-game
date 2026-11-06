@@ -1,11 +1,11 @@
 /* Online rooms for all games (peer-to-peer, WebRTC). (c) Alon Maidenberg 2026 - please do not copy.
-   Room = host + guests. Signalling goes through a public pub/sub topic (ntfy.sh), game data goes directly between browsers. */
+   Room = host + guests. Everything goes through free public MQTT relay servers (two at once, for safety),
+   so it works on phone data and school/home Wi-Fi alike. Video play (net.remote) still uses WebRTC. */
 (function(){
   'use strict';
   var EN=window.AG_LANG==='en',T=function(h,e){return EN?e:h};
   function ls(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){}return null}
   function ss(k,v){try{if(v===undefined)return sessionStorage.getItem(k);if(v===null)sessionStorage.removeItem(k);else sessionStorage.setItem(k,v)}catch(e){}return null}
-  var SIG=ls('ag_sig')||'https://ntfy.sh';
   var ICE={iceServers:[{urls:['stun:stun.l.google.com:19302','stun:stun1.l.google.com:19302','stun:stun.cloudflare.com:3478']},
     {urls:['turn:openrelay.metered.ca:80','turn:openrelay.metered.ca:443','turn:openrelay.metered.ca:443?transport=tcp'],username:'openrelayproject',credential:'openrelayproject'}]};
   if(ls('ag_ice')==='local')ICE={iceServers:[]};
@@ -19,30 +19,58 @@
   function emit(){subs.forEach(function(f){try{f(net)}catch(e){}});renderBtn();if(panelOpen)renderPanel()}
   function save(){ss('ag_room',room?JSON.stringify({code:room.code,host:room.host,gid:room.gid,name:room.name}):null)}
 
-  /* ---------- signalling ---------- */
-  function post(topic,obj){
-    var s=JSON.stringify(obj),id=rid(6),n=Math.ceil(s.length/2800);
-    for(var i=0;i<n;i++){
-      var m=JSON.stringify({c:id,i:i,n:n,d:s.slice(i*2800,(i+1)*2800)});
-      fetch(SIG+'/'+topic,{method:'POST',body:m}).catch(function(){});
+  /* ---------- relay: both players connect to a free public MQTT server, so it works on any network ---------- */
+  var BROKERS=(ls('ag_mqtt')||'wss://broker.emqx.io:8084/mqtt,wss://broker.hivemq.com:8884/mqtt').split(',');
+  var socks=[],relayT=null,relayFn=null,seenM={},seenQ=[],outQ=[];
+  var TE=new TextEncoder(),TD=new TextDecoder();
+  function vlen(n){var a=[];do{var d=n%128;n=Math.floor(n/128);if(n>0)d|=128;a.push(d)}while(n>0);return a}
+  function mstr(x){var b=TE.encode(x),o=new Uint8Array(2+b.length);o[0]=b.length>>8;o[1]=b.length&255;o.set(b,2);return o}
+  function cat(){var n=0,i,a=arguments;for(i=0;i<a.length;i++)n+=a[i].length;var o=new Uint8Array(n),k=0;for(i=0;i<a.length;i++){o.set(a[i],k);k+=a[i].length}return o}
+  function pkt(h,body){return cat([h],vlen(body.length),body)}
+  function mqOpen(url){
+    var s={ws:null,ok:false,buf:new Uint8Array(0),ping:null,dead:false,retry:0};
+    function later(){if(s.dead)return;s.retry=Math.min(s.retry+1,8);setTimeout(open,800*s.retry)}
+    function open(){
+      if(s.dead)return;
+      try{s.ws=new WebSocket(url,'mqtt')}catch(e){return later()}
+      s.ws.binaryType='arraybuffer';
+      s.ws.onopen=function(){s.ws.send(pkt(0x10,cat([0,4,77,81,84,84,4,2,0,40],mstr('ag'+rid(12)))))};
+      s.ws.onmessage=function(e){s.buf=cat(s.buf,new Uint8Array(e.data));parse()};
+      s.ws.onclose=function(){s.ok=false;clearInterval(s.ping);later()};
+      s.ws.onerror=function(){};
     }
+    function parse(){
+      while(s.buf.length>=2){
+        var mul=1,len=0,i=1,c;
+        do{if(i>=s.buf.length)return;c=s.buf[i++];len+=(c&127)*mul;mul*=128}while(c&128);
+        if(s.buf.length<i+len)return;
+        var h=s.buf[0],body=s.buf.slice(i,i+len);s.buf=s.buf.slice(i+len);
+        if((h>>4)===2){if(body[1]===0){s.ok=true;s.retry=0;
+            s.ws.send(pkt(0x82,cat([0,1],mstr(relayT),[0])));
+            clearInterval(s.ping);s.ping=setInterval(function(){try{s.ws.send(new Uint8Array([0xC0,0]))}catch(e){}},20000);
+            var q=outQ;outQ=[];q.forEach(mqPub);emit()}}
+        else if((h>>4)===3){var tl=(body[0]<<8)|body[1],p=2+tl+(((h>>1)&3)?2:0);try{gotRelay(JSON.parse(TD.decode(body.subarray(p))))}catch(e){}}
+      }
+    }
+    s.close=function(){s.dead=true;clearInterval(s.ping);try{s.ws.close()}catch(e){}};
+    open();return s;
   }
-  function listen(topic,fn){
-    if(es){try{es.close()}catch(e){}}
-    es=new EventSource(SIG+'/'+topic+'/sse?since=40s');
-    es.onmessage=function(ev){
-      try{var o=JSON.parse(ev.data);if(o.event!=='message')return;if(seen[o.id])return;seen[o.id]=1;
-        var m=JSON.parse(o.message);var b=chunks[m.c]||(chunks[m.c]={n:m.n,p:{},k:0});if(!b.p[m.i]){b.p[m.i]=m.d;b.k++}
-        if(b.k===b.n){var s='';for(var i=0;i<b.n;i++)s+=b.p[i];delete chunks[m.c];var age=o.time?Date.now()/1000-o.time:0;fn(JSON.parse(s),age)}}catch(e){}};
+  function gotRelay(m){if(!m||!m.id||seenM[m.id])return;seenM[m.id]=1;seenQ.push(m.id);if(seenQ.length>800)delete seenM[seenQ.shift()];if(relayFn)relayFn(m)}
+  function mqPub(m){
+    if(!m.id)m.id=rid(10);
+    var body=cat(mstr(relayT),TE.encode(JSON.stringify(m))),sent=false;
+    socks.forEach(function(s){if(s.ok){try{s.ws.send(pkt(0x30,body));sent=true}catch(e){}}});
+    if(!sent){outQ.push(m);if(outQ.length>60)outQ.shift()}
   }
-  function topic(code){return 'agr-'+code.toLowerCase()+'-v1'}
+  function relayStart(code,fn){relayStop();relayT='agames/v2/'+code.toLowerCase();relayFn=fn;socks=BROKERS.map(mqOpen)}
+  function relayStop(){socks.forEach(function(x){x.close()});socks=[];relayFn=null;outQ=[]}
   function gather(pc){return new Promise(function(res){
     if(pc.iceGatheringState==='complete')return res();
     var t=setTimeout(res,3000);pc.addEventListener('icegatheringstatechange',function(){if(pc.iceGatheringState==='complete'){clearTimeout(t);res()}})})}
 
   /* ---------- room ---------- */
   var net={
-    get room(){return room},get connected(){return !!room&&(room.host||(room.link&&room.link.dc&&room.link.dc.readyState==='open'))},
+    get room(){return room},get connected(){return !!room&&(room.host||(!!room.hostAt&&Date.now()-room.hostAt<15000))},
     get members(){return room?room.members:[]},get me(){return room?room.gid:null},
     on:function(f){subs.push(f)},
     create:function(){leave(true);room={code:rcode(),host:true,gid:'h'+rid(5),name:myName(),members:[],links:{}};room.members=[{gid:room.gid,name:room.name}];save();startHost();emit();return room.code},
@@ -61,76 +89,51 @@
   };
   var match=null;
   function leave(keepUI){
-    if(es){try{es.close()}catch(e){}es=null}
-    if(room){try{if(room.host)Object.keys(room.links).forEach(function(k){try{room.links[k].pc.close()}catch(e){}});else if(room.link)room.link.pc.close()}catch(e){}}
+    relayStop();
     clearInterval(hbT);room=null;match=null;pendingChal=null;save();ss('ag_vs',null);if(!keepUI)emit()}
 
   var hbT=null;
-  function startHost(){
-    listen(topic(room.code),function(m,age){
-      if(!room||!room.host)return;
-      if(m.t==='hello'&&m.g!==room.gid){if(age>12)return;offerTo(m)}
-      else if(m.t==='answer'&&m.to===room.gid){var L=room.links[m.from];if(L&&L.n===m.n&&L.pc.signalingState==='have-local-offer')L.pc.setRemoteDescription({type:'answer',sdp:m.sdp}).catch(function(){})}
-    });
-    clearInterval(hbT);hbT=setInterval(function(){if(room&&room.host){pruneMembers()}},4000);
+  function onRelay(m){
+    if(!room||m.from===room.gid)return;
+    if(room.host&&(m.t==='hello'||m.t==='hb')){
+      room.seenAt=room.seenAt||{};room.seenAt[m.from]=Date.now();
+      var known=room.members.some(function(x){return x.gid===m.from});setMember(m.from,m.name||'?');
+      if(!known||m.t==='hello')sendMembers();return}
+    if(!room.host&&m.t==='members'){
+      var was=net.connected;room.members=m.list||[];
+      if(room.members.some(function(x){return x.gid===room.gid})){room.hostAt=Date.now();if(!was)tryResume()}
+      emit();return}
+    if(m.to&&m.to!=='*'&&m.to!==room.gid&&!(room.host&&m.to==='h'))return;
+    onMsg(m);
   }
-  function offerTo(h){
-    var old=room.links[h.g];if(old&&old.n===h.n)return;if(old){try{old.pc.close()}catch(e){}}
-    var pc=new RTCPeerConnection(ICE),dc=pc.createDataChannel('ag'),L={pc:pc,dc:dc,n:h.n,name:h.name,gid:h.g};room.links[h.g]=L;
-    dc.onopen=function(){setMember(h.g,h.name);sendMembers()};
-    dc.onmessage=function(e){try{onMsg(JSON.parse(e.data))}catch(x){}};
-    dc.onclose=function(){if(room&&room.links[h.g]===L){delete room.links[h.g];dropMember(h.g);sendMembers()}};
-    pc.createOffer().then(function(o){return pc.setLocalDescription(o)}).then(function(){return gather(pc)}).then(function(){
-      post(topic(room.code),{t:'offer',to:h.g,from:room.gid,n:h.n,sdp:pc.localDescription.sdp})}).catch(function(){});
+  function startHost(){
+    relayStart(room.code,onRelay);
+    clearInterval(hbT);hbT=setInterval(function(){if(room&&room.host){pruneMembers();sendMembers()}},4000);
   }
   function bubble(n,t){var d=document.createElement('div');d.textContent=n+': '+t;d.style.cssText='position:fixed;left:50%;top:70px;transform:translateX(-50%) translateY(-10px);z-index:2147483300;background:linear-gradient(135deg,rgba(255,255,255,.95),rgba(220,255,248,.9));color:#0b4553;border-radius:18px;padding:8px 16px;font:900 17px system-ui,Arial;box-shadow:0 8px 24px rgba(10,120,130,.3);opacity:0;transition:all .3s;max-width:90vw;text-align:center;pointer-events:none';document.body.appendChild(d);requestAnimationFrame(function(){d.style.opacity='1';d.style.transform='translateX(-50%) translateY(0)'});setTimeout(function(){d.style.opacity='0'},2600);setTimeout(function(){d.remove()},3000)}
   function setMember(g,n){var f=room.members.filter(function(m){return m.gid===g})[0];if(f)f.name=n;else room.members.push({gid:g,name:n})}
   function dropMember(g){room.members=room.members.filter(function(m){return m.gid!==g})}
-  function pruneMembers(){var ch=false;room.members=room.members.filter(function(m){if(m.gid===room.gid)return true;var L=room.links[m.gid];var ok=L&&L.dc.readyState==='open';if(!ok)ch=true;return ok});if(ch){sendMembers()}}
-  function sendMembers(){var l=room.members.map(function(m){return{gid:m.gid,name:m.name}});Object.keys(room.links).forEach(function(k){var d=room.links[k].dc;if(d.readyState==='open')d.send(JSON.stringify({t:'members',list:l,from:room.gid,to:k}))});emit()}
-
+  function pruneMembers(){var now=Date.now();room.members=room.members.filter(function(m){return m.gid===room.gid||(room.seenAt&&now-(room.seenAt[m.gid]||0)<15000)})}
+  function sendMembers(){if(!room)return;mqPub({t:'members',from:room.gid,to:'*',list:room.members.map(function(m){return{gid:m.gid,name:m.name}})});emit()}
   function startGuest(){
-    var n=rid(6),pc=null,tries=0,total=0,offerAt=0,lastHello=0;
-    function connect(){
+    relayStart(room.code,onRelay);
+    var last=false;
+    function tick(){
       if(!room||room.host)return;
-      if(room.link&&room.link.dc&&room.link.dc.readyState==='open')return;
-      var now=Date.now(),cs=room.link&&room.link.pc&&(room.link.pc.connectionState||room.link.pc.iceConnectionState);
-      // an offer arrived and the connection is still being built: give it time instead of starting over
-      if(offerAt&&now-offerAt<15000&&cs!=='failed'&&cs!=='closed')return;
-      // no answer for a while, or it failed: start a fresh attempt
-      if(offerAt||tries>=4){n=rid(6);tries=0;offerAt=0}
-      // slow down after many tries so the free signalling service doesn't block us
-      if(now-lastHello<(total>12?8000:3000))return;
-      tries++;total++;lastHello=now;post(topic(room.code),{t:'hello',g:room.gid,n:n,name:room.name});
+      var c=net.connected;if(c!==last){last=c;emit()}
+      mqPub({t:c?'hb':'hello',from:room.gid,name:room.name});
     }
-    listen(topic(room.code),function(m,age){
-      if(!room||room.host)return;
-      if(m.t==='offer'&&m.to===room.gid&&m.n===n&&!(age>20)){offerAt=Date.now();
-        if(room.link){try{room.link.pc.close()}catch(e){}}
-        pc=new RTCPeerConnection(ICE);room.link={pc:pc,dc:null};
-        pc.ondatachannel=function(e){var dc=e.channel;room.link.dc=dc;
-          dc.onopen=function(){dc.send(JSON.stringify({t:'name',from:room.gid,to:'h',name:room.name}));emit();tryResume()};
-          dc.onmessage=function(ev){try{onMsg(JSON.parse(ev.data))}catch(x){}};
-          dc.onclose=function(){if(room){room.members=[];emit()}}};
-        pc.setRemoteDescription({type:'offer',sdp:m.sdp}).then(function(){return pc.createAnswer()}).then(function(a){return pc.setLocalDescription(a)}).then(function(){return gather(pc)}).then(function(){
-          post(topic(room.code),{t:'answer',to:m.from,from:room.gid,n:n,sdp:pc.localDescription.sdp})}).catch(function(){});
-      }
-    });
-    clearInterval(hbT);hbT=setInterval(function(){connect()},1000);connect();
+    clearInterval(hbT);hbT=setInterval(tick,2500);tick();
   }
 
   /* ---------- messaging ---------- */
   function route(msg){
-    var s=JSON.stringify(msg);
-    if(room.host){
-      if(msg.to==='*'){Object.keys(room.links).forEach(function(k){var d=room.links[k].dc;if(d.readyState==='open')d.send(s)})}
-      else if(msg.to===room.gid||msg.to==='h')onMsg(msg);
-      else{var L=room.links[msg.to];if(L&&L.dc.readyState==='open')L.dc.send(s)}
-    }else if(room.link&&room.link.dc&&room.link.dc.readyState==='open')room.link.dc.send(s);
+    if(!room)return;
+    if(msg.to===room.gid||(room.host&&msg.to==='h')){onMsg(msg);return}
+    mqPub(msg);
   }
   function onMsg(m){
     if(!room)return;
-    if(room.host&&m.to&&m.to!==room.gid&&m.to!=='h'){route(m);if(m.to!=='*')return;}
     if(m.t==='name'&&room.host){setMember(m.from,m.name);sendMembers();return}
     if(m.t==='members'){room.members=m.list;emit();return}
     if(m.t==='chal')return showChal(m);

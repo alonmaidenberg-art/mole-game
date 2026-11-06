@@ -1029,12 +1029,12 @@ function netMsg(d){
   if(d.t==='b'){ // friend hit or served: the ball now flies towards me
     if(!ball)ball={};
     ball.x=-d.x;ball.y=1-d.y;ball.h=d.h;ball.vx=-d.vx;ball.vy=-d.vy;ball.vh=d.vh;ball.cpuMiss=0;
-    for(let i=Math.min(6,Math.round(lagMs/16.7));i>0;i--){ball.x+=ball.vx;ball.y+=ball.vy;ball.h+=ball.vh;ball.vh-=G;if(ball.h<0&&ball.vh<0){ball.h=0;ball.vh=-ball.vh*.82}}
+    for(let i=Math.min(9,Math.round(lagMs/16.7));i>0;i--){ball.x+=ball.vx;ball.y+=ball.vy;ball.h+=ball.vh;ball.vh-=G;if(ball.h<0&&ball.vh<0){ball.h=0;ball.vh=-ball.vh*.82}}
     L=1;bnc=[0,0];trail=[];phase='play';cswing=14;tone(430,.05,'square',.09);return}
   if(d.t==='pt'){if(on)score(d.w,'',true);return}
   if(d.t==='again'){$('#end').classList.remove('show');start();on=true;return}
 }
-setInterval(()=>{if(NET&&on){netSend({t:'p',x:+px.toFixed(3),s:mySkin.id})}},33);
+setInterval(()=>{if(NET&&on){netSend({t:'p',x:+px.toFixed(3),s:mySkin.id})}},50);
 setInterval(()=>{if(NET)netSend({t:'ping',k:performance.now()})},2000);
 (function hook(n){
   if(!(window.AG&&AG.net)){if(n<100)setTimeout(()=>hook(n+1),150);return}
