@@ -2,492 +2,630 @@
 <html lang="he" dir="rtl">
 <head>
 <meta name="author" content="Alon Maidenberg - אלון מידנברג"><meta name="copyright" content="© 2026 אלון מידנברג. כל הזכויות שמורות.">
-<!-- © 2026 Alon Maidenberg (אלון מידנברג). All rights reserved. Copying, republishing or modifying this game without written permission is not allowed. -->
+<!-- © 2026 Alon Maidenberg (אלון מידנברג). All rights reserved. -->
 <meta name="robots" content="noai, noimageai">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>שוברים את הבנק 3D – אלון מידנברג</title>
-<meta name="description" content="פורצים לבנק, שוברים קירות, גונבים כסף – לפני שמגיעים השומרים!">
+<title>שוברים את הבנק – אלון מידנברג</title>
+<meta name="description" content="FPS תלת-ממדי: פורצים לבנק, שוברים קירות בלוק-בלוק, גונבים כסף.">
 <meta name="theme-color" content="#1a1a2e">
 <style>
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;min-height:100%;background:#1a1a2e;color:#fff;font-family:system-ui,-apple-system,"Segoe UI",Arial,"Noto Sans Hebrew",sans-serif;user-select:none;-webkit-user-select:none}
-body{overflow:hidden;position:fixed;inset:0;width:100%;touch-action:manipulation}
-#cv{position:fixed;left:0;top:0;width:100%;height:100%;display:block;touch-action:none}
-.ov{position:fixed;inset:0;background:rgba(5,2,20,.88);display:none;align-items:center;justify-content:center;z-index:30;padding:16px;overflow-y:auto}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#0e1a0e;color:#fff;font-family:system-ui,Arial,sans-serif;user-select:none;-webkit-user-select:none}
+#cv{display:block;width:100%;height:100%;touch-action:none}
+/* HUD */
+#hud{position:fixed;inset:0;pointer-events:none;z-index:5}
+#crosshair{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:22px;opacity:.85;text-shadow:0 0 4px #000}
+#toolbar{position:absolute;bottom:max(14px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);display:flex;gap:8px;direction:ltr}
+.tslot{width:56px;height:56px;border-radius:14px;border:2px solid rgba(255,255,255,.3);background:rgba(0,0,0,.55);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:24px;gap:0}
+.tslot span{font-size:10px;font-weight:800;opacity:.75}
+.tslot.on{border-color:#ffd05a;background:rgba(255,208,80,.2);box-shadow:0 0 10px rgba(255,208,80,.4)}
+#topcorner{position:absolute;top:max(10px,env(safe-area-inset-top));left:0;right:0;display:flex;justify-content:space-between;padding:0 14px}
+.hudpill{background:rgba(0,0,0,.6);border:1.5px solid rgba(255,255,255,.18);border-radius:999px;padding:5px 14px;font-weight:900;font-size:16px;text-shadow:0 1px 3px #000}
+#timer.urgent{color:#ff5555;animation:blink .5s infinite alternate}
+@keyframes blink{to{opacity:.4}}
+#dmg{position:fixed;inset:0;pointer-events:none;z-index:6;border:12px solid rgba(255,0,0,.7);opacity:0;transition:opacity .15s;border-radius:0}
+#hit{position:fixed;inset:0;pointer-events:none;z-index:6;background:rgba(255,255,255,.18);opacity:0;transition:opacity .05s}
+/* Viewmodel */
+#vm{position:fixed;bottom:0;right:-10px;width:260px;height:220px;pointer-events:none;z-index:4}
+#vmcv{width:100%;height:100%}
+/* Overlays */
+.ov{position:fixed;inset:0;background:rgba(5,10,5,.92);display:none;align-items:center;justify-content:center;z-index:20;padding:16px;overflow-y:auto}
 .ov.show{display:flex}
-.ovc{width:100%;max-width:400px;background:linear-gradient(160deg,#2a1a3e,#1a1a2e);border:2px solid rgba(255,220,80,.3);border-radius:28px;padding:24px;text-align:center;margin:auto}
-.ovc h2{margin:0 0 8px;font-size:32px;color:#ffd05a}
-.lb{opacity:.85;font-size:15px;margin-bottom:8px;line-height:1.6}
-.btn{display:block;width:100%;border:0;border-radius:18px;padding:16px;margin-top:12px;font:inherit;font-size:21px;font-weight:900;color:#1a1a2e;background:linear-gradient(180deg,#ffd05a,#e6a800);box-shadow:0 6px 0 #9c7000;cursor:pointer;transition:transform .1s}
-.btn:active{transform:translateY(3px);box-shadow:0 3px 0 #9c7000}
-.btn.alt{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.3);box-shadow:none;font-size:16px;padding:12px}
-#hud{position:fixed;left:0;right:0;top:0;display:flex;justify-content:space-between;align-items:flex-start;pointer-events:none;z-index:8;padding:max(10px,env(safe-area-inset-top)) 14px 0;text-shadow:0 2px 4px #000;font-weight:900;font-size:17px;gap:8px}
-.hudbox{background:rgba(0,0,0,.55);border-radius:12px;padding:6px 12px;font-size:16px;font-weight:900;line-height:1.3}
-#tools{position:fixed;bottom:max(14px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);display:none;gap:12px;z-index:8;direction:ltr}
-.tool{width:66px;height:66px;border-radius:18px;border:3px solid rgba(255,255,255,.35);background:rgba(10,5,30,.7);color:#fff;font-size:28px;font-weight:900;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;transition:.12s}
-.tool.on{border-color:#ffd05a;background:rgba(255,208,90,.25);box-shadow:0 0 14px rgba(255,208,90,.4)}
-.tool span{font-size:11px;font-weight:800;opacity:.8}
-#joy{position:fixed;bottom:max(14px,env(safe-area-inset-bottom));right:14px;width:110px;height:110px;border-radius:50%;border:3px solid rgba(255,255,255,.25);background:rgba(0,0,0,.35);display:none;touch-action:none;z-index:8}
-#knob{position:absolute;width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.65);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none}
-#alarm{position:fixed;top:0;left:0;right:0;height:6px;background:transparent;z-index:9;transition:background .3s}
-#alarm.on{background:linear-gradient(90deg,#f00,#ff0,#f00);animation:al .4s infinite alternate}
-@keyframes al{to{opacity:.5}}
-#dmg{position:fixed;inset:0;pointer-events:none;z-index:7;border-radius:0;opacity:0;transition:opacity .15s;border:12px solid rgba(255,0,0,.7)}
+.ovc{width:100%;max-width:420px;background:linear-gradient(160deg,#1e2e1e,#0e1a0e);border:2px solid rgba(100,220,100,.25);border-radius:28px;padding:24px;text-align:center;margin:auto}
+.ovc h2{margin:0 0 8px;font-size:32px;color:#7fff88}
+.lb{opacity:.85;font-size:14px;margin-bottom:8px;line-height:1.6}
+.btn{display:block;width:100%;border:0;border-radius:16px;padding:15px;margin-top:10px;font:inherit;font-size:20px;font-weight:900;color:#0a1a0a;background:linear-gradient(180deg,#7fff88,#44cc55);box-shadow:0 5px 0 #1a6e22;cursor:pointer}
+.btn:active{transform:translateY(3px);box-shadow:0 2px 0 #1a6e22}
+.btn.alt{background:transparent;color:#aaffaa;border:2px solid rgba(100,255,100,.3);box-shadow:none;font-size:15px;padding:11px}
+/* Mobile controls */
+#joy{position:fixed;bottom:max(14px,env(safe-area-inset-bottom));left:14px;width:100px;height:100px;border-radius:50%;border:2.5px solid rgba(255,255,255,.2);background:rgba(0,0,0,.3);display:none;touch-action:none;z-index:8}
+#jknob{position:absolute;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.55);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none}
+#hitBtn{position:fixed;bottom:max(14px,env(safe-area-inset-bottom));right:14px;width:72px;height:72px;border-radius:50%;border:2.5px solid rgba(255,200,50,.5);background:rgba(80,50,0,.55);color:#ffd05a;font-size:30px;display:none;touch-action:none;z-index:8;align-items:center;justify-content:center}
+/* Click to lock */
+#lockMsg{position:fixed;bottom:120px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.7);border-radius:14px;padding:10px 22px;font-weight:800;font-size:16px;pointer-events:none;z-index:7;text-align:center;transition:opacity .3s}
+#alarmbar{position:fixed;top:0;left:0;right:0;height:5px;background:transparent;z-index:9;transition:.4s}
 </style>
 </head>
 <body>
-<script src="../lib/three.min.js"></script>
 <canvas id="cv"></canvas>
-<div id="alarm"></div>
 <div id="dmg"></div>
+<div id="hit"></div>
 <div id="hud">
-  <div class="hudbox" id="hudL">💰 0</div>
-  <div class="hudbox" id="hudC" style="font-size:19px;letter-spacing:1px">💎 שוברים את הבנק</div>
-  <div class="hudbox" id="hudR">❤️❤️❤️</div>
+  <div id="topcorner">
+    <div class="hudpill" id="cash">💰 0</div>
+    <div class="hudpill" id="timer">⏱ 60</div>
+    <div class="hudpill" id="hearts">❤️❤️❤️</div>
+  </div>
+  <div id="crosshair">+</div>
+  <div id="toolbar">
+    <div class="tslot on" id="t0">🔨<span>פטיש</span></div>
+    <div class="tslot" id="t1">⚙️<span>מקדח</span></div>
+    <div class="tslot" id="t2">💣<span>פצצה x<b id="bc">3</b></span></div>
+  </div>
 </div>
-<div style="position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:9;pointer-events:none;padding-top:max(48px,calc(env(safe-area-inset-top)+42px));width:100%;text-align:center">
-  <div id="hudTimer" style="font-size:28px;font-weight:900;text-shadow:0 2px 4px #000;display:none"></div>
-</div>
-<div id="tools">
-  <div class="tool on" id="tHammer" onclick="selTool(0)">🔨<span>פטיש</span></div>
-  <div class="tool" id="tDrill" onclick="selTool(1)">⚙️<span>מקדח</span></div>
-  <div class="tool" id="tBomb" onclick="selTool(2)">💣<span>פצצה</span></div>
-</div>
-<div id="joy"><div id="knob"></div></div>
+<div id="alarmbar"></div>
+<!-- Viewmodel canvas -->
+<div id="vm"><canvas id="vmcv" width="260" height="220"></canvas></div>
+<!-- Mobile -->
+<div id="joy"><div id="jknob"></div></div>
+<div id="hitBtn" style="display:none">🔨</div>
+<div id="lockMsg">🖱 לחצו לשחק</div>
 
-<!-- Menu -->
+<!-- MENU -->
 <div class="ov show" id="menu"><div class="ovc">
-  <div style="font-size:62px">🏦</div>
+  <div style="font-size:60px">🏦</div>
   <h2>שוברים את הבנק</h2>
-  <div class="lb">פורצים לבנק, שוברים קירות, גונבים את הכסף מהכספות – לפני שמגיעים השומרים!</div>
-  <div class="lb" style="font-size:13px;opacity:.7"><b>WASD / חצים</b> – תנועה &nbsp;|&nbsp; <b>E / לחיצה</b> – שימוש בכלי &nbsp;|&nbsp; <b>1-2-3</b> – החלפת כלי</div>
-  <button class="btn" id="go">▶ לשוד!</button>
-  <div style="margin-top:12px;opacity:.75;font-size:15px">שיא: <b id="best">0</b> 💰</div>
+  <div class="lb">FPS תלת-ממדי! שברו קירות, פרצו כספות ואספו כסף לפני שהזמן נגמר ושומרים יתפסו אתכם.</div>
+  <div class="lb" style="font-size:12px;opacity:.65"><b>WASD</b> תנועה · <b>עכבר</b> הסתכלות · <b>לחיצה / E</b> שבירה · <b>1-2-3</b> כלי · <b>רווח</b> קפיצה</div>
+  <div style="display:flex;gap:8px;margin-top:4px">
+    <button class="btn" id="go1" style="font-size:17px">▶ שלב 1 – הבנק הקטן</button>
+  </div>
+  <div style="display:flex;gap:8px">
+    <button class="btn alt" id="go2">שלב 2</button>
+    <button class="btn alt" id="go3">שלב 3</button>
+  </div>
+  <div style="margin-top:12px;opacity:.7;font-size:14px">שיא: <b id="best">0</b> 💰</div>
 </div></div>
-
-<!-- Level clear -->
+<!-- CLEAR -->
 <div class="ov" id="clear"><div class="ovc">
-  <div style="font-size:52px" id="clIcon">🌟</div>
-  <h2 id="clTitle">שלב הושלם!</h2>
-  <div style="font-size:36px;font-weight:900;color:#ffd05a" id="clScore"></div>
-  <p id="clMsg" style="opacity:.8"></p>
-  <button class="btn" id="nextLvl">▶ שלב הבא</button>
+  <div style="font-size:50px" id="clIcon">🌟</div>
+  <h2 id="clT" style="color:#ffd05a">שלב הושלם!</h2>
+  <div style="font-size:38px;font-weight:900;color:#7fff88" id="clS"></div>
+  <p id="clM" style="opacity:.8;margin-top:6px"></p>
+  <button class="btn" id="nextBtn">▶ שלב הבא</button>
+  <button class="btn alt" id="clMenu">תפריט</button>
 </div></div>
-
-<!-- Game over -->
+<!-- OVER -->
 <div class="ov" id="over"><div class="ovc">
-  <div style="font-size:52px">🚨</div>
-  <h2 style="color:#ff5555">נתפסת!</h2>
-  <div style="font-size:36px;font-weight:900;color:#ffd05a" id="ovScore"></div>
-  <p id="ovMsg" style="opacity:.8"></p>
+  <div style="font-size:50px">🚨</div>
+  <h2 style="color:#ff7777">נתפסת!</h2>
+  <div style="font-size:38px;font-weight:900;color:#ffd05a" id="ovS"></div>
+  <p id="ovM" style="opacity:.8;margin-top:6px"></p>
   <button class="btn" id="retry">🔁 שוב</button>
-  <button class="btn alt" id="toMenu">תפריט</button>
+  <button class="btn alt" id="ovMenu">תפריט</button>
 </div></div>
 
+<script src="../lib/three.min.js"></script>
 <script>
 'use strict';
+/* ───── utils ───── */
 const $=s=>document.querySelector(s);
 const store={get(k,d){try{const v=localStorage.getItem(k);return v===null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
 let _ac=null;
-function tone(f,d=.1,t='triangle',v=.08){try{_ac=_ac||new(window.AudioContext||window.webkitAudioContext)();const o=_ac.createOscillator(),g=_ac.createGain();o.type=t;o.frequency.value=f;g.gain.setValueAtTime(v,_ac.currentTime);g.gain.exponentialRampToValueAtTime(.0001,_ac.currentTime+d);o.connect(g);g.connect(_ac.destination);o.start();o.stop(_ac.currentTime+d+.02)}catch(e){}}
-function chord(freqs,d){freqs.forEach((f,i)=>setTimeout(()=>tone(f,d,'sine',.06),i*60))}
+function tone(f,d=.1,type='triangle',v=.07){try{_ac=_ac||new(window.AudioContext||window.webkitAudioContext)();const o=_ac.createOscillator(),g=_ac.createGain();o.type=type;o.frequency.value=f;g.gain.setValueAtTime(v,_ac.currentTime);g.gain.exponentialRampToValueAtTime(.0001,_ac.currentTime+d);o.connect(g);g.connect(_ac.destination);o.start();o.stop(_ac.currentTime+d+.02)}catch(e){}}
+function chord(fs,d){fs.forEach((f,i)=>setTimeout(()=>tone(f,d,'sine',.05),i*70))}
 
-const cv=$('#cv');
-const R=new THREE.WebGLRenderer({canvas:cv,antialias:true,shadowMap:{enabled:true}});
-R.shadowMap.type=THREE.PCFSoftShadowMap;
+/* ───── renderer ───── */
+const rcv=$('#cv');
+const R=new THREE.WebGLRenderer({canvas:rcv,antialias:true});
 R.setPixelRatio(Math.min(devicePixelRatio,2));
-R.setClearColor(0x1a1a2e);
+R.shadowMap.enabled=true;
+R.shadowMap.type=THREE.PCFSoftShadowMap;
 const scene=new THREE.Scene();
-scene.fog=new THREE.FogExp2(0x1a1a2e,.035);
-const cam=new THREE.PerspectiveCamera(55,1,.1,180);
+const cam=new THREE.PerspectiveCamera(75,1,.05,200);
+cam.position.set(0,1.6,0);
+scene.add(cam);
+
 function resize(){R.setSize(innerWidth,innerHeight,false);cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix()}
 addEventListener('resize',resize);resize();
 
-// Lighting
-const amb=new THREE.AmbientLight(0x334466,.7);scene.add(amb);
-const sun=new THREE.DirectionalLight(0xfff0cc,1.4);
-sun.position.set(20,40,30);sun.castShadow=true;
-sun.shadow.mapSize.set(1024,1024);sun.shadow.camera.near=1;sun.shadow.camera.far=120;
-sun.shadow.camera.left=sun.shadow.camera.bottom=-50;sun.shadow.camera.right=sun.shadow.camera.top=50;
-scene.add(sun);
-const fillL=new THREE.PointLight(0x4466aa,.5,80);fillL.position.set(-15,8,0);scene.add(fillL);
+/* ───── lighting ───── */
+scene.fog=new THREE.Fog(0x87ceeb,.1,120);
+scene.background=new THREE.Color(0x87ceeb);
+const sun=new THREE.DirectionalLight(0xfff5dd,1.4);sun.position.set(50,80,30);sun.castShadow=true;
+sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.near=1;sun.shadow.camera.far=200;
+sun.shadow.camera.left=sun.shadow.camera.bottom=-80;sun.shadow.camera.right=sun.shadow.camera.top=80;
+scene.add(sun);scene.add(new THREE.AmbientLight(0xaaccff,.55));
+const hemi=new THREE.HemisphereLight(0x87ceeb,0x4a7a1a,.4);scene.add(hemi);
 
+/* ───── block system ───── */
+// Block types: 0=air,1=concrete,2=brick,3=plaster,4=vault,5=safe,6=floor/ground,7=glass,8=wood
+const BLK_COLOR=[0,0x888888,0xcc8866,0xddcc99,0x556655,0xddaa00,0x447733,0xaaddff,0x8b6914];
+const BLK_HP   =[0,       4,       3,       2,       7,       6,       0,       1,      3];
+const BLK_EMIT =[0,0,0,0,0,1,0,0,0];
+const BLK_SIZE=1;
+
+const world=new Map(); // "x,y,z" -> {type,mesh,hp,maxHp}
+function wKey(x,y,z){return x+','+y+','+z}
+
+const matByType=[];
+for(let i=1;i<=8;i++){
+  const m=new THREE.MeshLambertMaterial({color:BLK_COLOR[i]});
+  if(BLK_EMIT[i])m.emissive=new THREE.Color(BLK_COLOR[i]),m.emissiveIntensity=.3;
+  matByType.push(m);
+}
+const geo=new THREE.BoxGeometry(.99,.99,.99);
+
+function placeBlock(x,y,z,type){
+  const k=wKey(x,y,z);
+  if(world.has(k))return;
+  const mesh=new THREE.Mesh(geo,matByType[type-1].clone());
+  mesh.position.set(x+.5,y+.5,z+.5);
+  mesh.castShadow=true;mesh.receiveShadow=true;
+  scene.add(mesh);
+  world.set(k,{type,mesh,hp:BLK_HP[type],maxHp:BLK_HP[type]});
+}
+
+function removeBlock(x,y,z){
+  const k=wKey(x,y,z);
+  const b=world.get(k);if(!b)return;
+  scene.remove(b.mesh);world.delete(k);
+}
+
+function hasBlock(x,y,z){return world.has(wKey(x,y,z))}
+function getBlock(x,y,z){return world.get(wKey(x,y,z))}
+
+/* ───── level building ───── */
+function fillBox(x1,y1,z1,x2,y2,z2,type,hollow=false){
+  for(let x=x1;x<=x2;x++)for(let y=y1;y<=y2;y++)for(let z=z1;z<=z2;z++){
+    if(hollow&&x>x1&&x<x2&&y>y1&&y<y2&&z>z1&&z<z2)continue;
+    placeBlock(x,y,z,type);
+  }
+}
+
+// Ground plane (infinite-ish green)
+function mkGround(){
+  const groundGeo=new THREE.PlaneGeometry(400,400);
+  const groundMat=new THREE.MeshLambertMaterial({color:0x4a8a1a});
+  const g=new THREE.Mesh(groundGeo,groundMat);g.rotation.x=-Math.PI/2;g.receiveShadow=true;
+  scene.add(g);
+  // Grass tufts for depth
+  for(let i=0;i<80;i++){
+    const b=new THREE.Mesh(new THREE.BoxGeometry(.6,1,.6),new THREE.MeshLambertMaterial({color:0x336622}));
+    b.position.set((Math.random()-.5)*120,.5,(Math.random()-.5)*120);
+    if(Math.abs(b.position.x)<20&&Math.abs(b.position.z)<25)continue;
+    scene.add(b);
+  }
+  // Road
+  const road=new THREE.Mesh(new THREE.PlaneGeometry(8,60),new THREE.MeshLambertMaterial({color:0x555566}));
+  road.rotation.x=-Math.PI/2;road.position.y=.01;road.position.z=10;scene.add(road);
+}
+
+// Levels
+const LEVELS=[
+  // Level 1 – Small bank, 2 vaults
+  ()=>{
+    // Outer shell: 20x6x16 bank
+    fillBox(-10,0,-14,9,0,-14,6); // floor strip for entry
+    // Main building
+    for(let x=-10;x<=9;x++)for(let z=-14;z<=-1;z++){
+      if(z===0)continue;
+      const isWall=x===-10||x===9||z===-14;
+      const isCeil=false;
+      if(isWall)placeBlock(x,0,z,1);
+    }
+    // Floor inside
+    for(let x=-9;x<=8;x++)for(let z=-13;z<=-2;z++)placeBlock(x,-1,z,6);
+    // Walls height 1-5
+    for(let y=1;y<=5;y++){
+      for(let x=-10;x<=9;x++){
+        placeBlock(x,y,-14,1); // back
+        if(y<=4){placeBlock(-10,y,-14+0,1);placeBlock(9,y,-14+0,1);} // already done
+      }
+      for(let z=-14;z<=-1;z++){
+        placeBlock(-10,y,z,1); // left
+        placeBlock(9,y,z,1);  // right
+      }
+      // Ceiling
+      if(y===5)for(let x=-10;x<=9;x++)for(let z=-14;z<=-1;z++)placeBlock(x,y,z,1);
+    }
+    // Windows (remove blocks)
+    for(let y=2;y<=4;y++)for(let x=-7;x<=-2;x++)removeBlock(x,y,-14);
+    for(let y=2;y<=4;y++)for(let x=2;x<=7;x++)removeBlock(x,y,-14);
+    for(let y=2;y<=3;y++){for(let z=-11;z>=-5;z--)removeBlock(-10,y,z);for(let z=-11;z>=-5;z--)removeBlock(9,y,z);}
+    // Glass in windows
+    for(let y=2;y<=4;y++)for(let x=-7;x<=-2;x++)placeBlock(x,y,-14,7);
+    for(let y=2;y<=4;y++)for(let x=2;x<=7;x++)placeBlock(x,y,-14,7);
+    // Entry (gap in front wall)
+    for(let y=0;y<=2;y++)for(let x=-1;x<=0;x++){removeBlock(x,y,0);} // front door
+    // Interior partition wall
+    for(let x=-10;x<=-2;x++)for(let y=0;y<=4;y++)placeBlock(x,y,-7,2);
+    for(let x=1;x<=9;x++)for(let y=0;y<=4;y++)placeBlock(x,y,-7,2);
+    // Vault doors
+    placeBlock(-1,0,-7,4);placeBlock(-1,1,-7,4);placeBlock(0,0,-7,4);placeBlock(0,1,-7,4);
+    // Safes in vault room
+    placeBlock(-7,0,-12,5);placeBlock(5,0,-12,5);placeBlock(-3,0,-12,5);placeBlock(2,0,-12,5);
+    // Some wooden crates for cover
+    placeBlock(-5,0,-3,8);placeBlock(4,0,-3,8);placeBlock(-5,1,-3,8);placeBlock(4,1,-3,8);
+    // Guard spawns
+    return {guards:[{x:3,z:-4},{x:-5,z:-10}],exit:{x:0,z:3},cashPerSafe:300,time:90,safeCount:4};
+  },
+  // Level 2 – Bigger, more rooms
+  ()=>{
+    // Floor
+    for(let x=-14;x<=13;x++)for(let z=-20;z<=-1;z++)placeBlock(x,-1,z,6);
+    // Outer walls 5 high
+    for(let y=0;y<=5;y++){
+      for(let x=-14;x<=13;x++){placeBlock(x,y,-20,1);if(y===5)placeBlock(x,y,-20,1);}
+      for(let z=-20;z<=-1;z++){placeBlock(-14,y,z,1);placeBlock(13,y,z,1);}
+      if(y===5)for(let x=-14;x<=13;x++)for(let z=-20;z<=-1;z++)placeBlock(x,y,z,1);
+    }
+    // Windows
+    for(let y=2;y<=4;y++){for(let x=-11;x<=-4;x++)removeBlock(x,y,-20);for(let x=3;x<=10;x++)removeBlock(x,y,-20);}
+    for(let y=2;y<=4;y++){for(let z=-15;z>=-7;z--){removeBlock(-14,y,z);removeBlock(13,y,z);}}
+    for(let y=2;y<=4;y++){for(let x=-11;x<=-4;x++)placeBlock(x,y,-20,7);for(let x=3;x<=10;x++)placeBlock(x,y,-20,7);}
+    // Entry
+    for(let y=0;y<=2;y++)for(let x=-1;x<=0;x++)removeBlock(x,y,0);
+    // Interior walls
+    for(let x=-14;x<=-3;x++)for(let y=0;y<=4;y++)placeBlock(x,y,-10,2);
+    for(let x=2;x<=13;x++)for(let y=0;y<=4;y++)placeBlock(x,y,-10,2);
+    // Corridor partition
+    for(let z=-10;z>=-1;z--)for(let y=0;y<=4;y++){placeBlock(-2,y,z,3);placeBlock(1,y,z,3);}
+    for(let y=0;y<=2;y++){removeBlock(-2,y,-6);removeBlock(-2,y,-5);removeBlock(1,y,-6);removeBlock(1,y,-5);}
+    // Vault wall
+    for(let x=-14;x<=13;x++)for(let y=0;y<=4;y++)placeBlock(x,y,-16,1);
+    // Vault doors
+    for(let dy=0;dy<=1;dy++){placeBlock(-6,dy,-16,4);placeBlock(-5,dy,-16,4);placeBlock(4,dy,-16,4);placeBlock(5,dy,-16,4);}
+    // Safes
+    for(const [sx,sz] of[[-10,-19],[6,-19],[0,-19],[-4,-19],[4,-13],[-4,-13]])placeBlock(sx,0,sz,5);
+    // Crates / cover
+    for(const [cx,cz] of[[-8,-4],[6,-4],[-8,-13],[6,-13]])for(let dy=0;dy<=1;dy++)placeBlock(cx,dy,cz,8);
+    return {guards:[{x:4,z:-4},{x:-8,z:-4},{x:0,z:-13},{x:7,z:-13}],exit:{x:0,z:3},cashPerSafe:400,time:100,safeCount:6};
+  },
+  // Level 3 – Big bank, maze layout
+  ()=>{
+    for(let x=-16;x<=15;x++)for(let z=-26;z<=-1;z++)placeBlock(x,-1,z,6);
+    for(let y=0;y<=6;y++){
+      for(let x=-16;x<=15;x++){placeBlock(x,y,-26,1);}
+      for(let z=-26;z<=-1;z++){placeBlock(-16,y,z,1);placeBlock(15,y,z,1);}
+      if(y===6)for(let x=-16;x<=15;x++)for(let z=-26;z<=-1;z++)placeBlock(x,y,z,1);
+    }
+    for(let y=2;y<=5;y++){for(let x=-13;x<=-5;x++)removeBlock(x,y,-26);for(let x=4;x<=12;x++)removeBlock(x,y,-26);}
+    for(let y=2;y<=5;y++){for(let x=-13;x<=-5;x++)placeBlock(x,y,-26,7);for(let x=4;x<=12;x++)placeBlock(x,y,-26,7);}
+    for(let y=0;y<=2;y++)for(let x=-1;x<=0;x++)removeBlock(x,y,0);
+    // Corridor grid
+    for(let x=-16;x<=-5;x++)for(let y=0;y<=5;y++)placeBlock(x,y,-10,2);
+    for(let x=4;x<=15;x++)for(let y=0;y<=5;y++)placeBlock(x,y,-10,2);
+    for(let z=-10;z>=-1;z--)for(let y=0;y<=5;y++){placeBlock(-4,y,z,2);placeBlock(3,y,z,2);}
+    for(let y=0;y<=2;y++){removeBlock(-4,y,-6);removeBlock(-4,y,-5);removeBlock(3,y,-6);removeBlock(3,y,-5);}
+    for(let x=-5;x<=4;x++)for(let y=0;y<=5;y++)placeBlock(x,y,-18,1);
+    for(let x=-16;x<=15;x++)for(let y=0;y<=5;y++)placeBlock(x,y,-21,1);
+    for(const [dy] of[[0],[1]]){
+      for(const [sx] of[[-12],[-11],[9],[10]])placeBlock(sx,dy,-10,4);
+      for(const [sx] of[[-3],[-2],[1],[2]])placeBlock(sx,dy,-18,4);
+      for(const [sx] of[[-8],[-7],[5],[6]])placeBlock(sx,dy,-21,4);
+    }
+    for(const [sx,sz] of[[-12,-25],[8,-25],[0,-25],[-5,-25],[4,-25],[-12,-15],[8,-15],[0,-15]])placeBlock(sx,0,sz,5);
+    for(const [cx,cz] of[[-10,-4],[7,-4],[-10,-15],[7,-15],[0,-9],[0,-20]])for(let dy=0;dy<=1;dy++)placeBlock(cx,dy,cz,8);
+    return {guards:[{x:5,z:-4},{x:-9,z:-4},{x:0,z:-14},{x:8,z:-14},{x:-8,z:-23},{x:5,z:-23}],exit:{x:0,z:3},cashPerSafe:500,time:120,safeCount:8};
+  }
+];
+
+/* ───── player ───── */
+const player={
+  px:0,py:1.6,pz:2,   // position (eye level)
+  yaw:0,pitch:0,       // look angles
+  vx:0,vy:0,vz:0,
+  onGround:false,
+  hp:3,
+  cash:0,
+  bombCount:3,
+  inv:0               // invincibility frames
+};
+const PLAYER_H=1.7,PLAYER_R=.35;
+const GRAVITY=.018,JUMP_V=.3,WALK_SPEED=.1,RUN_SPEED=.17;
+
+/* ───── input ───── */
 const keys={};
-addEventListener('keydown',e=>{keys[e.code]=1;if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','KeyE'].includes(e.code))e.preventDefault();if(e.code==='Digit1')selTool(0);if(e.code==='Digit2')selTool(1);if(e.code==='Digit3')selTool(2)});
+addEventListener('keydown',e=>{keys[e.code]=1;if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();if(e.code==='Digit1')selTool(0);if(e.code==='Digit2')selTool(1);if(e.code==='Digit3')selTool(2)});
 addEventListener('keyup',e=>{keys[e.code]=0});
 
-// Materials
-const mat=(c,rough=.8,metal=0,emit=0)=>{const m=new THREE.MeshStandardMaterial({color:c,roughness:rough,metalness:metal});if(emit)m.emissive=new THREE.Color(c);m.emissiveIntensity=emit;return m};
-const matFloor=mat(0x2a2a3e,.95);
-const matWall=mat(0x3a3050,.8);
-const matWallHit=mat(0x5a4878,.7);
-const matVault=mat(0x888888,.3,.8);
-const matVaultOpen=mat(0xffd05a,.4,.5);
-const matSafe=mat(0x446644,.4,.6);
-const matCash=mat(0x22cc44,.5);
-const matGuard=mat(0x2244cc,.4);
-const matGuardHat=mat(0xdd2222,.3);
-const matAlert=mat(0xff4400,.2,0,.6);
-const matParticle=(c)=>mat(c,.5);
-const matLoot=mat(0x00ff99,.3,0,.4);
-const matBomb=mat(0x222222,.7);
-const matBombFuse=mat(0xffaa00,.2,0,.8);
+// Pointer lock
+let locked=false,mouseDX=0,mouseDY=0;
+document.addEventListener('pointerlockchange',()=>{locked=!!document.pointerLockElement;$('#lockMsg').style.opacity=locked?0:1});
+document.addEventListener('mousemove',e=>{if(locked){mouseDX+=e.movementX;mouseDY+=e.movementY}});
+rcv.addEventListener('click',()=>{if(!locked&&state==='play')rcv.requestPointerLock()});
+rcv.addEventListener('mousedown',e=>{if(locked&&state==='play'&&e.button===0){startHit()}});
+addEventListener('keydown',e=>{if(e.code==='KeyE'&&state==='play')startHit()});
 
-// Storage
+// Touch / mobile
+const isMobile=matchMedia('(pointer:coarse)').matches;
+let joyAx=0,joyAy=0,joyId=null,joyOrigin=null;
+let lookId=null,lookLast=null;
+if(isMobile){
+  $('#joy').style.display='block';
+  $('#hitBtn').style.display='flex';
+  $('#lockMsg').style.opacity=0;
+  const joy=$('#joy'),knob=$('#jknob');
+  joy.addEventListener('pointerdown',e=>{joyId=e.pointerId;joyOrigin={x:e.clientX,y:e.clientY};joy.setPointerCapture(e.pointerId)});
+  joy.addEventListener('pointermove',e=>{if(e.pointerId!==joyId||!joyOrigin)return;const dx=e.clientX-joyOrigin.x,dy=e.clientY-joyOrigin.y;const r=Math.min(30,Math.hypot(dx,dy));const a=Math.atan2(dy,dx);joyAx=Math.cos(a)*r/30;joyAy=Math.sin(a)*r/30;knob.style.left=(50+joyAx*34)+'%';knob.style.top=(50+joyAy*34)+'%'});
+  function resetJoy(){joyAx=joyAy=0;joyId=null;joyOrigin=null;$('#jknob').style.left=$('#jknob').style.top='50%'}
+  joy.addEventListener('pointerup',resetJoy);joy.addEventListener('pointercancel',resetJoy);
+  // Right-side look drag
+  rcv.addEventListener('pointerdown',e=>{if(e.clientX<innerWidth/2)return;lookId=e.pointerId;lookLast={x:e.clientX,y:e.clientY}});
+  rcv.addEventListener('pointermove',e=>{if(e.pointerId!==lookId||!lookLast)return;mouseDX+=e.clientX-lookLast.x;mouseDY+=e.clientY-lookLast.y;lookLast={x:e.clientX,y:e.clientY}});
+  rcv.addEventListener('pointerup',e=>{if(e.pointerId===lookId){lookId=null;lookLast=null}});
+  rcv.addEventListener('pointercancel',e=>{if(e.pointerId===lookId){lookId=null;lookLast=null}});
+  $('#hitBtn').addEventListener('pointerdown',startHit);
+}
+
+/* ───── tool ───── */
+let toolIdx=0;
+const TOOL_IDS=['t0','t1','t2'];
+function selTool(i){toolIdx=i;TOOL_IDS.forEach((id,j)=>$(('#'+id)).classList.toggle('on',j===i));tone([440,620,820][i],.05,'sine',.04)}
+
+/* ───── viewmodel (hammer in hand) ───── */
+const vmcv=$('#vmcv'),vmx=vmcv.getContext('2d');
+let vmSwing=0,vmSwingV=0;
+function startHit(){if(state!=='play')return;vmSwingV=1;doHit()}
+function drawVM(){
+  vmx.clearRect(0,0,260,220);
+  vmSwingV*=.8;vmSwing=vmSwing*.7+vmSwingV*.3;
+  const sx=130+vmSwing*18,sy=160-vmSwing*30;
+  const icons=['🔨','⚙️','💣'];
+  if(toolIdx===2&&player.bombCount<=0){vmx.fillStyle='rgba(255,255,255,.4)';vmx.font='900 14px system-ui';vmx.textAlign='center';vmx.fillText('אין פצצות',130,200);return}
+  vmx.save();vmx.translate(sx,sy);vmx.rotate((-0.3+vmSwing*.5)*Math.PI/2);
+  // Draw tool body
+  vmx.fillStyle=toolIdx===0?'#885522':toolIdx===1?'#666':' #222';
+  vmx.fillRect(-8,0,16,55); // handle
+  vmx.fillStyle=toolIdx===0?'#888':toolIdx===1?'#aaa':'#333';
+  if(toolIdx===0){vmx.fillRect(-18,-22,36,24);} // hammer head
+  else if(toolIdx===1){for(let i=0;i<6;i++){vmx.fillRect(-3-i*.5,-6-i*7,6+i,6);}} // drill bits
+  else{vmx.beginPath();vmx.arc(0,-15,15,0,Math.PI*2);vmx.fill();vmx.fillStyle='#555';vmx.fillRect(-3,-12,6,20);} // bomb
+  vmx.restore();
+}
+
+/* ───── hit / destroy ───── */
+const REACH=4.5;
+let hitCooldown=0;
+function doHit(){
+  if(hitCooldown>0)return;
+  // Raycast from camera center
+  const dir=new THREE.Vector3(0,0,-1).applyEuler(new THREE.Euler(player.pitch,player.yaw,0,'YXZ'));
+  const origin=new THREE.Vector3(player.px,player.py,player.pz);
+  // Step along ray
+  for(let t=0.3;t<=REACH;t+=0.25){
+    const x=Math.floor(origin.x+dir.x*t);
+    const y=Math.floor(origin.y+dir.y*t);
+    const z=Math.floor(origin.z+dir.z*t);
+    const b=getBlock(x,y,z);
+    if(b&&b.type!==6){// hit something (not indestructible floor)
+      hitBlock(x,y,z,b);
+      // Flash
+      $('#hit').style.opacity=.3;setTimeout(()=>$('#hit').style.opacity=0,80);
+      break;
+    }
+  }
+  hitCooldown=toolIdx===1?10:toolIdx===0?14:0;
+  if(toolIdx===2){// bomb
+    if(player.bombCount<=0){tone(100,.1,'square',.05);return}
+    player.bombCount--;
+    updateBombCount();
+    // Plant bomb at feet+1
+    plantBomb(Math.floor(player.px),Math.floor(player.py-1),Math.floor(player.pz-1));
+    hitCooldown=60;tone(300,.1,'sine',.06);
+  }
+}
+
+function hitBlock(x,y,z,b){
+  if(b.type===6)return;// indestructible
+  const dmg=toolIdx===1?2:1;
+  b.hp-=dmg;
+  // Tint to show damage
+  const frac=Math.max(0,b.hp/b.maxHp);
+  const base=BLK_COLOR[b.type];
+  b.mesh.material.color.setHex(base).multiplyScalar(.4+frac*.6);
+  tone(200+b.hp*40,.06,'square',.06);
+  // Dust particles
+  dustAt(x+.5,y+.5,z+.5,b.type);
+  if(b.hp<=0){
+    if(b.type===5)openSafe(x,y,z);// safe drops cash
+    removeBlock(x,y,z);
+    tone(150,.15,'sawtooth',.08);
+  }
+}
+
+/* ───── particles ───── */
+const parts=[];
+function dustAt(px,py,pz,type){
+  for(let i=0;i<6;i++){
+    const m=new THREE.Mesh(new THREE.BoxGeometry(.15,.15,.15),new THREE.MeshBasicMaterial({color:BLK_COLOR[type]}));
+    m.position.set(px,py,pz);scene.add(m);
+    const a=Math.random()*Math.PI*2,el=(Math.random()-.5)*Math.PI;
+    const sp=.05+Math.random()*.12;
+    parts.push({m,vx:Math.cos(a)*Math.cos(el)*sp,vy:Math.sin(el)*sp+.04,vz:Math.sin(a)*Math.cos(el)*sp,life:25,maxL:25});
+  }
+}
+function stepParts(){for(let i=parts.length-1;i>=0;i--){const p=parts[i];p.vx*=.9;p.vz*=.9;p.vy-=.008;p.m.position.x+=p.vx;p.m.position.y+=p.vy;p.m.position.z+=p.vz;p.life--;if(p.life<=0){scene.remove(p.m);parts.splice(i,1)}}}
+
+/* ───── safe & cash ───── */
+let cashObjects=[];
+function openSafe(x,y,z){
+  tone(880,.1,'sine',.07);setTimeout(()=>tone(1100,.1,'sine',.06),80);setTimeout(()=>tone(1320,.15,'sine',.07),160);
+  // Spray cash bundles
+  for(let i=0;i<4;i++){
+    const cm=new THREE.Mesh(new THREE.BoxGeometry(.4,.25,.4),new THREE.MeshLambertMaterial({color:0x22ee66,emissive:new THREE.Color(0x115533),emissiveIntensity:.4}));
+    const a=i*Math.PI/2+.3;cm.position.set(x+.5+Math.cos(a)*.8,y+.5,z+.5+Math.sin(a)*.8);
+    scene.add(cm);cashObjects.push({m:cm,x:x+.5+Math.cos(a)*.8,z:z+.5+Math.sin(a)*.8,bob:i,val:Math.floor(currentLvlData.cashPerSafe/4)});
+  }
+  dustAt(x+.5,y+.5,z+.5,5);
+}
+function pickupCash(){for(let i=cashObjects.length-1;i>=0;i--){const c=cashObjects[i];if(Math.hypot(player.px-c.x,player.pz-c.z)<1.3){player.cash+=c.val;scene.remove(c.m);cashObjects.splice(i,1);$('#cash').textContent='💰 '+player.cash;tone(600,.05,'sine',.05)}}}
+function updateBombCount(){$('#t2').querySelector('b').textContent=player.bombCount}
+
+/* ───── bombs ───── */
+const activeBombs=[];
+function plantBomb(x,y,z){
+  const bm=new THREE.Mesh(new THREE.SphereGeometry(.35,8,6),new THREE.MeshLambertMaterial({color:0x222222,emissive:new THREE.Color(0xff4400),emissiveIntensity:.5}));
+  bm.position.set(x+.5,y+.5,z+.5);scene.add(bm);
+  activeBombs.push({m:bm,x,y,z,timer:180});
+}
+function stepBombs(){for(let i=activeBombs.length-1;i>=0;i--){const b=activeBombs[i];b.timer--;b.m.material.emissiveIntensity=.5+Math.sin(b.timer*.3)*.4;if(b.timer<=0){// BOOM
+  scene.remove(b.m);activeBombs.splice(i,1);
+  tone(80,.5,'sawtooth',.12);
+  dustAt(b.x+.5,b.y+.5,b.z+.5,1);dustAt(b.x+.5,b.y+.5,b.z+.5,2);
+  for(let dx=-2;dx<=2;dx++)for(let dy=-1;dy<=2;dy++)for(let dz=-2;dz<=2;dz++){
+    const bb=getBlock(b.x+dx,b.y+dy,b.z+dz);
+    if(bb&&bb.type!==6){if(bb.type===5)openSafe(b.x+dx,b.y+dy,b.z+dz);removeBlock(b.x+dx,b.y+dy,b.z+dz);}}
+  // Hurt player if close
+  if(Math.hypot(player.px-(b.x+.5),player.py-(b.y+.5),player.pz-(b.z+.5))<3)hurtPlayer();
+}}}
+
+/* ───── guards ───── */
+let guards=[];
+const guardGeos=[new THREE.BoxGeometry(.6,1,.5),new THREE.BoxGeometry(.55,.55,.55),new THREE.BoxGeometry(.7,.2,.7)];
+const guardMats=[new THREE.MeshLambertMaterial({color:0x2255cc}),new THREE.MeshLambertMaterial({color:0xffbb88}),new THREE.MeshLambertMaterial({color:0xdd2222})];
+function mkGuard(x,z){
+  const g=new THREE.Group();
+  const body=new THREE.Mesh(guardGeos[0],guardMats[0].clone());body.position.y=.6;g.add(body);
+  const head=new THREE.Mesh(guardGeos[1],guardMats[1].clone());head.position.y=1.4;g.add(head);
+  const hat=new THREE.Mesh(guardGeos[2],guardMats[2].clone());hat.position.y=1.72;g.add(hat);
+  g.castShadow=true;scene.add(g);
+  const a=Math.random()*Math.PI*2;
+  return{g,x,z,a:0,state:'patrol',patA:x,patB:x+(Math.random()-.5)*10,patZ:z,patT:0,speed:.04+level*.007,alertTimer:0,cd:0};
+}
+function guardSees(gd){const dx=player.px-gd.x,dz=player.pz-gd.z;const dist=Math.hypot(dx,dz);if(dist>7)return false;const steps=Math.ceil(dist/.4);for(let s=1;s<steps;s++){const t=s/steps;if(hasBlock(Math.floor(gd.x+dx*t),Math.floor(player.py-.5),Math.floor(gd.z+dz*t)))return false;}return true}
+function stepGuard(gd){gd.cd=Math.max(0,gd.cd-1);gd.patT++;
+  if(gd.state==='patrol'){const tx=(gd.patT%300<150)?gd.patA:gd.patB,tz=gd.patZ;const dx=tx-gd.x,dz=tz-gd.z;const d=Math.hypot(dx,dz);if(d>.4){moveEntity(gd,dx/d*gd.speed,dz/d*gd.speed,.3);gd.a=Math.atan2(dx,dz)}if(guardSees(gd)){gd.state='chase';gd.alertTimer=0;tone(880,.08,'sine',.04);alarm=Math.min(100,alarm+8)}}
+  else{gd.alertTimer++;alarm=Math.min(100,alarm+.4);const dx=player.px-gd.x,dz=player.pz-gd.z;const d=Math.hypot(dx,dz);if(d>.5){moveEntity(gd,dx/d*gd.speed*1.7,dz/d*gd.speed*1.7,.3);gd.a=Math.atan2(dx,dz)}
+  if(d<1&&player.inv<=0){hurtPlayer();gd.state='patrol';gd.alertTimer=0}
+  if(!guardSees(gd)){gd.alertTimer++;if(gd.alertTimer>80){gd.state='patrol';gd.alertTimer=0}}}
+  gd.g.position.set(gd.x,0,gd.z);gd.g.rotation.y=gd.a;
+  // Bobbing walk
+  gd.g.position.y=Math.abs(Math.sin(gd.patT*.15))*.06;
+}
+function moveEntity(e,dx,dz,r){const nx=e.x+dx,nz=e.z+dz;if(!hasBlock(Math.floor(nx),0,Math.floor(e.z))&&!hasBlock(Math.floor(nx),1,Math.floor(e.z)))e.x=nx;if(!hasBlock(Math.floor(e.x),0,Math.floor(nz))&&!hasBlock(Math.floor(e.x),1,Math.floor(nz)))e.z=nz;}
+
+/* ───── player movement ───── */
+function movePlayer(){
+  // Look
+  const sens=isMobile?.003:.0025;
+  player.yaw-=mouseDX*sens;
+  player.pitch=Math.max(-Math.PI/2.2,Math.min(Math.PI/2.2,player.pitch-mouseDY*sens));
+  mouseDX=0;mouseDY=0;
+  cam.rotation.order='YXZ';cam.rotation.y=player.yaw;cam.rotation.x=player.pitch;
+
+  // Move
+  const sp=(keys.ShiftLeft||keys.ShiftRight)?RUN_SPEED:WALK_SPEED;
+  let fx=((keys.KeyD||keys.ArrowRight)?1:0)-((keys.KeyA||keys.ArrowLeft)?1:0);
+  let fz=((keys.KeyS||keys.ArrowDown)?1:0)-((keys.KeyW||keys.ArrowUp)?1:0);
+  if(isMobile){fx+=joyAx;fz+=joyAy}
+  const fl=Math.hypot(fx,fz);if(fl>0){fx/=fl;fz/=fl}
+  // Apply yaw to movement
+  const cy=Math.cos(player.yaw),sy=Math.sin(player.yaw);
+  player.vx=(fx*cy-fz*sy)*sp;
+  player.vz=(fx*sy+fz*cy)*sp;
+  // Gravity
+  player.vy-=GRAVITY;
+  // Jump
+  if((keys.Space)&&player.onGround){player.vy=JUMP_V;player.onGround=false;tone(300,.05,'sine',.04)}
+  // Collide & move
+  const nx=player.px+player.vx,ny=player.py+player.vy,nz=player.pz+player.vz;
+  player.onGround=false;
+  // Floor check
+  if(ny<1.6){player.py=1.6;player.vy=0;player.onGround=true}else player.py=ny;
+  // Block collision (simple AABB)
+  const bx=Math.floor(nx),by=Math.floor(player.py-1),bz=Math.floor(player.pz);
+  if(!hasBlock(bx,by,bz)&&!hasBlock(bx,by+1,bz))player.px=nx;
+  const bx2=Math.floor(player.px),bz2=Math.floor(nz);
+  if(!hasBlock(bx2,by,bz2)&&!hasBlock(bx2,by+1,bz2))player.pz=nz;
+  // Ground on block tops
+  const floorY=Math.floor(player.py-.01);
+  if(hasBlock(Math.floor(player.px),floorY,Math.floor(player.pz))){player.py=floorY+1+1.6;player.vy=0;player.onGround=true}
+  cam.position.set(player.px,player.py,player.pz);
+  if(player.inv>0)player.inv--;
+}
+
+/* ───── hurt ───── */
+function hurtPlayer(){player.hp--;player.inv=80;$('#dmg').style.opacity=.6;setTimeout(()=>$('#dmg').style.opacity=0,200);tone(100,.3,'sawtooth',.1);$('#hearts').textContent='❤️'.repeat(Math.max(0,player.hp))+'🖤'.repeat(Math.max(0,3-player.hp));if(player.hp<=0)gameOver()}
+
+/* ───── alarm ───── */
+let alarm=0;
+function updateAlarm(){if(alarm>0&&!guards.some(g=>g.state==='chase'))alarm=Math.max(0,alarm-.1);const pct=alarm/100;$('#alarmbar').style.background=alarm>0?`linear-gradient(90deg,hsl(${10+pct*20},100%,50%),hsl(${40-pct*30},100%,60%))`:'';}
+
+/* ───── timer ───── */
+let timeLeft=90,lastSecFrame=0,gameFrame=0;
+function updateTimer(){const sec=Math.floor(gameFrame/60);if(sec!==lastSecFrame){lastSecFrame=sec;timeLeft=Math.max(0,currentLvlData.time-sec);$('#timer').textContent='⏱ '+timeLeft;$('#timer').classList.toggle('urgent',timeLeft<=15);if(timeLeft===0)gameOver()}}
+
+/* ───── exit ───── */
+let exitMesh=null;
+function mkExit(ex){if(exitMesh)scene.remove(exitMesh);const em=new THREE.Mesh(new THREE.BoxGeometry(2,3,.2),new THREE.MeshLambertMaterial({color:0xffd05a,emissive:new THREE.Color(0xffd05a),emissiveIntensity:.5}));em.position.set(ex.x+.5,1.5,ex.z+.5);scene.add(em);exitMesh=em}
+function checkExit(){if(!currentLvlData)return;const ex=currentLvlData.exit;if(Math.hypot(player.px-ex.x,player.pz-ex.z)<2&&cashObjects.length===0&&player.cash>0)levelClear()}
+
+/* ───── state machine ───── */
+let state='menu',level=1,currentLvlData=null;
 const BEST_KEY='heist3d_best';
 let best=+store.get(BEST_KEY,0);$('#best').textContent=best;
 
-// Game state
-let state='menu',level=1,totalCash=0,hp=3,alarm=0,alarmMax=100,tool=0;
-let player,guards=[],walls=[],vaults=[],loots=[],particles=[],bombs=[];
-let frame=0,camTarget=new THREE.Vector3(),camPos=new THREE.Vector3(0,20,16);
-let dmgFlash=0,toolCooldown=0,shakeT=0;
-let joyAx=0,joyAy=0,joyActive=false;
-
-// Joystick
-const joy=$('#joy'),knob=$('#knob');
-let joyOrigin=null,joyId=null;
-joy.addEventListener('pointerdown',e=>{joyId=e.pointerId;joyOrigin={x:e.clientX,y:e.clientY};joy.setPointerCapture(e.pointerId)});
-joy.addEventListener('pointermove',e=>{if(e.pointerId!==joyId||!joyOrigin)return;const dx=e.clientX-joyOrigin.x,dy=e.clientY-joyOrigin.y;const r=Math.min(32,Math.hypot(dx,dy));const a=Math.atan2(dy,dx);joyAx=Math.cos(a)*r/32;joyAy=Math.sin(a)*r/32;knob.style.left=(50+joyAx*34)+'%';knob.style.top=(50+joyAy*34)+'%';joyActive=true});
-function resetJoy(){joyAx=0;joyAy=0;joyActive=false;knob.style.left='50%';knob.style.top='50%';joyOrigin=null;joyId=null}
-joy.addEventListener('pointerup',resetJoy);joy.addEventListener('pointercancel',resetJoy);
-
-// Tool select
-const TOOLS=['tHammer','tDrill','tBomb'];
-function selTool(i){tool=i;TOOLS.forEach((id,j)=>$(('#'+id)).classList.toggle('on',j===i));tone([440,660,880][i],.05,'sine',.04)}
-
-// Geometry helpers
-function box(w,h,d,m,rx=0,ry=0,rz=0){const mesh=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);mesh.castShadow=true;mesh.receiveShadow=true;mesh.rotation.set(rx,ry,rz);return mesh}
-function addAt(mesh,x,y,z){mesh.position.set(x,y,z);scene.add(mesh);return mesh}
-
-// Particle burst
-function burst(x,z,color,n=12,vy=.2){for(let i=0;i<n;i++){const m=new THREE.Mesh(new THREE.BoxGeometry(.22,.22,.22),matParticle(color));m.position.set(x,1.5,z);scene.add(m);const a=Math.random()*Math.PI*2;const sp=.1+Math.random()*.2;particles.push({m,vx:Math.cos(a)*sp,vy:.1+Math.random()*vy,vz:Math.sin(a)*sp,life:35,maxL:35})}}
-function cashBurst(x,z){burst(x,z,0x22ee66,16,.35);tone(880,.12,'sine',.07);setTimeout(()=>tone(1100,.1,'sine',.06),80)}
-function boomBurst(x,z){burst(x,z,0xff8800,24,.4);burst(x,z,0xffdd00,16,.5);burst(x,z,0x888888,10,.3);tone(80,.4,'sawtooth',.12);setTimeout(()=>tone(160,.3,'square',.08),100)}
-
-// LEVELS definition: array of wall layouts. Each level = {bg, walls: [{x,z,w,d,hp}], vaults: [{x,z}], guards: n, time: s}
-const LEVELS=[
-  // 1 – Simple bank
-  {bg:0x1a1a2e,walls:[
-    {x:0,z:0,w:20,d:.8,hp:0,fixed:true},// front wall
-    {x:-5,z:-4,w:.8,d:8,hp:3},{x:5,z:-4,w:.8,d:8,hp:3},// vault corridors
-    {x:0,z:-8,w:12,d:.8,hp:4},// vault back wall
-    {x:-8,z:2,w:.8,d:12,hp:0,fixed:true},{x:8,z:2,w:.8,d:12,hp:0,fixed:true}// outer walls
-  ],vaults:[{x:-2,z:-11,cash:300},{x:2,z:-11,cash:300}],guards:1,time:50},
-  // 2 – More corridors
-  {bg:0x1a2a1a,walls:[
-    {x:0,z:3,w:16,d:.8,hp:0,fixed:true},
-    {x:-6,z:-1,w:.8,d:8,hp:3},{x:0,z:-1,w:.8,d:8,hp:3},{x:6,z:-1,w:.8,d:8,hp:3},
-    {x:0,z:-7,w:18,d:.8,hp:5},
-    {x:-9,z:-2,w:.8,d:12,hp:0,fixed:true},{x:9,z:-2,w:.8,d:12,hp:0,fixed:true}
-  ],vaults:[{x:-5,z:-10,cash:400},{x:0,z:-10,cash:200},{x:5,z:-10,cash:400}],guards:2,time:55},
-  // 3 – Maze
-  {bg:0x2a1a1a,walls:[
-    {x:-4,z:2,w:8,d:.8,hp:4},{x:4,z:0,w:8,d:.8,hp:4},
-    {x:-7,z:-4,w:.8,d:8,hp:3},{x:0,z:-4,w:.8,d:8,hp:3},{x:7,z:-4,w:.8,d:8,hp:3},
-    {x:0,z:-9,w:16,d:.8,hp:6},
-    {x:-8,z:-3,w:.8,d:16,hp:0,fixed:true},{x:8,z:-3,w:.8,d:16,hp:0,fixed:true}
-  ],vaults:[{x:-5,z:-12,cash:500},{x:5,z:-12,cash:500},{x:0,z:-12,cash:600}],guards:3,time:60},
-  // 4 – Double vault
-  {bg:0x1a1a1a,walls:[
-    {x:-2,z:3,w:12,d:.8,hp:0,fixed:true},{x:2,z:-12,w:12,d:.8,hp:0,fixed:true},
-    {x:-5,z:-2,w:.8,d:10,hp:4},{x:5,z:-2,w:.8,d:10,hp:4},
-    {x:-5,z:-9,w:.8,d:6,hp:5},{x:5,z:-9,w:.8,d:6,hp:5},
-    {x:0,z:-4,w:6,d:.8,hp:5},
-    {x:-9,z:-4,w:.8,d:16,hp:0,fixed:true},{x:9,z:-4,w:.8,d:16,hp:0,fixed:true}
-  ],vaults:[{x:-6,z:-12,cash:600},{x:6,z:-12,cash:600},{x:0,z:-7,cash:800}],guards:4,time:65},
-  // 5 – Central vault
-  {bg:0x1a1030,walls:[
-    {x:0,z:4,w:22,d:.8,hp:0,fixed:true},
-    {x:-5,z:-2,w:.8,d:12,hp:5},{x:5,z:-2,w:.8,d:12,hp:5},
-    {x:0,z:-2,w:8,d:.8,hp:6},
-    {x:-3,z:-8,w:.8,d:8,hp:5},{x:3,z:-8,w:.8,d:8,hp:5},
-    {x:0,z:-12,w:8,d:.8,hp:7},
-    {x:-10,z:-4,w:.8,d:18,hp:0,fixed:true},{x:10,z:-4,w:.8,d:18,hp:0,fixed:true}
-  ],vaults:[{x:-7,z:-9,cash:700},{x:7,z:-9,cash:700},{x:0,z:-15,cash:1200}],guards:5,time:70},
-];
-
-function mkLevel(){
-  // Clear scene (except lights)
-  for(const o of [...scene.children]){if(o.isLight)continue;scene.remove(o)}
-  walls=[];vaults=[];guards=[];loots=[];particles=[];bombs=[];frame=0;alarm=0;toolCooldown=0;
-
-  const lvlData=LEVELS[Math.min(level-1,LEVELS.length-1)];
-  R.setClearColor(lvlData.bg);scene.fog.color.setHex(lvlData.bg);
-
-  // Floor
-  const floor=box(40,0.4,40,matFloor);floor.receiveShadow=true;addAt(floor,0,-.2,0);
-
-  // Grid pattern on floor
-  for(let ix=-8;ix<=8;ix+=4)for(let iz=-14;iz<=8;iz+=4){
-    const tile=box(3.9,0.05,3.9,mat(ix%8===0?0x33334a:0x2e2e42,.9));
-    tile.receiveShadow=true;addAt(tile,ix,.01,iz);
-  }
-
-  // Build boundary walls (outer shell)
-  const outerMat=mat(0x222232,.9);
-  for(const [ox,oz,ow,od] of[[-12,0,.8,36],[12,0,.8,36],[0,-16,24,.8],[0,8,24,.8]]){
-    const w=box(ow,5,od,outerMat);w.castShadow=true;addAt(w,ox,2.5,oz);
-  }
-
-  // Level walls
-  for(const wd of lvlData.walls){
-    const m=wd.fixed?mat(0x222232,.9):mat(wd.hp>4?0x4a3060:wd.hp>2?0x3a3050:0x334060,.8);
-    const mesh=box(wd.w,3.5,wd.d,m.clone());addAt(mesh,wd.x,1.75,wd.z);
-    walls.push({mesh,x:wd.x,z:wd.z,w:wd.w,d:wd.d,hp:wd.hp||0,fixed:!!wd.fixed,maxHp:wd.hp||0,mat:m});
-    // Add crack lines on breakable walls
-    if(!wd.fixed&&wd.hp>0){
-      const crack=box(wd.w-.1,3.4,wd.d+.02,mat(0x0,0));crack.material.wireframe=true;crack.material.opacity=.2;crack.material.transparent=true;
-      addAt(crack,wd.x,1.75,wd.z);
-    }
-  }
-
-  // Ceiling strips (atmosphere)
-  for(let iz=-14;iz<=6;iz+=5){
-    const strip=box(22,.1,0.3,mat(0x4455aa,.2,0,.3));strip.material.transparent=true;strip.material.opacity=0.6;addAt(strip,0,4.9,iz);
-  }
-  // Emergency lights
-  for(const [lx,lz] of[[-8,-8],[8,-8],[0,0],[-8,2],[8,2]]){
-    const lm=new THREE.PointLight(0x2244ff,.4,12);lm.position.set(lx,4.5,lz);scene.add(lm);
-    const bulb=box(.4,.4,.4,mat(0x4466ff,.2,0,.8));addAt(bulb,lx,4.7,lz);
-  }
-
-  // Vaults
-  for(const vd of lvlData.vaults){
-    const vMesh=box(2,2,2,matVault.clone());vMesh.castShadow=true;addAt(vMesh,vd.x,1,vd.z);
-    // Safe door detail
-    const door=box(1.9,1.9,.15,mat(0x666666,.3,.7));addAt(door,vd.x,1,vd.z+1.08);
-    const handle=box(.15,.8,.2,mat(0xcccccc,.2,.9));addAt(handle,vd.x+.5,1,vd.z+1.2);
-    const dial=box(.4,.4,.15,mat(0x888888,.2,.8));addAt(dial,vd.x,1.3,vd.z+1.2);
-    // Cash stack visual
-    const stack=box(1,.8,1,matCash);addAt(stack,vd.x,.5,vd.z);
-    vaults.push({mesh:vMesh,door,stack,x:vd.x,z:vd.z,cash:vd.cash,open:false,lit:new THREE.PointLight(0x00ff44,.5,5)});
-    vd.vaultObj=vaults[vaults.length-1];scene.add(vaults[vaults.length-1].lit);
-    vaults[vaults.length-1].lit.position.set(vd.x,3,vd.z);
-  }
-
-  // Player
-  const pg=new THREE.Group();
-  const body=box(0.8,1.2,.6,mat(0x111111,.7));body.position.y=.6;pg.add(body);
-  const head=box(.6,.6,.6,mat(0xffcc88,.6));head.position.y=1.5;pg.add(head);
-  const hat=box(.7,.25,.7,mat(0x111111,.8));hat.position.y=1.85;pg.add(hat);
-  const hatBrim=box(.9,.08,.9,mat(0x111111,.8));hatBrim.position.y=1.72;pg.add(hatBrim);
-  const eye1=box(.12,.12,.05,mat(0xffffff));eye1.position.set(-.15,1.52,.32);pg.add(eye1);
-  const eye2=eye1.clone();eye2.position.x=.15;pg.add(eye2);
-  // Tool mesh
-  const toolMesh=box(.12,.5,.12,mat(0x885522,.5));toolMesh.position.set(.5,.8,.2);pg.add(toolMesh);
-  pg.castShadow=true;
-  scene.add(pg);
-  player={g:pg,x:0,z:5,a:0,hp:3,toolMesh,speed:.12,inv:0};
-  hp=3;
-
-  // Guards
-  for(let gi=0;gi<lvlData.guards;gi++){
-    const gg=new THREE.Group();
-    const gb=box(.7,1.1,.5,matGuard.clone());gb.position.y=.55;gg.add(gb);
-    const gh=box(.5,.5,.5,mat(0xffaa88,.6));gh.position.y=1.35;gg.add(gh);
-    const ghat=box(.6,.3,.6,matGuardHat.clone());ghat.position.y=1.65;gg.add(ghat);
-    // Alert cone above guard
-    const alertMesh=box(.2,1,.2,matAlert.clone());alertMesh.position.y=2.2;alertMesh.material.transparent=true;alertMesh.material.opacity=0;gg.add(alertMesh);
-    // Guard light
-    const glight=new THREE.SpotLight(0xffff00,.0,10,Math.PI/6,.5);glight.position.y=2;gg.add(glight);scene.add(glight.target);
-    gg.castShadow=true;
-    // Place away from player
-    let gx,gz,tries=0;
-    do{gx=(Math.random()-.5)*16;gz=-6-Math.random()*8}while(Math.hypot(gx,gz-5)<4&&tries++<20);
-    scene.add(gg);
-    guards.push({g:gg,glight,alertMesh,x:gx,z:gz,a:0,state:'patrol',target:{x:gx,z:gz},alertV:0,cd:60+gi*20,
-      pathA:gx,pathB:gx+(Math.random()-.5)*8,pathZ:gz,patrolT:0,speed:.04+level*.005});
-  }
-
-  updateHUD();
-  $([`#tools`,`#joy`].join(',')).style.display='flex';
+function startLevel(lvl){
+  level=lvl;
+  // Clear world
+  for(const[k,b]of world)scene.remove(b.mesh);world.clear();
+  for(const p of parts)scene.remove(p.m);parts.length=0;
+  for(const b of activeBombs)scene.remove(b.m);activeBombs.length=0;
+  for(const c of cashObjects)scene.remove(c.m);cashObjects.length=0;
+  for(const g of guards)scene.remove(g.g);guards.length=0;
+  if(exitMesh)scene.remove(exitMesh);exitMesh=null;
+  mkGround();
+  currentLvlData=LEVELS[lvl-1]();
+  guards=currentLvlData.guards.map(gd=>mkGuard(gd.x,gd.z));
+  mkExit(currentLvlData.exit);
+  player.px=0;player.py=1.6;player.pz=2;player.vx=player.vy=player.vz=0;player.hp=3;player.cash=0;player.inv=0;player.bombCount=3;
+  player.yaw=Math.PI;player.pitch=0;
+  toolIdx=0;selTool(0);
+  alarm=0;gameFrame=0;lastSecFrame=0;timeLeft=currentLvlData.time;hitCooldown=0;
+  if(!isMobile&&state!=='play')rcv.requestPointerLock().catch(()=>{});
+  state='play';
+  $('#hearts').textContent='❤️❤️❤️';
+  $('#cash').textContent='💰 0';
+  $('#timer').textContent='⏱ '+currentLvlData.time;
+  $('#timer').classList.remove('urgent');
+  updateBombCount();
 }
 
-function wallAt(x,z,r){return walls.some(w=>!w.destroyed&&Math.abs(x-w.x)<w.w/2+r&&Math.abs(z-w.z)<w.d/2+r)}
-function wallAtExact(x,z){return walls.find(w=>!w.destroyed&&Math.abs(x-w.x)<w.w/2+.5&&Math.abs(z-w.z)<w.d/2+.5)}
-function move(obj,dx,dz,r=.45){const nx=Math.max(-11,Math.min(11,obj.x+dx));const nz=Math.max(-15,Math.min(7,obj.z+dz));if(!wallAt(nx,obj.z,r))obj.x=nx;if(!wallAt(obj.x,nz,r))obj.z=nz}
+function gameOver(){state='over';if(locked)document.exitPointerLock();$('#ovS').textContent='💰 '+player.cash;$('#ovM').textContent='שלב '+level;if(player.cash>best){best=player.cash;store.set(BEST_KEY,best);$('#best').textContent=best}if(window.AG&&player.cash>0)AG.add(Math.floor(player.cash/60),0);$('#over').classList.add('show')}
+function levelClear(){state='clear';if(locked)document.exitPointerLock();chord([880,1100,1320,1760],.5);const earn=Math.floor(player.cash/50)+(level>1?1:0);const dia=level>=3&&alarm<20?1:0;if(player.cash>best){best=player.cash;store.set(BEST_KEY,best);$('#best').textContent=best}if(window.AG&&earn>0)AG.add(earn,dia);$('#clT').textContent=level>=3?'🏆 כל הבנקים!':'✅ שלב '+level+' הושלם!';$('#clS').textContent='💰 '+player.cash;$('#clM').textContent='שומרים: '+(alarm<20?'🕵️ חרישי +💎':alarm<50?'הסתבכת קצת':'🚨 היה רעש')+' · +'+earn+' 🪙'+(dia?' +1 💎':'');$('#clear').classList.add('show')}
 
-function hitWall(wx,wz){const w=walls.find(ww=>!ww.destroyed&&!ww.fixed&&Math.abs(wx-ww.x)<ww.w/2+1&&Math.abs(wz-ww.z)<ww.d/2+1);
-  if(!w)return false;w.hp--;
-  // Update color by damage
-  const frac=w.hp/w.maxHp;w.mesh.material.color.setHex(frac>.6?0x5a4878:frac>.3?0x7a5898:0xaa88c8);
-  burst(w.x,w.z,0x9977aa,8,.25);
-  if(w.hp<=0){w.destroyed=true;burst(w.x,w.z,0xddbbee,20,.35);scene.remove(w.mesh);tone(220,.2,'sawtooth',.09)}
-  else tone(300+w.hp*40,.08,'square',.07);
-  return true}
-
-function tryUse(){if(toolCooldown>0)return;
-  // Find facing direction (toward nearest wall or vault)
-  const fa=player.a;const fx=Math.sin(fa)*1.4,fz=Math.cos(fa)*1.4;
-  const wx=player.x+fx,wz=player.z+fz;
-
-  if(tool===2){// Bomb
-    toolCooldown=50;tone(400,.06,'sine',.08);
-    const bMesh=box(.5,.5,.5,matBomb.clone());addAt(bMesh,wx,.5,wz);
-    const fuse=box(.06,.4,.06,matBombFuse);addAt(fuse,wx,.8,wz);
-    bombs.push({mesh:bMesh,fuse,x:wx,z:wz,timer:120,armed:true});
-    return;
-  }
-  if(tool===1)toolCooldown=14;else toolCooldown=10;// drill slower, hammer faster
-
-  // Check vault interaction
-  for(const v of vaults){if(!v.open&&Math.hypot(wx-v.x,wz-v.z)<2.2){
-    if(tool===0){v.crackProgress=(v.crackProgress||0)+1;tone(500+v.crackProgress*20,.05,'square',.05);if(v.crackProgress>=8){openVault(v)}}
-    else if(tool===1){v.crackProgress=(v.crackProgress||0)+2;tone(300,.05,'sawtooth',.06);if(v.crackProgress>=8){openVault(v)}}
-    return}}
-
-  // Check wall hit
-  if(!hitWall(wx,wz)){tone(200,.04,'square',.03)}// missed
+/* ───── main loop ───── */
+function step(){
+  if(state!=='play')return;
+  gameFrame++;
+  if(hitCooldown>0)hitCooldown--;
+  movePlayer();
+  guards.forEach(stepGuard);
+  stepParts();stepBombs();
+  pickupCash();checkExit();updateAlarm();updateTimer();
+  // Cash bob
+  cashObjects.forEach(c=>{c.bob+=.07;c.m.position.y=.5+Math.sin(c.bob)*.12;c.m.rotation.y+=.03});
+  // Guard bobbing already in stepGuard
+  drawVM();
+  R.render(scene,cam);
 }
 
-function openVault(v){v.open=true;v.crackProgress=0;v.mesh.material=matVaultOpen.clone();v.lit.color.setHex(0xffd05a);v.lit.intensity=1.2;
-  v.door.material=mat(0xffd05a,.4,.5);
-  cashBurst(v.x,v.z);cashBurst(v.x,v.z);
-  chord([880,1100,1320],.3);
-  // Spawn loot
-  for(let i=0;i<4;i++){const a=i*Math.PI/2+.4;const lm=box(.5,.35,.5,matLoot.clone());lm.material.transparent=true;const loot={mesh:lm,x:v.x+Math.cos(a)*1.4,z:v.z+Math.sin(a)*1.4,cash:Math.floor(v.cash/4),bob:Math.random()*6.28};
-    addAt(lm,loot.x,.5,loot.z);loots.push(loot)}
-  alarm=Math.min(alarmMax,alarm+25);// vault alarm rises
-}
+// Menu buttons
+$('#go1').onclick=()=>{$('#menu').classList.remove('show');startLevel(1)};
+$('#go2').onclick=()=>{$('#menu').classList.remove('show');startLevel(2)};
+$('#go3').onclick=()=>{$('#menu').classList.remove('show');startLevel(3)};
+$('#retry').onclick=()=>{$('#over').classList.remove('show');startLevel(level)};
+$('#ovMenu').onclick=()=>{$('#over').classList.remove('show');state='menu';$('#menu').classList.add('show')};
+$('#nextBtn').onclick=()=>{$('#clear').classList.remove('show');if(level<3)startLevel(level+1);else{state='menu';$('#menu').classList.add('show')}};
+$('#clMenu').onclick=()=>{$('#clear').classList.remove('show');state='menu';$('#menu').classList.add('show')};
 
-function pickupLoot(){for(let i=loots.length-1;i>=0;i--){const l=loots[i];if(Math.hypot(player.x-l.x,player.z-l.z)<1.1){totalCash+=l.cash;cashBurst(l.x,l.z);scene.remove(l.mesh);loots.splice(i,1);updateHUD()}}}
-
-function updateHUD(){$('#hudL').textContent='💰 '+totalCash;$('#hudR').textContent='❤️'.repeat(Math.max(0,hp))+(hp<3?'🖤'.repeat(3-hp):'');
-  const pct=alarm/alarmMax;$('#alarm').style.background=alarm>0?`linear-gradient(90deg,hsl(${10+pct*20},100%,50%),hsl(${40-pct*30},100%,60%),hsl(${10+pct*20},100%,50%))`:'transparent';
-  $('#alarm').classList.toggle('on',alarm>60)}
-
-function guardSee(g){// Can guard see player? Simple LOS check
-  const dx=player.x-g.x,dz=player.z-g.z;const dist=Math.hypot(dx,dz);
-  if(dist>8)return false;
-  const steps=Math.ceil(dist/.5);for(let s=1;s<steps;s++){const t=s/steps;if(wallAt(g.x+dx*t,g.z+dz*t,.2))return false}
-  return true}
-
-function guardStep(g){g.patrolT++;
-  if(g.state==='patrol'){
-    // Patrol between two points
-    const target=g.patrolT%200<100?g.pathA:g.pathB;const tz={x:target,z:g.pathZ};
-    const dx=tz.x-g.x,dz=tz.z-g.z;const dist=Math.hypot(dx,dz);
-    if(dist>.3){move(g,dx/dist*g.speed,dz/dist*g.speed,.4);g.a=Math.atan2(dx,dz)}
-    if(guardSee(g)){g.state='alert';g.alertV=0;tone(880,.1,'sine',.05);alarm=Math.min(alarmMax,alarm+5)}
-  } else if(g.state==='alert'){
-    g.alertV+=2;alarm=Math.min(alarmMax,alarm+.5);
-    // Chase player
-    const dx=player.x-g.x,dz=player.z-g.z;const dist=Math.hypot(dx,dz);
-    const spd=g.speed*1.6;if(dist>.5){move(g,dx/dist*spd,dz/dist*spd,.4);g.a=Math.atan2(dx,dz)}
-    if(dist<1){// Caught!
-      hp--;dmgFlash=20;shakeT=15;updateHUD();tone(100,.4,'sawtooth',.12);
-      if(hp<=0)gameOver();else{g.state='patrol';g.alertV=0;alarm=Math.min(alarmMax,alarm+20);player.inv=90}}
-    if(!guardSee(g)){g.lostTimer=(g.lostTimer||0)+1;if(g.lostTimer>60){g.state='patrol';g.alertV=0;g.lostTimer=0}}else g.lostTimer=0;
-  }
-  // Alert indicator
-  g.alertMesh.material.opacity=Math.min(1,g.alertV/60)*.8;
-  g.glight.intensity=g.state==='alert'?1.2:0;
-  if(g.state==='alert'){const angle=Math.atan2(player.x-g.x,player.z-g.z);g.glight.target.position.set(player.x,0,player.z);g.glight.target.updateMatrixWorld()}
-  g.g.position.set(g.x,0,g.z);g.g.rotation.y=g.a;
-  if(player.inv>0)return;// invincible, guard won't trigger
-}
-
-function bombStep(){for(let i=bombs.length-1;i>=0;i--){const b=bombs[i];b.timer--;b.fuse.position.y=.5+.3*(b.timer/120);b.fuse.material.emissiveIntensity=Math.sin(b.timer*.3)*.5+.5;b.mesh.rotation.y+=.05;
-  if(b.timer<=0){boomBurst(b.x,b.z);scene.remove(b.mesh);scene.remove(b.fuse);bombs.splice(i,1);
-    // Destroy nearby walls
-    walls.forEach(w=>{if(!w.fixed&&!w.destroyed&&Math.hypot(b.x-w.x,b.z-w.z)<4){w.destroyed=true;burst(w.x,w.z,0xddbbee,24,.4);scene.remove(w.mesh)}});
-    // Open nearby vaults
-    vaults.forEach(v=>{if(!v.open&&Math.hypot(b.x-v.x,b.z-v.z)<3)openVault(v)});
-    alarm=Math.min(alarmMax,alarm+30);updateHUD()}}}
-
-function gameOver(){state='over';$('#tools').style.display='none';$('#joy').style.display='none';
-  const earn=Math.floor(totalCash/80);const dia=alarm<30?1:0;
-  if(totalCash>best){best=totalCash;store.set(BEST_KEY,best);$('#best').textContent=best}
-  if(window.AG&&earn>0)AG.add(earn,dia);
-  $('#ovScore').textContent='💰 '+totalCash;$('#ovMsg').textContent='שלב '+level+(earn>0?' · +'+earn+' 🪙'+(dia?' +1 💎':''):'');
-  $('#over').classList.add('show')}
-
-function levelClear(){state='clear';$('#tools').style.display='none';$('#joy').style.display='none';
-  chord([880,1100,1320,1760],.5);
-  // Bonus for time and alarm
-  const timeBonus=Math.floor((+$('#hudTimer').dataset.t||0)*5);
-  const stealthBonus=alarm<20?500:alarm<50?200:0;
-  const earn=Math.max(1,Math.floor((totalCash+timeBonus+stealthBonus)/60));
-  const dia=level>=3?1:0;
-  if(totalCash>best){best=totalCash;store.set(BEST_KEY,best);$('#best').textContent=best}
-  if(window.AG&&earn>0)AG.add(earn,dia);
-  $('#clTitle').textContent=level>=LEVELS.length?'🏆 כל הבנקים!':'✅ שלב '+level+' הושלם!';
-  $('#clScore').textContent='💰 '+totalCash;
-  $('#clMsg').textContent='⏱ בונוס זמן +'+timeBonus+(stealthBonus?` · 🕵️ חרישי +${stealthBonus}`:'')+(earn>0?` · +${earn} 🪙`+(dia?' +1 💎':''):'');
-  $('#clear').classList.add('show')}
-
-let timeLeft=50,lastSec=0;
-function step(){if(state!=='play')return;frame++;
-
-  // Movement
-  let dx=((keys.ArrowRight||keys.KeyD)?1:0)-((keys.ArrowLeft||keys.KeyA)?1:0);
-  let dz=((keys.ArrowDown||keys.KeyS)?1:0)-((keys.ArrowUp||keys.KeyW)?1:0);
-  if(joyActive){dx+=joyAx;dz+=joyAy}
-  const dl=Math.hypot(dx,dz);if(dl>0){dx/=dl;dz/=dl;player.a=Math.atan2(dx,dz);move(player,dx*player.speed,dz*player.speed)}
-
-  // Auto-use tool on E key
-  if(keys.KeyE||keys.Space)tryUse();
-  if(toolCooldown>0)toolCooldown--;
-
-  // Player mesh
-  player.g.position.set(player.x,0,player.z);player.g.rotation.y=player.a;
-  if(player.inv>0){player.inv--;player.g.visible=player.inv%6<4}else player.g.visible=true;
-  // Bob tool mesh
-  player.toolMesh.position.y=.8+Math.sin(frame*.15)*.05;
-
-  // Guards
-  guards.forEach(guardStep);
-
-  // Bombs
-  bombStep();
-
-  // Loot pickup (auto)
-  pickupLoot();
-
-  // Loot bob animation
-  loots.forEach(l=>{l.bob+=.07;l.mesh.position.y=.5+Math.sin(l.bob)*.12;l.mesh.rotation.y+=.03});
-
-  // Particles
-  particles.forEach(p=>{p.vx*=.95;p.vz*=.95;p.vy-=.03;p.m.position.x+=p.vx;p.m.position.y+=p.vy;p.m.position.z+=p.vz;p.life--;p.m.material.opacity=p.life/p.maxL;p.m.material.transparent=true});
-  particles=particles.filter(p=>{if(p.life<=0){scene.remove(p.m);return false}return true});
-
-  // Alarm decay when no guards see player
-  if(alarm>0&&!guards.some(g=>g.state==='alert'))alarm=Math.max(0,alarm-.15);
-  if(frame%4===0)updateHUD();
-
-  // Damage flash
-  if(dmgFlash>0){$('#dmg').style.opacity=dmgFlash/20;dmgFlash--}else $('#dmg').style.opacity=0;
-
-  // Shake
-  let sx=0,sy=0;if(shakeT>0){sx=(Math.random()-.5)*.02;sy=(Math.random()-.5)*.02;shakeT--}
-
-  // Camera
-  const tcy=16+level*1.2,tcz=player.z+14+level*.5;
-  camTarget.lerp(new THREE.Vector3(player.x*.3+sx,0,player.z*.3+sy),.07);
-  camPos.lerp(new THREE.Vector3(player.x*.25+sx,tcy,tcz),.06);
-  cam.position.copy(camPos);cam.lookAt(camTarget);
-
-  // Timer
-  const nowSec=Math.floor(frame/60);if(nowSec>lastSec){lastSec=nowSec;timeLeft=Math.max(0,(LEVELS[Math.min(level-1,LEVELS.length-1)].time||50)-nowSec);$('#hudTimer').textContent='⏱ '+timeLeft;$('#hudTimer').dataset.t=timeLeft;$('#hudTimer').style.color=timeLeft<10?'#ff5555':timeLeft<20?'#ffaa00':'#ffffff';$('#hudTimer').style.display='block';if(timeLeft===0)gameOver()}
-
-  // Check win
-  if(loots.length===0&&vaults.every(v=>v.open)&&frame>60)levelClear();
-
-  R.render(scene,cam)}
-
-// Touch interaction for canvas (use tool tap)
-let lastTap=0;
-cv.addEventListener('pointerup',e=>{if(e.target!==cv)return;const now=Date.now();if(now-lastTap<300)return;lastTap=now;if(state==='play')tryUse()});
-
-// Start
-$('#go').onclick=()=>{$('#menu').classList.remove('show');level=1;totalCash=0;state='play';mkLevel();loop()};
-$('#retry').onclick=()=>{$('#over').classList.remove('show');totalCash=0;state='play';mkLevel()};
-$('#toMenu').onclick=()=>{$('#over').classList.remove('show');state='menu';$('#tools').style.display='none';$('#joy').style.display='none';$('#menu').classList.add('show')};
-$('#nextLvl').onclick=()=>{$('#clear').classList.remove('show');level=Math.min(level+1,LEVELS.length);if(level>LEVELS.length){$('#menu').classList.add('show');state='menu';$('#tools').style.display='none';$('#joy').style.display='none'}else{state='play';mkLevel()}};
-
+// Initial render
+R.render(scene,cam);
 function loop(){requestAnimationFrame(loop);step()}
+loop();
 </script>
 <script src="../hub.js"></script>
 </body>
