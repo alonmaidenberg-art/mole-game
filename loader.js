@@ -353,61 +353,107 @@ else{window.addEventListener('load',markReady,{once:true});}
 
 frame();
 
-/* ── PAGE TRANSITION ── */
+/* ── PAGE TRANSITION: spinning portal ── */
 var transCV=document.createElement('canvas');
-transCV.style.cssText='position:fixed;inset:0;width:100%;height:100%;z-index:99998;pointer-events:none;opacity:0';
+transCV.style.cssText='position:fixed;inset:0;width:100%;height:100%;z-index:99998;pointer-events:none';
+transCV.style.display='none';
 document.documentElement.appendChild(transCV);
 var tCtx=transCV.getContext('2d');
 var transActive=false;
 
-function burst(callback){
-  if(transActive){callback&&callback();return;}
+function portalOpen(callback){
+  if(transActive)return;
   transActive=true;
-  transCV.width=window.innerWidth;
-  transCV.height=window.innerHeight;
-  transCV.style.opacity='1';
-  var TW=transCV.width,TH=transCV.height;
-  var cx=TW/2,cy=TH/2;
-  var COLS=['#ff3dff','#00f5ff','#ffd23f','#ff3d71','#4ade80','#a855f7','#f97316'];
-  var shards=[];
-  var count=22;
-  for(var i=0;i<count;i++){
-    var ang=((Math.PI*2)/count)*i+Math.random()*.3;
-    var spd=Math.max(TW,TH)*.012+Math.random()*.006;
-    shards.push({x:cx,y:cy,vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd,
-      w:40+Math.random()*80,h:12+Math.random()*20,
-      c:COLS[i%COLS.length],a:1,rot:ang});
-  }
+  var TW=window.innerWidth, TH=window.innerHeight;
+  transCV.width=TW; transCV.height=TH;
+  transCV.style.display='block';
+
+  var cx=TW/2, cy=TH/2;
+  var maxR=Math.sqrt(cx*cx+cy*cy)+10;
+  // portal grows from center and covers screen, spinning rings + zoom
   var tf=0;
+  var TOTAL=38; // frames until navigate
+  var COLS=['#ff3dff','#00f5ff','#a855f7','#4ade80','#ffd23f'];
   var traf;
+
   function tframe(){
     tf++;
+    var p=tf/TOTAL; // 0→1
     tCtx.clearRect(0,0,TW,TH);
-    if(tf<8){
-      // white flash
-      tCtx.fillStyle='rgba(255,255,255,'+(1-tf/8)+')';
-      tCtx.fillRect(0,0,TW,TH);
-    }
-    var done=true;
-    shards.forEach(function(s){
-      s.x+=s.vx;s.y+=s.vy;s.vy+=.3;s.a-=.025;s.rot+=.08;
-      if(s.a>0){done=false;}
-      tCtx.save();tCtx.translate(s.x,s.y);tCtx.rotate(s.rot);
-      tCtx.globalAlpha=Math.max(0,s.a);
-      tCtx.fillStyle=s.c;
-      tCtx.fillRect(-s.w/2,-s.h/2,s.w,s.h);
+
+    // phase 1 (0→0.5): spinning rings grow from center
+    // phase 2 (0.5→1): black circle fills screen
+    var ringP=Math.min(p/.5,1);
+    var fillP=Math.max((p-.5)/.5,0);
+
+    // spinning neon rings
+    var rings=5;
+    for(var i=0;i<rings;i++){
+      var ri=rings-1-i;
+      var r=maxR*(0.08+ri*.18)*ringP;
+      var rot=tf*.12+i*1.2;
+      var alpha=(1-ri/rings)*.85*(1-fillP*.7);
+      tCtx.save();
+      tCtx.translate(cx,cy);tCtx.rotate(rot);
+      tCtx.strokeStyle=COLS[i%COLS.length];
+      tCtx.lineWidth=4+ri*2;
+      tCtx.globalAlpha=alpha;
+      tCtx.beginPath();
+      // dashed arc
+      var segs=6+i*2;
+      for(var s=0;s<segs;s++){
+        var a0=(s/segs)*Math.PI*2;
+        var a1=a0+Math.PI/segs*.75;
+        tCtx.arc(0,0,r,a0,a1);
+        tCtx.moveTo(Math.cos(a1+.01)*r,Math.sin(a1+.01)*r);
+      }
+      tCtx.stroke();
       tCtx.restore();
-    });
-    if(done||tf>60){
-      transCV.style.opacity='0';
-      transActive=false;
+    }
+
+    // zooming grid lines radiating outward (speed lines)
+    if(ringP>.3){
+      var lineCount=16;
+      tCtx.save();tCtx.translate(cx,cy);tCtx.rotate(tf*.04);
+      for(var l=0;l<lineCount;l++){
+        var la=(l/lineCount)*Math.PI*2;
+        var r0=maxR*ringP*.1;
+        var r1=maxR*ringP*.7;
+        tCtx.beginPath();
+        tCtx.moveTo(Math.cos(la)*r0,Math.sin(la)*r0);
+        tCtx.lineTo(Math.cos(la)*r1,Math.sin(la)*r1);
+        tCtx.strokeStyle='rgba(255,255,255,'+(0.07*(1-fillP))+')';
+        tCtx.lineWidth=1;tCtx.stroke();
+      }
+      tCtx.restore();
+    }
+
+    // black hole fill growing from center
+    if(fillP>0){
+      var fr=maxR*fillP*fillP; // ease-in
+      tCtx.save();tCtx.translate(cx,cy);
+      tCtx.beginPath();tCtx.arc(0,0,fr,0,Math.PI*2);
+      tCtx.fillStyle='#000';tCtx.fill();
+      // inner glow rim
+      var rim=tCtx.createRadialGradient(0,0,fr*.9,0,0,fr+8);
+      rim.addColorStop(0,'rgba(0,0,0,0)');
+      rim.addColorStop(.6,NEON1+'66');
+      rim.addColorStop(1,'rgba(0,0,0,0)');
+      tCtx.beginPath();tCtx.arc(0,0,fr+8,0,Math.PI*2);
+      tCtx.fillStyle=rim;tCtx.fill();
+      tCtx.restore();
+    }
+
+    if(tf>=TOTAL){
+      // fill screen fully black, navigate
+      tCtx.fillStyle='#000';tCtx.fillRect(0,0,TW,TH);
+      if(callback)callback();
       cancelAnimationFrame(traf);
       return;
     }
     traf=requestAnimationFrame(tframe);
   }
-  // navigate after a brief flash
-  if(callback){setTimeout(callback,120);}
+
   tframe();
 }
 
@@ -417,14 +463,25 @@ document.addEventListener('click',function(e){
   if(!link)return;
   var href=link.getAttribute('href');
   if(!href||href.startsWith('http')||href.startsWith('#')||href.startsWith('mailto'))return;
-  // internal link — do burst then navigate
   e.preventDefault();
-  burst(function(){window.location.href=link.href;});
+  portalOpen(function(){window.location.href=link.href;});
 },true);
 
-/* also trigger when going BACK to hub from a game */
+/* reverse portal when coming back */
 window.addEventListener('pageshow',function(e){
-  if(e.persisted){burst();}
+  if(!e.persisted)return;
+  // flash-wipe in reverse: black fades out fast
+  transCV.style.display='block';
+  transCV.width=window.innerWidth;transCV.height=window.innerHeight;
+  tCtx.fillStyle='#000';tCtx.fillRect(0,0,transCV.width,transCV.height);
+  var fo=1;
+  (function fade(){
+    fo-=.07;
+    if(fo<=0){transCV.style.display='none';transActive=false;return;}
+    tCtx.clearRect(0,0,transCV.width,transCV.height);
+    tCtx.fillStyle='rgba(0,0,0,'+fo+')';tCtx.fillRect(0,0,transCV.width,transCV.height);
+    requestAnimationFrame(fade);
+  })();
 });
 
 })();
