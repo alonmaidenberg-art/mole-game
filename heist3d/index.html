@@ -64,6 +64,21 @@ body[data-ph="drive"] #hotbar,body[data-ph="drive"] #xh,body[data-ph="drive"] #v
 body[data-ph="drive"] #driveHud,body[data-ph="drive"] #radar{display:flex}
 body[data-ph="drive"] #radar{display:block}
 #fps{position:fixed;bottom:2px;left:4px;font-size:10px;opacity:.35;z-index:9;pointer-events:none}
+#secHud{position:fixed;top:max(52px,calc(env(safe-area-inset-top) + 52px));left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:5px;z-index:7;pointer-events:none}
+#camWrap{display:none;flex-direction:column;align-items:center;gap:3px}
+#camWrap.on{display:flex}
+#camBar{background:linear-gradient(90deg,#ffd05a,#ff3b3b)}
+#codeHud{display:none;background:rgba(6,10,20,.66);border:1.5px solid rgba(255,208,90,.35);border-radius:999px;padding:4px 14px;font-weight:900;font-size:14px;text-shadow:0 1px 3px #000}
+#codeHud.on{display:block}
+#codeDigits{letter-spacing:4px;color:#ffd05a}
+#prompt{display:none;position:fixed;top:56%;left:50%;transform:translateX(-50%);background:rgba(6,10,20,.78);border:2px solid rgba(140,200,255,.4);border-radius:14px;padding:9px 20px;font-weight:900;font-size:16px;z-index:9;cursor:pointer}
+#prompt.on{display:block}
+#padDisp{font-size:34px;font-weight:900;letter-spacing:10px;color:#ffd05a;margin:8px 0;font-variant-numeric:tabular-nums}
+#padKeys{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;direction:ltr}
+#padKeys button{border:0;border-radius:12px;padding:13px;font:inherit;font-size:21px;font-weight:900;color:#06101e;background:linear-gradient(180deg,#cfe4f5,#9ec2dd);cursor:pointer}
+#padKeys button:active{transform:translateY(2px)}
+#padKeys button.wide{background:linear-gradient(180deg,#8fd0ff,#3f9fe0)}
+body[data-ph="drive"] #secHud,body[data-ph="drive"] #prompt{display:none!important}
 </style>
 </head>
 <body>
@@ -86,6 +101,18 @@ body[data-ph="drive"] #radar{display:block}
   <div class="mlabel">מרחק בריחה</div><div class="meter"><i id="dBar"></i></div>
   <div class="mlabel">דחף ⚡ (Shift)</div><div class="meter"><i id="bBar"></i></div>
 </div>
+<div id="secHud">
+  <div id="camWrap"><div class="mlabel" id="camLbl">📹 מצלמה מאתרת אותך</div><div class="meter"><i id="camBar"></i></div></div>
+  <div id="codeHud">🔑 קוד: <b id="codeDigits">_ _ _ _</b></div>
+</div>
+<div id="prompt">לחצו <b>F</b></div>
+<div class="ov" id="pad"><div class="ovc" style="max-width:300px">
+  <div style="font-size:40px">🔐</div>
+  <h2 style="font-size:22px;color:#8fd0ff">מקלדת הכספת</h2>
+  <div id="padDisp">_ _ _ _</div>
+  <div id="padKeys"></div>
+  <button class="btn alt" id="padClose">סגירה (Esc)</button>
+</div></div>
 <div id="vm"><canvas id="vmcv" width="270" height="230"></canvas></div>
 <div id="joy"><div id="jk"></div></div>
 <div id="fire">🔨</div>
@@ -100,6 +127,8 @@ body[data-ph="drive"] #radar{display:block}
   <div class="lb" style="color:#ff9a9a"><b>🚨 נגמר הזמן?</b> המשטרה מקיפה את הבניין. רוצו למכונית הבריחה ושרדו את המרדף.</div>
   <div class="lb" style="font-size:12px;opacity:.6"><b>WASD</b> תנועה · <b>Shift</b> ריצה · <b>רווח</b> קפיצה · <b>עכבר</b> הסתכלות/ירי · <b>1-6</b> כלים</div>
   <button class="btn" id="goBtn">▶ התחלה</button>
+  <button class="btn" id="villaBtn" style="background:linear-gradient(180deg,#ffd05a,#e09a20);box-shadow:0 5px 0 #8a5c10">🏠 שלב מיוחד — הבית של אלון</button>
+  <div class="lb" style="font-size:12px;opacity:.6;margin-top:6px">3 קומות · מצלמות אבטחה · לייזרים (קפצו מעליהם) · כספת עם קוד בן 4 ספרות · 4 פתקים מפוזרים עם הרמזים</div>
   <div class="row"><button class="btn alt" id="lvDn">◀</button><button class="btn alt" id="lvLbl" style="flex:2">שלב 1</button><button class="btn alt" id="lvUp">▶</button></div>
   <div style="margin-top:10px;opacity:.7;font-size:14px">שיא: <b id="best">0</b> 💰</div>
 </div></div>
@@ -184,11 +213,20 @@ const MAT=[
  {n:'carpet', c:0x8b2b3c, hp:9},
  {n:'hedge',  c:0x2f7a34, hp:7},
  {n:'door',   c:0x6b4a24, hp:13},
- {n:'gold',   c:0xf2c53d, hp:48, loot:900}
+ {n:'gold',   c:0xf2c53d, hp:48, loot:900},
+ {n:'laser',  c:0xff2d4a, hp:4},
+ {n:'camera', c:0x24242c, hp:7},
+ {n:'keypad', c:0x2f6fd0, hp:16},
+ {n:'marble', c:0xe9e5dd, hp:17},
+ {n:'velvet', c:0x5d2440, hp:9},
+ {n:'book',   c:0x7a4a2a, hp:8}
 ];
 const AIR=0,GRASS=1,DIRT=2,ROAD=3,CONC=4,BRICK=5,PLASTER=6,WOOD=7,GLASS=8,METAL=9,
       VAULT=10,SAFE=11,MONEY=12,FLOOR=13,CRATE=14,COUNTER=15,ROOF=16,ROCK=17,LAMP=18,
-      TRIM=19,CARPET=20,HEDGE=21,DOOR=22,GOLD=23;
+      TRIM=19,CARPET=20,HEDGE=21,DOOR=22,GOLD=23,
+      LASER=24,CAMERA=25,KEYPAD=26,MARBLE=27,VELVET=28,BOOK=29;
+/* לייזרים נראים אבל אפשר לעבור דרכם – בשביל זה הם שם */
+const NOCOL=new Uint8Array(256);NOCOL[LASER]=1;
 const HP=new Uint8Array(256),LOOT=new Uint16Array(256),COLR=new Float32Array(256*3);
 for(let i=1;i<MAT.length;i++){const m=MAT[i];HP[i]=Math.min(255,m.hp);LOOT[i]=m.loot||0;
   COLR[i*3]=((m.c>>16)&255)/255;COLR[i*3+1]=((m.c>>8)&255)/255;COLR[i*3+2]=(m.c&255)/255}
@@ -246,7 +284,8 @@ function buildChunk(ci){
     const cr=COLR[m*3],cg=COLR[m*3+1],cb=COLR[m*3+2];
     for(let f=0;f<6;f++){
       const F=FACE[f],d=F.d;
-      if(gv(x+d[0],y+d[1],z+d[2]))continue;
+      const nb=gv(x+d[0],y+d[1],z+d[2]);
+      if(nb&&!NOCOL[nb])continue;
       const sh=F.s*k;
       const r=cr*sh,g=cg*sh,b=cb*sh;
       for(let q=0;q<4;q++){const vv=F.v[q];_pos.push(x+vv[0],y+vv[1],z+vv[2]);_col.push(r,g,b)}
@@ -381,8 +420,16 @@ function stepItems(dt){
     it.g.position.set(it.x,it.y+(it.rest?.06+Math.sin(it.bob)*.08:0),it.z);
     it.g.rotation.y+=dt*1.5;
     if(Math.hypot(P.x-it.x,P.z-it.z,(P.y+.6-it.y)*.5)<1.8){
-      addCash(it.val);lootGot+=it.val;
-      tone(720,.07,'sine',.07);setTimeout(()=>tone(1020,.1,'sine',.06),55);
+      if(it.note!==undefined){
+        const d=SEC.code[it.note];
+        SEC.found[it.note]=d;
+        banner('📝 '+CLUE[it.note][0]+d+CLUE[it.note][1],3.4);
+        tone(900,.08,'sine',.06);setTimeout(()=>tone(1250,.12,'sine',.05),70);
+        showCode();
+      }else{
+        addCash(it.val);lootGot+=it.val;
+        tone(720,.07,'sine',.07);setTimeout(()=>tone(1020,.1,'sine',.06),55);
+      }
       scene.remove(it.g);items.splice(i,1);
     }
   }
@@ -451,7 +498,7 @@ function explode(cx,cy,cz,r,power){
 const PR=.3,PH=1.8,EYE=1.62;
 const P={x:32,y:GY+1,z:52,vx:0,vy:0,vz:0,yaw:Math.PI,pitch:0,ground:false,hp:3,inv:0};
 let shake=0;
-function solid(x,y,z){const m=gv(x,y,z);return m!==0}
+function solid(x,y,z){const m=gv(x,y,z);return m!==0&&!NOCOL[m]}
 function hits(px,py,pz){
   const x0=Math.floor(px-PR),x1=Math.floor(px+PR);
   const y0=Math.floor(py),y1=Math.floor(py+PH-.02);
@@ -461,14 +508,17 @@ function hits(px,py,pz){
 }
 const GRAV=28,JUMPV=9.1,WALK=5.0,RUN=8.4,ACC=52,FRIC=11;
 function physics(dt){
+  if(SEC.padOpen){P.vx=P.vz=0}
   /* desired horizontal velocity */
   let fx=(key.KeyD||key.ArrowRight?1:0)-(key.KeyA||key.ArrowLeft?1:0);
   let fz=(key.KeyS||key.ArrowDown?1:0)-(key.KeyW||key.ArrowUp?1:0);
   if(touchDev){fx+=joyX;fz+=joyY}
+  if(SEC.padOpen){fx=0;fz=0}
   const fl=Math.hypot(fx,fz);if(fl>1){fx/=fl;fz/=fl}
   const sp=(key.ShiftLeft||key.ShiftRight||runHeld)?RUN:WALK;
+  /* forward = (-sin yaw, -cos yaw), right = (cos yaw, -sin yaw) — must match aimDir() */
   const cy=Math.cos(P.yaw),sy=Math.sin(P.yaw);
-  const tx=(fx*cy-fz*sy)*sp,tz=(fx*sy+fz*cy)*sp;
+  const tx=(fx*cy+fz*sy)*sp,tz=(fz*cy-fx*sy)*sp;
   const a=P.ground?ACC:ACC*.38;
   P.vx+=clamp(tx-P.vx,-a*dt,a*dt);
   P.vz+=clamp(tz-P.vz,-a*dt,a*dt);
@@ -477,16 +527,17 @@ function physics(dt){
   if(P.vy<-46)P.vy=-46;
   if((key.Space||jumpHeld)&&P.ground){P.vy=JUMPV;P.ground=false;tone(260,.06,'sine',.035)}
   /* integrate, axis by axis, with step-up */
+  let stepped=false;
   let nx=P.x+P.vx*dt;
   if(!hits(nx,P.y,P.z))P.x=nx;
   else{
-    if(P.ground&&!hits(nx,P.y+1.02,P.z)&&!hits(P.x,P.y+1.02,P.z)){P.y+=1.02;P.x=nx}
+    if(P.ground&&!stepped&&!hits(nx,P.y+1.02,P.z)&&!hits(P.x,P.y+1.02,P.z)){P.y+=1.02;P.x=nx;stepped=true}
     else P.vx=0;
   }
   let nz=P.z+P.vz*dt;
   if(!hits(P.x,P.y,nz))P.z=nz;
   else{
-    if(P.ground&&!hits(P.x,P.y+1.02,nz)&&!hits(P.x,P.y+1.02,P.z)){P.y+=1.02;P.z=nz}
+    if(P.ground&&!stepped&&!hits(P.x,P.y+1.02,nz)&&!hits(P.x,P.y+1.02,P.z)){P.y+=1.02;P.z=nz;stepped=true}
     else P.vz=0;
   }
   P.ground=false;
@@ -699,6 +750,127 @@ function stepGuard(g,dt){
 }
 function gSolid(x,y,z){return solid(Math.floor(x),Math.floor(y),Math.floor(z))}
 
+/* ════════ security: lasers, cameras, keypad, clues ════════ */
+const SEC={on:false,cams:[],code:'',notes:0,found:[null,null,null,null],
+           vault:null,open:false,alarm:false,entry:'',padOpen:false,near:null};
+let camWarn=0;
+function resetSec(){
+  for(const c of SEC.cams)scene.remove(c.lens);
+  SEC.on=false;SEC.cams=[];SEC.code='';SEC.notes=0;SEC.found=[null,null,null,null];
+  SEC.vault=null;SEC.open=false;SEC.alarm=false;SEC.entry='';SEC.padOpen=false;SEC.near=null;
+  camWarn=0;
+  $('#codeHud').classList.remove('on');$('#camWrap').classList.remove('on');
+  $('#prompt').classList.remove('on');$('#pad').classList.remove('show');
+}
+function showCode(){
+  $('#codeHud').classList.toggle('on',SEC.on&&SEC.found.some(d=>d!==null));
+  $('#codeDigits').textContent=SEC.found.map(d=>d===null?'_':d).join(' ');
+}
+function trigAlarm(why){
+  if(SEC.alarm||state!=='play')return;
+  SEC.alarm=true;sirenStart();
+  banner('🚨 אזעקה! ('+why+') — נשארו לכם פחות זמן',3.2);
+  noise(.4,.2,900);tone(520,.5,'square',.08);
+  for(const g of guards)if(!g.down&&!g.cop){g.state='chase';g.give=0;g.alert=9}
+  playT+=25;                                   /* האזעקה גוזלת 25 שניות */
+}
+function addCam(x,y,z,a0,sweep){
+  setV(x,y,z,CAMERA);
+  const lens=new THREE.Mesh(new THREE.BoxGeometry(.22,.22,.22),new THREE.MeshBasicMaterial({color:0x33dd55}));
+  scene.add(lens);
+  SEC.cams.push({x,y,z,a0,sweep,t:Math.random()*6,seen:0,dead:false,lens});
+}
+function stepCams(dt){
+  camWarn=0;
+  for(const c of SEC.cams){
+    if(c.dead)continue;
+    if(gv(c.x,c.y,c.z)!==CAMERA){c.dead=true;c.lens.material.color.setHex(0x303036);c.seen=0;continue}
+    c.t+=dt;
+    const ang=c.a0+Math.sin(c.t*.5)*c.sweep;
+    c.lens.position.set(c.x+.5+Math.sin(ang)*.44,c.y+.42,c.z+.5+Math.cos(ang)*.44);
+    const dx=P.x-(c.x+.5),dy=(P.y+.9)-(c.y+.5),dz=P.z-(c.z+.5),d=Math.hypot(dx,dy,dz)||1;
+    let see=false;
+    if(d<15&&(dx/d)*Math.sin(ang)+(dz/d)*Math.cos(ang)>.62){
+      const i=idx(c.x,c.y,c.z),sv=V[i];V[i]=0;          /* אל תפגע בעצמך */
+      if(!raycast(c.x+.5,c.y+.5,c.z+.5,dx/d,dy/d,dz/d,d-.5))see=true;
+      V[i]=sv;
+    }
+    c.seen=see?Math.min(1,c.seen+dt/1.6):Math.max(0,c.seen-dt/2.4);
+    c.lens.material.color.setHex(c.seen>=1?0xff2222:c.seen>.04?0xffaa22:0x33dd55);
+    if(see&&c.seen>.04&&c.seen<1&&Math.random()<dt*5)tone(1100,.04,'square',.03);
+    if(c.seen>=1)trigAlarm('מצלמה');
+    if(c.seen>camWarn)camWarn=c.seen;
+  }
+  const w=$('#camWrap');
+  w.classList.toggle('on',camWarn>.03);
+  $('#camBar').style.width=(camWarn*100)+'%';
+}
+function checkLasers(){
+  if(!SEC.on||SEC.alarm)return;
+  const x0=Math.floor(P.x-PR),x1=Math.floor(P.x+PR),y0=Math.floor(P.y),y1=Math.floor(P.y+PH-.02),
+        z0=Math.floor(P.z-PR),z1=Math.floor(P.z+PR);
+  for(let y=y0;y<=y1;y++)for(let z=z0;z<=z1;z++)for(let x=x0;x<=x1;x++)
+    if(gv(x,y,z)===LASER){trigAlarm('לייזר');return}
+}
+/* keypad */
+function openPad(){
+  if(SEC.open)return;
+  SEC.padOpen=true;SEC.entry='';
+  if(locked)document.exitPointerLock();
+  padDisp();$('#pad').classList.add('show');
+}
+function closePad(){SEC.padOpen=false;$('#pad').classList.remove('show')}
+function padDisp(){
+  const e=SEC.entry.padEnd(4,'_').split('').join(' ');
+  $('#padDisp').textContent=e;
+}
+function padKey(k){
+  if(k==='C'){SEC.entry='';padDisp();tone(240,.05,'square',.04);return}
+  if(k==='E'){
+    if(SEC.entry===SEC.code){
+      SEC.open=true;closePad();
+      chord([660,880,1180],.3);
+      banner('🔓 הכספת נפתחה!',2.4);
+      if(SEC.vault){const v=SEC.vault;for(let y=v.y0;y<=v.y1;y++)for(let x=v.x0;x<=v.x1;x++)setV(x,y,v.z,AIR)}
+    }else{
+      tone(150,.3,'square',.08);noise(.2,.1,600);
+      banner('❌ קוד שגוי',1.4);SEC.entry='';padDisp();
+    }
+    return;
+  }
+  if(SEC.entry.length<4){SEC.entry+=k;padDisp();tone(600+ +k*40,.05,'sine',.04)}
+  if(SEC.entry.length===4)setTimeout(()=>padKey('E'),220);
+}
+(function(){
+  const g=$('#padKeys');
+  ['1','2','3','4','5','6','7','8','9','C','0','E'].forEach(k=>{
+    const btn=document.createElement('button');
+    btn.textContent=k==='C'?'✕':k==='E'?'✓':k;
+    if(k==='C'||k==='E')btn.className='wide';
+    btn.addEventListener('pointerdown',e=>{e.preventDefault();padKey(k)});
+    g.appendChild(btn);
+  });
+  $('#padClose').onclick=closePad;
+  $('#prompt').addEventListener('pointerdown',e=>{e.preventDefault();interact()});
+})();
+function interact(){
+  if(SEC.near==='pad')openPad();
+}
+/* מה קרוב אליי */
+function stepProx(){
+  if(!SEC.on){SEC.near=null;$('#prompt').classList.remove('on');return}
+  let near=null;
+  if(!SEC.open){
+    const d=aimDir();
+    const h=raycast(P.x,P.y+EYE,P.z,d.x,d.y,d.z,4);
+    if(h&&h.m===KEYPAD)near='pad';
+  }
+  SEC.near=near;
+  const pr=$('#prompt');
+  pr.classList.toggle('on',!!near&&!SEC.padOpen);
+  if(near==='pad')pr.innerHTML=touchDev?'🔐 פתיחת מקלדת':'🔐 לחצו <b>F</b>';
+}
+
 /* ════════ procedural bank ════════ */
 let lvl=1,lvlTime=120,exitZ=0,startPos={x:32,z:52},BLD={x0:0,x1:WX-1,z0:0,z1:WZ-1};
 function rng(seed){let s=seed>>>0||1;return()=>{s^=s<<13;s>>>=0;s^=s>>17;s^=s<<5;s>>>=0;return s/4294967296}}
@@ -854,6 +1026,162 @@ function genLevel(n){
   rebuildAll();
 }
 
+/* ════════ שלב מיוחד: הבית של אלון ════════ */
+const CLUE=[
+ ['בפתק מכתב־יד: "הספרה הראשונה של הקוד היא ',"'"],
+ ['על לוח בקליפ: "ספרה שנייה — ',"'"],
+ ['מאחורי תמונה: "השלישית היא ',"'"],
+ ['בתחתית מגירה: "האחרונה בקוד — ',"'"]
+];
+function dropNote(x,y,z,i){
+  const g=new THREE.Group();
+  const pg=new THREE.Mesh(new THREE.BoxGeometry(.42,.06,.54),new THREE.MeshBasicMaterial({color:0xfdf6e3}));
+  pg.position.y=.2;pg.rotation.z=.12;g.add(pg);
+  const ink=new THREE.Mesh(new THREE.BoxGeometry(.26,.02,.3),new THREE.MeshBasicMaterial({color:0x8899aa}));
+  ink.position.y=.24;g.add(ink);
+  g.position.set(x,y,z);scene.add(g);
+  items.push({g,x,y,z,vx:0,vy:0,vz:0,val:0,note:i,bob:Math.random()*6,rest:true});
+  SEC.notes++;
+}
+function genMansion(n){
+  clearWorld();resetSec();
+  SEC.on=true;
+  const r=rng(n*104729+555);
+  const ri=(a,b)=>a+Math.floor(r()*(b-a+1));
+  SEC.code=''+ri(1,9)+ri(0,9)+ri(0,9)+ri(1,9);
+  /* קרקע */
+  fill(0,0,0,WX-1,GY-3,WZ-1,ROCK);
+  fill(0,GY-2,0,WX-1,GY-1,WZ-1,DIRT);
+  fill(0,GY,0,WX-1,GY,WZ-1,GRASS);
+  fill(0,GY,WZ-14,WX-1,GY,WZ-1,ROAD);
+  /* גדר חיה מסביב לחצר */
+  for(let x=12;x<=52;x++){setV(x,GY+1,20,HEDGE);setV(x,GY+2,20,HEDGE)}
+  for(let z=20;z<=47;z++){setV(12,GY+1,z,HEDGE);setV(12,GY+2,z,HEDGE);setV(52,GY+1,z,HEDGE);setV(52,GY+2,z,HEDGE)}
+  for(let x=28;x<=36;x++){setV(x,GY+1,47,AIR);setV(x,GY+2,47,AIR)}
+  for(let x=12;x<=52;x++){if(x<28||x>36){setV(x,GY+1,47,HEDGE);setV(x,GY+2,47,HEDGE)}}
+
+  const x0=18,x1=46,z0=24,z1=44,FH=6,doorX=32;
+  BLD={x0:x0,x1:x1,z0:z0,z1:z1};
+  exitZ=z1+8;startPos={x:doorX,z:z1+6};
+  const wallMat=BRICK,trimMat=TRIM;
+
+  for(let f=0;f<3;f++){
+    const yb=GY+1+f*FH, yt=yb+FH-1;
+    fill(x0,yb-1,z0,x1,yb-1,z1,f===0?MARBLE:WOOD);
+    for(let y=yb;y<=yt-1;y++){
+      for(let x=x0;x<=x1;x++){setV(x,y,z0,wallMat);setV(x,y,z1,wallMat)}
+      for(let z=z0;z<=z1;z++){setV(x0,y,z,wallMat);setV(x1,y,z,wallMat)}
+    }
+    for(let x=x0;x<=x1;x++){setV(x,yt-1,z0,trimMat);setV(x,yt-1,z1,trimMat)}
+    for(let z=z0;z<=z1;z++){setV(x0,yt-1,z,trimMat);setV(x1,yt-1,z,trimMat)}
+    if(f===2)fill(x0,yt,z0,x1,yt,z1,ROOF);
+    /* חלונות גדולים */
+    for(let x=x0+2;x<=x1-2;x+=4){
+      if(f===0&&Math.abs(x-doorX)<3)continue;
+      for(let y=yb+1;y<=yb+3;y++){setV(x,y,z1,GLASS);setV(x+1,y,z1,GLASS);setV(x,y,z0,GLASS);setV(x+1,y,z0,GLASS)}
+    }
+    for(let z=z0+3;z<=z1-3;z+=5)for(let y=yb+1;y<=yb+3;y++){setV(x0,y,z,GLASS);setV(x1,y,z,GLASS)}
+    /* פנים */
+    fill(x0+1,yb,z0+1,x1-1,yt-1,z1-1,AIR);
+    fill(x0+1,yb-1,z0+1,x1-1,yb-1,z1-1,f===0?MARBLE:VELVET);
+
+    /* גרם מדרגות בפינה המזרחית */
+    const sx=x1-5,sz=z0+2;
+    if(f<2){
+      for(let st=0;st<FH;st++)fill(sx,yb+st,sz+st,sx+3,yb+st,sz+st,CONC);
+      fill(sx,yb+FH-1,sz,sx+3,yb+FH-1,sz+FH-1,AIR);
+    }
+    if(f>0)fill(sx,yb-1,sz,sx+3,yb-1,sz+FH-1,AIR);   /* פתח בתקרה מתחת */
+
+    if(f===0){
+      /* כניסה + חופה */
+      for(let y=yb;y<=yb+3;y++)for(let x=doorX-2;x<=doorX+2;x++)setV(x,y,z1,AIR);
+      fill(doorX-4,GY,z1+1,doorX+4,GY,z1+6,MARBLE);
+      fill(doorX-4,yb+4,z1+1,doorX+4,yb+4,z1+2,ROOF);
+      for(const bx of[doorX-4,doorX+4])fill(bx,yb,z1+2,bx,yb+3,z1+2,PILLARM());
+      /* מסדרון לייזרים – אפשר לקפוץ מעליהם */
+      for(let x=x0+1;x<=x1-1;x++){
+        if(x>sx-1&&x<sx+4)continue;
+        if(!gv(x,yb,z1-6))setV(x,yb,z1-6,LASER);
+      }
+      for(let x=x0+1;x<=x1-1;x++)if(x%7===0)for(let y=yb;y<=yb+2;y++)if(!gv(x,y,z1-12))setV(x,y,z1-12,LASER);
+      /* ריהוט סלון + שלל */
+      for(let i=0;i<10;i++){
+        const x=ri(x0+2,x1-2),z=ri(z0+2,z1-8);
+        if(gv(x,yb,z))continue;
+        if(r()<.4){setV(x,yb,z,COUNTER);if(r()<.6)setV(x,yb+1,z,MONEY)}
+        else if(r()<.5)setV(x,yb,z,BOOK);
+        else setV(x,yb,z,MONEY);
+      }
+      addCam(x0+1,yb+3,z1-2,Math.PI*.75,.55);
+      addCam(x1-1,yb+3,z0+1,-Math.PI*.25,.55);
+      dropNote(doorX-6+.5,yb+.1,z1-9+.5,0);
+    }
+    if(f===1){
+      /* משרד: מקלדת הכספת + פתקים; חדרי שינה עם כספות */
+      for(let z=z0+1;z<=z1-1;z++)fill(x0+10,yb,z,x0+10,yb+3,z,PLASTER);
+      for(let y=yb;y<=yb+1;y++)setV(x0+10,y,z0+7,AIR);
+      for(let i=0;i<7;i++){
+        const x=ri(x0+1,x0+9),z=ri(z0+1,z1-1);
+        if(!gv(x,yb,z)){setV(x,yb,z,r()<.5?SAFE:BOOK)}
+      }
+      for(let i=0;i<8;i++){
+        const x=ri(x0+11,x1-1),z=ri(z0+1,z1-1);
+        if(x>sx-1&&x<sx+4&&z<z0+FH+2)continue;
+        if(!gv(x,yb,z))setV(x,yb,z,r()<.45?SAFE:MONEY);
+      }
+      for(let x=x0+13;x<=x1-3;x+=3)setV(x,yb,z1-2,VELVET);
+      addCam(x1-1,yb+3,z1-1,-Math.PI*.75,.6);
+      dropNote(x0+4+.5,yb+.1,z0+3+.5,1);
+      dropNote(x1-3+.5,yb+.1,z1-4+.5,2);
+      /* שורות לייזר רוחביות במסדרון המזרחי – קופצים מעליהן */
+      for(let z=z0+4;z<=z1-3;z+=5)
+        for(let x=x0+11;x<=x1-1;x++)
+          if(!gv(x,yb,z))setV(x,yb,z,LASER);
+    }
+    if(f===2){
+      /* חדר הכספת – פלדה, נפתח רק בקוד */
+      const vx0=x0+6,vx1=x0+18,vz0=z0+2,vz1=z0+12;
+      box(vx0,yb,vz0,vx1,yb+4,vz1,VAULT);
+      fill(vx0+1,yb,vz0+1,vx1-1,yb+3,vz1-1,AIR);
+      const dx=Math.floor((vx0+vx1)/2);
+      for(let y=yb;y<=yb+2;y++)for(let x=dx-1;x<=dx+1;x++)setV(x,y,vz1,VAULT);
+      SEC.vault={x0:dx-1,x1:dx+1,y0:yb,y1:yb+2,z:vz1};
+      /* מקלדת ליד הדלת */
+      setV(dx+2,yb+1,vz1,KEYPAD);
+      /* זהב וכספות בפנים */
+      for(let z=vz0+1;z<=vz1-1;z++)for(let x=vx0+1;x<=vx1-1;x++){
+        if(r()<.34)setV(x,yb,z,GOLD);
+        else if(r()<.6)setV(x,yb,z,SAFE);
+        if(r()<.3)setV(x,yb+1,z,MONEY);
+      }
+      /* לייזרים לפני הדלת */
+      for(let x=vx0-1;x<=vx1+1;x++)if(!gv(x,yb,vz1+2))setV(x,yb,vz1+2,LASER);
+      addCam(x1-1,yb+3,z1-1,-Math.PI*.75,.7);
+      dropNote(x1-4+.5,yb+.1,z1-3+.5,3);
+      for(let i=0;i<6;i++){
+        const x=ri(vx1+3,x1-2),z=ri(z0+1,z1-1);
+        if(!gv(x,yb,z))setV(x,yb,z,r()<.5?MONEY:BOOK);
+      }
+    }
+  }
+  /* מנורות רחוב */
+  for(const lx of[doorX-14,doorX+14]){fill(lx,GY+1,WZ-9,lx,GY+5,WZ-9,METAL);setV(lx,GY+6,WZ-9,LAMP)}
+
+  lootTotal=0;
+  for(let i=0;i<NVOX;i++)if(LOOT[V[i]])lootTotal+=LOOT[V[i]];
+  guards.forEach(g=>scene.remove(g.g));guards=[];
+  for(let i=0;i<Math.min(8,4+n);i++){
+    const f=i%3,yb=GY+1+f*FH;
+    const gx=ri(x0+2,x1-2),gz=ri(z0+2,z1-2);
+    const g=mkGuard(gx+.5,gz+.5,false);g.y=yb;g.home={x:gx,z:gz};
+    guards.push(g);
+  }
+  showCode();
+  rebuildAll();
+}
+function PILLARM(){return TRIM}
+
 /* ════════ hurt / alarm ════════ */
 let alarm=0;
 function hurt(){
@@ -891,6 +1219,14 @@ let bobT=0;
 const key={};
 let runHeld=false,jumpHeld=false,fireHeld=false;
 addEventListener('keydown',e=>{
+  if(SEC.padOpen){
+    if(e.code==='Escape')closePad();
+    else if(e.code==='Backspace')padKey('C');
+    else if(e.code==='Enter')padKey('E');
+    else if(/^(Digit|Numpad)[0-9]$/.test(e.code))padKey(e.code.slice(-1));
+    e.preventDefault();return;
+  }
+  if(e.code==='KeyF'){interact();return}
   key[e.code]=1;
   if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Tab'].includes(e.code))e.preventDefault();
   if(e.code.startsWith('Digit')){const i=+e.code.slice(5)-1;if(i>=0&&i<TOOLS.length)selTool(i)}
@@ -903,7 +1239,7 @@ let locked=false,mdx=0,mdy=0;
 document.addEventListener('pointerlockchange',()=>{locked=!!document.pointerLockElement;$('#lockMsg').style.opacity=locked?0:1});
 document.addEventListener('mousemove',e=>{if(locked){mdx+=e.movementX;mdy+=e.movementY}});
 const onFoot=()=>state==='play'||state==='raid';
-cvEl.addEventListener('mousedown',e=>{if(!onFoot())return;if(!locked){cvEl.requestPointerLock();return}if(e.button===0)fireHeld=true});
+cvEl.addEventListener('mousedown',e=>{if(!onFoot()||SEC.padOpen)return;if(!locked){cvEl.requestPointerLock();return}if(e.button===0)fireHeld=true});
 addEventListener('mouseup',e=>{if(e.button===0)fireHeld=false});
 addEventListener('wheel',e=>{if(onFoot())selTool((tool+(e.deltaY>0?1:TOOLS.length-1))%TOOLS.length)},{passive:true});
 
@@ -1138,19 +1474,21 @@ const BEST='heist3d_best';
 let best=+store.get(BEST,0)||0;$('#best').textContent=best;
 function setBest(){if(cash>best){best=cash;store.set(BEST,best);$('#best').textContent=best}}
 
-function startLevel(n){
-  lvl=n;
+let mode='bank';
+function startLevel(n,m){
+  lvl=n;mode=m||'bank';
   sirenStop();document.body.dataset.ph='fps';$('#banner').style.opacity=0;
   for(const p of proj){if(p.mesh)scene.remove(p.mesh)}proj.length=0;
   parts.length=0;pMesh.count=0;clearItems();
   if(getaway){scene.remove(getaway);getaway=null}
-  genLevel(n);
+  if(mode==='mansion')genMansion(n);else{resetSec();genLevel(n)}
   cash=0;lootGot=0;
   P.x=startPos.x+.5;P.y=GY+1;P.z=startPos.z+.5;P.vx=P.vy=P.vz=0;
   P.yaw=0;P.pitch=-.02;P.hp=3;P.inv=0;
   TOOLS[2].ammo=10+n*2;TOOLS[3].ammo=2+Math.floor(n/2);TOOLS[4].ammo=1+Math.floor(n/3);TOOLS[5].ammo=n>=3?1:0;
+  if(mode==='mansion'){TOOLS[2].ammo=18;TOOLS[3].ammo=4;TOOLS[4].ammo=3;TOOLS[5].ammo=2}
   tool=0;refreshHotbar();
-  lvlTime=110+n*12;timeLeft=lvlTime;playT=0;lastSec=-1;
+  lvlTime=(mode==='mansion'?210+n*10:110+n*12);timeLeft=lvlTime;playT=0;lastSec=-1;
   alarm=0;cool=0;shake=0;
   $('#cash').textContent='💰 0';
   $('#hearts').textContent='❤❤❤';$('#dHearts').textContent='❤❤❤';
@@ -1212,6 +1550,7 @@ function tick(dt){
   bobT+=Math.hypot(P.vx,P.vz)*dt*2.2;
   for(const g of guards)stepGuard(g,dt);
   stepProj(dt);stepItems(dt);
+  if(SEC.on){stepCams(dt);checkLasers();stepProx()}
   if(state==='play'){
     playT+=dt;
     const sec=Math.floor(playT);
@@ -1260,10 +1599,11 @@ function frame(now){
 function lvlLabel(){$('#lvLbl').textContent='שלב '+menuLvl}
 $('#lvUp').onclick=()=>{menuLvl=Math.min(12,menuLvl+1);lvlLabel()};
 $('#lvDn').onclick=()=>{menuLvl=Math.max(1,menuLvl-1);lvlLabel()};
-$('#goBtn').onclick=()=>{ac();$('#menu').classList.remove('show');startLevel(menuLvl)};
-$('#retry').onclick=()=>{$('#over').classList.remove('show');startLevel(lvl)};
+$('#goBtn').onclick=()=>{ac();$('#menu').classList.remove('show');startLevel(menuLvl,'bank')};
+$('#villaBtn').onclick=()=>{ac();$('#menu').classList.remove('show');startLevel(menuLvl,'mansion')};
+$('#retry').onclick=()=>{$('#over').classList.remove('show');startLevel(lvl,mode)};
 $('#ovMenu').onclick=()=>{$('#over').classList.remove('show');state='menu';$('#menu').classList.add('show')};
-$('#nextBtn').onclick=()=>{$('#clear').classList.remove('show');menuLvl=Math.min(12,lvl+1);lvlLabel();startLevel(menuLvl)};
+$('#nextBtn').onclick=()=>{$('#clear').classList.remove('show');if(mode==='mansion'){state='menu';$('#menu').classList.add('show');return}menuLvl=Math.min(12,lvl+1);lvlLabel();startLevel(menuLvl)};
 $('#clMenu').onclick=()=>{$('#clear').classList.remove('show');state='menu';$('#menu').classList.add('show')};
 
 buildHotbar();lvlLabel();resize();
