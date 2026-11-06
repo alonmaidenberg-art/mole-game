@@ -63,6 +63,18 @@ body.touch #lockMsg{display:none}
 body[data-ph="drive"] #hotbar,body[data-ph="drive"] #xh,body[data-ph="drive"] #vm,body[data-ph="drive"] #fire,body[data-ph="drive"] #jump,body[data-ph="drive"] #lockMsg{display:none!important}
 body[data-ph="drive"] #driveHud,body[data-ph="drive"] #radar{display:flex}
 body[data-ph="drive"] #radar{display:block}
+#walletBar{background:rgba(255,208,90,.12);border:1.5px solid rgba(255,208,90,.3);border-radius:999px;padding:6px 14px;font-weight:900;font-size:15px;margin:4px 0 10px}
+#wBank{color:#ffd05a}
+#shopList{display:flex;flex-direction:column;gap:7px;margin:10px 0;text-align:right}
+.sItem{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.05);border:1.5px solid rgba(140,200,255,.18);border-radius:14px;padding:9px 11px}
+.sItem .ic{font-size:26px;flex:0 0 32px;text-align:center}
+.sItem .tx{flex:1;min-width:0}
+.sItem .nm{font-weight:900;font-size:15px}
+.sItem .ds{font-size:11.5px;opacity:.7;line-height:1.35}
+.sItem .lv{font-size:11px;color:#ffd05a;font-weight:900}
+.sItem button{border:0;border-radius:11px;padding:9px 12px;font:inherit;font-size:13px;font-weight:900;color:#06101e;background:linear-gradient(180deg,#8fd0ff,#3f9fe0);cursor:pointer;white-space:nowrap}
+.sItem button:disabled{background:#2a3446;color:#6b7a90;cursor:default}
+.sItem.done{border-color:rgba(127,255,136,.3)}
 #fps{position:fixed;bottom:2px;left:4px;font-size:10px;opacity:.35;z-index:9;pointer-events:none}
 #secHud{position:fixed;top:max(52px,calc(env(safe-area-inset-top) + 52px));left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:5px;z-index:7;pointer-events:none}
 #camWrap{display:none;flex-direction:column;align-items:center;gap:3px}
@@ -110,6 +122,7 @@ body[data-ph="drive"] #secHud,body[data-ph="drive"] #prompt{display:none!importa
   <div style="font-size:40px">🔐</div>
   <h2 style="font-size:22px;color:#8fd0ff">מקלדת הכספת</h2>
   <div id="padDisp">_ _ _ _</div>
+  <div class="lb" id="padHint" style="font-size:12px;margin:0"></div>
   <div id="padKeys"></div>
   <button class="btn alt" id="padClose">סגירה (Esc)</button>
 </div></div>
@@ -126,19 +139,30 @@ body[data-ph="drive"] #secHud,body[data-ph="drive"] #prompt{display:none!importa
   <div class="lb">עולם ווקסלים הרסיק לגמרי. פוצצו קירות, פרצו את הכספת, קחו כמה שאתם מעיזים — וצאו לפני שהזמן נגמר.</div>
   <div class="lb" style="color:#ff9a9a"><b>🚨 נגמר הזמן?</b> המשטרה מקיפה את הבניין. רוצו למכונית הבריחה ושרדו את המרדף.</div>
   <div class="lb" style="font-size:12px;opacity:.6"><b>WASD</b> תנועה · <b>Shift</b> ריצה · <b>רווח</b> קפיצה · <b>עכבר</b> הסתכלות/ירי · <b>1-6</b> כלים</div>
-  <button class="btn" id="goBtn">▶ התחלה</button>
-  <button class="btn" id="villaBtn" style="background:linear-gradient(180deg,#ffd05a,#e09a20);box-shadow:0 5px 0 #8a5c10">🏠 שלב מיוחד — הבית של אלון</button>
-  <div class="lb" style="font-size:12px;opacity:.6;margin-top:6px">3 קומות · מצלמות אבטחה · לייזרים (קפצו מעליהם) · כספת עם קוד בן 4 ספרות · 4 פתקים מפוזרים עם הרמזים</div>
-  <div class="row"><button class="btn alt" id="lvDn">◀</button><button class="btn alt" id="lvLbl" style="flex:2">שלב 1</button><button class="btn alt" id="lvUp">▶</button></div>
-  <div style="margin-top:10px;opacity:.7;font-size:14px">שיא: <b id="best">0</b> 💰</div>
+  <div id="walletBar">💰 <b id="wBank">0</b> · <b id="wRank">מתחיל</b></div>
+  <button class="btn" id="villaBtn" style="background:linear-gradient(180deg,#ffd05a,#e09a20);box-shadow:0 5px 0 #8a5c10">🏠 בתי יוקרה — 120 שלבים</button>
+  <div class="row"><button class="btn alt" id="vDn">◀</button><button class="btn alt" id="vLbl" style="flex:2">בית 1</button><button class="btn alt" id="vUp">▶</button></div>
+  <div class="lb" style="font-size:11.5px;opacity:.6;margin-top:4px">כל בית שונה · מצלמות · לייזרים (קפצו מעליהם) · כספת עם קוד · פתקים עם רמזים · בחלק מהבתים הליקופטר משטרה</div>
+  <button class="btn" id="shopBtn" style="background:linear-gradient(180deg,#b6f5c0,#4fc46a);box-shadow:0 5px 0 #1f7a35">🛒 חנות הגנבים</button>
+  <button class="btn alt" id="goBtn">🏦 מצב בנק קלאסי</button>
+  <div class="row"><button class="btn alt" id="lvDn">◀</button><button class="btn alt" id="lvLbl" style="flex:2">בנק 1</button><button class="btn alt" id="lvUp">▶</button></div>
+  <div style="margin-top:10px;opacity:.7;font-size:13px">שיא בשלב יחיד: <b id="best">0</b> 💰</div>
 </div></div>
 
+<div class="ov" id="shop"><div class="ovc" style="max-width:480px">
+  <div style="font-size:42px">🛒</div>
+  <h2 style="font-size:25px">חנות הגנבים</h2>
+  <div class="lb" id="shopWallet"></div>
+  <div id="shopList"></div>
+  <button class="btn alt" id="shopClose">חזרה</button>
+</div></div>
 <div class="ov" id="clear"><div class="ovc">
   <div style="font-size:48px" id="clIcon">🌟</div>
   <h2 id="clT" style="color:#ffd05a">הצלחת!</h2>
   <div style="font-size:34px;font-weight:900;color:#8fff9a" id="clS"></div>
   <p id="clM" style="opacity:.82;margin-top:6px;font-size:14px"></p>
   <button class="btn" id="nextBtn">▶ שלב הבא</button>
+  <button class="btn alt" id="clShop">🛒 חנות</button>
   <button class="btn alt" id="clMenu">תפריט</button>
 </div></div>
 
@@ -148,6 +172,7 @@ body[data-ph="drive"] #secHud,body[data-ph="drive"] #prompt{display:none!importa
   <div style="font-size:34px;font-weight:900;color:#ffd05a" id="ovS"></div>
   <p id="ovM" style="opacity:.82;margin-top:6px;font-size:14px"></p>
   <button class="btn" id="retry">🔁 שוב</button>
+  <button class="btn alt" id="ovShop">🛒 חנות</button>
   <button class="btn alt" id="ovMenu">תפריט</button>
 </div></div>
 
@@ -201,8 +226,8 @@ const MAT=[
  {n:'glass',  c:0xa6dcef, hp:6},
  {n:'metal',  c:0x889098, hp:32},
  {n:'vault',  c:0x4d5866, hp:88},
- {n:'safe',   c:0xc9a52a, hp:42, loot:450},
- {n:'money',  c:0x3fcc5e, hp:9,  loot:85},
+ {n:'safe',   c:0xc9a52a, hp:42, loot:120},
+ {n:'money',  c:0x3fcc5e, hp:9,  loot:25},
  {n:'floor',  c:0x6b6b74, hp:22},
  {n:'crate',  c:0xa98340, hp:10},
  {n:'counter',c:0x5c4231, hp:12},
@@ -213,7 +238,7 @@ const MAT=[
  {n:'carpet', c:0x8b2b3c, hp:9},
  {n:'hedge',  c:0x2f7a34, hp:7},
  {n:'door',   c:0x6b4a24, hp:13},
- {n:'gold',   c:0xf2c53d, hp:48, loot:900},
+ {n:'gold',   c:0xf2c53d, hp:48, loot:260},
  {n:'laser',  c:0xff2d4a, hp:4},
  {n:'camera', c:0x24242c, hp:7},
  {n:'keypad', c:0x2f6fd0, hp:16},
@@ -427,7 +452,7 @@ function stepItems(dt){
         tone(900,.08,'sine',.06);setTimeout(()=>tone(1250,.12,'sine',.05),70);
         showCode();
       }else{
-        addCash(it.val);lootGot+=it.val;
+        addCash(lootVal(it.val));lootGot+=it.val;
         tone(720,.07,'sine',.07);setTimeout(()=>tone(1020,.1,'sine',.06),55);
       }
       scene.remove(it.g);items.splice(i,1);
@@ -440,8 +465,14 @@ let cash=0,lootTotal=0,lootGot=0;
 function addCash(v){cash+=v;$('#cash').textContent='💰 '+cash}
 /* כספות וזהב מפילים שק שצריך לאסוף; חבילות כסף נכנסות ישר לכיס */
 function collectMat(m,x,y,z,fling){
-  if(m===SAFE||m===GOLD)dropBag(x+.5,y+.7,z+.5,LOOT[m],fling);
-  else{addCash(LOOT[m]);lootGot+=LOOT[m];tone(760,.08,'sine',.07);setTimeout(()=>tone(1040,.09,'sine',.06),55)}
+  if(m===SAFE||m===GOLD){
+    if(m===SAFE&&Math.random()<.26){                /* כספת ריקה */
+      tone(200,.18,'square',.05);banner('🗄️ הכספת ריקה',1);return;
+    }
+    const v=Math.round(LOOT[m]*(.7+Math.random()*.6));
+    dropBag(x+.5,y+.7,z+.5,v,fling);
+  }
+  else{addCash(lootVal(LOOT[m]));lootGot+=LOOT[m];tone(760,.08,'sine',.07);setTimeout(()=>tone(1040,.09,'sine',.06),55)}
 }
 function breakAt(x,y,z,debris){
   const i=idx(x,y,z),m=V[i];
@@ -515,7 +546,7 @@ function physics(dt){
   if(touchDev){fx+=joyX;fz+=joyY}
   if(SEC.padOpen){fx=0;fz=0}
   const fl=Math.hypot(fx,fz);if(fl>1){fx/=fl;fz/=fl}
-  const sp=(key.ShiftLeft||key.ShiftRight||runHeld)?RUN:WALK;
+  const sp=((key.ShiftLeft||key.ShiftRight||runHeld)?RUN:WALK)*(1+up('boots')*.12);
   /* forward = (-sin yaw, -cos yaw), right = (cos yaw, -sin yaw) — must match aimDir() */
   const cy=Math.cos(P.yaw),sy=Math.sin(P.yaw);
   const tx=(fx*cy+fz*sy)*sp,tz=(fz*cy-fx*sy)*sp;
@@ -690,9 +721,8 @@ function downGuard(g,fling){
   g.down=true;g.state='down';
   g.g.rotation.set(0,g.a,Math.PI*.47);
   g.g.position.set(g.x,g.y+.34,g.z);
-  dropBag(g.x,g.y+.9,g.z,220+lvl*45,fling||4);
+  if(Math.random()<.55){dropBag(g.x,g.y+.9,g.z,55+lvl*7,fling||4);banner('💰 הפיל שק כסף',1.1)}
   noise(.22,.15,800);tone(150,.26,'sawtooth',.07,60);
-  banner('💰 הפיל שק כסף',1.1);
 }
 function stepGuard(g,dt){
   if(g.down)return;
@@ -750,6 +780,101 @@ function stepGuard(g,dt){
 }
 function gSolid(x,y,z){return solid(Math.floor(x),Math.floor(y),Math.floor(z))}
 
+/* ════════ סימון דרך קירות – גלאי לייזרים / סורק מצלמות ════════ */
+const MKMAX=170;
+const MK=new THREE.InstancedMesh(new THREE.BoxGeometry(1.06,1.06,1.06),
+  new THREE.MeshBasicMaterial({transparent:true,opacity:.34,depthTest:false,depthWrite:false}),MKMAX);
+MK.renderOrder=999;MK.frustumCulled=false;MK.count=0;
+for(let i=0;i<MKMAX;i++)MK.setColorAt(i,_pc.setHex(0xffffff));
+MK.instanceColor.setUsage(THREE.DynamicDrawUsage);
+scene.add(MK);
+let mkT=0;
+function scanTargets(){
+  SEC.laserList=[];SEC.camList=[];
+  for(let i=0;i<NVOX;i++){
+    const m=V[i];
+    if(m===LASER)SEC.laserList.push(i);
+    else if(m===CAMERA)SEC.camList.push(i);
+  }
+}
+function stepMarkers(dt){
+  const wantL=up('ldet'),wantC=up('cscan');
+  if((!wantL&&!wantC)||!SEC.on||state==='drive'){MK.count=0;return}
+  mkT-=dt;if(mkT>0)return;
+  mkT=.18;
+  let n=0;const WXZ=WX*WZ;
+  const put=(i,hex,pulse)=>{
+    if(n>=MKMAX)return;
+    const x=i%WX,y=(i/WXZ)|0,z=((i/WX)|0)%WZ;
+    const dx=x+.5-P.x,dz=z+.5-P.z,dy=y+.5-(P.y+EYE);
+    if(dx*dx+dz*dz+dy*dy>26*26)return;
+    _v3.set(x+.5,y+.5,z+.5);_q.identity();
+    const sc=pulse?1+Math.sin(performance.now()/160)*.06:1;
+    _s3.set(sc,sc,sc);_m4.compose(_v3,_q,_s3);
+    MK.setMatrixAt(n,_m4);MK.setColorAt(n,_pc.setHex(hex));n++;
+  };
+  if(wantL&&SEC.laserList)for(const i of SEC.laserList){if(V[i]===LASER)put(i,0xff2d4a,true)}
+  if(wantC&&SEC.camList)for(const i of SEC.camList){if(V[i]===CAMERA)put(i,0x35e0ff,true)}
+  MK.count=n;
+  MK.instanceMatrix.needsUpdate=true;MK.instanceColor.needsUpdate=true;
+}
+
+/* ════════ הליקופטר משטרה ════════ */
+let HELI=null;
+function mkHeliMesh(){
+  const g=new THREE.Group();
+  const M=(w,h,d,c,x,y,z)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshBasicMaterial({color:c}));m.position.set(x,y,z);g.add(m);return m};
+  M(2.4,1.6,4.6,0x1b2a4a,0,0,0);
+  M(2.0,1.1,1.5,0x9fd0f0,0,.15,-2.3);
+  M(.6,.5,4.2,0x1b2a4a,0,.5,3.4);
+  M(.3,1.6,.9,0x1b2a4a,0,1.2,5.2);
+  M(.35,1.6,.35,0x2a3a5a,0,1.5,0);
+  for(const sx of[-1.5,1.5])M(.3,1.3,.3,0x2a3a5a,sx,-1.2,0);
+  for(const sx of[-1.5,1.5])M(.35,.3,4.4,0x2a3a5a,sx,-1.8,0);
+  const rotor=new THREE.Group();
+  for(let i=0;i<2;i++){const bl=new THREE.Mesh(new THREE.BoxGeometry(13,.14,.7),new THREE.MeshBasicMaterial({color:0x14141a}));bl.rotation.y=i*Math.PI/2;rotor.add(bl)}
+  rotor.position.y=2.3;g.add(rotor);
+  const tail=new THREE.Mesh(new THREE.BoxGeometry(.12,3,.5),new THREE.MeshBasicMaterial({color:0x14141a}));
+  tail.position.set(.35,1.3,5.2);g.add(tail);
+  const l1=M(.5,.3,.3,0xff2222,-1.0,-.6,-2.2), l2=M(.5,.3,.3,0x2255ff,1.0,-.6,-2.2);
+  /* אלומת זרקור */
+  const beam=new THREE.Mesh(new THREE.CylinderGeometry(.5,7,26,14,1,true),
+    new THREE.MeshBasicMaterial({color:0xfff2b0,transparent:true,opacity:.17,side:THREE.DoubleSide,depthWrite:false}));
+  beam.position.y=-13;g.add(beam);
+  g.userData={rotor,tail,l1,l2,beam};
+  return g;
+}
+function spawnHeli(cx,cy,cz){
+  killHeli();
+  const g=mkHeliMesh();scene.add(g);
+  HELI={g,cx,cy,cz,rad:21,t:Math.random()*6,sp:.33,seen:0,alerted:false};
+}
+function killHeli(){if(HELI){scene.remove(HELI.g);HELI=null}}
+function stepHeli(dt){
+  if(!HELI)return;
+  const H=HELI;H.t+=dt*H.sp;
+  const x=H.cx+Math.cos(H.t)*H.rad, z=H.cz+Math.sin(H.t)*H.rad;
+  const px=H.g.position.x,pz=H.g.position.z;
+  H.g.position.set(x,H.cy+Math.sin(H.t*2.3)*.7,z);
+  H.g.rotation.y=Math.atan2(x-px,z-pz);
+  H.g.userData.rotor.rotation.y+=dt*34;
+  H.g.userData.tail.rotation.x+=dt*40;
+  const ph=Math.floor(H.t*9)%2;
+  H.g.userData.l1.material.color.setHex(ph?0xff2222:0x330808);
+  H.g.userData.l2.material.color.setHex(ph?0x08082a:0x2255ff);
+  /* הזרקור תופס אותך רק בחוץ או על הגג */
+  const dx=P.x-x, dz=P.z-z, flat=Math.hypot(dx,dz);
+  const outside=!inBld(P.x,P.z);
+  const onRoof=P.y>GY+1+(VILLA?VILLA.floors*6:18)-2;
+  let lit=false;
+  if((outside||onRoof)&&flat<11&&P.y>GY-2)lit=true;
+  H.seen=lit?Math.min(1,H.seen+dt/2.0):Math.max(0,H.seen-dt/2.6);
+  H.g.userData.beam.material.opacity=.1+H.seen*.3;
+  H.g.userData.beam.material.color.setHex(H.seen>.6?0xffb0b0:0xfff2b0);
+  if(H.seen>camWarn)camWarn=H.seen;
+  if(H.seen>=1&&state==='play')trigAlarm('הליקופטר');
+}
+
 /* ════════ security: lasers, cameras, keypad, clues ════════ */
 const SEC={on:false,cams:[],code:'',notes:0,found:[null,null,null,null],
            vault:null,open:false,alarm:false,entry:'',padOpen:false,near:null};
@@ -758,6 +883,7 @@ function resetSec(){
   for(const c of SEC.cams)scene.remove(c.lens);
   SEC.on=false;SEC.cams=[];SEC.code='';SEC.notes=0;SEC.found=[null,null,null,null];
   SEC.vault=null;SEC.open=false;SEC.alarm=false;SEC.entry='';SEC.padOpen=false;SEC.near=null;
+  SEC.laserList=[];SEC.camList=[];MK.count=0;
   camWarn=0;
   $('#codeHud').classList.remove('on');$('#camWrap').classList.remove('on');
   $('#prompt').classList.remove('on');$('#pad').classList.remove('show');
@@ -772,7 +898,7 @@ function trigAlarm(why){
   banner('🚨 אזעקה! ('+why+') — נשארו לכם פחות זמן',3.2);
   noise(.4,.2,900);tone(520,.5,'square',.08);
   for(const g of guards)if(!g.down&&!g.cop){g.state='chase';g.give=0;g.alert=9}
-  playT+=25;                                   /* האזעקה גוזלת 25 שניות */
+  playT+=up('damp')?10:25;                     /* האזעקה גוזלת זמן יקר */
 }
 function addCam(x,y,z,a0,sweep){
   setV(x,y,z,CAMERA);
@@ -795,7 +921,7 @@ function stepCams(dt){
       if(!raycast(c.x+.5,c.y+.5,c.z+.5,dx/d,dy/d,dz/d,d-.5))see=true;
       V[i]=sv;
     }
-    c.seen=see?Math.min(1,c.seen+dt/1.6):Math.max(0,c.seen-dt/2.4);
+    c.seen=see?Math.min(1,c.seen+dt/(1.6*(up('cscan')?1.9:1))):Math.max(0,c.seen-dt/2.4);
     c.lens.material.color.setHex(c.seen>=1?0xff2222:c.seen>.04?0xffaa22:0x33dd55);
     if(see&&c.seen>.04&&c.seen<1&&Math.random()<dt*5)tone(1100,.04,'square',.03);
     if(c.seen>=1)trigAlarm('מצלמה');
@@ -817,12 +943,12 @@ function openPad(){
   if(SEC.open)return;
   SEC.padOpen=true;SEC.entry='';
   if(locked)document.exitPointerLock();
-  padDisp();$('#pad').classList.add('show');
+  padDisp();$('#padHint').textContent='קוד בן '+SEC.code.length+' ספרות · הרמזים בפתקים';$('#pad').classList.add('show');
 }
 function closePad(){SEC.padOpen=false;$('#pad').classList.remove('show')}
 function padDisp(){
-  const e=SEC.entry.padEnd(4,'_').split('').join(' ');
-  $('#padDisp').textContent=e;
+  const L=SEC.code.length||4;
+  $('#padDisp').textContent=SEC.entry.padEnd(L,'_').split('').join(' ');
 }
 function padKey(k){
   if(k==='C'){SEC.entry='';padDisp();tone(240,.05,'square',.04);return}
@@ -838,8 +964,9 @@ function padKey(k){
     }
     return;
   }
-  if(SEC.entry.length<4){SEC.entry+=k;padDisp();tone(600+ +k*40,.05,'sine',.04)}
-  if(SEC.entry.length===4)setTimeout(()=>padKey('E'),220);
+  const L=SEC.code.length||4;
+  if(SEC.entry.length<L){SEC.entry+=k;padDisp();tone(600+ +k*40,.05,'sine',.04)}
+  if(SEC.entry.length===L)setTimeout(()=>padKey('E'),240);
 }
 (function(){
   const g=$('#padKeys');
@@ -1027,13 +1154,16 @@ function genLevel(n){
 }
 
 /* ════════ שלב מיוחד: הבית של אלון ════════ */
+let VILLA=null;
 const CLUE=[
  ['בפתק מכתב־יד: "הספרה הראשונה של הקוד היא ',"'"],
  ['על לוח בקליפ: "ספרה שנייה — ',"'"],
  ['מאחורי תמונה: "השלישית היא ',"'"],
- ['בתחתית מגירה: "האחרונה בקוד — ',"'"]
+ ['בתחתית מגירה: "הספרה הרביעית — ',"'"],
+ ['מתחת לכרית: "והאחרונה בקוד היא ',"'"]
 ];
 function dropNote(x,y,z,i){
+  if(i>=SEC.code.length)return;
   const g=new THREE.Group();
   const pg=new THREE.Mesh(new THREE.BoxGeometry(.42,.06,.54),new THREE.MeshBasicMaterial({color:0xfdf6e3}));
   pg.position.y=.2;pg.rotation.z=.12;g.add(pg);
@@ -1043,12 +1173,41 @@ function dropNote(x,y,z,i){
   items.push({g,x,y,z,vx:0,vy:0,vz:0,val:0,note:i,bob:Math.random()*6,rest:true});
   SEC.notes++;
 }
+/* ── פרופיל הבית לפי מספר השלב (1..120) ── */
+function villaPlan(n){
+  const t=Math.min(1,(n-1)/119);                       /* 0 בהתחלה, 1 בשלב 120 */
+  const r=rng(n*104729+555);
+  const ri=(a,b)=>a+Math.floor(r()*(b-a+1));
+  const floors = n<6?2 : n<34?3 : n<78?(r()<.5?3:4) : 4;
+  const digits = n<10?3 : n<50?4 : 5;
+  const w  = clamp(22+Math.round(t*12)+ri(-2,2),20,34);
+  const dp = clamp(17+Math.round(t*8)+ri(-2,2),15,25);
+  const STY=[
+    {w:BRICK,  t:TRIM,   f:MARBLE, nm:'לבנים'},
+    {w:PLASTER,t:TRIM,   f:MARBLE, nm:'טיח לבן'},
+    {w:CONC,   t:PLASTER,f:FLOOR,  nm:'בטון'},
+    {w:WOOD,   t:TRIM,   f:WOOD,   nm:'עץ'},
+    {w:MARBLE, t:TRIM,   f:MARBLE, nm:'שיש'},
+    {w:METAL,  t:CONC,   f:FLOOR,  nm:'פלדה'}
+  ];
+  const sty=STY[ri(0,Math.min(STY.length-1,2+Math.floor(t*3)))];
+  return {r,ri,t,floors,digits,sty,w,dp,
+    cams: clamp(2+Math.round(t*9)+ri(0,1),2,12),
+    laserRows: clamp(1+Math.round(t*5),1,7),
+    guards: clamp(3+Math.round(t*7)+ri(0,1),3,11),
+    heli: n>=14 && (n%4===0 || r()<.3),
+    time: Math.round(185+t*110),
+    vaultHp: 1+t                                       /* קירות הכספת מתעבים */
+  };
+}
 function genMansion(n){
   clearWorld();resetSec();
   SEC.on=true;
-  const r=rng(n*104729+555);
-  const ri=(a,b)=>a+Math.floor(r()*(b-a+1));
-  SEC.code=''+ri(1,9)+ri(0,9)+ri(0,9)+ri(1,9);
+  const PLAN=villaPlan(n), r=PLAN.r, ri=PLAN.ri;
+  SEC.code='';
+  for(let i=0;i<PLAN.digits;i++)SEC.code+= i===0?ri(1,9):ri(0,9);
+  SEC.found=new Array(PLAN.digits).fill(null);
+  const noteSpots=[];
   /* קרקע */
   fill(0,0,0,WX-1,GY-3,WZ-1,ROCK);
   fill(0,GY-2,0,WX-1,GY-1,WZ-1,DIRT);
@@ -1060,21 +1219,23 @@ function genMansion(n){
   for(let x=28;x<=36;x++){setV(x,GY+1,47,AIR);setV(x,GY+2,47,AIR)}
   for(let x=12;x<=52;x++){if(x<28||x>36){setV(x,GY+1,47,HEDGE);setV(x,GY+2,47,HEDGE)}}
 
-  const x0=18,x1=46,z0=24,z1=44,FH=6,doorX=32;
+  const FL=PLAN.floors, FH=6;
+  const x0=Math.floor((WX-PLAN.w)/2), x1=x0+PLAN.w-1;
+  const z1=44, z0=z1-PLAN.dp+1, doorX=Math.floor((x0+x1)/2);
   BLD={x0:x0,x1:x1,z0:z0,z1:z1};
   exitZ=z1+8;startPos={x:doorX,z:z1+6};
-  const wallMat=BRICK,trimMat=TRIM;
+  const wallMat=PLAN.sty.w,trimMat=PLAN.sty.t,floorMat=PLAN.sty.f;
 
-  for(let f=0;f<3;f++){
+  for(let f=0;f<FL;f++){
     const yb=GY+1+f*FH, yt=yb+FH-1;
-    fill(x0,yb-1,z0,x1,yb-1,z1,f===0?MARBLE:WOOD);
+    fill(x0,yb-1,z0,x1,yb-1,z1,f===0?floorMat:WOOD);
     for(let y=yb;y<=yt-1;y++){
       for(let x=x0;x<=x1;x++){setV(x,y,z0,wallMat);setV(x,y,z1,wallMat)}
       for(let z=z0;z<=z1;z++){setV(x0,y,z,wallMat);setV(x1,y,z,wallMat)}
     }
     for(let x=x0;x<=x1;x++){setV(x,yt-1,z0,trimMat);setV(x,yt-1,z1,trimMat)}
     for(let z=z0;z<=z1;z++){setV(x0,yt-1,z,trimMat);setV(x1,yt-1,z,trimMat)}
-    if(f===2)fill(x0,yt,z0,x1,yt,z1,ROOF);
+    if(f===FL-1)fill(x0,yt,z0,x1,yt,z1,ROOF);
     /* חלונות גדולים */
     for(let x=x0+2;x<=x1-2;x+=4){
       if(f===0&&Math.abs(x-doorX)<3)continue;
@@ -1083,11 +1244,11 @@ function genMansion(n){
     for(let z=z0+3;z<=z1-3;z+=5)for(let y=yb+1;y<=yb+3;y++){setV(x0,y,z,GLASS);setV(x1,y,z,GLASS)}
     /* פנים */
     fill(x0+1,yb,z0+1,x1-1,yt-1,z1-1,AIR);
-    fill(x0+1,yb-1,z0+1,x1-1,yb-1,z1-1,f===0?MARBLE:VELVET);
+    fill(x0+1,yb-1,z0+1,x1-1,yb-1,z1-1,f===0?floorMat:VELVET);
 
     /* גרם מדרגות בפינה המזרחית */
     const sx=x1-5,sz=z0+2;
-    if(f<2){
+    if(f<FL-1){
       for(let st=0;st<FH;st++)fill(sx,yb+st,sz+st,sx+3,yb+st,sz+st,CONC);
       fill(sx,yb+FH-1,sz,sx+3,yb+FH-1,sz+FH-1,AIR);
     }
@@ -1113,11 +1274,11 @@ function genMansion(n){
         else if(r()<.5)setV(x,yb,z,BOOK);
         else setV(x,yb,z,MONEY);
       }
-      addCam(x0+1,yb+3,z1-2,Math.PI*.75,.55);
-      addCam(x1-1,yb+3,z0+1,-Math.PI*.25,.55);
-      dropNote(doorX-6+.5,yb+.1,z1-9+.5,0);
+      camsForFloor(f,FL,x0,x1,z0,z1,yb,PLAN);
+      for(let k=0;k<4;k++){const nx=ri(x0+2,x1-2),nz=ri(z0+2,z1-8);
+        if(!gv(nx,yb,nz)&&!gv(nx,yb+1,nz))noteSpots.push([nx+.5,yb+.12,nz+.5])}
     }
-    if(f===1){
+    if(f>0&&f<FL-1){
       /* משרד: מקלדת הכספת + פתקים; חדרי שינה עם כספות */
       for(let z=z0+1;z<=z1-1;z++)fill(x0+10,yb,z,x0+10,yb+3,z,PLASTER);
       for(let y=yb;y<=yb+1;y++)setV(x0+10,y,z0+7,AIR);
@@ -1131,15 +1292,16 @@ function genMansion(n){
         if(!gv(x,yb,z))setV(x,yb,z,r()<.45?SAFE:MONEY);
       }
       for(let x=x0+13;x<=x1-3;x+=3)setV(x,yb,z1-2,VELVET);
-      addCam(x1-1,yb+3,z1-1,-Math.PI*.75,.6);
-      dropNote(x0+4+.5,yb+.1,z0+3+.5,1);
-      dropNote(x1-3+.5,yb+.1,z1-4+.5,2);
+      camsForFloor(f,FL,x0,x1,z0,z1,yb,PLAN);
+      for(let k=0;k<5;k++){const nx=ri(x0+1,x1-2),nz=ri(z0+2,z1-2);
+        if(!gv(nx,yb,nz)&&!gv(nx,yb+1,nz))noteSpots.push([nx+.5,yb+.12,nz+.5])}
       /* שורות לייזר רוחביות במסדרון המזרחי – קופצים מעליהן */
-      for(let z=z0+4;z<=z1-3;z+=5)
-        for(let x=x0+11;x<=x1-1;x++)
-          if(!gv(x,yb,z))setV(x,yb,z,LASER);
+      {const step=Math.max(3,Math.round((z1-z0-6)/PLAN.laserRows));
+       for(let z=z0+4;z<=z1-3;z+=step)
+         for(let x=x0+11;x<=x1-1;x++)
+           if(!gv(x,yb,z))setV(x,yb,z,LASER);}
     }
-    if(f===2){
+    if(f===FL-1){
       /* חדר הכספת – פלדה, נפתח רק בקוד */
       const vx0=x0+6,vx1=x0+18,vz0=z0+2,vz1=z0+12;
       box(vx0,yb,vz0,vx1,yb+4,vz1,VAULT);
@@ -1157,8 +1319,9 @@ function genMansion(n){
       }
       /* לייזרים לפני הדלת */
       for(let x=vx0-1;x<=vx1+1;x++)if(!gv(x,yb,vz1+2))setV(x,yb,vz1+2,LASER);
-      addCam(x1-1,yb+3,z1-1,-Math.PI*.75,.7);
-      dropNote(x1-4+.5,yb+.1,z1-3+.5,3);
+      camsForFloor(f,FL,x0,x1,z0,z1,yb,PLAN);
+      for(let k=0;k<5;k++){const nx=ri(vx1+3,x1-2),nz=ri(z0+2,z1-2);
+        if(nx<=x1-2&&!gv(nx,yb,nz)&&!gv(nx,yb+1,nz))noteSpots.push([nx+.5,yb+.12,nz+.5])}
       for(let i=0;i<6;i++){
         const x=ri(vx1+3,x1-2),z=ri(z0+1,z1-1);
         if(!gv(x,yb,z))setV(x,yb,z,r()<.5?MONEY:BOOK);
@@ -1171,26 +1334,53 @@ function genMansion(n){
   lootTotal=0;
   for(let i=0;i<NVOX;i++)if(LOOT[V[i]])lootTotal+=LOOT[V[i]];
   guards.forEach(g=>scene.remove(g.g));guards=[];
-  for(let i=0;i<Math.min(8,4+n);i++){
-    const f=i%3,yb=GY+1+f*FH;
+  for(let i=0;i<PLAN.guards;i++){
+    const f=i%FL,yb=GY+1+f*FH;
     const gx=ri(x0+2,x1-2),gz=ri(z0+2,z1-2);
     const g=mkGuard(gx+.5,gz+.5,false);g.y=yb;g.home={x:gx,z:gz};
     guards.push(g);
   }
+  /* פתק אחד לכל ספרה בקוד, מפוזרים בין הקומות */
+  for(let i=noteSpots.length-1;i>0;i--){const j=Math.floor(r()*(i+1));const t2=noteSpots[i];noteSpots[i]=noteSpots[j];noteSpots[j]=t2}
+  for(let i=0;i<SEC.code.length;i++){
+    const sp=noteSpots[i]||[doorX+.5,GY+1.12,z1+2.5];
+    dropNote(sp[0],sp[1],sp[2],i);
+  }
+  VILLA=PLAN;
+  if(PLAN.heli)spawnHeli(doorX+.5,GY+1+FL*FH+9,(z0+z1)/2);
   showCode();
-  rebuildAll();
+  rebuildAll();scanTargets();
 }
 function PILLARM(){return TRIM}
+/* מצלמות בפינות, כמה שהפרופיל דורש */
+function camsForFloor(f,FL,x0,x1,z0,z1,yb,PLAN){
+  if(PLAN.camLeft===undefined)PLAN.camLeft=PLAN.cams;
+  const per=Math.max(1,Math.min(PLAN.camLeft,Math.ceil(PLAN.camLeft/Math.max(1,FL-f))));
+  PLAN.camLeft-=per;
+  const spots=[
+    [x0+1,z1-2, Math.PI*.75],[x1-1,z0+1,-Math.PI*.25],
+    [x1-1,z1-2,-Math.PI*.75],[x0+1,z0+1, Math.PI*.25],
+    [x0+1,Math.floor((z0+z1)/2), Math.PI*.5],[x1-1,Math.floor((z0+z1)/2),-Math.PI*.5]
+  ];
+  for(let i=0;i<per&&i<spots.length;i++){
+    const sp=spots[(i+f)%spots.length];
+    if(gv(sp[0],yb+3,sp[1])===CAMERA)continue;
+    addCam(sp[0],yb+3,sp[1],sp[2],.5+PLAN.t*.45);
+  }
+}
 
 /* ════════ hurt / alarm ════════ */
 let alarm=0;
+function drawHearts(){
+  const m=maxHP(),h='❤'.repeat(Math.max(0,P.hp))+'🖤'.repeat(Math.max(0,m-P.hp));
+  $('#hearts').textContent=h;$('#dHearts').textContent=h;
+}
 function hurt(){
   if(P.inv>0)return;
   P.hp--;P.inv=1.5;shake=Math.max(shake,1);
   $('#dmg').style.opacity=.75;setTimeout(()=>$('#dmg').style.opacity=0,220);
   tone(110,.3,'sawtooth',.1,50);noise(.2,.14,700);
-  const h='❤'.repeat(Math.max(0,P.hp))+'🖤'.repeat(Math.max(0,3-P.hp));
-  $('#hearts').textContent=h;$('#dHearts').textContent=h;
+  drawHearts();
   if(P.hp<=0)gameOver();
 }
 
@@ -1321,7 +1511,7 @@ function stepRaid(dt){
 }
 /* --- car chase --- */
 const SEGL=44,NSEG=9,ROADW=19;
-let CS=null,ccam=null,drv=null,pool=null;
+let CS=null,ccam=null,drv=null,pool=null,CHOP=null;
 function killObj(g){CS.remove(g);g.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material)o.material.dispose()})}
 function mkSeg(i){
   const g=new THREE.Group();
@@ -1376,6 +1566,8 @@ function startDrive(){
   state='drive';document.body.dataset.ph='drive';
   if(locked)document.exitPointerLock();
   banner('🚗 דוושה למטה! חמקו מהניידות',3);chord([330,440,550],.3);
+  if(!CHOP){CHOP=mkHeliMesh();CS.add(CHOP)}
+  CHOP.visible=true;
   for(const p of pool.police)killObj(p.g);pool.police.length=0;
   for(const o of pool.obs)killObj(o.g);pool.obs.length=0;
   pool.segs.forEach((s,i)=>{s.position.z=-i*SEGL+SEGL});
@@ -1383,7 +1575,7 @@ function startDrive(){
        t:0,bumpCd:0,shake:0,spawnCd:1.4,obsCd:2.4,crash:0,scrT:0};
   pool.car.position.set(0,0,0);pool.car.rotation.set(0,0,0);
   /* הגעת למכונית – מתחילים את המרדף עם מלוא הלבבות */
-  P.hp=3;P.inv=0;$('#hearts').textContent='❤❤❤';$('#dHearts').textContent='❤❤❤';
+  P.hp=maxHP();P.inv=0;drawHearts();
   mdx=mdy=0;$('#timer').textContent='🚔 מרדף';
 }
 const rdc=$('#radar'),rdx=rdc.getContext('2d');
@@ -1456,6 +1648,19 @@ function stepDrive(dt){
       P.inv=0;hurt();if(state!=='drive')return;
     }
   }
+  /* ההליקופטר מרחף מעליך ומאיץ את קצב הניידות */
+  if(CHOP){
+    CHOP.position.set(D.x*.7+Math.sin(D.t*.7)*5, 15+Math.sin(D.t*1.3)*1.2, -16+Math.cos(D.t*.5)*5);
+    CHOP.rotation.y=Math.PI+Math.sin(D.t*.7)*.3;
+    CHOP.userData.rotor.rotation.y+=dt*34;
+    CHOP.userData.tail.rotation.x+=dt*40;
+    const hp2=Math.floor(D.t*9)%2;
+    CHOP.userData.l1.material.color.setHex(hp2?0xff2222:0x330808);
+    CHOP.userData.l2.material.color.setHex(hp2?0x08082a:0x2255ff);
+    const lit=Math.abs(CHOP.position.x-D.x)<6;
+    CHOP.userData.beam.material.opacity=lit?.3:.13;
+    if(lit)D.spawnCd-=dt*1.1;
+  }
   D.shake*=Math.pow(.015,dt);
   const sh=D.shake;
   ccam.position.set(D.x*.6+(Math.random()-.5)*sh*.9,4.7+(Math.random()-.5)*sh*.6,11.6);
@@ -1471,6 +1676,35 @@ function stepDrive(dt){
 /* ════════ state machine ════════ */
 let state='menu',timeLeft=120,playT=0,lastSec=-1,menuLvl=1;
 const BEST='heist3d_best';
+/* ── ארנק קבוע ושדרוגים ── */
+const SKEY='heist3d_save_v1';
+const UPG=[
+ {id:'vest',  ic:'🦺', n:'אפוד מגן',     d:'לב נוסף (עד 6)',            max:3, cost:l=>900+l*1100},
+ {id:'boots', ic:'👟', n:'נעלי ריצה',    d:'+12% מהירות',               max:3, cost:l=>700+l*900},
+ {id:'bag',   ic:'🎒', n:'תיק גדול',     d:'+18% מכל שלל',              max:3, cost:l=>1200+l*1500},
+ {id:'ham',   ic:'🔨', n:'פטיש כבד',     d:'+2 נזק לפטיש',              max:3, cost:l=>600+l*700},
+ {id:'dri',   ic:'🪛', n:'מקדח תעשייתי', d:'+0.8 נזק למקדח',            max:3, cost:l=>800+l*900},
+ {id:'ldet',  ic:'📡', n:'גלאי לייזרים', d:'מסמן לייזרים דרך קירות',    max:1, cost:()=>2600},
+ {id:'cscan', ic:'🛰️', n:'סורק מצלמות',  d:'מסמן מצלמות ומאט איתור',    max:1, cost:()=>3100},
+ {id:'code',  ic:'🧠', n:'מפענח קודים',  d:'ספרה אחת מהקוד מראש',       max:2, cost:l=>2200+l*2600},
+ {id:'damp',  ic:'🔇', n:'משתיק אזעקה',  d:'אזעקה עולה 10 ש׳ במקום 25', max:1, cost:()=>2900},
+ {id:'ammo',  ic:'🧨', n:'מחסן נפץ',     d:'+1 דינמיט ורקטה בכל שלב',   max:3, cost:l=>1500+l*1800}
+];
+let SAVE={bank:0,career:0,up:{},villaMax:1,bankMax:1};
+function loadSave(){
+  try{const o=JSON.parse(store.get(SKEY,'')||'{}');
+    SAVE.bank=+o.bank||0;SAVE.career=+o.career||0;SAVE.up=o.up||{};
+    SAVE.villaMax=+o.villaMax||1;SAVE.bankMax=+o.bankMax||1;
+  }catch(e){}
+}
+function saveNow(){try{store.set(SKEY,JSON.stringify(SAVE))}catch(e){}}
+const up=id=>SAVE.up[id]|0;
+const RANKS=[[0,'מתחיל 🐣'],[6000,'שולייה 🧤'],[20000,'פורץ 🧰'],[55000,'מקצוען 🎩'],
+             [120000,'אמן השוד 💎'],[260000,'אגדה 👑']];
+function rankName(){let r=RANKS[0][1];for(const [t,nm] of RANKS)if(SAVE.career>=t)r=nm;return r}
+function lootVal(v){return Math.round(v*(1+up('bag')*.18))}
+function maxHP(){return 3+up('vest')}
+loadSave();
 let best=+store.get(BEST,0)||0;$('#best').textContent=best;
 function setBest(){if(cash>best){best=cash;store.set(BEST,best);$('#best').textContent=best}}
 
@@ -1481,17 +1715,27 @@ function startLevel(n,m){
   for(const p of proj){if(p.mesh)scene.remove(p.mesh)}proj.length=0;
   parts.length=0;pMesh.count=0;clearItems();
   if(getaway){scene.remove(getaway);getaway=null}
+  killHeli();VILLA=null;
   if(mode==='mansion')genMansion(n);else{resetSec();genLevel(n)}
   cash=0;lootGot=0;
   P.x=startPos.x+.5;P.y=GY+1;P.z=startPos.z+.5;P.vx=P.vy=P.vz=0;
-  P.yaw=0;P.pitch=-.02;P.hp=3;P.inv=0;
+  P.yaw=0;P.pitch=-.02;P.hp=maxHP();P.inv=0;
   TOOLS[2].ammo=10+n*2;TOOLS[3].ammo=2+Math.floor(n/2);TOOLS[4].ammo=1+Math.floor(n/3);TOOLS[5].ammo=n>=3?1:0;
   if(mode==='mansion'){TOOLS[2].ammo=18;TOOLS[3].ammo=4;TOOLS[4].ammo=3;TOOLS[5].ammo=2}
+  TOOLS[4].ammo+=up('ammo');TOOLS[5].ammo+=up('ammo');
+  TOOLS[0].dmg=3+up('ham')*2;TOOLS[1].dmg=1.5+up('dri')*.8;
+  /* מפענח הקודים חושף ספרות מראש */
+  if(SEC.on&&up('code'))for(let i=0;i<up('code')&&i<SEC.code.length;i++){
+    SEC.found[i]=SEC.code[i];
+    const k=items.findIndex(it=>it.note===i);
+    if(k>=0){scene.remove(items[k].g);items.splice(k,1)}
+  }
+  if(SEC.on)showCode();
   tool=0;refreshHotbar();
-  lvlTime=(mode==='mansion'?210+n*10:110+n*12);timeLeft=lvlTime;playT=0;lastSec=-1;
+  lvlTime=(mode==='mansion'?(VILLA?VILLA.time:220):110+n*12);timeLeft=lvlTime;playT=0;lastSec=-1;
   alarm=0;cool=0;shake=0;
   $('#cash').textContent='💰 0';
-  $('#hearts').textContent='❤❤❤';$('#dHearts').textContent='❤❤❤';
+  drawHearts();
   $('#timer').textContent='⏱ '+lvlTime;$('#timer').classList.remove('urgent');
   state='play';
   if(!touchDev)cvEl.requestPointerLock&&cvEl.requestPointerLock().catch&&cvEl.requestPointerLock().catch(()=>{});
@@ -1500,8 +1744,8 @@ function stars(){const f=lootTotal?lootGot/lootTotal:0;return f>=.85?3:f>=.5?2:1
 function levelClear(){
   state='clear';sirenStop();if(locked)document.exitPointerLock();
   chord([880,1100,1320,1760],.5);
-  const s=stars();setBest();
-  const earn=Math.floor(cash/50)+s;
+  const s=stars();setBest();payout();
+  const earn=Math.floor(cash/140)+s;
   if(window.AG&&earn>0)AG.add(earn,s>=3?1:0);
   $('#clIcon').textContent='🌟';
   $('#clT').textContent='יצאת עם השלל!';
@@ -1512,8 +1756,8 @@ function levelClear(){
 function escaped(){
   state='clear';sirenStop();document.body.dataset.ph='fps';
   chord([660,880,1100,1320],.45);
-  const bonus=400+lvl*200;addCash(bonus);setBest();
-  const earn=Math.floor(cash/50)+2;
+  const bonus=150+lvl*25;addCash(bonus);setBest();payout();
+  const earn=Math.floor(cash/140)+2;
   if(window.AG)AG.add(earn,1);
   $('#clIcon').textContent='🚗💨';
   $('#clT').textContent='נמלטת מהמשטרה!';
@@ -1530,11 +1774,46 @@ function gameOver(){
   $('#ovS').textContent='💰 '+cash;
   $('#ovM').textContent='שלב '+lvl+(was==='drive'&&drv?' · '+Math.round(drv.dist)+' מ׳ מתוך '+drv.goal:'');
   setBest();
-  if(window.AG&&cash>0)AG.add(Math.floor(cash/60),0);
+  /* נתפסת – מאבדים חצי מהשלל */
+  cash=Math.floor(cash*.5);payout();
+  $('#ovM').textContent+=' · הצלחת להציל '+cash.toLocaleString('he')+' 💰';
+  if(window.AG&&cash>0)AG.add(Math.floor(cash/160),0);
   $('#over').classList.add('show');
 }
 function checkExit(){
   if(P.z>exitZ+1.5&&cash>0)levelClear();
+}
+
+/* ════════ חנות ════════ */
+function openShop(){renderShop();$('#shop').classList.add('show')}
+function renderShop(){
+  $('#shopWallet').innerHTML='בכיס: <b style="color:#ffd05a">'+SAVE.bank.toLocaleString('he')+' 💰</b> · דרגה: <b>'+rankName()+'</b>';
+  const L=$('#shopList');L.innerHTML='';
+  for(const u of UPG){
+    const lv=up(u.id),maxed=lv>=u.max,price=maxed?0:u.cost(lv);
+    const d=document.createElement('div');
+    d.className='sItem'+(maxed?' done':'');
+    d.innerHTML='<div class="ic">'+u.ic+'</div><div class="tx"><div class="nm">'+u.n+
+      ' <span class="lv">'+(u.max>1?lv+'/'+u.max:(maxed?'✓':''))+'</span></div><div class="ds">'+u.d+'</div></div>';
+    const btn=document.createElement('button');
+    if(maxed){btn.textContent='מקסימום';btn.disabled=true}
+    else{btn.textContent=price.toLocaleString('he')+' 💰';btn.disabled=SAVE.bank<price;
+      btn.addEventListener('pointerdown',e=>{e.preventDefault();buy(u,price)})}
+    d.appendChild(btn);L.appendChild(d);
+  }
+}
+function buy(u,price){
+  if(SAVE.bank<price)return;
+  SAVE.bank-=price;SAVE.up[u.id]=up(u.id)+1;saveNow();
+  chord([660,880,1100],.22);renderShop();refreshMenu();
+}
+function payout(){
+  const earned=cash;
+  SAVE.bank+=earned;SAVE.career+=earned;
+  if(mode==='mansion')SAVE.villaMax=Math.max(SAVE.villaMax,Math.min(120,lvl+1));
+  else SAVE.bankMax=Math.max(SAVE.bankMax,Math.min(12,lvl+1));
+  saveNow();refreshMenu();
+  return earned;
 }
 
 /* ════════ main loop ════════ */
@@ -1550,7 +1829,8 @@ function tick(dt){
   bobT+=Math.hypot(P.vx,P.vz)*dt*2.2;
   for(const g of guards)stepGuard(g,dt);
   stepProj(dt);stepItems(dt);
-  if(SEC.on){stepCams(dt);checkLasers();stepProx()}
+  if(SEC.on){stepCams(dt);checkLasers();stepProx();stepMarkers(dt)}
+  stepHeli(dt);
   if(state==='play'){
     playT+=dt;
     const sec=Math.floor(playT);
@@ -1596,17 +1876,32 @@ function frame(now){
 }
 
 /* ════════ menu ════════ */
-function lvlLabel(){$('#lvLbl').textContent='שלב '+menuLvl}
-$('#lvUp').onclick=()=>{menuLvl=Math.min(12,menuLvl+1);lvlLabel()};
-$('#lvDn').onclick=()=>{menuLvl=Math.max(1,menuLvl-1);lvlLabel()};
+let menuVilla=1;
+function refreshMenu(){
+  $('#lvLbl').textContent='בנק '+menuLvl;
+  $('#vLbl').textContent='בית '+menuVilla+' / 120';
+  $('#wBank').textContent=SAVE.bank.toLocaleString('he');
+  $('#wRank').textContent=rankName();
+}
+const lvlLabel=refreshMenu;
+$('#lvUp').onclick=()=>{menuLvl=Math.min(SAVE.bankMax,menuLvl+1);refreshMenu()};
+$('#lvDn').onclick=()=>{menuLvl=Math.max(1,menuLvl-1);refreshMenu()};
+$('#vUp').onclick=()=>{menuVilla=Math.min(SAVE.villaMax,menuVilla+1);refreshMenu()};
+$('#vDn').onclick=()=>{menuVilla=Math.max(1,menuVilla-1);refreshMenu()};
 $('#goBtn').onclick=()=>{ac();$('#menu').classList.remove('show');startLevel(menuLvl,'bank')};
-$('#villaBtn').onclick=()=>{ac();$('#menu').classList.remove('show');startLevel(menuLvl,'mansion')};
+$('#villaBtn').onclick=()=>{ac();$('#menu').classList.remove('show');startLevel(menuVilla,'mansion')};
+$('#shopBtn').onclick=()=>{ac();openShop()};
+$('#shopClose').onclick=()=>$('#shop').classList.remove('show');
+$('#clShop').onclick=()=>openShop();
+$('#ovShop').onclick=()=>openShop();
 $('#retry').onclick=()=>{$('#over').classList.remove('show');startLevel(lvl,mode)};
 $('#ovMenu').onclick=()=>{$('#over').classList.remove('show');state='menu';$('#menu').classList.add('show')};
-$('#nextBtn').onclick=()=>{$('#clear').classList.remove('show');if(mode==='mansion'){state='menu';$('#menu').classList.add('show');return}menuLvl=Math.min(12,lvl+1);lvlLabel();startLevel(menuLvl)};
+$('#nextBtn').onclick=()=>{$('#clear').classList.remove('show');
+  if(mode==='mansion'){menuVilla=Math.min(120,lvl+1);refreshMenu();startLevel(menuVilla,'mansion')}
+  else{menuLvl=Math.min(12,lvl+1);refreshMenu();startLevel(menuLvl,'bank')}};
 $('#clMenu').onclick=()=>{$('#clear').classList.remove('show');state='menu';$('#menu').classList.add('show')};
 
-buildHotbar();lvlLabel();resize();
+buildHotbar();refreshMenu();resize();
 genLevel(1);
 P.x=startPos.x+.5;P.z=startPos.z+.5;P.y=GY+1;P.yaw=0;
 requestAnimationFrame(frame);
