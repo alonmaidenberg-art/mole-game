@@ -5,7 +5,7 @@
 
 /* ── CONFIG ── */
 var DARK='#0a0620', NEON1='#ff3dff', NEON2='#00f5ff', GOLD='#ffd23f';
-var MIN_MS=1800; // minimum show time
+var MIN_MS=3800; // minimum show time
 
 /* ── CREATE OVERLAY ── */
 var ov=document.createElement('div');
@@ -138,6 +138,81 @@ function drawPhone(x,y,sc,glitch){
   ctx.restore();
 }
 
+function drawPingPong(x,y,sc){
+  ctx.save();ctx.translate(x,y);ctx.scale(sc,sc);
+  // paddle handle
+  ctx.beginPath();ctx.roundRect(-6,30,12,38,[4]);
+  ctx.fillStyle='#8B4513';ctx.fill();
+  // paddle blade (oval)
+  ctx.beginPath();ctx.ellipse(0,10,26,34,0,0,Math.PI*2);
+  var gr=ctx.createRadialGradient(-6,-8,2,0,0,32);
+  gr.addColorStop(0,'#ff6b6b');gr.addColorStop(1,'#c0392b');
+  ctx.fillStyle=gr;ctx.fill();
+  // blade shine
+  ctx.beginPath();ctx.ellipse(-8,-12,8,5,-.5,0,Math.PI*2);
+  ctx.fillStyle='rgba(255,255,255,.25)';ctx.fill();
+  // ball nearby
+  var bx=40+Math.sin(t*.18)*12;
+  var by=-20+Math.cos(t*.14)*10;
+  ctx.beginPath();ctx.arc(bx,by,10,0,Math.PI*2);ctx.fillStyle='#fff';ctx.fill();
+  ctx.beginPath();ctx.arc(bx-3,by-3,3,0,Math.PI*2);ctx.fillStyle='rgba(0,0,0,.12)';ctx.fill();
+  ctx.restore();
+}
+
+function drawBasketball(x,y,r){
+  ctx.save();ctx.translate(x,y);
+  var gr=ctx.createRadialGradient(-r*.3,-r*.3,r*.05,0,0,r);
+  gr.addColorStop(0,'#ff8c00');gr.addColorStop(.6,'#e65c00');gr.addColorStop(1,'#b34000');
+  ctx.beginPath();ctx.arc(0,0,r,0,Math.PI*2);ctx.fillStyle=gr;ctx.fill();
+  // seams
+  ctx.strokeStyle='#5a1a00';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.arc(0,0,r,0,Math.PI*2);ctx.stroke();
+  // vertical seam
+  ctx.beginPath();ctx.moveTo(0,-r);ctx.bezierCurveTo(r*.5,-r*.5,r*.5,r*.5,0,r);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(0,-r);ctx.bezierCurveTo(-r*.5,-r*.5,-r*.5,r*.5,0,r);ctx.stroke();
+  // horizontal seam
+  ctx.beginPath();ctx.arc(0,0,r,-Math.PI*.15,Math.PI*.15);ctx.stroke();
+  ctx.beginPath();ctx.arc(0,0,r,Math.PI-.15,Math.PI+.15);ctx.stroke();
+  // shine
+  ctx.beginPath();ctx.ellipse(-r*.28,-r*.32,r*.18,r*.1,-.6,0,Math.PI*2);
+  ctx.fillStyle='rgba(255,255,255,.28)';ctx.fill();
+  ctx.restore();
+}
+
+function drawPlaystation(x,y,sc){
+  ctx.save();ctx.translate(x,y);ctx.scale(sc,sc);
+  // body
+  ctx.beginPath();ctx.roundRect(-60,-28,120,56,[16]);
+  ctx.fillStyle='#1a1a2e';ctx.fill();
+  ctx.beginPath();ctx.roundRect(-60,-28,120,56,[16]);
+  ctx.strokeStyle='rgba(0,245,255,.4)';ctx.lineWidth=1.5;ctx.stroke();
+  // grips
+  ctx.beginPath();ctx.roundRect(-60,8,28,30,[0,0,10,10]);ctx.fillStyle='#111428';ctx.fill();
+  ctx.beginPath();ctx.roundRect(32,8,28,30,[0,0,10,10]);ctx.fillStyle='#111428';ctx.fill();
+  // left analog
+  ctx.beginPath();ctx.arc(-30,14,13,0,Math.PI*2);ctx.fillStyle='#222';ctx.fill();
+  ctx.beginPath();ctx.arc(-30,14,8,0,Math.PI*2);ctx.fillStyle='#333';ctx.fill();
+  // right analog
+  ctx.beginPath();ctx.arc(14,14,13,0,Math.PI*2);ctx.fillStyle='#222';ctx.fill();
+  ctx.beginPath();ctx.arc(14,14,8,0,Math.PI*2);ctx.fillStyle='#333';ctx.fill();
+  // d-pad (left)
+  [[-44,-10],[-44,2],[-52,-4],[-36,-4]].forEach(function(d){
+    ctx.beginPath();ctx.roundRect(d[0]-4,d[1]-4,8,8,[2]);ctx.fillStyle='#2a2a4a';ctx.fill();
+  });
+  // action buttons ×△○□
+  var btns=[{x:42,y:-4,c:'#2266cc'},{x:50,y:-12,c:'#cc2222'},{x:58,y:-4,c:'#22cc22'},{x:50,y:4,c:'#cc22cc'}];
+  btns.forEach(function(b){
+    ctx.beginPath();ctx.arc(b.x,b.y,6,0,Math.PI*2);ctx.fillStyle=b.c;ctx.fill();
+  });
+  // touchpad
+  ctx.beginPath();ctx.roundRect(-14,-16,28,16,[4]);ctx.fillStyle='#222';ctx.fill();
+  // PS button (center)
+  ctx.beginPath();ctx.arc(0,2,7,0,Math.PI*2);ctx.fillStyle='#4fc3f7';ctx.fill();
+  ctx.font='bold 7px system-ui';ctx.fillStyle='#fff';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText('PS',0,2);ctx.textBaseline='alphabetic';
+  ctx.restore();
+}
+
 function drawSpeedLines(x,y,facing){
   ctx.save();ctx.translate(x,y);
   var dir=facing<0?1:-1;
@@ -173,50 +248,70 @@ function frame(){
     ctx.globalAlpha=1;
   });
 
-  // scene y = bottom ground
-  var ground=H-50;
-  // ground line
-  ctx.beginPath();ctx.moveTo(0,ground);ctx.lineTo(W,ground);
-  ctx.strokeStyle='rgba(255,255,255,.08)';ctx.lineWidth=1;ctx.stroke();
+  // two rows of items
+  var row1=H*.30, row2=H*.72;
 
-  // PAC-MAN running (leads)
-  var pax=((t*3.2)%(W+100))-40;
-  var pay=ground-32;
-  drawDots(60,pay+5,8);
-  drawPacman(pax,pay,.55);
-
-  // DOTS eaten by pacman trail
-  // CAR racing behind pacman
-  var carX=((t*2.4+140)%(W+180))-120;
-  drawSpeedLines(carX-50,ground-50,1);
-  drawCar(carX,ground-30,.48,false);
-
-  // BOWLING BALL rolling on ground
-  var ballX=((t*1.6+320)%(W+100))-50;
-  var ballBounce=Math.abs(Math.sin(t*.08))*12;
-  var ballRot=t*.05;
-  ctx.save();ctx.translate(ballX,ground-28-ballBounce);
-  ctx.rotate(ballRot);
-  drawBowlingBall(0,0,.5);
-  ctx.restore();
-
-  // PHONE floating / glitching at top
-  var phoneX=W*.72+Math.sin(t*.04)*8;
-  var phoneY=H*.35+Math.sin(t*.06)*6;
+  // ROW 1: Phone(left) + Ping Pong(mid) + PlayStation(right)  — floating
+  // PHONE (left, glitching)
+  var phoneX=W*.14+Math.sin(t*.04)*7;
+  var phoneY=row1+Math.sin(t*.06)*5;
   var glitching=Math.sin(t*.11)>.7;
   if(glitching){
-    // glitch color strips
-    ctx.save();ctx.fillStyle=NEON1;ctx.globalAlpha=.15;
-    ctx.fillRect(phoneX-60,phoneY-20,120,8);
-    ctx.fillStyle=NEON2;
-    ctx.fillRect(phoneX-60,phoneY+4,100,5);
+    ctx.save();ctx.fillStyle=NEON1;ctx.globalAlpha=.13;
+    ctx.fillRect(phoneX-50,phoneY-18,100,7);
+    ctx.fillStyle=NEON2;ctx.fillRect(phoneX-50,phoneY+2,80,5);
     ctx.globalAlpha=1;ctx.restore();
   }
-  drawPhone(phoneX,phoneY,.75,glitching);
+  drawPhone(phoneX,phoneY,.78,glitching);
+  ctx.font='bold 11px system-ui';ctx.fillStyle='rgba(255,61,255,.85)';ctx.textAlign='center';
+  ctx.fillText('BOSS MODE',phoneX,phoneY+72);
 
-  // phone label
-  ctx.font='bold 11px system-ui';ctx.fillStyle='rgba(255,61,255,.8)';ctx.textAlign='center';
-  ctx.fillText('BOSS MODE',phoneX,phoneY+78);
+  // PING PONG (center top, bobbing + spinning)
+  var ppX=W*.5;
+  var ppY=row1+Math.sin(t*.07)*8;
+  ctx.save();ctx.translate(ppX,ppY);ctx.rotate(Math.sin(t*.05)*.35);
+  drawPingPong(0,0,.95);ctx.restore();
+  ctx.font='bold 11px system-ui';ctx.fillStyle='rgba(0,245,255,.8)';ctx.textAlign='center';
+  ctx.fillText('פינג פונג',ppX,ppY+76);
+
+  // PLAYSTATION (right, floating)
+  var psX=W*.86+Math.sin(t*.05)*6;
+  var psY=row1+Math.cos(t*.07)*6;
+  drawPlaystation(psX,psY,.82);
+  ctx.font='bold 11px system-ui';ctx.fillStyle='rgba(79,195,247,.9)';ctx.textAlign='center';
+  ctx.fillText('🎮 שלט',psX,psY+44);
+
+  // ROW 2: ground line
+  ctx.beginPath();ctx.moveTo(0,row2+6);ctx.lineTo(W,row2+6);
+  ctx.strokeStyle='rgba(255,255,255,.07)';ctx.lineWidth=1;ctx.stroke();
+
+  // PAC-MAN running
+  var pax=((t*3.0)%(W+120))-50;
+  var pay=row2-30;
+  drawDots(60,pay+5,9);
+  drawPacman(pax,pay,.52);
+
+  // CAR racing
+  var carX=((t*2.2+180)%(W+200))-130;
+  drawSpeedLines(carX-50,row2-48,1);
+  drawCar(carX,row2-28,.46,false);
+
+  // BASKETBALL bouncing
+  var bkX=((t*1.4+400)%(W+120))-60;
+  var bkBounce=Math.abs(Math.sin(t*.14))*40;
+  var bkRot=t*.06;
+  ctx.save();ctx.translate(bkX,row2-20-bkBounce);ctx.rotate(bkRot);
+  drawBasketball(0,0,20);ctx.restore();
+  // squish shadow on ground
+  var sqsh=1-bkBounce/40*.6;
+  ctx.save();ctx.translate(bkX,row2-2);ctx.scale(sqsh,.3);
+  ctx.beginPath();ctx.arc(0,0,20,0,Math.PI*2);ctx.fillStyle='rgba(0,0,0,.18)';ctx.fill();ctx.restore();
+
+  // BOWLING BALL rolling
+  var bowlX=((t*1.8+600)%(W+120))-60;
+  var bowlBounce=Math.abs(Math.sin(t*.08))*10;
+  ctx.save();ctx.translate(bowlX,row2-26-bowlBounce);ctx.rotate(t*.05);
+  drawBowlingBall(0,0,.48);ctx.restore();
 
   // neon glow on title area
   var grd=ctx.createLinearGradient(0,0,W,0);
