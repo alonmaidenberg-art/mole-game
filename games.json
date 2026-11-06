@@ -1,700 +1,708 @@
 [
-  {
-    "id": "mole",
-    "name": "תפוס את החפרפרת",
-    "description": "לחצו על החפרפרות לפני שהן נעלמות. ארבעה עולמות, פצצות, קסדות ואירועים נדירים.",
-    "url": "mole/",
-    "icon": "mole/icons/icon-192.png",
-    "tag": "ארקייד"
-  },
-  {
-    "id": "basketball",
-    "name": "כדורסל 1 על 1",
-    "description": "20 קבוצות NBA, 15 שחקנים בכל קבוצה. נגד המחשב, שני שחקנים או טורניר.",
-    "url": "basketball/",
-    "icon": "basketball/icons/icon-192.png",
-    "tag": "ספורט"
-  },
-  {
-    "id": "impostor",
-    "name": "אימפוסטר",
-    "description": "משחק חברה לטלפון אחד: כולם מקבלים אותה מילה חוץ מהאימפוסטר. מי מסתתר בינינו?",
-    "url": "impostor/",
-    "icon": "impostor/icons/icon-192.png",
-    "tag": "חברה",
-    "noteTitle": "📱 עדיף לשחק בטלפון",
-    "note": "האימפוסטר הוא משחק שמעבירים מיד ליד: כל שחקן רואה את המילה שלו בסתר ואז מעבירים את הטלפון הלאה. לכן הרבה יותר כיף לשחק אותו על טלפון עם חברים. אפשר להמשיך גם מהמחשב."
-  },
-  {
-    "id": "chess",
-    "name": "שחמט",
-    "description": "שחמט מלא נגד המחשב ב-4 רמות או שני שחקנים. הצרחה, אן-פסאן והמרה.",
-    "url": "chess/",
-    "icon": "chess/icons/icon-192.png",
-    "tag": "אסטרטגיה"
-  },
-  {
-    "id": "englishbot",
-    "name": "EnglishBot",
-    "description": "משחקים ללימוד אנגלית: תרגום, הפכים, זיכרון, וורדל, איש תלוי ועוד. עם XP ורמות.",
-    "url": "englishbot/",
-    "icon": "englishbot/icons/icon-192.png",
-    "tag": "לימוד"
-  },
-  {
-    "id": "tictactoe",
-    "name": "איקס עיגול",
-    "description": "נגד המחשב (גם בלתי מנוצח) או נגד חבר. ניקוד וסיבובים.",
-    "url": "tictactoe/",
-    "icon": "tictactoe/icons/icon-192.png",
-    "tag": "פשוט"
-  },
-  {
-    "id": "snake",
-    "name": "נחש",
-    "description": "אוכלים תפוחים וגדלים. שלוש מהירויות, קירות או מעבר דרך הקירות.",
-    "url": "snake/",
-    "icon": "snake/icons/icon-192.png",
-    "tag": "ארקייד"
-  },
-  {
-    "id": "game2048",
-    "name": "2048",
-    "description": "חברו אריחים זהים והגיעו ל-2048. החלקה, ביטול מהלך ושיא.",
-    "url": "game2048/",
-    "icon": "game2048/icons/icon-192.png",
-    "tag": "חשיבה"
-  },
-  {
-    "id": "memory",
-    "name": "זיכרון",
-    "description": "מוצאים זוגות. שלושה גדלים וארבעה נושאים.",
-    "url": "memory/",
-    "icon": "memory/icons/icon-192.png",
-    "tag": "חשיבה"
-  },
-  {
-    "id": "blocks",
-    "name": "בלוקים",
-    "description": "חפרו, בנו וחקרו עולם בלוקים משלכם. יצירתי או הישרדות, יום ולילה.",
-    "url": "blocks/",
-    "icon": "blocks/icons/icon-192.png",
-    "tag": "יצירה"
-  },
-  {
-    "id": "connect4",
-    "name": "4 בשורה",
-    "description": "מלכדים 4 בשורה מול המחשב או חבר",
-    "url": "connect4/",
-    "icon": "connect4/icons/icon-192.png",
-    "tag": "משחק לשניים"
-  },
-  {
-    "id": "minesweeper",
-    "name": "שולה מוקשים",
-    "description": "מוצאים את כל המוקשים בלי להתפוצץ",
-    "url": "minesweeper/",
-    "icon": "minesweeper/icons/icon-192.png",
-    "tag": "חשיבה"
-  },
-  {
-    "id": "fallingblocks",
-    "name": "בלוקים נופלים",
-    "description": "מסדרים צורות ומנקים שורות",
-    "url": "fallingblocks/",
-    "icon": "fallingblocks/icons/icon-192.png",
-    "tag": "קלאסי"
-  },
-  {
-    "id": "flappy",
-    "name": "ציפור מעופפת",
-    "description": "מעופפים בין הצינורות",
-    "url": "flappy/",
-    "icon": "flappy/icons/icon-192.png",
-    "tag": "רפלקסים"
-  },
-  {
-    "id": "hangman",
-    "name": "איש תלוי",
-    "description": "מנחשים מילה בעברית אות אחרי אות",
-    "url": "hangman/",
-    "icon": "hangman/icons/icon-192.png",
-    "tag": "מילים"
-  },
-  {
-    "id": "superhoops",
-    "name": "סופר בסקטבול 3D",
-    "description": "כדורסל תלת-ממדי: סלים ענקיים, עצים לטיפוס, קפיצות, דודג׳ים, סופרמן וכוחות על",
-    "url": "superhoops/",
-    "icon": "superhoops/icons/icon-192.png",
-    "tag": "אקשן"
-  },
-  {
-    "id": "superfootball",
-    "name": "סופר כדורגל 3D",
-    "description": "כדורגל תלת-ממדי: שערים ענקיים, קפיצות, דודג׳ים, סופרמן וכוחות על",
-    "url": "superfootball/",
-    "icon": "superfootball/icons/icon-192.png",
-    "tag": "אקשן"
-  },
-  {
-    "id": "football",
-    "name": "כדורגל",
-    "description": "20 נבחרות, 160 שחקנים, חנות כוחות ומטבעות",
-    "url": "football/",
-    "icon": "football/icons/icon-192.png",
-    "tag": "ספורט"
-  },
-  {
-    "id": "fighter",
-    "name": "קרב רחוב",
-    "description": "4 דמויות, מהלך מיוחד, נגד מחשב או שניים",
-    "url": "fighter/",
-    "icon": "fighter/icons/icon-192.png",
-    "tag": "לחימה"
-  },
-  {
-    "id": "crossy",
-    "name": "חוצה כבישים",
-    "description": "חצו כבישים, נהרות ומסילות בלי להיפגע",
-    "url": "crossy/",
-    "icon": "crossy/icons/icon-192.png",
-    "tag": "הרפתקה"
-  },
-  {
-    "id": "racer",
-    "name": "מירוץ כביש",
-    "description": "מירוץ שמאיץ לאט לאט, אספו מטבעות",
-    "url": "racer/",
-    "icon": "racer/icons/icon-192.png",
-    "tag": "מירוץ"
-  },
-  {
-    "id": "hockey",
-    "name": "הוקי אוויר",
-    "description": "הוקי אוויר נגד מחשב או חבר",
-    "url": "hockey/",
-    "icon": "hockey/icons/icon-192.png",
-    "tag": "ספורט"
-  },
-  {
-    "id": "space",
-    "name": "קרב בחלל",
-    "description": "ירו באויבים, אספו כוחות ונצחו בוסים",
-    "url": "space/",
-    "icon": "space/icons/icon-192.png",
-    "tag": "ירי"
-  },
-  {
-    "id": "runner3d",
-    "name": "ריצה 3D",
-    "description": "ריצה תלת-ממדית: קפיצה, החלקה ומטבעות",
-    "url": "runner3d/",
-    "icon": "runner3d/icons/icon-192.png",
-    "tag": "3D"
-  },
-  {
-    "id": "stack3d",
-    "name": "מגדל 3D",
-    "description": "בנו מגדל גבוה בלי להחמיץ",
-    "url": "stack3d/",
-    "icon": "stack3d/icons/icon-192.png",
-    "tag": "3D"
-  },
-  {
-    "id": "tanks3d",
-    "name": "קרב טנקים 3D",
-    "description": "קרב טנקים תלת-ממדי מול גלי אויבים",
-    "url": "tanks3d/",
-    "icon": "tanks3d/icons/icon-192.png",
-    "tag": "3D"
-  },
-  {
-    "id": "snooker",
-    "name": "סנוקר",
-    "description": "סנוקר נגד מחשב או חבר",
-    "url": "snooker/",
-    "icon": "snooker/icons/icon-192.png",
-    "tag": "ספורט"
-  },
-  {
-    "id": "bubbles",
-    "name": "פופ בועות",
-    "description": "פוצצו בועות צבעוניות",
-    "url": "bubbles/",
-    "icon": "bubbles/icons/icon-192.png",
-    "tag": "פאזל"
-  },
-  {
-    "id": "race3d",
-    "name": "מירוץ 3D",
-    "description": "מירוץ מכוניות תלת-ממדי מול 3 יריבים",
-    "url": "race3d/",
-    "icon": "race3d/icons/icon-192.png",
-    "tag": "3D"
-  },
-  {
-    "id": "flight3d",
-    "name": "טיסה 3D",
-    "description": "טיסה דרך טבעות זהב והרים",
-    "url": "flight3d/",
-    "icon": "flight3d/icons/icon-192.png",
-    "tag": "3D"
-  },
-  {
-    "id": "parkour3d",
-    "name": "פארקור 3D",
-    "description": "קפיצות בין פלטפורמות עם קפיצה כפולה",
-    "url": "parkour3d/",
-    "icon": "parkour3d/icons/icon-192.png",
-    "tag": "3D"
-  },
-  {
-    "id": "golf3d",
-    "name": "מיני גולף 3D",
-    "description": "מיני גולף עם 6 מסלולים",
-    "url": "golf3d/",
-    "icon": "golf3d/icons/icon-192.png",
-    "tag": "3D"
-  },
-  {
-    "id": "bowling3d",
-    "name": "באולינג 3D",
-    "description": "באולינג עם 10 סיבובים וסטרייקים",
-    "url": "bowling3d/",
-    "icon": "bowling3d/icons/icon-192.png",
-    "tag": "3D"
-  },
-  {
-    "id": "pong",
-    "name": "פונג",
-    "description": "פונג נגד המחשב עד 7 נקודות",
-    "url": "pong/",
-    "icon": "pong/icons/icon-192.png",
-    "tag": "ארקייד"
-  },
-  {
-    "id": "breakout",
-    "name": "שוברי לבנים",
-    "description": "שברו את כל הלבנים",
-    "url": "breakout/",
-    "icon": "breakout/icons/icon-192.png",
-    "tag": "ארקייד"
-  },
-  {
-    "id": "dino",
-    "name": "ריצת דינוזאור",
-    "description": "קפצו מעל קקטוסים והתכופפו מתחת לציפורים",
-    "url": "dino/",
-    "icon": "dino/icons/icon-192.png",
-    "tag": "ארקייד"
-  },
-  {
-    "id": "jumper",
-    "name": "קפצן",
-    "description": "קפצו כמה שיותר גבוה",
-    "url": "jumper/",
-    "icon": "jumper/icons/icon-192.png",
-    "tag": "ארקייד"
-  },
-  {
-    "id": "maze",
-    "name": "בולעים",
-    "description": "אכלו את כל הנקודות והתחמקו מרוחות",
-    "url": "maze/",
-    "icon": "maze/icons/icon-192.png",
-    "tag": "ארקייד"
-  },
-  {
-    "id": "simon",
-    "name": "סיימון",
-    "description": "זכרו את רצף הצבעים",
-    "url": "simon/",
-    "icon": "simon/icons/icon-192.png",
-    "tag": "זיכרון"
-  },
-  {
-    "id": "reaction",
-    "name": "מהירות תגובה",
-    "description": "לחצו כשהמסך הופך לירוק",
-    "url": "reaction/",
-    "icon": "reaction/icons/icon-192.png",
-    "tag": "רפלקסים"
-  },
-  {
-    "id": "mastermind",
-    "name": "מאסטרמיינד",
-    "description": "נחשו את קוד הצבעים",
-    "url": "mastermind/",
-    "icon": "mastermind/icons/icon-192.png",
-    "tag": "חשיבה"
-  },
-  {
-    "id": "lights",
-    "name": "כבו את האורות",
-    "description": "כבו את כל האורות",
-    "url": "lights/",
-    "icon": "lights/icons/icon-192.png",
-    "tag": "חשיבה"
-  },
-  {
-    "id": "slide",
-    "name": "פאזל מספרים",
-    "description": "סדרו את המספרים לפי הסדר",
-    "url": "slide/",
-    "icon": "slide/icons/icon-192.png",
-    "tag": "חשיבה"
-  },
-  {
-    "id": "colors",
-    "name": "צבע או מילה",
-    "description": "לחצו על הצבע שבו המילה כתובה",
-    "url": "colors/",
-    "icon": "colors/icons/icon-192.png",
-    "tag": "רפלקסים"
-  },
-  {
-    "id": "clicker",
-    "name": "קליקר מטבעות",
-    "description": "לחצו, שדרגו והרוויחו מטבעות",
-    "url": "clicker/",
-    "icon": "clicker/icons/icon-192.png",
-    "tag": "ארקייד"
-  },
-  {
-    "id": "asteroids",
-    "name": "אסטרואידים",
-    "description": "שברו אסטרואידים בחלל",
-    "url": "asteroids/",
-    "icon": "asteroids/icons/icon-192.png",
-    "tag": "ירי"
-  },
-  {
-    "id": "gallery",
-    "name": "קליעה למטרה",
-    "description": "פגעו במטרות והימנעו מפצצות",
-    "url": "gallery/",
-    "icon": "gallery/icons/icon-192.png",
-    "tag": "רפלקסים"
-  },
-  {
-    "id": "dodge",
-    "name": "התחמקות",
-    "description": "התחמקו מחפצים נופלים ואספו מטבעות",
-    "url": "dodge/",
-    "icon": "dodge/icons/icon-192.png",
-    "tag": "ארקייד"
-  },
-  {
-    "id": "boss",
-    "name": "שלבי בוס: הגליץ׳",
-    "description": "20 שלבי בוס: מצילים את המשחקים מגליץ׳ (נפתח אחרי 20 משחקים)",
-    "url": "boss/",
-    "icon": "boss/icons/icon-192.png",
-    "tag": "בוס"
-  },
-  {
-    "id": "fruit",
-    "name": "חותך פירות",
-    "description": "החליקו על המסך וחתכו פירות. אל תיגעו בפצצות!",
-    "url": "fruit/",
-    "icon": "fruit/icons/icon-192.png",
-    "tag": "רפלקסים"
-  },
-  {
-    "id": "invaders",
-    "name": "פולשים מהחלל",
-    "description": "הגנו על כדור הארץ מגלי חייזרים.",
-    "url": "invaders/",
-    "icon": "invaders/icons/icon-192.png",
-    "tag": "ירי"
-  },
-  {
-    "id": "missile",
-    "name": "הגנת ערים",
-    "description": "יירטו טילים לפני שיפגעו בערים.",
-    "url": "missile/",
-    "icon": "missile/icons/icon-192.png",
-    "tag": "אסטרטגיה"
-  },
-  {
-    "id": "cannon",
-    "name": "תותח",
-    "description": "כוונו את התותח והפילו את כל המטרות.",
-    "url": "cannon/",
-    "icon": "cannon/icons/icon-192.png",
-    "tag": "חשיבה"
-  },
-  {
-    "id": "balloons",
-    "name": "פוצצו בלונים",
-    "description": "פוצצו בלונים וקבלו בונוסים.",
-    "url": "balloons/",
-    "icon": "balloons/icons/icon-192.png",
-    "tag": "פשוט"
-  },
-  {
-    "id": "pachinko",
-    "name": "פלינקו",
-    "description": "הפילו כדורים בין הנעצים ופגעו בניקוד הגבוה.",
-    "url": "pachinko/",
-    "icon": "pachinko/icons/icon-192.png",
-    "tag": "ארקייד"
-  },
-  {
-    "id": "fishing",
-    "name": "דיג",
-    "description": "הורידו חכה ותפסו דגים עמוקים.",
-    "url": "fishing/",
-    "icon": "fishing/icons/icon-192.png",
-    "tag": "פשוט"
-  },
-  {
-    "id": "rhythm",
-    "name": "קצב",
-    "description": "לחצו על הנוטות בקצב הנכון וצברו קומבו.",
-    "url": "rhythm/",
-    "icon": "rhythm/icons/icon-192.png",
-    "tag": "רפלקסים"
-  },
-  {
-    "id": "sort",
-    "name": "מיון צבעים",
-    "description": "מיינו כדורים נופלים לתא בצבע הנכון.",
-    "url": "sort/",
-    "icon": "sort/icons/icon-192.png",
-    "tag": "רפלקסים"
-  },
-  {
-    "id": "zigzag",
-    "name": "זיגזג",
-    "description": "הכדור נע באלכסון, החליפו כיוון בזמן.",
-    "url": "zigzag/",
-    "icon": "zigzag/icons/icon-192.png",
-    "tag": "רפלקסים"
-  },
-  {
-    "id": "orbit",
-    "name": "מסלול",
-    "description": "שחררו את החללית ותפסו את כוכב הלכת הבא.",
-    "url": "orbit/",
-    "icon": "orbit/icons/icon-192.png",
-    "tag": "חשיבה"
-  },
-  {
-    "id": "pendulum",
-    "name": "נדנדה",
-    "description": "התנדנדו בחבל ועברו כמה שיותר רחוק.",
-    "url": "pendulum/",
-    "icon": "pendulum/icons/icon-192.png",
-    "tag": "אקשן"
-  },
-  {
-    "id": "math",
-    "name": "מהר חשבון",
-    "description": "פתרו כמה שיותר תרגילי חשבון בזמן.",
-    "url": "math/",
-    "icon": "math/icons/icon-192.png",
-    "tag": "לימוד"
-  },
-  {
-    "id": "colorswitch",
-    "name": "קפיצת צבעים",
-    "description": "קפצו דרך טבעות והתאימו צבע.",
-    "url": "colorswitch/",
-    "icon": "colorswitch/icons/icon-192.png",
-    "tag": "רפלקסים"
-  },
-  {
-    "id": "balance",
-    "name": "איזון",
-    "description": "הטו את הקרש ושמרו על הכדור.",
-    "url": "balance/",
-    "icon": "balance/icons/icon-192.png",
-    "tag": "חשיבה"
-  },
-  {
-    "id": "mergefruit",
-    "name": "איחוד פירות",
-    "description": "הפילו פירות ואחדו זוגות זהים עד שתגיעו לאבטיח.",
-    "url": "mergefruit/",
-    "icon": "mergefruit/icons/icon-192.png",
-    "tag": "פאזל"
-  },
-  {
-    "id": "blackhole",
-    "name": "חור שחור",
-    "description": "בלעו כל מה שקטן מכם – וגדלו!",
-    "url": "blackhole/",
-    "icon": "blackhole/icons/icon-192.png",
-    "tag": "ארקייד"
-  },
-  {
-    "id": "tubesort",
-    "name": "מיון צינורות",
-    "description": "סדרו את הצבעים כך שכל צינור יהיה בצבע אחד.",
-    "url": "tubesort/",
-    "icon": "tubesort/icons/icon-192.png",
-    "tag": "חשיבה"
-  },
-  {
-    "id": "roundabout",
-    "name": "כיכר התנועה",
-    "description": "שלחו מכוניות לכיכר בזמן הנכון ואל תתנגשו.",
-    "url": "roundabout/",
-    "icon": "roundabout/icons/icon-192.png",
-    "tag": "חשיבה"
-  },
-  {
-    "id": "redgreen",
-    "name": "אור אדום, אור ירוק",
-    "description": "רוצו כשהאור ירוק – ועצרו כשהוא אדום.",
-    "url": "redgreen/",
-    "icon": "redgreen/icons/icon-192.png",
-    "tag": "רפלקסים"
-  },
-  {
-    "id": "stackup",
-    "name": "מגדל גבוה",
-    "description": "עצרו כל קרש מעל הקודם ובנו מגדל גבוה.",
-    "url": "stackup/",
-    "icon": "stackup/icons/icon-192.png",
-    "tag": "רפלקסים"
-  },
-  {
-    "id": "meteors",
-    "name": "גשם מטאורים",
-    "description": "התחמקו מהסלעים ואספו כוכבים.",
-    "url": "meteors/",
-    "icon": "meteors/icons/icon-192.png",
-    "tag": "ארקייד"
-  },
-  {
-    "id": "cookies",
-    "name": "מפעל עוגיות",
-    "description": "לחצו על העוגייה, קנו שדרוגים ואספו כמה שיותר.",
-    "url": "cookies/",
-    "icon": "cookies/icons/icon-192.png",
-    "tag": "פשוט"
-  },
-  {
-    "id": "lanes",
-    "name": "שלושה נתיבים",
-    "description": "רוצו בין שלושה נתיבים והתחמקו ממכשולים.",
-    "url": "lanes/",
-    "icon": "lanes/icons/icon-192.png",
-    "tag": "ארקייד"
-  },
-  {
-    "id": "whack",
-    "name": "פוגעים בבועות",
-    "description": "לחצו על המטרות לפני שהן נעלמות.",
-    "url": "whack/",
-    "icon": "whack/icons/icon-192.png",
-    "tag": "רפלקסים"
-  },
-  {
-    "id": "agar",
-    "name": "אכלו ותגדלו",
-    "description": "אכלו נקודות ועיגולים קטנים וברחו מהגדולים.",
-    "url": "agar/",
-    "icon": "agar/icons/icon-192.png",
-    "tag": "אסטרטגיה"
-  },
-  {
-    "id": "bricksmash",
-    "name": "שובר לבנים",
-    "description": "שברו את כל הלבנים עם הכדור.",
-    "url": "bricksmash/",
-    "icon": "bricksmash/icons/icon-192.png",
-    "tag": "קלאסי"
-  },
-  {
-    "id": "froghop",
-    "name": "צפרדע קופצת",
-    "description": "הצפרדע קופצת מפלטפורמה לפלטפורמה – כמה גבוה תגיעו?",
-    "url": "froghop/",
-    "icon": "froghop/icons/icon-192.png",
-    "tag": "ארקייד"
-  },
-  {
-    "id": "tabletennis",
-    "name": "טניס שולחן",
-    "description": "נצחו את המחשב בטניס שולחן.",
-    "url": "tabletennis/",
-    "icon": "tabletennis/icons/icon-192.png",
-    "tag": "קלאסי"
-  },
-  {
-    "id": "colormemory",
-    "name": "זיכרון צבעים",
-    "description": "חזרו על רצף האורות שהמשחק מציג.",
-    "url": "colormemory/",
-    "icon": "colormemory/icons/icon-192.png",
-    "tag": "זיכרון"
-  },
-  {
-    "id": "sneakylevels",
-    "name": "מסדרון הפתעות",
-    "description": "150 שלבים ערמומיים – שום דבר הוא לא מה שהוא נראה.",
-    "url": "sneakylevels/",
-    "icon": "sneakylevels/icons/icon-192.png",
-    "tag": "אקשן"
-  },
-  {
-    "id": "munchmaze",
-    "name": "מבוך הנשנשן",
-    "description": "אספו את כל הגבישים במבוך והימנעו מהבאגים.",
-    "url": "munchmaze/",
-    "icon": "munchmaze/icons/icon-192.png",
-    "tag": "ארקייד"
-  },
-  {
-    "id": "hoops3",
-    "name": "כדורסל 3 על 3",
-    "description": "כדורסל 3 על 3 נגד המחשב – מסירות, זריקות ושלשות.",
-    "url": "hoops3/",
-    "icon": "hoops3/icons/icon-192.png",
-    "tag": "ספורט"
-  },
-  {
-    "id": "wormio",
-    "name": "נחש נגד תולעים",
-    "description": "זירה ענקית עם תולעים צבעוניות: אכלו נקודות אור, גדלו, האיצו ואל תיפגעו בגוף של האחרות.",
-    "url": "wormio/",
-    "icon": "wormio/icons/icon-192.png",
-    "tag": "ארקייד"
-  },
-  {
-    "id": "wave",
-    "name": "גל",
-    "description": "אתה גל בים — בלע גלים קטנים, גדל, והימנע מגלים גדולים!",
-    "url": "wave/",
-    "icon": "wave/icons/icon-192.png",
-    "tag": "ארקייד"
-  },
-  {
-    "id": "wire",
-    "name": "חוט",
-    "description": "הובל את החוט המתקצר מ-A ל-B — בלי לגעת בקירות!",
-    "url": "wire/",
-    "icon": "wire/icons/icon-192.png",
-    "tag": "אתגר"
-  },
-  {
-    "id": "roles",
-    "name": "תפקידים",
-    "description": "כל סיבוב — תפקיד אחר עם יכולת מיוחדת! ספורטאי, גנב, קוסם ועוד",
-    "url": "roles/",
-    "icon": "roles/icons/icon-192.png",
-    "tag": "אסטרטגיה"
-  },
-  {
-    "id": "heist3d",
-    "name": "שוברים את הבנק",
-    "description": "פורצים לבנק בתלת-ממד! שוברים קירות, פוצחים כספות וגונבים כסף – לפני שמגיעים השומרים.",
-    "url": "heist3d/",
-    "icon": "heist3d/icons/icon-192.png",
-    "tag": "3D"
-  }
+ {
+  "id": "mole",
+  "name": "תפוס את החפרפרת",
+  "description": "לחצו על החפרפרות לפני שהן נעלמות. ארבעה עולמות, פצצות, קסדות ואירועים נדירים.",
+  "url": "mole/",
+  "icon": "mole/icons/icon-192.png",
+  "tag": "ארקייד"
+ },
+ {
+  "id": "basketball",
+  "name": "כדורסל 1 על 1",
+  "description": "20 קבוצות NBA, 15 שחקנים בכל קבוצה. נגד המחשב, שני שחקנים או טורניר.",
+  "url": "basketball/",
+  "icon": "basketball/icons/icon-192.png",
+  "tag": "ספורט"
+ },
+ {
+  "id": "impostor",
+  "name": "אימפוסטר",
+  "description": "משחק חברה לטלפון אחד: כולם מקבלים אותה מילה חוץ מהאימפוסטר. מי מסתתר בינינו?",
+  "url": "impostor/",
+  "icon": "impostor/icons/icon-192.png",
+  "tag": "חברה",
+  "noteTitle": "📱 עדיף לשחק בטלפון",
+  "note": "האימפוסטר הוא משחק שמעבירים מיד ליד: כל שחקן רואה את המילה שלו בסתר ואז מעבירים את הטלפון הלאה. לכן הרבה יותר כיף לשחק אותו על טלפון עם חברים. אפשר להמשיך גם מהמחשב."
+ },
+ {
+  "id": "chess",
+  "name": "שחמט",
+  "description": "שחמט מלא נגד המחשב ב-4 רמות או שני שחקנים. הצרחה, אן-פסאן והמרה.",
+  "url": "chess/",
+  "icon": "chess/icons/icon-192.png",
+  "tag": "אסטרטגיה"
+ },
+ {
+  "id": "englishbot",
+  "name": "EnglishBot",
+  "description": "משחקים ללימוד אנגלית: תרגום, הפכים, זיכרון, וורדל, איש תלוי ועוד. עם XP ורמות.",
+  "url": "englishbot/",
+  "icon": "englishbot/icons/icon-192.png",
+  "tag": "לימוד"
+ },
+ {
+  "id": "tictactoe",
+  "name": "איקס עיגול",
+  "description": "נגד המחשב (גם בלתי מנוצח) או נגד חבר. ניקוד וסיבובים.",
+  "url": "tictactoe/",
+  "icon": "tictactoe/icons/icon-192.png",
+  "tag": "פשוט"
+ },
+ {
+  "id": "snake",
+  "name": "נחש",
+  "description": "אוכלים תפוחים וגדלים. שלוש מהירויות, קירות או מעבר דרך הקירות.",
+  "url": "snake/",
+  "icon": "snake/icons/icon-192.png",
+  "tag": "ארקייד"
+ },
+ {
+  "id": "game2048",
+  "name": "2048",
+  "description": "חברו אריחים זהים והגיעו ל-2048. החלקה, ביטול מהלך ושיא.",
+  "url": "game2048/",
+  "icon": "game2048/icons/icon-192.png",
+  "tag": "חשיבה"
+ },
+ {
+  "id": "memory",
+  "name": "זיכרון",
+  "description": "מוצאים זוגות. שלושה גדלים וארבעה נושאים.",
+  "url": "memory/",
+  "icon": "memory/icons/icon-192.png",
+  "tag": "חשיבה"
+ },
+ {
+  "id": "blocks",
+  "name": "בלוקים",
+  "description": "חפרו, בנו וחקרו עולם בלוקים משלכם. יצירתי או הישרדות, יום ולילה.",
+  "url": "blocks/",
+  "icon": "blocks/icons/icon-192.png",
+  "tag": "יצירה"
+ },
+ {
+  "id": "connect4",
+  "name": "4 בשורה",
+  "description": "מלכדים 4 בשורה מול המחשב או חבר",
+  "url": "connect4/",
+  "icon": "connect4/icons/icon-192.png",
+  "tag": "משחק לשניים"
+ },
+ {
+  "id": "minesweeper",
+  "name": "שולה מוקשים",
+  "description": "מוצאים את כל המוקשים בלי להתפוצץ",
+  "url": "minesweeper/",
+  "icon": "minesweeper/icons/icon-192.png",
+  "tag": "חשיבה"
+ },
+ {
+  "id": "fallingblocks",
+  "name": "בלוקים נופלים",
+  "description": "מסדרים צורות ומנקים שורות",
+  "url": "fallingblocks/",
+  "icon": "fallingblocks/icons/icon-192.png",
+  "tag": "קלאסי"
+ },
+ {
+  "id": "flappy",
+  "name": "ציפור מעופפת",
+  "description": "מעופפים בין הצינורות",
+  "url": "flappy/",
+  "icon": "flappy/icons/icon-192.png",
+  "tag": "רפלקסים"
+ },
+ {
+  "id": "hangman",
+  "name": "איש תלוי",
+  "description": "מנחשים מילה בעברית אות אחרי אות",
+  "url": "hangman/",
+  "icon": "hangman/icons/icon-192.png",
+  "tag": "מילים"
+ },
+ {
+  "id": "superhoops",
+  "name": "סופר בסקטבול 3D",
+  "description": "כדורסל תלת-ממדי: סלים ענקיים, עצים לטיפוס, קפיצות, דודג׳ים, סופרמן וכוחות על",
+  "url": "superhoops/",
+  "icon": "superhoops/icons/icon-192.png",
+  "tag": "אקשן"
+ },
+ {
+  "id": "superfootball",
+  "name": "סופר כדורגל 3D",
+  "description": "כדורגל תלת-ממדי: שערים ענקיים, קפיצות, דודג׳ים, סופרמן וכוחות על",
+  "url": "superfootball/",
+  "icon": "superfootball/icons/icon-192.png",
+  "tag": "אקשן"
+ },
+ {
+  "id": "football",
+  "name": "כדורגל",
+  "description": "20 נבחרות, 160 שחקנים, חנות כוחות ומטבעות",
+  "url": "football/",
+  "icon": "football/icons/icon-192.png",
+  "tag": "ספורט"
+ },
+ {
+  "id": "fighter",
+  "name": "קרב רחוב",
+  "description": "4 דמויות, מהלך מיוחד, נגד מחשב או שניים",
+  "url": "fighter/",
+  "icon": "fighter/icons/icon-192.png",
+  "tag": "לחימה"
+ },
+ {
+  "id": "crossy",
+  "name": "חוצה כבישים",
+  "description": "חצו כבישים, נהרות ומסילות בלי להיפגע",
+  "url": "crossy/",
+  "icon": "crossy/icons/icon-192.png",
+  "tag": "הרפתקה"
+ },
+ {
+  "id": "racer",
+  "name": "מירוץ כביש",
+  "description": "מירוץ שמאיץ לאט לאט, אספו מטבעות",
+  "url": "racer/",
+  "icon": "racer/icons/icon-192.png",
+  "tag": "מירוץ"
+ },
+ {
+  "id": "hockey",
+  "name": "הוקי אוויר",
+  "description": "הוקי אוויר נגד מחשב או חבר",
+  "url": "hockey/",
+  "icon": "hockey/icons/icon-192.png",
+  "tag": "ספורט"
+ },
+ {
+  "id": "space",
+  "name": "קרב בחלל",
+  "description": "ירו באויבים, אספו כוחות ונצחו בוסים",
+  "url": "space/",
+  "icon": "space/icons/icon-192.png",
+  "tag": "ירי"
+ },
+ {
+  "id": "runner3d",
+  "name": "ריצה 3D",
+  "description": "ריצה תלת-ממדית: קפיצה, החלקה ומטבעות",
+  "url": "runner3d/",
+  "icon": "runner3d/icons/icon-192.png",
+  "tag": "3D"
+ },
+ {
+  "id": "stack3d",
+  "name": "מגדל 3D",
+  "description": "בנו מגדל גבוה בלי להחמיץ",
+  "url": "stack3d/",
+  "icon": "stack3d/icons/icon-192.png",
+  "tag": "3D"
+ },
+ {
+  "id": "tanks3d",
+  "name": "קרב טנקים 3D",
+  "description": "קרב טנקים תלת-ממדי מול גלי אויבים",
+  "url": "tanks3d/",
+  "icon": "tanks3d/icons/icon-192.png",
+  "tag": "3D"
+ },
+ {
+  "id": "snooker",
+  "name": "סנוקר",
+  "description": "סנוקר נגד מחשב או חבר",
+  "url": "snooker/",
+  "icon": "snooker/icons/icon-192.png",
+  "tag": "ספורט"
+ },
+ {
+  "id": "bubbles",
+  "name": "פופ בועות",
+  "description": "פוצצו בועות צבעוניות",
+  "url": "bubbles/",
+  "icon": "bubbles/icons/icon-192.png",
+  "tag": "פאזל"
+ },
+ {
+  "id": "race3d",
+  "name": "מירוץ 3D",
+  "description": "מירוץ מכוניות תלת-ממדי מול 3 יריבים",
+  "url": "race3d/",
+  "icon": "race3d/icons/icon-192.png",
+  "tag": "3D"
+ },
+ {
+  "id": "flight3d",
+  "name": "טיסה 3D",
+  "description": "טיסה דרך טבעות זהב והרים",
+  "url": "flight3d/",
+  "icon": "flight3d/icons/icon-192.png",
+  "tag": "3D"
+ },
+ {
+  "id": "parkour3d",
+  "name": "פארקור 3D",
+  "description": "קפיצות בין פלטפורמות עם קפיצה כפולה",
+  "url": "parkour3d/",
+  "icon": "parkour3d/icons/icon-192.png",
+  "tag": "3D"
+ },
+ {
+  "id": "golf3d",
+  "name": "מיני גולף 3D",
+  "description": "מיני גולף עם 6 מסלולים",
+  "url": "golf3d/",
+  "icon": "golf3d/icons/icon-192.png",
+  "tag": "3D"
+ },
+ {
+  "id": "bowling3d",
+  "name": "באולינג 3D",
+  "description": "באולינג עם 10 סיבובים וסטרייקים",
+  "url": "bowling3d/",
+  "icon": "bowling3d/icons/icon-192.png",
+  "tag": "3D"
+ },
+ {
+  "id": "pong",
+  "name": "פונג",
+  "description": "פונג נגד המחשב עד 7 נקודות",
+  "url": "pong/",
+  "icon": "pong/icons/icon-192.png",
+  "tag": "ארקייד"
+ },
+ {
+  "id": "breakout",
+  "name": "שוברי לבנים",
+  "description": "שברו את כל הלבנים",
+  "url": "breakout/",
+  "icon": "breakout/icons/icon-192.png",
+  "tag": "ארקייד"
+ },
+ {
+  "id": "dino",
+  "name": "ריצת דינוזאור",
+  "description": "קפצו מעל קקטוסים והתכופפו מתחת לציפורים",
+  "url": "dino/",
+  "icon": "dino/icons/icon-192.png",
+  "tag": "ארקייד"
+ },
+ {
+  "id": "jumper",
+  "name": "קפצן",
+  "description": "קפצו כמה שיותר גבוה",
+  "url": "jumper/",
+  "icon": "jumper/icons/icon-192.png",
+  "tag": "ארקייד"
+ },
+ {
+  "id": "maze",
+  "name": "בולעים",
+  "description": "אכלו את כל הנקודות והתחמקו מרוחות",
+  "url": "maze/",
+  "icon": "maze/icons/icon-192.png",
+  "tag": "ארקייד"
+ },
+ {
+  "id": "simon",
+  "name": "סיימון",
+  "description": "זכרו את רצף הצבעים",
+  "url": "simon/",
+  "icon": "simon/icons/icon-192.png",
+  "tag": "זיכרון"
+ },
+ {
+  "id": "reaction",
+  "name": "מהירות תגובה",
+  "description": "לחצו כשהמסך הופך לירוק",
+  "url": "reaction/",
+  "icon": "reaction/icons/icon-192.png",
+  "tag": "רפלקסים"
+ },
+ {
+  "id": "mastermind",
+  "name": "מאסטרמיינד",
+  "description": "נחשו את קוד הצבעים",
+  "url": "mastermind/",
+  "icon": "mastermind/icons/icon-192.png",
+  "tag": "חשיבה"
+ },
+ {
+  "id": "lights",
+  "name": "כבו את האורות",
+  "description": "כבו את כל האורות",
+  "url": "lights/",
+  "icon": "lights/icons/icon-192.png",
+  "tag": "חשיבה"
+ },
+ {
+  "id": "slide",
+  "name": "פאזל מספרים",
+  "description": "סדרו את המספרים לפי הסדר",
+  "url": "slide/",
+  "icon": "slide/icons/icon-192.png",
+  "tag": "חשיבה"
+ },
+ {
+  "id": "colors",
+  "name": "צבע או מילה",
+  "description": "לחצו על הצבע שבו המילה כתובה",
+  "url": "colors/",
+  "icon": "colors/icons/icon-192.png",
+  "tag": "רפלקסים"
+ },
+ {
+  "id": "clicker",
+  "name": "קליקר מטבעות",
+  "description": "לחצו, שדרגו והרוויחו מטבעות",
+  "url": "clicker/",
+  "icon": "clicker/icons/icon-192.png",
+  "tag": "ארקייד"
+ },
+ {
+  "id": "asteroids",
+  "name": "אסטרואידים",
+  "description": "שברו אסטרואידים בחלל",
+  "url": "asteroids/",
+  "icon": "asteroids/icons/icon-192.png",
+  "tag": "ירי"
+ },
+ {
+  "id": "gallery",
+  "name": "קליעה למטרה",
+  "description": "פגעו במטרות והימנעו מפצצות",
+  "url": "gallery/",
+  "icon": "gallery/icons/icon-192.png",
+  "tag": "רפלקסים"
+ },
+ {
+  "id": "dodge",
+  "name": "התחמקות",
+  "description": "התחמקו מחפצים נופלים ואספו מטבעות",
+  "url": "dodge/",
+  "icon": "dodge/icons/icon-192.png",
+  "tag": "ארקייד"
+ },
+ {
+  "id": "boss",
+  "name": "שלבי בוס: הגליץ׳",
+  "description": "20 שלבי בוס: מצילים את המשחקים מגליץ׳ (נפתח אחרי 20 משחקים)",
+  "url": "boss/",
+  "icon": "boss/icons/icon-192.png",
+  "tag": "בוס"
+ },
+ {
+  "id": "fruit",
+  "name": "חותך פירות",
+  "description": "החליקו על המסך וחתכו פירות. אל תיגעו בפצצות!",
+  "url": "fruit/",
+  "icon": "fruit/icons/icon-192.png",
+  "tag": "רפלקסים"
+ },
+ {
+  "id": "invaders",
+  "name": "פולשים מהחלל",
+  "description": "הגנו על כדור הארץ מגלי חייזרים.",
+  "url": "invaders/",
+  "icon": "invaders/icons/icon-192.png",
+  "tag": "ירי"
+ },
+ {
+  "id": "missile",
+  "name": "הגנת ערים",
+  "description": "יירטו טילים לפני שיפגעו בערים.",
+  "url": "missile/",
+  "icon": "missile/icons/icon-192.png",
+  "tag": "אסטרטגיה"
+ },
+ {
+  "id": "cannon",
+  "name": "תותח",
+  "description": "כוונו את התותח והפילו את כל המטרות.",
+  "url": "cannon/",
+  "icon": "cannon/icons/icon-192.png",
+  "tag": "חשיבה"
+ },
+ {
+  "id": "balloons",
+  "name": "פוצצו בלונים",
+  "description": "פוצצו בלונים וקבלו בונוסים.",
+  "url": "balloons/",
+  "icon": "balloons/icons/icon-192.png",
+  "tag": "פשוט"
+ },
+ {
+  "id": "pachinko",
+  "name": "פלינקו",
+  "description": "הפילו כדורים בין הנעצים ופגעו בניקוד הגבוה.",
+  "url": "pachinko/",
+  "icon": "pachinko/icons/icon-192.png",
+  "tag": "ארקייד"
+ },
+ {
+  "id": "fishing",
+  "name": "דיג",
+  "description": "הורידו חכה ותפסו דגים עמוקים.",
+  "url": "fishing/",
+  "icon": "fishing/icons/icon-192.png",
+  "tag": "פשוט"
+ },
+ {
+  "id": "rhythm",
+  "name": "קצב",
+  "description": "לחצו על הנוטות בקצב הנכון וצברו קומבו.",
+  "url": "rhythm/",
+  "icon": "rhythm/icons/icon-192.png",
+  "tag": "רפלקסים"
+ },
+ {
+  "id": "sort",
+  "name": "מיון צבעים",
+  "description": "מיינו כדורים נופלים לתא בצבע הנכון.",
+  "url": "sort/",
+  "icon": "sort/icons/icon-192.png",
+  "tag": "רפלקסים"
+ },
+ {
+  "id": "zigzag",
+  "name": "זיגזג",
+  "description": "הכדור נע באלכסון, החליפו כיוון בזמן.",
+  "url": "zigzag/",
+  "icon": "zigzag/icons/icon-192.png",
+  "tag": "רפלקסים"
+ },
+ {
+  "id": "orbit",
+  "name": "מסלול",
+  "description": "שחררו את החללית ותפסו את כוכב הלכת הבא.",
+  "url": "orbit/",
+  "icon": "orbit/icons/icon-192.png",
+  "tag": "חשיבה"
+ },
+ {
+  "id": "pendulum",
+  "name": "נדנדה",
+  "description": "התנדנדו בחבל ועברו כמה שיותר רחוק.",
+  "url": "pendulum/",
+  "icon": "pendulum/icons/icon-192.png",
+  "tag": "אקשן"
+ },
+ {
+  "id": "math",
+  "name": "מהר חשבון",
+  "description": "פתרו כמה שיותר תרגילי חשבון בזמן.",
+  "url": "math/",
+  "icon": "math/icons/icon-192.png",
+  "tag": "לימוד"
+ },
+ {
+  "id": "colorswitch",
+  "name": "קפיצת צבעים",
+  "description": "קפצו דרך טבעות והתאימו צבע.",
+  "url": "colorswitch/",
+  "icon": "colorswitch/icons/icon-192.png",
+  "tag": "רפלקסים"
+ },
+ {
+  "id": "balance",
+  "name": "איזון",
+  "description": "הטו את הקרש ושמרו על הכדור.",
+  "url": "balance/",
+  "icon": "balance/icons/icon-192.png",
+  "tag": "חשיבה"
+ },
+ {
+  "id": "mergefruit",
+  "name": "איחוד פירות",
+  "description": "הפילו פירות ואחדו זוגות זהים עד שתגיעו לאבטיח.",
+  "url": "mergefruit/",
+  "icon": "mergefruit/icons/icon-192.png",
+  "tag": "פאזל"
+ },
+ {
+  "id": "blackhole",
+  "name": "חור שחור",
+  "description": "בלעו כל מה שקטן מכם – וגדלו!",
+  "url": "blackhole/",
+  "icon": "blackhole/icons/icon-192.png",
+  "tag": "ארקייד"
+ },
+ {
+  "id": "tubesort",
+  "name": "מיון צינורות",
+  "description": "סדרו את הצבעים כך שכל צינור יהיה בצבע אחד.",
+  "url": "tubesort/",
+  "icon": "tubesort/icons/icon-192.png",
+  "tag": "חשיבה"
+ },
+ {
+  "id": "roundabout",
+  "name": "כיכר התנועה",
+  "description": "שלחו מכוניות לכיכר בזמן הנכון ואל תתנגשו.",
+  "url": "roundabout/",
+  "icon": "roundabout/icons/icon-192.png",
+  "tag": "חשיבה"
+ },
+ {
+  "id": "redgreen",
+  "name": "אור אדום, אור ירוק",
+  "description": "רוצו כשהאור ירוק – ועצרו כשהוא אדום.",
+  "url": "redgreen/",
+  "icon": "redgreen/icons/icon-192.png",
+  "tag": "רפלקסים"
+ },
+ {
+  "id": "stackup",
+  "name": "מגדל גבוה",
+  "description": "עצרו כל קרש מעל הקודם ובנו מגדל גבוה.",
+  "url": "stackup/",
+  "icon": "stackup/icons/icon-192.png",
+  "tag": "רפלקסים"
+ },
+ {
+  "id": "meteors",
+  "name": "גשם מטאורים",
+  "description": "התחמקו מהסלעים ואספו כוכבים.",
+  "url": "meteors/",
+  "icon": "meteors/icons/icon-192.png",
+  "tag": "ארקייד"
+ },
+ {
+  "id": "cookies",
+  "name": "מפעל עוגיות",
+  "description": "לחצו על העוגייה, קנו שדרוגים ואספו כמה שיותר.",
+  "url": "cookies/",
+  "icon": "cookies/icons/icon-192.png",
+  "tag": "פשוט"
+ },
+ {
+  "id": "lanes",
+  "name": "שלושה נתיבים",
+  "description": "רוצו בין שלושה נתיבים והתחמקו ממכשולים.",
+  "url": "lanes/",
+  "icon": "lanes/icons/icon-192.png",
+  "tag": "ארקייד"
+ },
+ {
+  "id": "whack",
+  "name": "פוגעים בבועות",
+  "description": "לחצו על המטרות לפני שהן נעלמות.",
+  "url": "whack/",
+  "icon": "whack/icons/icon-192.png",
+  "tag": "רפלקסים"
+ },
+ {
+  "id": "agar",
+  "name": "אכלו ותגדלו",
+  "description": "אכלו נקודות ועיגולים קטנים וברחו מהגדולים.",
+  "url": "agar/",
+  "icon": "agar/icons/icon-192.png",
+  "tag": "אסטרטגיה"
+ },
+ {
+  "id": "bricksmash",
+  "name": "שובר לבנים",
+  "description": "שברו את כל הלבנים עם הכדור.",
+  "url": "bricksmash/",
+  "icon": "bricksmash/icons/icon-192.png",
+  "tag": "קלאסי"
+ },
+ {
+  "id": "froghop",
+  "name": "צפרדע קופצת",
+  "description": "הצפרדע קופצת מפלטפורמה לפלטפורמה – כמה גבוה תגיעו?",
+  "url": "froghop/",
+  "icon": "froghop/icons/icon-192.png",
+  "tag": "ארקייד"
+ },
+ {
+  "id": "tabletennis",
+  "name": "טניס שולחן",
+  "description": "נצחו את המחשב בטניס שולחן.",
+  "url": "tabletennis/",
+  "icon": "tabletennis/icons/icon-192.png",
+  "tag": "קלאסי"
+ },
+ {
+  "id": "colormemory",
+  "name": "זיכרון צבעים",
+  "description": "חזרו על רצף האורות שהמשחק מציג.",
+  "url": "colormemory/",
+  "icon": "colormemory/icons/icon-192.png",
+  "tag": "זיכרון"
+ },
+ {
+  "id": "sneakylevels",
+  "name": "מסדרון הפתעות",
+  "description": "150 שלבים ערמומיים – שום דבר הוא לא מה שהוא נראה.",
+  "url": "sneakylevels/",
+  "icon": "sneakylevels/icons/icon-192.png",
+  "tag": "אקשן"
+ },
+ {
+  "id": "munchmaze",
+  "name": "מבוך הנשנשן",
+  "description": "אספו את כל הגבישים במבוך והימנעו מהבאגים.",
+  "url": "munchmaze/",
+  "icon": "munchmaze/icons/icon-192.png",
+  "tag": "ארקייד"
+ },
+ {
+  "id": "hoops3",
+  "name": "כדורסל 3 על 3",
+  "description": "כדורסל 3 על 3 נגד המחשב – מסירות, זריקות ושלשות.",
+  "url": "hoops3/",
+  "icon": "hoops3/icons/icon-192.png",
+  "tag": "ספורט"
+ },
+ {
+  "id": "wormio",
+  "name": "נחש נגד תולעים",
+  "description": "זירה ענקית עם תולעים צבעוניות: אכלו נקודות אור, גדלו, האיצו ואל תיפגעו בגוף של האחרות.",
+  "url": "wormio/",
+  "icon": "wormio/icons/icon-192.png",
+  "tag": "ארקייד"
+ },
+ {
+  "id": "wave",
+  "name": "גל",
+  "description": "אתה גל בים — בלע גלים קטנים, גדל, והימנע מגלים גדולים!",
+  "url": "wave/",
+  "icon": "wave/icons/icon-192.png",
+  "tag": "ארקייד"
+ },
+ {
+  "id": "wire",
+  "name": "חוט",
+  "description": "הובל את החוט המתקצר מ-A ל-B — בלי לגעת בקירות!",
+  "url": "wire/",
+  "icon": "wire/icons/icon-192.png",
+  "tag": "אתגר"
+ },
+ {
+  "id": "roles",
+  "name": "תפקידים",
+  "description": "כל סיבוב — תפקיד אחר עם יכולת מיוחדת! ספורטאי, גנב, קוסם ועוד",
+  "url": "roles/",
+  "icon": "roles/icons/icon-192.png",
+  "tag": "אסטרטגיה"
+ },
+ {
+  "id": "heist3d",
+  "name": "שוברים את הבנק",
+  "description": "פורצים לבנק בתלת-ממד! שוברים קירות, פוצחים כספות וגונבים כסף – לפני שמגיעים השומרים.",
+  "url": "heist3d/",
+  "icon": "heist3d/icons/icon-192.png",
+  "tag": "3D"
+ },
+ {
+  "id": "arcade",
+  "name": "חנות המטבעות",
+  "description": "נהלו חנות מטבעות ארקייד בתלת-ממד: שחקו בעצמכם במכונות כדי להשיג מלאי, ומכרו ללקוחות — כולל תא VR.",
+  "tag": "3D",
+  "icon": "arcade/icons/icon-192.png",
+  "url": "arcade/"
+ }
 ]
