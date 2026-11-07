@@ -3,9 +3,14 @@
   'use strict';
   var HASH='a28e690a3b6d041970a632d16ad8d54a2ae463d1319f7990a490a5ffd8431884';
   // Mini-admin: staff/team members get limited perks but not full admin
-  // Hash of "alon-games|TEAM2026"
-  var MINI_HASH='1fda172f00dfce9a09790df5406d90dac425df32f03a595541cad87f8fe76c6f';
+  // Hash of "alon-games|GLITCH347" - the code to hand out now
+  var MINI_HASH='23e37b88d2cfaae9de54fd62559521d3c75c48797dc01466bf6488adb3c6e64b';
+  // Retired codes. They no longer let anyone IN, but anyone who already typed
+  // one keeps their team mode, so the team never has to re-enter a code.
+  // (TEAM2026 - retired 7.11.2026)
+  var MINI_OLD=['1fda172f00dfce9a09790df5406d90dac425df32f03a595541cad87f8fe76c6f'];
   var KM='ag_mini'; // localStorage key for mini-admin
+  function miniOk(v){return v===MINI_HASH||MINI_OLD.indexOf(v)>=0}
   var script=document.currentScript;
   var ROOT=new URL('./',script&&script.src?script.src:location.href).href;
 
@@ -28,12 +33,12 @@
     played:function(){try{return JSON.parse(localStorage.getItem('ag_played')||'[]').length}catch(e){return 0}},
     coins:function(){return rd().c},
     diamonds:function(){return rd().d},
-    add:function(c,d){c=c||0;d=d||0;if((c>0||d>0)&&localStorage.getItem(KA)!==HASH&&localStorage.getItem(KM)!==MINI_HASH&&!allow(Math.max(0,c),Math.max(0,d)))return;if(c>0&&AG.coinMult)c=Math.floor(c*AG.coinMult());var w=rd();w.c=Math.max(0,w.c+c);w.d=Math.max(0,w.d+d);wr(w)},
+    add:function(c,d){c=c||0;d=d||0;if((c>0||d>0)&&localStorage.getItem(KA)!==HASH&&!miniOk(localStorage.getItem(KM))&&!allow(Math.max(0,c),Math.max(0,d)))return;if(c>0&&AG.coinMult)c=Math.floor(c*AG.coinMult());var w=rd();w.c=Math.max(0,w.c+c);w.d=Math.max(0,w.d+d);wr(w)},
     tampered:function(){return tampered},
     spend:function(c,d){var w=rd();c=c||0;d=d||0;if(w.c<c||w.d<d)return false;w.c-=c;w.d-=d;wr(w);return true},
     onChange:function(f){subs.push(f)},
     isAdmin:function(){try{return localStorage.getItem(KA)===HASH}catch(e){return false}},
-    isMini:function(){try{return localStorage.getItem(KM)===MINI_HASH}catch(e){return false}},
+    isMini:function(){try{return miniOk(localStorage.getItem(KM))}catch(e){return false}},
     tryMini:function(code){
       code=String(code||'').trim().toUpperCase();
       var data=new TextEncoder().encode('alon-games|'+code);
