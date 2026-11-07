@@ -35,10 +35,14 @@
   /* anti-cheat: the wallet is signed; a hand-edited wallet is reset. (A deterrent only - real protection would need a server.) */
   function sig(c,d){var t='ag|'+c+'|'+d+'|k7Qx',h=2166136261;for(var i=0;i<t.length;i++){h^=t.charCodeAt(i);h=Math.imul(h,16777619)>>>0}return h.toString(36)}
   var tampered=false;
+  /* team members (mini-admin) can hold at most this many coins. The head admin is not capped. */
+  var MINICAP=5000;
+  function cap(c){try{if(localStorage.getItem(KA)===HASH)return c;
+    if(miniOk(localStorage.getItem(KM)))return Math.min(c,MINICAP)}catch(e){}return c}
   function rd(){try{var w=JSON.parse(localStorage.getItem(K)||'{}'),c=Math.max(0,+w.c||0),d=Math.max(0,+w.d||0);
     if(w.s!==undefined&&w.s!==sig(c,d)&&!(localStorage.getItem(KA)===HASH)){tampered=true;try{localStorage.setItem(K,JSON.stringify({c:0,d:0,s:sig(0,0)}))}catch(e){}return{c:0,d:0}}
-    return{c:c,d:d}}catch(e){return{c:0,d:0}}}
-  function wr(w){try{localStorage.setItem(K,JSON.stringify({c:w.c,d:w.d,s:sig(w.c,w.d)}))}catch(e){}subs.forEach(function(f){try{f(w)}catch(e){}})}
+    return{c:cap(c),d:d}}catch(e){return{c:0,d:0}}}
+  function wr(w){w.c=cap(Math.max(0,w.c||0));try{localStorage.setItem(K,JSON.stringify({c:w.c,d:w.d,s:sig(w.c,w.d)}))}catch(e){}subs.forEach(function(f){try{f(w)}catch(e){}})}
   var gains=[];function allow(c,d){var n=Date.now();gains=gains.filter(function(g){return n-g[0]<60000});
     var sc=0,sd=0;gains.forEach(function(g){sc+=g[1];sd+=g[2]});
     if(c>800||d>12||sc+c>3500||sd+d>40)return false;gains.push([n,c,d]);return true}
@@ -48,6 +52,7 @@
     coins:function(){return rd().c},
     diamonds:function(){return rd().d},
     add:function(c,d){c=c||0;d=d||0;if((c>0||d>0)&&localStorage.getItem(KA)!==HASH&&!miniOk(localStorage.getItem(KM))&&!allow(Math.max(0,c),Math.max(0,d)))return;if(c>0&&AG.coinMult)c=Math.floor(c*AG.coinMult());var w=rd();w.c=Math.max(0,w.c+c);w.d=Math.max(0,w.d+d);wr(w);if(c>0)qBump(function(o){o.coin+=c})},
+    miniCap:function(){return MINICAP},
     today:dayStr,
     quests:qGet,
     questPut:qPut,

@@ -255,10 +255,14 @@ body.cmp .sec{font-size:18px;margin-top:11px}
 <div class="mo" id="admM"><div class="mc"><h2>🔑 קוד אדמין</h2>
   <div id="admIn"><p>הכניסו את הקוד הסודי</p><input id="admC" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="AG-XXXX-XXXX-XXXX"><div class="err" id="admE"></div><button class="mb" id="admOk">אישור</button></div>
   <div id="admPanel" style="display:none"><p>מצב אדמין פעיל ✅<br><small>במשחק הבלוקים יש כפתור ערכת אדמין בתיק.</small></p>
-    <button class="mb" id="a1">+10,000 🪙</button><button class="mb" id="a2">+500 💎</button><button class="mb alt" id="a3">אפס ארנק</button><button class="mb alt" id="a4">יציאה ממצב אדמין</button></div>
-  <div id="miniPanel" style="display:none"><p>מצב צוות פעיל ⭐</p>
+    <button class="mb" id="a1">+10,000 🪙</button><button class="mb" id="a2">+500 💎</button><button class="mb" id="a5">👥 ניהול שחקנים</button><button class="mb alt" id="a3">אפס ארנק</button><button class="mb alt" id="a4">יציאה ממצב אדמין</button></div>
+  <div id="miniPanel" style="display:none"><p>מצב צוות פעיל ⭐<br><small id="miniCapT"></small></p>
     <button class="mb" id="m1">+1,000 🪙</button><button class="mb" id="m2">+10 💎</button><button class="mb alt" id="m3">יציאה ממצב צוות</button></div>
   <button class="mb alt" id="admX">סגור</button></div></div>
+<div class="mo" id="plM"><div class="mc" style="max-height:88vh;overflow:auto"><h2>👥 השחקנים</h2>
+  <input id="plQ" autocomplete="off" placeholder="חיפוש שם…" style="width:100%;font:inherit;font-size:16px;padding:10px;border-radius:12px;border:2px solid rgba(255,255,255,.25);background:#2e639b;color:#fff;margin-bottom:6px">
+  <div id="plMsg" style="min-height:20px;font-size:14px;margin:6px 0;opacity:.9"></div>
+  <div id="plList"></div><button class="mb alt" id="plX">סגור</button></div></div>
 <script src="hub.js"></script>
 <script>
 var LIST=[],cat='הכל',q='';
@@ -465,6 +469,85 @@ $('lbB').onclick=lbOpen;
      .then(function(b){G=b.g;fill();paint();msg(T('נמחק','Deleted'))}).catch(function(){msg(T('משהו השתבש','Something went wrong'))})}
   $('gbB').onclick=function(){try{nm.value=localStorage.getItem('ag_name')||''}catch(e){}$('gbM').classList.add('show');msg('');G=null;paint();load()};
   $('gbX').onclick=function(){$('gbM').classList.remove('show')};$('gbSend').onclick=send;sel.onchange=paint;
+
+  /* ---------- admin: every player, with ban / remove team mode / zero wallet ----------
+     The admin leaves an order on the board; that player's own browser picks it up
+     the next time it checks the lobby (once an hour at most) and carries it out. */
+  function bare(n){n=String(n||'').trim();try{n=n.replace(/^[^\p{L}\p{N}]+/u,'')}catch(e){}return n.trim().toLowerCase()}
+  var PL=null,plq='';
+  function plPaint(){
+    var L=$('plList');L.textContent='';
+    if(!PL){L.textContent=T('טוען…','Loading…');return}
+    var seen={};
+    Object.keys(PL.g||{}).forEach(function(id){(PL.g[id]||[]).forEach(function(e){
+      var k=bare(e.n);if(!k)return;var r=seen[k]||(seen[k]={n:e.n,k:k,c:0,best:0});r.c++;if(e.s>r.best)r.best=e.s})});
+    (PL.banned||[]).forEach(function(k){if(!seen[k])seen[k]={n:k,k:k,c:0,best:0}});
+    Object.keys(PL.orders||{}).forEach(function(k){if(!seen[k])seen[k]={n:k,k:k,c:0,best:0}});
+    var rows=Object.keys(seen).map(function(k){return seen[k]}).sort(function(a,b){return b.c-a.c});
+    if(plq)rows=rows.filter(function(r){return r.k.indexOf(plq)>=0});
+    $('plMsg').textContent=EN?rows.length+' players':rows.length===1?'שחקן אחד':rows.length+' שחקנים';
+    if(!rows.length){L.textContent=T('אין שחקנים להצגה.','No players to show.');return}
+    rows.slice(0,150).forEach(function(r){
+      var banned=(PL.banned||[]).indexOf(r.k)>=0,o=(PL.orders||{})[r.k]||{};
+      var d=document.createElement('div');d.style.cssText='background:rgba(255,255,255,.08);border-radius:12px;padding:8px 10px;margin:6px 0;text-align:start';
+      var h=document.createElement('div');h.style.cssText='display:flex;align-items:center;gap:8px';
+      var nm2=document.createElement('div');nm2.style.cssText='flex:1;font-weight:900;overflow:hidden;text-overflow:ellipsis;white-space:nowrap';
+      nm2.textContent=(banned?'🚫 ':'')+r.n;
+      var sc=document.createElement('div');sc.style.cssText='font-size:12.5px;opacity:.85;white-space:nowrap';
+      sc.textContent=r.c?(EN?r.c+' records':r.c===1?'שיא אחד':r.c===2?'שני שיאים':r.c+' שיאים'):T('ללא שיאים','no records');
+      h.append(nm2,sc);
+      var bar=document.createElement('div');bar.style.cssText='display:flex;flex-wrap:wrap;gap:6px;margin-top:7px';
+      function btn(txt,fn,col){var b=document.createElement('button');b.textContent=txt;
+        b.style.cssText='border:0;border-radius:10px;padding:6px 9px;font:900 12.5px system-ui;cursor:pointer;background:'+(col||'#ffd23f')+';color:#222';
+        b.onclick=fn;bar.append(b)}
+      btn(banned?'✅ ביטול חסימה':'🚫 חסימה',function(){order(r,banned?{unban:1}:{ban:1})},banned?'#9be7a5':'#ff9a9a');
+      btn('⭐✖ הורדת צוות',function(){order(r,{unmini:1})});
+      btn('💸 איפוס כסף',function(){order(r,{wipe:1})});
+      btn('🗑️ מחיקת שיאים',function(){if(confirm(T('למחוק את כל השיאים של ','Delete every record of ')+r.n+'?'))del(r.n)},'#cfc9df');
+      d.append(h,bar);
+      var st=[];if(o.wipe)st.push(T('איפוס כסף','wallet reset'));if(o.unmini)st.push(T('הורדת צוות','team mode removed'));
+      if(st.length){var s2=document.createElement('div');s2.style.cssText='font-size:12px;opacity:.75;margin-top:5px';
+        s2.textContent='⏳ '+T('מחכה שייכנס לאתר: ','waiting for them to visit: ')+st.join(' · ');d.append(s2)}
+      L.append(d)})}
+  function order(r,what){
+    if(!AG.isAdmin())return;
+    $('plMsg').textContent=T('שומר…','Saving…');
+    jbGet().then(function(b){
+      b.orders=b.orders||{};b.banned=b.banned||[];
+      var o=b.orders[r.k]||{},now=Date.now();
+      if(what.wipe)o.wipe=now;
+      if(what.unmini)o.unmini=now;
+      if(what.ban&&b.banned.indexOf(r.k)<0)b.banned.push(r.k);
+      if(what.unban)b.banned=b.banned.filter(function(x){return x!==r.k});
+      if(o.wipe||o.unmini)b.orders[r.k]=o;
+      Object.keys(b.orders).forEach(function(k){var x=b.orders[k];   /* drop orders older than two months */
+        if(Math.max(+x.wipe||0,+x.unmini||0)<Date.now()-62*864e5)delete b.orders[k]});
+      return jbPut(b)})
+     .then(function(b){PL=b;G=b.g;plPaint();$('plMsg').textContent=T('נשמר ✅','Saved ✅')})
+     .catch(function(){$('plMsg').textContent=T('משהו השתבש','Something went wrong')})}
+  function plOpen(){if(!AG.isAdmin())return;PL=null;plq='';$('plQ').value='';$('plMsg').textContent='';
+    $('plM').classList.add('show');plPaint();
+    jbGet().then(function(b){PL=b;plPaint()}).catch(function(){$('plList').textContent=T('אין חיבור לשרת.','No connection.')})}
+  $('a5').onclick=plOpen;$('plX').onclick=function(){$('plM').classList.remove('show')};
+  $('plQ').addEventListener('input',function(){plq=bare(this.value);plPaint()});
+
+  /* ---------- carry out an order the admin left for me ---------- */
+  (function(){
+    var me='';try{me=bare(localStorage.getItem('ag_name'))}catch(e){}
+    if(!me||AG.isAdmin())return;
+    var last=0;try{last=+localStorage.getItem('ag_ordck')||0}catch(e){}
+    if(Date.now()-last<36e5)return;                    /* one check an hour is enough */
+    try{localStorage.setItem('ag_ordck',String(Date.now()))}catch(e){}
+    jbGet().then(function(b){
+      var o=(b.orders||{})[me];if(!o)return;
+      var seen=0;try{seen=+localStorage.getItem('ag_ord')||0}catch(e){}
+      var newest=Math.max(+o.wipe||0,+o.unmini||0);if(newest<=seen)return;
+      var did=[];
+      if((+o.wipe||0)>seen){AG.spend(AG.coins(),AG.diamonds());did.push(T('הארנק אופס','your wallet was reset'))}
+      if((+o.unmini||0)>seen){try{localStorage.removeItem('ag_mini')}catch(e){}did.push(T('מצב הצוות הוסר','team mode was removed'))}
+      try{localStorage.setItem('ag_ord',String(newest))}catch(e){}
+      if(did.length)setTimeout(function(){alert(T('עדכון מהאדמין: ','From the admin: ')+did.join(' · '))},500)})
+     .catch(function(){})})();
 })();
 $('lbX').onclick=function(){$('lbM').classList.remove('show')};
 (function(){var n=AG.played(),ok=n>=20||AG.isAdmin();$('bossT').textContent=ok?'סיפור: 5 פרקים – הגליץ׳, דינוזאור, דרקון, מלך הרובוטים ומלכת הקרח':'שחקו ב-20 משחקים שונים כדי לפתוח ('+Math.min(n,20)+'/20)';var sp=0;try{sp=+localStorage.getItem('boss_story')||0}catch(e){}$('bossBar').style.width=Math.min(100,sp/20*100)+'%'})();
@@ -472,7 +555,8 @@ function showNote(x){$('noteT').textContent=x.noteTitle||x.name;$('noteP').textC
 function $(i){return document.getElementById(i)}
 function wal(){$('wc').textContent=AG.coins().toLocaleString('he-IL');$('wd').textContent=AG.diamonds().toLocaleString('he-IL')}
 wal();AG.onChange(wal);
-function admView(){var on=AG.isAdmin(),mini=AG.isMini&&AG.isMini();$('admIn').style.display=(on||mini)?'none':'block';$('admPanel').style.display=on?'block':'none';$('miniPanel').style.display=(!on&&mini)?'block':'none'}
+function admView(){var on=AG.isAdmin(),mini=AG.isMini&&AG.isMini();$('admIn').style.display=(on||mini)?'none':'block';$('admPanel').style.display=on?'block':'none';$('miniPanel').style.display=(!on&&mini)?'block':'none';
+  if(mini&&AG.miniCap)$('miniCapT').textContent='תקרת ארנק לצוות: '+AG.miniCap().toLocaleString('he-IL')+' 🪙'}
 $('keyB').onclick=function(){$('admE').textContent='';$('admC').value='';admView();$('admM').classList.add('show')};
 $('admX').onclick=function(){$('admM').classList.remove('show')};
 $('admOk').onclick=function(){var code=$('admC').value;AG.tryAdmin(code).then(function(ok){if(ok){admView()}else{AG.tryMini(code).then(function(okM){if(okM){admView()}else{$('admE').textContent='הקוד לא נכון'}})}})};
