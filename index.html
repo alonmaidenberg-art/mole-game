@@ -106,6 +106,26 @@ h1{font-family:'Secular One',Rubik,system-ui;font-weight:400;margin:6px 0 6px;
 .bossb small{opacity:.92;font-size:13.5px}
 .bossb .bar{height:9px;background:rgba(0,0,0,.4);border-radius:5px;margin-top:8px;overflow:hidden}
 .bossb .bar i{display:block;height:100%;background:var(--zap);border-radius:5px}
+/* משימות יומיות */
+.quests{margin:0 0 18px;padding:14px 16px;border-radius:22px;background:#fff;
+  border:4px solid var(--ink);box-shadow:0 7px 0 var(--ink)}
+.quests .qh{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.quests .qh b{font-size:18px;font-weight:900;flex:1;color:var(--ink)}
+.quests .qf{font-weight:900;font-size:15px;color:#b4253f;background:#ffe0e6;
+  border:3px solid var(--ink);border-radius:999px;padding:3px 11px;white-space:nowrap}
+.qr{display:flex;align-items:center;gap:11px;padding:9px 0;border-top:3px dashed #e3e0ef}
+.qr:first-child{border-top:0}
+.qr .qi{font-size:26px;width:30px;text-align:center}
+.qr .qm{flex:1;min-width:0}
+.qr .qt{font-weight:900;font-size:15px;color:var(--ink)}
+.qr .qp{height:9px;background:#ece9f6;border-radius:5px;margin-top:6px;overflow:hidden}
+.qr .qp i{display:block;height:100%;background:linear-gradient(90deg,#35e0ff,#5b2bd6);border-radius:5px}
+.qr .qn{font-size:12.5px;color:#6b6386;font-weight:700;margin-top:4px}
+.qr .qb{border:3px solid var(--ink);border-radius:14px;padding:7px 11px;font:900 13px Rubik,system-ui;
+  background:var(--zap);color:#2b1659;cursor:pointer;box-shadow:0 4px 0 var(--ink);white-space:nowrap}
+.qr .qb:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
+.qr .qb[disabled]{background:#ece9f6;color:#9a94ad;cursor:default;box-shadow:0 4px 0 #cfc9df}
+.qr.ok .qt{text-decoration:line-through;opacity:.55}
 
 /* ── קיר הקלטות ── */
 #grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(146px,1fr));gap:13px}
@@ -213,6 +233,10 @@ body.cmp .sec{font-size:18px;margin-top:11px}
 
   <div class="tools"><input class="sr" id="sr" type="search" placeholder="🔍 איזה משחק בא לכם?" autocomplete="off"><button class="sr" id="cmpB" type="button" aria-label="תצוגה"></button></div>
   <div id="chips"></div>
+  <section class="quests" id="qBox" hidden aria-label="המשימות של היום">
+    <div class="qh"><b>📋 המשימות של היום</b><span class="qf" id="qStreak"></span></div>
+    <div id="qList"></div>
+  </section>
   <a class="bossb" id="bossB" href="boss/"><span class="em">👾</span><span style="flex:1"><b>שלבי הבוס: הגליץ׳</b><small id="bossT"></small><div class="bar"><i id="bossBar"></i></div></span></a>
   </header>
   <section id="grid" aria-label="רשימת המשחקים"><p class="empty">טוען משחקים…</p></section>
@@ -273,7 +297,7 @@ function chips(){
 (function(){var b=$('cmpB'),k='ag_cmp';function ap(){var c=localStorage.getItem(k)!=='0';document.body.classList.toggle('cmp',c);b.textContent=c?'▦':'☰';b.title=c?'תצוגה מורחבת':'תצוגה מצומצמת'}b.onclick=function(){try{localStorage.setItem(k,localStorage.getItem(k)==='0'?'1':'0')}catch(e){}ap()};ap()})();
 $('sr').addEventListener('input',function(){q=this.value.trim().toLowerCase();render()});
 fetch('games.json',{cache:'no-cache'}).then(function(r){return r.json()}).then(function(list){if(window.AG_LANG==='en'||localStorage.getItem('ag_lang')==='en')list=list.filter(function(g){return g.id!=='englishbot'});
-  LIST=list;$('stat').textContent=list.length+' משחקים · משחקים חדשים מתווספים כל הזמן';chips();render()
+  LIST=list;$('stat').textContent=list.length+' משחקים · משחקים חדשים מתווספים כל הזמן';chips();render();QRENDER()
 }).catch(function(){$('grid').innerHTML='<p class="empty">לא הצלחנו לטעון את הרשימה. <a style="color:#ffd23f" href="mole/">לחצו כאן למשחק החפרפרת</a></p>'});
 /* daily gift */
 (function(){var K='ag_daily',b=$('dailyB');function today(){return new Date().toISOString().slice(0,10)}
@@ -282,6 +306,74 @@ fetch('games.json',{cache:'no-cache'}).then(function(r){return r.json()}).then(f
   b.onclick=function(){var o=st(),t=today();if(o.d===t)return;var y=new Date(Date.now()-864e5).toISOString().slice(0,10);var s=o.d===y?o.s+1:1;var c=30+Math.min(s,7)*10,dm=s%7===0?1:0;AG.add(c,dm);sv(K,{d:t,s:s});alert('קיבלת '+c+' 🪙'+(dm?' ו-💎 1':'')+'\nרצף: '+s+' ימים');paint()};
   paint()})();
 
+/* daily missions: three a day, the same three for everyone, plus a streak of
+   days where all three were finished. Progress is counted by hub.js/fx.js
+   inside the games themselves (ag_q), so this only reads and pays out. */
+var QRENDER=function(){};
+(function(){
+  var KS='ag_qstreak',QDAY='';
+  function mk(k,i,t,n,f,c,d){return{k:k,i:i,t:t,n:n,f:f,r:[c,d]}}
+  var MIN=function(q){return Math.floor(q.sec/60)},GAMES=function(q){return q.g.length},
+      REC=function(q){return q.rec},COIN=function(q){return q.coin};
+  var TIER=[
+    [mk('games','🎮','שחקו ב-3 משחקים שונים',3,GAMES,40,0),
+     mk('time','⏱️','שחקו 10 דקות',10,MIN,40,0),
+     mk('coin','🪙','אספו 150 מטבעות',150,COIN,40,0),
+     mk('spot','⭐','',1,function(q){return q.g.indexOf(QDAY)>=0?1:0},50,0)],
+    [mk('rec','🏆','שברו שיא אישי אחד',1,REC,80,1),
+     mk('games','🎲','שחקו ב-5 משחקים שונים',5,GAMES,80,1),
+     mk('time','⌛','שחקו 20 דקות',20,MIN,80,1)],
+    [mk('rec','👑','שברו 3 שיאים אישיים',3,REC,150,2),
+     mk('games','🚀','שחקו ב-8 משחקים שונים',8,GAMES,150,2),
+     mk('coin','💰','אספו 400 מטבעות',400,COIN,150,2)]];
+  function seed(){var s=AG.today(),h=2166136261;for(var i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)>>>0}return h}
+  /* one mission per tier, never two of the same kind */
+  function pick(){
+    var h=seed(),used=[],out=[];
+    for(var t=0;t<TIER.length;t++){var row=TIER[t],j=(h>>>(t*7))%row.length,n=0;
+      while(used.indexOf(row[j].k)>=0&&n++<row.length)j=(j+1)%row.length;
+      used.push(row[j].k);out.push(row[j])}
+    return out}
+  function ldS(){try{var o=JSON.parse(localStorage.getItem(KS)||'null');return o&&typeof o==='object'?{d:o.d||'',n:+o.n||0}:{d:'',n:0}}catch(e){return{d:'',n:0}}}
+  function yesterday(){var t=new Date(Date.now()-864e5);return t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0')}
+  function days(n){return n===1?'יום אחד':n===2?'יומיים':n+' ימים'}
+  function render(){
+    var box=$('qBox'),L=$('qList');if(!box||!window.AG||!AG.quests)return;
+    if(!LIST.length)return;
+    QDAY=LIST[seed()%LIST.length].id;
+    var dayName=(LIST.find(function(x){return x.id===QDAY})||{}).name||'';
+    var q=AG.quests(),ms=pick(),st=ldS(),allDone=true;
+    L.textContent='';
+    ms.forEach(function(m){
+      var txt=m.k==='spot'?('שחקו ב'+dayName+' – משחק היום'):m.t;
+      var have=Math.min(m.f(q),m.n),ok=have>=m.n,got=q.done.indexOf(m.k+m.n)>=0;
+      if(!got)allDone=false;
+      var r=document.createElement('div');r.className='qr'+(got?' ok':'');
+      var ic=document.createElement('div');ic.className='qi';ic.textContent=got?'✅':m.i;
+      var mid=document.createElement('div');mid.className='qm';
+      var t=document.createElement('div');t.className='qt';t.textContent=txt;
+      var p=document.createElement('div');p.className='qp';var pi=document.createElement('i');pi.style.width=Math.round(have/m.n*100)+'%';p.append(pi);
+      var n=document.createElement('div');n.className='qn';n.textContent=have+' / '+m.n+' · פרס '+m.r[0]+' 🪙'+(m.r[1]?' + '+m.r[1]+' 💎':'');
+      mid.append(t,p,n);
+      var b=document.createElement('button');b.className='qb';
+      b.textContent=got?'נאסף':ok?'קחו את הפרס':'בתהליך';b.disabled=got||!ok;
+      b.onclick=function(){var cur=AG.quests();if(cur.done.indexOf(m.k+m.n)>=0)return;
+        cur.done.push(m.k+m.n);AG.questPut(cur);AG.add(m.r[0],m.r[1]);render()};
+      r.append(ic,mid,b);L.append(r)});
+    /* all three done: bonus once, and the streak moves up a day */
+    if(allDone&&!q.all){var c2=AG.quests();c2.all=1;AG.questPut(c2);
+      var s2=st.d===AG.today()?st:{d:AG.today(),n:(st.d===yesterday()?st.n:0)+1};
+      try{localStorage.setItem(KS,JSON.stringify(s2))}catch(e){}
+      var bd=1+(s2.n%7===0?3:0);AG.add(100,bd);
+      setTimeout(function(){alert('סיימתם את כל המשימות של היום! 🎉\n+100 🪙 ו-'+bd+' 💎\nרצף משימות: '+days(s2.n));render()},80);
+      return}
+    st=ldS();
+    var live=st.d===AG.today()||st.d===yesterday()?st.n:0;
+    $('qStreak').textContent=live?'🔥 רצף '+days(live):'🔥 התחילו רצף';
+    box.hidden=false}
+  QRENDER=render;
+  document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')render()});
+})();
 
 /* personal bests */
 var BK={flappy:'b_best',fallingblocks:'f_best',game2048:'g_best',snake:'s_best'};

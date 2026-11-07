@@ -16,8 +16,22 @@
 
   /* record which games were opened (for Boss mode unlock) */
   try{var rel=location.href.slice(ROOT.length).split(/[?#]/)[0].replace(/index\.html$/,'').replace(/\/$/,'');
-    if(rel&&rel.indexOf('/')<0&&rel!=='boss'&&rel!=='lib'&&rel!=='assets'){var pl=JSON.parse(localStorage.getItem('ag_played')||'[]');if(pl.indexOf(rel)<0){pl.push(rel);localStorage.setItem('ag_played',JSON.stringify(pl))}}}catch(e){}
+    if(rel&&rel.indexOf('/')<0&&rel!=='boss'&&rel!=='lib'&&rel!=='assets'){var pl=JSON.parse(localStorage.getItem('ag_played')||'[]');if(pl.indexOf(rel)<0){pl.push(rel);localStorage.setItem('ag_played',JSON.stringify(pl))}
+      qBump(function(o){if(o.g.indexOf(rel)<0)o.g.push(rel)})}}catch(e){}
   var K='ag_wallet',KA='ag_admin',subs=[];
+
+  /* ---------- counters for the daily missions ----------
+     One record per day, reset the moment the local date changes. Every page
+     writes into it (games played, seconds, records, coins) and the lobby reads it. */
+  var KQ='ag_q';
+  function dayStr(){var t=new Date();return t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0')}
+  function qBlank(){return{d:dayStr(),g:[],sec:0,rec:0,coin:0,done:[],all:0}}
+  function qGet(){try{var o=JSON.parse(localStorage.getItem(KQ)||'null');
+    if(!o||o.d!==dayStr())return qBlank();
+    o.g=Array.isArray(o.g)?o.g:[];o.done=Array.isArray(o.done)?o.done:[];
+    o.sec=+o.sec||0;o.rec=+o.rec||0;o.coin=+o.coin||0;o.all=+o.all||0;return o}catch(e){return qBlank()}}
+  function qPut(o){try{localStorage.setItem(KQ,JSON.stringify(o))}catch(e){}}
+  function qBump(f){var o=qGet();try{f(o)}catch(e){}qPut(o)}
   /* anti-cheat: the wallet is signed; a hand-edited wallet is reset. (A deterrent only - real protection would need a server.) */
   function sig(c,d){var t='ag|'+c+'|'+d+'|k7Qx',h=2166136261;for(var i=0;i<t.length;i++){h^=t.charCodeAt(i);h=Math.imul(h,16777619)>>>0}return h.toString(36)}
   var tampered=false;
@@ -33,7 +47,11 @@
     played:function(){try{return JSON.parse(localStorage.getItem('ag_played')||'[]').length}catch(e){return 0}},
     coins:function(){return rd().c},
     diamonds:function(){return rd().d},
-    add:function(c,d){c=c||0;d=d||0;if((c>0||d>0)&&localStorage.getItem(KA)!==HASH&&!miniOk(localStorage.getItem(KM))&&!allow(Math.max(0,c),Math.max(0,d)))return;if(c>0&&AG.coinMult)c=Math.floor(c*AG.coinMult());var w=rd();w.c=Math.max(0,w.c+c);w.d=Math.max(0,w.d+d);wr(w)},
+    add:function(c,d){c=c||0;d=d||0;if((c>0||d>0)&&localStorage.getItem(KA)!==HASH&&!miniOk(localStorage.getItem(KM))&&!allow(Math.max(0,c),Math.max(0,d)))return;if(c>0&&AG.coinMult)c=Math.floor(c*AG.coinMult());var w=rd();w.c=Math.max(0,w.c+c);w.d=Math.max(0,w.d+d);wr(w);if(c>0)qBump(function(o){o.coin+=c})},
+    today:dayStr,
+    quests:qGet,
+    questPut:qPut,
+    questBump:qBump,
     tampered:function(){return tampered},
     spend:function(c,d){var w=rd();c=c||0;d=d||0;if(w.c<c||w.d<d)return false;w.c-=c;w.d-=d;wr(w);return true},
     onChange:function(f){subs.push(f)},
