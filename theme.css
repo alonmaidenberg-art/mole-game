@@ -129,6 +129,12 @@ body.hub .av{background:var(--zap)!important;color:#3a2400!important;
 body.hub .av small{color:#7a5200!important}
 body.hub .purse,body.hub .ico{background:#fff!important;color:#2b1659!important;
   border:3px solid var(--cabd)!important;box-shadow:0 4px 0 var(--cabd)!important}
+/* מחובר לחשבון: הצ'יפ ירוק, וליד כפתור התנתקות אדום */
+body.hub #accB.in,html[data-th="night"] body.hub #accB.in{
+  background:linear-gradient(180deg,#7df3dc,#2bcfae)!important;color:#05332b!important}
+body.hub #outB,html[data-th="night"] body.hub #outB{
+  background:linear-gradient(180deg,#ff9a9a,#e5484d)!important;color:#fff!important}
+body.hub #outB[hidden]{display:none!important}
 
 /* חיפוש וקטגוריות */
 body.hub .sr{background:#fff!important;color:#2b1659!important;

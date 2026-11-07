@@ -57,6 +57,9 @@ main{max-width:1180px;margin:0 auto;padding:calc(max(10px,env(safe-area-inset-to
 .ico.key{opacity:.45;font-size:16px;padding:7px 10px}
 #accT{font-size:14px;font-weight:900}
 #accS{display:none}
+#accB.in{background:linear-gradient(180deg,#5ff7d6,#1fc9a6);color:#06322b}
+#outB{background:linear-gradient(180deg,#ff9a9a,#e5484d);color:#fff}
+#outB[hidden]{display:none}
 @media(max-width:720px){#accT{display:none}.av small{display:none}.av b{font-size:14px}}
 
 /* ── המרקיזה: השלט המואר ── */
@@ -195,6 +198,7 @@ body.cmp .sec{font-size:18px;margin-top:11px}
     <span class="purse">🪙 <b id="wc">0</b></span>
     <span class="purse">💎 <b id="wd">0</b></span>
     <button class="ico" id="accB" type="button"><span id="accE">👤</span><span id="accT">התחברות</span><span id="accS"></span></button>
+    <button class="ico" id="outB" type="button" aria-label="התנתקות" title="התנתקות" hidden>🚪</button>
     <button class="ico" id="achB" type="button" aria-label="הישגים" title="הישגים">🏅</button>
     <button class="ico" id="lbB" type="button" aria-label="השיאים שלי" title="השיאים שלי">🏆</button>
     <button class="ico" id="gbB" type="button" aria-label="לוח תוצאות" title="לוח תוצאות">🌍</button>
@@ -387,8 +391,15 @@ $('m1').onclick=function(){AG.add(1000,0)};$('m2').onclick=function(){AG.add(0,1
 $('m3').onclick=function(){AG.miniLogout();admView()};
 </script>
 <script>(function(){function upd(){if(!window.AGAv)return setTimeout(upd,120);document.getElementById('meI').src=AGAv.url(null,92);var n='';try{n=(localStorage.getItem('ag_name')||'').trim()}catch(e){}if(n&&AGAv.mine())document.getElementById('meN').textContent=n;if(!AGAv.mine())document.querySelector('#meB small').textContent='🎨 צרו דמות משלכם – חדש!'}upd();addEventListener('pageshow',upd)})();
-(function(){function u(){if(!window.AGAcct)return setTimeout(u,120);var a=AGAcct.me(),n='';try{n=(localStorage.getItem('ag_name')||'').trim()}catch(e){}
+(function(){var ob=document.getElementById('outB');
+function u(){if(!window.AGAcct)return setTimeout(u,120);var a=AGAcct.me(),n='';try{n=(localStorage.getItem('ag_name')||'').trim()}catch(e){}
+var ab=document.getElementById('accB');
 document.getElementById('accE').textContent=a?'☁️':'👤';document.getElementById('accT').textContent=a?(n||'מחובר'):'התחברות';document.getElementById('accS').textContent=a?'מחובר · התנתקות':'שחקו מכל מחשב';
-if(!u.h){u.h=1;AGAcct.onChange(u);document.getElementById('accB').onclick=function(){AGAcct.open()}}}u()})();</script>
+ab.classList.toggle('in',!!a);ab.title=a?'החשבון שלי · הקוד הסודי':'התחברות לחשבון';
+ob.hidden=!a;ob.title=a?'התנתקות'+(n?' מ'+n:''):'התנתקות';
+if(!u.h){u.h=1;AGAcct.onChange(u);ab.onclick=function(){AGAcct.open()};
+  ob.onclick=function(){if(!confirm('להתנתק מהחשבון?\n\nההתקדמות נשמרת בענן ותחזור כשתתחברו שוב עם הקוד הסודי,\nאבל היא תימחק מהמחשב הזה.'))return;
+    ob.disabled=true;ob.textContent='⏳';AGAcct.logout().then(function(j){if(j&&j.ok)location.reload();else{ob.disabled=false;ob.textContent='🚪';alert((j&&j.msg)||'לא הצלחנו להתנתק עכשיו. נסו שוב.')}})}}}
+u()})();</script>
 </body>
 </html>
