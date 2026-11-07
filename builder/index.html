@@ -1,0 +1,473 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta name="author" content="Alon Maidenberg - אלון מידנברג"><meta name="copyright" content="© 2026 אלון מידנברג. כל הזכויות שמורות.">
+<!-- © 2026 Alon Maidenberg (אלון מידנברג). All rights reserved. Copying, republishing or modifying this game without written permission is not allowed. -->
+<meta name="robots" content="noai, noimageai">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>בונה השלבים – אלון מידנברג</title>
+<meta name="description" content="בנו שלב משלכם, שחקו בו, ושלחו את הקוד לחברים כדי שישחקו בו גם.">
+<meta name="theme-color" content="#1d1040">
+<link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:#1d1040;color:#fff;
+  font-family:Rubik,"Segoe UI",system-ui,sans-serif;overscroll-behavior:none}
+#wrap{display:flex;flex-direction:column;height:100%;gap:7px;padding:7px;padding-top:max(7px,env(safe-area-inset-top))}
+.bar{display:flex;gap:6px;align-items:center;flex-wrap:wrap;flex:0 0 auto}
+.btn{border:3px solid #0d0624;border-radius:13px;background:#ffd43b;color:#2b1659;
+  font:900 14px Rubik,system-ui;padding:8px 12px;cursor:pointer;box-shadow:0 4px 0 #0d0624}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #0d0624}
+.btn.g{background:#35e0ff}.btn.p{background:#ff3d8b;color:#fff}.btn.d{background:#cfc9df;color:#4b4463}
+.btn[disabled]{opacity:.5;cursor:default}
+.title{font:900 17px Rubik,system-ui;margin-inline-end:auto;white-space:nowrap}
+.pal{display:flex;gap:5px;flex-wrap:wrap;flex:0 0 auto}
+.pal button{width:46px;height:46px;border-radius:12px;border:3px solid #0d0624;background:#2a1a5e;
+  cursor:pointer;display:grid;place-items:center;padding:0}
+.pal button.on{outline:4px solid #ffd43b;outline-offset:1px}
+.pal button canvas{display:block}
+#stage{flex:1 1 auto;min-height:0;display:grid;place-items:center;background:#120a2c;
+  border:4px solid #0d0624;border-radius:18px;overflow:hidden;position:relative}
+canvas#cv{display:block;touch-action:none;max-width:100%;max-height:100%;image-rendering:auto}
+#hud{position:absolute;inset-inline-end:14px;bottom:10px;font:900 16px Rubik,system-ui;direction:ltr;
+  text-shadow:0 2px 0 rgba(0,0,0,.7);pointer-events:none;line-height:1.45;white-space:pre}
+#tip{font:700 13px Rubik,system-ui;opacity:.85;flex:0 0 auto}
+#pad{display:none;gap:8px;justify-content:space-between;flex:0 0 auto;
+  padding-bottom:max(2px,env(safe-area-inset-bottom))}
+#pad .side{display:flex;gap:8px}
+#pad button{width:68px;height:60px;border-radius:16px;border:3px solid #0d0624;background:rgba(255,255,255,.9);
+  color:#2b1659;font:900 24px system-ui;touch-action:none}
+body.play #pad{display:flex}
+#editOnly,#playOnly{display:contents}
+body.play .pal,body.play #editOnly,body.play #tip{display:none}
+body:not(.play) #playOnly{display:none}
+.mo{position:fixed;inset:0;background:rgba(10,6,28,.82);display:none;place-items:center;z-index:30;padding:14px}
+.mo.show{display:grid}
+.mc{background:#2a1a5e;border:4px solid #0d0624;border-radius:20px;padding:16px;max-width:480px;width:100%;
+  box-shadow:0 10px 0 #0d0624;max-height:88vh;overflow:auto}
+.mc h2{margin:0 0 10px;font:900 20px Rubik,system-ui}
+.mc p{margin:6px 0;font-size:14.5px;line-height:1.5}
+.mc textarea,.mc input{width:100%;font:700 14px ui-monospace,monospace;padding:9px;border-radius:12px;
+  border:3px solid #0d0624;background:#1a1040;color:#fff;resize:vertical}
+.mc textarea{min-height:88px}
+.row{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.lv{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.08);border-radius:12px;padding:8px 10px;margin:6px 0}
+.lv b{flex:1;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lv button{border:0;border-radius:10px;padding:6px 9px;font:900 12.5px system-ui;cursor:pointer;background:#ffd43b;color:#2b1659}
+.lv button.x{background:#ff9a9a}
+@media(max-width:560px){.title{font-size:15px}.btn{padding:7px 10px;font-size:13px}
+  .pal button{width:40px;height:40px}}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <div id="stage"><canvas id="cv"></canvas><div id="hud"></div></div>
+  <div class="pal" id="pal"></div>
+  <div id="tip">ציירו עם העכבר או האצבע. ▸ = התחלה, 🚩 = סיום. צריך את שניהם כדי לשחק.</div>
+  <div class="bar">
+    <span class="title">🏗️ בונה השלבים</span>
+    <span id="editOnly">
+      <button class="btn g" id="bPlay">▶ שחק</button>
+      <button class="btn" id="bSave">💾 שמור</button>
+      <button class="btn" id="bCode">📤 קוד לשיתוף</button>
+      <button class="btn" id="bLoad">📥 שלבים</button>
+      <button class="btn d" id="bClear">🧹 נקה</button>
+    </span>
+    <span id="playOnly">
+      <button class="btn p" id="bEdit">✏️ חזרה לעריכה</button>
+      <button class="btn d" id="bRetry">↻ מהתחלה</button>
+    </span>
+  </div>
+  <div id="pad">
+    <div class="side"><button id="pR">▶</button><button id="pL">◀</button></div>
+    <div class="side"><button id="pJ">⤒</button></div>
+  </div>
+</div>
+
+<div class="mo" id="mCode"><div class="mc"><h2>📤 הקוד של השלב</h2>
+  <p>שלחו את הקוד לחברים. הם לוחצים על "📥 שלבים" ומדביקים אותו, והשלב שלכם ייפתח אצלם.</p>
+  <textarea id="codeT" readonly></textarea>
+  <div class="row"><button class="btn" id="codeCopy">העתקת הקוד</button>
+    <button class="btn g" id="codeLink">העתקת קישור</button>
+    <button class="btn d" id="codeX">סגור</button></div>
+  <div id="codeMsg" style="min-height:18px;font-size:13.5px;margin-top:8px;opacity:.9"></div></div></div>
+
+<div class="mo" id="mLoad"><div class="mc"><h2>📥 שלבים</h2>
+  <p>הדביקו קוד של חבר:</p>
+  <input id="loadC" placeholder="הדביקו כאן את הקוד" autocomplete="off" spellcheck="false">
+  <div class="row"><button class="btn g" id="loadGo">פתיחת השלב</button><button class="btn d" id="loadX">סגור</button></div>
+  <div id="loadMsg" style="min-height:18px;font-size:13.5px;margin-top:8px;opacity:.9"></div>
+  <h2 style="margin-top:14px;font-size:17px">השלבים שלי</h2><div id="myList"></div>
+  <h2 style="margin-top:14px;font-size:17px">שלבים לדוגמה</h2><div id="demoList"></div></div></div>
+
+<div class="mo" id="mWin"><div class="mc" style="text-align:center"><h2 id="winT">🏁 סיימתם!</h2>
+  <p id="winP"></p>
+  <div class="row" style="justify-content:center"><button class="btn g" id="winAgain">↻ שוב</button>
+    <button class="btn" id="winEdit">✏️ לעריכה</button></div></div></div>
+
+<script src="../hub.js"></script>
+<script>
+'use strict';
+/* © 2026 Alon Maidenberg. Level builder: paint a level, play it, share it as a code. */
+var W=40,H=20,TS=30;                 /* grid size and tile pixels */
+var EMPTY=0,BLOCK=1,ICE=2,CRACK=3,SPIKE=4,COIN=5,PAD=6,FOE=7,START=8,GOAL=9;
+var SOLID=[0,1,1,1,0,0,1,0,0,0];     /* which tiles you stand on */
+var PAINT=[
+  {t:BLOCK,n:'קרקע'},{t:ICE,n:'קרח חלקלק'},{t:CRACK,n:'בלוק שנשבר'},
+  {t:SPIKE,n:'קוצים'},{t:COIN,n:'מטבע'},{t:PAD,n:'קפיצה'},{t:FOE,n:'אויב'},
+  {t:START,n:'התחלה'},{t:GOAL,n:'דגל סיום'},{t:EMPTY,n:'מחק'}];
+var G=new Uint8Array(W*H);
+function gi(x,y){return y*W+x}
+function get(x,y){return(x<0||y<0||x>=W||y>=H)?BLOCK:G[gi(x,y)]}   /* outside = wall */
+function set(x,y,t){if(x<0||y<0||x>=W||y>=H)return;
+  if(t===START||t===GOAL)for(var i=0;i<G.length;i++)if(G[i]===t)G[i]=EMPTY;
+  G[gi(x,y)]=t}
+function findOne(t){for(var i=0;i<G.length;i++)if(G[i]===t)return{x:i%W,y:(i/W)|0};return null}
+
+/* ---------- a starter level so the canvas is never empty ---------- */
+function blank(){G.fill(EMPTY);
+  for(var x=0;x<W;x++){G[gi(x,H-1)]=BLOCK;G[gi(x,H-2)]=BLOCK}
+  set(2,H-3,START);set(W-3,H-3,GOAL)}
+
+/* ---------- share codes: runs of "letter + how many" ---------- */
+var AB='abcdefghij';
+function encode(){
+  var s='L1',run=G[0],n=0,i;
+  for(i=0;i<G.length;i++){if(G[i]===run){n++;continue}s+=AB[run]+n;run=G[i];n=1}
+  return s+AB[run]+n}
+function decode(code){
+  code=String(code||'').trim().replace(/\s+/g,'');
+  var m=code.match(/^L1(.*)$/);if(!m)return null;
+  var body=m[1],out=[],i=0;
+  while(i<body.length){
+    var t=AB.indexOf(body[i]);if(t<0)return null;i++;
+    var d='';while(i<body.length&&body[i]>='0'&&body[i]<='9')d+=body[i++];
+    if(!d)return null;var n=+d;if(n<0||out.length+n>W*H+1)return null;
+    for(var k=0;k<n;k++)out.push(t)}
+  if(out.length!==W*H)return null;
+  return Uint8Array.from(out)}
+
+/* ---------- canvas ---------- */
+var cv=document.getElementById('cv'),cx=cv.getContext('2d'),stage=document.getElementById('stage');
+cv.width=W*TS;cv.height=H*TS;
+function fit(){var r=stage.getBoundingClientRect(),s=Math.min((r.width-8)/cv.width,(r.height-8)/cv.height);
+  if(!isFinite(s)||s<=0)s=1;cv.style.width=Math.floor(cv.width*s)+'px';cv.style.height=Math.floor(cv.height*s)+'px'}
+addEventListener('resize',fit);
+
+function rr(x,y,w,h,r){cx.beginPath();cx.moveTo(x+r,y);cx.arcTo(x+w,y,x+w,y+h,r);cx.arcTo(x+w,y+h,x,y+h,r);
+  cx.arcTo(x,y+h,x,y,r);cx.arcTo(x,y,x+w,y,r);cx.closePath()}
+function tile(t,px,py,s,anim){
+  var u=s/30;
+  if(t===BLOCK||t===ICE||t===CRACK){
+    var top=t===ICE?'#9fe9ff':t===CRACK?'#d9a86a':'#6ad06a',
+        bot=t===ICE?'#4fb7e0':t===CRACK?'#a97b42':'#2f8f3f';
+    cx.fillStyle=bot;rr(px,py,s,s,4*u);cx.fill();
+    cx.fillStyle=top;rr(px+1*u,py+1*u,s-2*u,s*0.52,4*u);cx.fill();
+    if(t===CRACK){cx.strokeStyle='rgba(0,0,0,.45)';cx.lineWidth=2*u;cx.beginPath();
+      cx.moveTo(px+s*0.3,py+2*u);cx.lineTo(px+s*0.45,py+s*0.5);cx.lineTo(px+s*0.28,py+s-2*u);cx.stroke()}
+    if(t===ICE){cx.fillStyle='rgba(255,255,255,.75)';rr(px+s*0.18,py+s*0.16,s*0.26,s*0.12,3*u);cx.fill()}
+    return}
+  if(t===SPIKE){cx.fillStyle='#ff5470';cx.beginPath();
+    for(var i=0;i<3;i++){var bx=px+i*s/3;cx.moveTo(bx,py+s);cx.lineTo(bx+s/6,py+s*0.18);cx.lineTo(bx+s/3,py+s)}
+    cx.fill();cx.fillStyle='rgba(255,255,255,.5)';cx.fillRect(px,py+s-3*u,s,3*u);return}
+  if(t===COIN){var w=Math.abs(Math.cos((anim||0)*2.4));
+    cx.fillStyle='#ffd43b';cx.beginPath();cx.ellipse(px+s/2,py+s/2,s*0.27*(0.25+0.75*w),s*0.29,0,0,6.3);cx.fill();
+    cx.strokeStyle='#c78f12';cx.lineWidth=2*u;cx.stroke();return}
+  if(t===PAD){cx.fillStyle='#4b3a86';rr(px+2*u,py+s*0.55,s-4*u,s*0.4,3*u);cx.fill();
+    cx.fillStyle='#ff3d8b';rr(px+1*u,py+s*0.3+Math.sin((anim||0)*6)*1.5*u,s-2*u,s*0.3,5*u);cx.fill();return}
+  if(t===GOAL){cx.fillStyle='#d9d4ea';cx.fillRect(px+s*0.22,py+s*0.08,3*u,s*0.86);
+    cx.fillStyle='#35e0ff';cx.beginPath();cx.moveTo(px+s*0.3,py+s*0.12);
+    cx.lineTo(px+s*0.86+Math.sin((anim||0)*3)*2*u,py+s*0.3);cx.lineTo(px+s*0.3,py+s*0.5);cx.fill();return}
+  if(t===START){cx.fillStyle='rgba(60,240,160,.28)';rr(px+2*u,py+2*u,s-4*u,s-4*u,6*u);cx.fill();
+    cx.fillStyle='#3cf0a0';cx.font='900 '+(s*0.55)+'px system-ui';cx.textAlign='center';cx.textBaseline='middle';
+    cx.fillText('▸',px+s/2,py+s/2);return}
+  if(t===FOE){foe(px+s/2,py+s*0.62,s*0.42,anim||0,1)}
+}
+function foe(cxp,cyp,r,anim,dir){
+  cx.fillStyle='#b14bff';cx.beginPath();cx.ellipse(cxp,cyp,r,r*0.9+Math.sin(anim*7)*r*0.06,0,0,6.3);cx.fill();
+  cx.fillStyle='#2a1a5e';cx.beginPath();
+  cx.arc(cxp-r*0.3*dir,cyp-r*0.2,r*0.17,0,6.3);cx.arc(cxp+r*0.25*dir,cyp-r*0.2,r*0.17,0,6.3);cx.fill();
+  cx.strokeStyle='#2a1a5e';cx.lineWidth=r*0.16;cx.beginPath();
+  cx.moveTo(cxp-r*0.35,cyp+r*0.42);cx.lineTo(cxp+r*0.35,cyp+r*0.42);cx.stroke()}
+
+/* ---------- player ---------- */
+var P={x:0,y:0,vx:0,vy:0,on:0,dir:1,dead:0,win:0},coins=0,total=0,deaths=0,t0=0,playing=false;
+var PW=20,PH=26,anim=0,foes=[],broken=[];
+function resetPlay(full){
+  var s=findOne(START)||{x:1,y:H-3};
+  P.x=s.x*TS+(TS-PW)/2;P.y=s.y*TS+TS-PH;P.vx=P.vy=0;P.on=0;P.dead=0;P.win=0;P.dir=1;
+  coins=0;broken=[];
+  foes=[];total=0;
+  for(var i=0;i<G.length;i++){
+    if(G[i]===COIN)total++;
+    if(G[i]===FOE)foes.push({x:(i%W)*TS+TS/2,y:((i/W)|0)*TS+TS*0.62,d:1,alive:1})}
+  if(full){deaths=0;t0=performance.now()}}
+function solidAt(px,py){
+  var t=get(Math.floor(px/TS),Math.floor(py/TS));
+  if(t===CRACK&&broken.indexOf(Math.floor(py/TS)*W+Math.floor(px/TS))>=0)return 0;
+  return SOLID[t]}
+function hits(x,y){
+  var x0=x+2,x1=x+PW-3,y0=y+1,y1=y+PH-1;
+  return solidAt(x0,y0)||solidAt(x1,y0)||solidAt(x0,y1)||solidAt(x1,y1)||
+         solidAt((x0+x1)/2,y0)||solidAt((x0+x1)/2,y1)}
+function cellsUnder(){var out=[],x0=Math.floor((P.x+3)/TS),x1=Math.floor((P.x+PW-4)/TS),
+    y0=Math.floor((P.y+2)/TS),y1=Math.floor((P.y+PH-2)/TS);
+  for(var y=y0;y<=y1;y++)for(var x=x0;x<=x1;x++)if(x>=0&&y>=0&&x<W&&y<H)out.push(gi(x,y));
+  return out}
+var key={};
+addEventListener('keydown',function(e){
+  if(['ArrowLeft','ArrowRight','ArrowUp',' ','a','d','w'].indexOf(e.key)>=0)e.preventDefault();
+  key[e.key]=1;if(e.key==='Escape'&&playing)toEdit()});
+addEventListener('keyup',function(e){key[e.key]=0});
+function held(a){for(var i=0;i<a.length;i++)if(key[a[i]])return 1;return 0}
+var padL=0,padR=0,padJ=0;
+function bindPad(id,set){var el=document.getElementById(id);
+  var on=function(e){e.preventDefault();set(1)},off=function(e){e.preventDefault();set(0)};
+  el.addEventListener('pointerdown',on);el.addEventListener('pointerup',off);
+  el.addEventListener('pointercancel',off);el.addEventListener('pointerleave',off)}
+bindPad('pL',function(v){padL=v});bindPad('pR',function(v){padR=v});bindPad('pJ',function(v){padJ=v});
+
+/* move in small steps so a fast player can never tunnel through a block,
+   then creep the last quarter-pixel so you end up flush against it */
+function moveX(d){
+  var n=Math.max(1,Math.ceil(Math.abs(d)/2)),s=d/n,e=s>0?0.25:-0.25,g;
+  for(var i=0;i<n;i++){
+    if(hits(P.x+s,P.y)){g=0;while(!hits(P.x+e,P.y)&&g++<12)P.x+=e;P.vx=0;return}
+    P.x+=s}}
+function moveY(d){
+  var n=Math.max(1,Math.ceil(Math.abs(d)/2)),s=d/n,e=s>0?0.25:-0.25,g;
+  P.on=0;
+  for(var i=0;i<n;i++){
+    if(hits(P.x,P.y+s)){g=0;while(!hits(P.x,P.y+e)&&g++<12)P.y+=e;
+      if(d>0)P.on=1;P.vy=0;return}
+    P.y+=s}}
+function step(){
+  if(P.win||P.dead)return;
+  var left=held(['ArrowLeft','a','A'])||padL,right=held(['ArrowRight','d','D'])||padR,
+      jump=held(['ArrowUp','w','W',' '])||padJ;
+  var onIce=P.on&&get(Math.floor((P.x+PW/2)/TS),Math.floor((P.y+PH+2)/TS))===ICE;
+  var acc=onIce?0.22:0.8,fr=onIce?0.975:0.76;
+  if(left){P.vx-=acc;P.dir=-1}
+  if(right){P.vx+=acc;P.dir=1}
+  if(!left&&!right)P.vx*=fr;
+  P.vx=Math.max(-3.6,Math.min(3.6,P.vx));
+  if(jump&&P.on){P.vy=-9.3;P.on=0}
+  if(!jump&&P.vy<-3)P.vy*=0.86;             /* short hop when the key is let go */
+  P.vy=Math.min(P.vy+0.55,13);
+
+  moveX(P.vx);moveY(P.vy);
+  if(P.x<0)P.x=0;if(P.x>W*TS-PW)P.x=W*TS-PW;
+  if(P.y>H*TS+60){P.dead=1}
+
+  /* what am I standing in */
+  var cs=cellsUnder(),i;
+  for(i=0;i<cs.length;i++){
+    var t=G[cs[i]];
+    if(t===COIN){G[cs[i]]=EMPTY;coins++;if(window.AG)AG.add(1,0)}
+    else if(t===SPIKE)P.dead=1;
+    else if(t===GOAL)P.win=1;
+    else if(t===PAD&&P.vy>=-1){P.vy=-13.6;P.on=0}}
+  /* a cracked block under my feet gives way */
+  if(P.on){var fx=Math.floor((P.x+PW/2)/TS),fy=Math.floor((P.y+PH+2)/TS);
+    if(get(fx,fy)===CRACK){var id=gi(fx,fy);if(broken.indexOf(id)<0)broken.push(id)}}
+
+  /* enemies walk, turn at walls and ledges, and can be stomped */
+  for(i=0;i<foes.length;i++){var f=foes[i];if(!f.alive)continue;
+    var nxf=f.x+f.d*1.15,cxi=Math.floor(nxf/TS),cyi=Math.floor(f.y/TS);
+    if(SOLID[get(cxi,cyi)]||!SOLID[get(cxi,cyi+1)])f.d*=-1;else f.x=nxf;
+    var dx=Math.abs(f.x-(P.x+PW/2)),dy=(P.y+PH)-f.y;
+    if(dx<TS*0.46&&dy>-TS*0.5&&dy<TS*0.62){
+      if(P.vy>1.2&&dy<TS*0.34){f.alive=0;P.vy=-7.6;if(window.AG)AG.add(2,0)}
+      else P.dead=1}}
+}
+function frame(ts){
+  requestAnimationFrame(frame);
+  anim=ts/1000;
+  if(playing){
+    step();
+    if(P.dead){deaths++;if(SNAP)G.set(SNAP);resetPlay(false)}
+    if(P.win){playing=false;win()}}
+  draw()}
+function draw(){
+  var sky=cx.createLinearGradient(0,0,0,cv.height);
+  sky.addColorStop(0,'#2a1a6e');sky.addColorStop(1,'#120a2c');
+  cx.fillStyle=sky;cx.fillRect(0,0,cv.width,cv.height);
+  if(!playing){ /* grid paper while editing */
+    cx.strokeStyle='rgba(255,255,255,.07)';cx.lineWidth=1;
+    cx.beginPath();for(var x=0;x<=W;x++){cx.moveTo(x*TS+.5,0);cx.lineTo(x*TS+.5,cv.height)}
+    for(var y=0;y<=H;y++){cx.moveTo(0,y*TS+.5);cx.lineTo(cv.width,y*TS+.5)}cx.stroke()}
+  for(var i=0;i<G.length;i++){var t=G[i];if(t===EMPTY)continue;
+    if(playing&&t===FOE)continue;
+    if(playing&&t===CRACK&&broken.indexOf(i)>=0)continue;
+    if(playing&&t===START)continue;
+    tile(t,(i%W)*TS,((i/W)|0)*TS,TS,anim)}
+  if(playing){
+    for(var f=0;f<foes.length;f++)if(foes[f].alive)foe(foes[f].x,foes[f].y,TS*0.42,anim,foes[f].d);
+    /* the player */
+    cx.fillStyle='#ffd43b';rr(P.x,P.y,PW,PH,7);cx.fill();
+    cx.fillStyle='#2b1659';
+    cx.beginPath();cx.arc(P.x+PW/2+P.dir*3,P.y+9,2.6,0,6.3);cx.fill();
+    cx.strokeStyle='#2b1659';cx.lineWidth=2;cx.beginPath();
+    cx.moveTo(P.x+5,P.y+17);cx.quadraticCurveTo(P.x+PW/2,P.y+21,P.x+PW-5,P.y+17);cx.stroke();
+    document.getElementById('hud').textContent='🪙 '+coins+' / '+total+'   💀 '+deaths+'   ⏱ '+tsec();
+  }else{
+    if(hoverC>=0&&hoverC<G.length){var hx=(hoverC%W)*TS,hy=((hoverC/W)|0)*TS;
+      cx.globalAlpha=.45;tile(PAINT[sel].t||EMPTY,hx,hy,TS,anim);cx.globalAlpha=1;
+      cx.strokeStyle='#ffd43b';cx.lineWidth=2;cx.strokeRect(hx+1,hy+1,TS-2,TS-2)}
+    document.getElementById('hud').textContent=''}
+}
+function tsec(){return ((performance.now()-t0)/1000).toFixed(1)}
+
+/* ---------- painting ---------- */
+var sel=0,hoverC=-1,down=false;
+(function(){var p=document.getElementById('pal');
+  PAINT.forEach(function(o,i){
+    var b=document.createElement('button');b.title=o.n;b.setAttribute('aria-label',o.n);
+    var c=document.createElement('canvas');c.width=c.height=34;var g=c.getContext('2d');
+    var save=cx;cx=g;
+    if(o.t===EMPTY){g.strokeStyle='#ff9a9a';g.lineWidth=4;g.beginPath();
+      g.moveTo(8,8);g.lineTo(26,26);g.moveTo(26,8);g.lineTo(8,26);g.stroke()}
+    else tile(o.t,2,2,30,0);
+    cx=save;
+    b.append(c);if(i===0)b.className='on';
+    b.onclick=function(){sel=i;[].forEach.call(p.children,function(e,j){e.className=j===i?'on':''})};
+    p.append(b)})})();
+function cellFrom(e){var r=cv.getBoundingClientRect();
+  var x=Math.floor((e.clientX-r.left)/r.width*W),y=Math.floor((e.clientY-r.top)/r.height*H);
+  return(x<0||y<0||x>=W||y>=H)?-1:gi(x,y)}
+cv.addEventListener('pointerdown',function(e){if(playing)return;e.preventDefault();down=true;
+  cv.setPointerCapture(e.pointerId);paintAt(cellFrom(e))});
+cv.addEventListener('pointermove',function(e){if(playing)return;hoverC=cellFrom(e);if(down)paintAt(hoverC)});
+cv.addEventListener('pointerup',function(){if(down){down=false;save()}});
+cv.addEventListener('pointerleave',function(){if(down){down=false;save()}hoverC=-1});
+cv.addEventListener('contextmenu',function(e){e.preventDefault()});
+function paintAt(c){if(c<0)return;set(c%W,(c/W)|0,PAINT[sel].t)}
+
+/* ---------- saving ---------- */
+var KEY='ag_builder',KCUR='ag_builder_cur';
+function save(){try{localStorage.setItem(KCUR,encode())}catch(e){}}
+function myLevels(){try{var a=JSON.parse(localStorage.getItem(KEY)||'[]');return Array.isArray(a)?a:[]}catch(e){return[]}}
+function putLevels(a){try{localStorage.setItem(KEY,JSON.stringify(a.slice(0,40)))}catch(e){}}
+
+/* ---------- screens ---------- */
+function toPlay(){
+  if(!findOne(START)){alert('חסרה נקודת התחלה ▸ — בחרו אותה בסרגל ולחצו על המפה.');return}
+  if(!findOne(GOAL)){alert('חסר דגל סיום 🚩 — בלעדיו אי אפשר לנצח.');return}
+  SNAP=Uint8Array.from(G);                 /* coins vanish while playing, so keep a copy */
+  document.body.classList.add('play');playing=true;resetPlay(true);fit()}
+function toEdit(){playing=false;if(SNAP)G.set(SNAP);document.body.classList.remove('play');fit();save()}
+var SNAP=null;
+function win(){
+  var t=tsec();
+  document.getElementById('winP').textContent='אספתם '+coins+' מתוך '+total+' מטבעות · '+deaths+
+    (deaths===1?' מוות':' מיתות')+' · '+t+' שניות';
+  document.getElementById('mWin').classList.add('show');
+  if(window.AG)AG.add(15+coins*2,0);
+  /* the record the lobby shows: how many levels you have finished */
+  try{localStorage.setItem('builder_best',String((+localStorage.getItem('builder_best')||0)+1))}catch(e){}}
+document.getElementById('bPlay').onclick=toPlay;
+document.getElementById('bEdit').onclick=toEdit;
+document.getElementById('bRetry').onclick=function(){if(SNAP)G.set(SNAP);resetPlay(true)};
+document.getElementById('winAgain').onclick=function(){document.getElementById('mWin').classList.remove('show');
+  if(SNAP)G.set(SNAP);playing=true;resetPlay(true)};
+document.getElementById('winEdit').onclick=function(){document.getElementById('mWin').classList.remove('show');toEdit()};
+document.getElementById('bClear').onclick=function(){if(confirm('למחוק את כל השלב ולהתחיל מחדש?')){blank();save()}};
+
+/* share code */
+function show(id,v){document.getElementById(id).classList[v?'add':'remove']('show')}
+document.getElementById('bCode').onclick=function(){
+  document.getElementById('codeT').value=encode();document.getElementById('codeMsg').textContent='';show('mCode',1)};
+document.getElementById('codeX').onclick=function(){show('mCode',0)};
+function copyText(s,msgId){
+  var done=function(){document.getElementById(msgId).textContent='הועתק ✅'};
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(s).then(done,function(){fall()});
+  else fall();
+  function fall(){var t=document.getElementById('codeT');t.focus();t.select();
+    try{document.execCommand('copy');done()}catch(e){document.getElementById(msgId).textContent='סמנו את הקוד והעתיקו ידנית'}}}
+document.getElementById('codeCopy').onclick=function(){copyText(encode(),'codeMsg')};
+document.getElementById('codeLink').onclick=function(){
+  copyText(location.origin+location.pathname+'?l='+encode(),'codeMsg')};
+
+/* levels drawer */
+var DEMOS=[
+  {n:'קפיצות ראשונות',c:null},
+  {n:'מערת הקוצים',c:null},
+  {n:'מגדל הקרח',c:null}];
+function demoLevels(){
+  /* built here rather than pasted, so the codes can never go stale.
+     They are drawn into the live grid and the player's own level is put back at the end. */
+  var hold=Uint8Array.from(G);
+  function build(fn){G.fill(EMPTY);fn();return encode()}
+  var out=[];
+  out.push(build(function(){
+    for(var x=0;x<W;x++){set(x,H-1,BLOCK);set(x,H-2,BLOCK)}
+    for(var i=0;i<5;i++){var bx=6+i*6;for(var k=0;k<3;k++)set(bx+k,H-4-i,BLOCK);set(bx+1,H-5-i,COIN)}
+    set(2,H-3,START);set(W-3,H-3-4,GOAL);for(var k2=0;k2<3;k2++)set(W-4+k2,H-3-4+1,BLOCK)}));
+  out.push(build(function(){
+    for(var x=0;x<W;x++){set(x,H-1,BLOCK);set(x,H-2,SPIKE)}
+    for(var i=0;i<9;i++){var bx=3+i*4;set(bx,H-3,BLOCK);set(bx+1,H-3,BLOCK);
+      if(i%3===1)set(bx,H-4,COIN);if(i%4===2)set(bx+1,H-4,FOE)}
+    set(3,H-4,START);set(W-4,H-4,GOAL);set(W-5,H-3,BLOCK);set(W-4,H-3,BLOCK)}));
+  out.push(build(function(){
+    /* a climb: every shelf overlaps the one below it, so it can always be jumped */
+    var last={x:0,y:0};
+    for(var i=0;i<7;i++){
+      var y=H-2-i*2,x0=(i%2)?16:4,wide=13;
+      for(var k=0;k<wide;k++)set(x0+k,y,i%2?ICE:BLOCK);
+      set(x0+(i%2?2:wide-3),y-1,COIN);
+      if(i>1&&i%3===0)set(x0+(i%2?wide-4:3),y-1,CRACK);
+      last={x:x0,y:y}}
+    set(5,H-3,START);
+    set(last.x+1,last.y-1,GOAL);
+    set(10,H-4,PAD)}));
+  G.set(hold);return out}
+function drawer(){
+  var my=document.getElementById('myList');my.textContent='';
+  var list=myLevels();
+  if(!list.length)my.innerHTML='<p style="opacity:.8;font-size:14px">עוד לא שמרתם שלב. בנו משהו ולחצו 💾 שמור.</p>';
+  list.forEach(function(o,i){
+    var d=document.createElement('div');d.className='lv';
+    var b=document.createElement('b');b.textContent=o.n;
+    var g1=document.createElement('button');g1.textContent='פתח';g1.onclick=function(){useCode(o.c,'loadMsg')};
+    var g2=document.createElement('button');g2.textContent='קוד';g2.onclick=function(){
+      show('mLoad',0);document.getElementById('codeT').value=o.c;document.getElementById('codeMsg').textContent='';show('mCode',1)};
+    var g3=document.createElement('button');g3.className='x';g3.textContent='מחק';
+    g3.onclick=function(){if(confirm('למחוק את "'+o.n+'"?')){var a=myLevels();a.splice(i,1);putLevels(a);drawer()}};
+    d.append(b,g1,g2,g3);my.append(d)});
+  var dl=document.getElementById('demoList');dl.textContent='';
+  var codes=demoLevels();
+  DEMOS.forEach(function(o,i){o.c=codes[i];
+    var d=document.createElement('div');d.className='lv';
+    var b=document.createElement('b');b.textContent=o.n;
+    var go=document.createElement('button');go.textContent='שחק';go.onclick=function(){useCode(o.c,'loadMsg',true)};
+    d.append(b,go);dl.append(d)})}
+function useCode(code,msgId,play){
+  var g=decode(code);
+  if(!g){document.getElementById(msgId).textContent='הקוד לא תקין. ודאו שהעתקתם אותו במלואו.';return}
+  G.set(g);save();show('mLoad',0);
+  if(play)toPlay();else{document.body.classList.remove('play');playing=false;SNAP=null}}
+document.getElementById('bLoad').onclick=function(){
+  document.getElementById('loadC').value='';document.getElementById('loadMsg').textContent='';
+  SNAP=Uint8Array.from(G);drawer();show('mLoad',1)};
+document.getElementById('loadX').onclick=function(){show('mLoad',0)};
+document.getElementById('loadGo').onclick=function(){useCode(document.getElementById('loadC').value,'loadMsg')};
+document.getElementById('bSave').onclick=function(){
+  var n=prompt('איך לקרוא לשלב?','השלב שלי '+(myLevels().length+1));
+  if(!n)return;var a=myLevels();a.unshift({n:String(n).slice(0,30),c:encode(),t:Date.now()});putLevels(a);
+  alert('נשמר! אפשר לפתוח אותו שוב מ-"📥 שלבים".')};
+
+/* ---------- start ---------- */
+(function(){
+  var fromUrl=(location.search.match(/[?&]l=([^&]+)/)||[])[1];
+  var g=fromUrl&&decode(decodeURIComponent(fromUrl));
+  if(!g){var cur=null;try{cur=localStorage.getItem(KCUR)}catch(e){}g=cur&&decode(cur)}
+  if(g)G.set(g);else blank();
+  fit();requestAnimationFrame(frame);
+  if(fromUrl&&g)setTimeout(toPlay,250)})();
+</script>
+</body>
+</html>
