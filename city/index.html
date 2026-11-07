@@ -1,0 +1,527 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta name="author" content="Alon Maidenberg - אלון מידנברג"><meta name="copyright" content="© 2026 אלון מידנברג. כל הזכויות שמורות.">
+<!-- © 2026 Alon Maidenberg (אלון מידנברג). All rights reserved. -->
+<meta name="robots" content="noai, noimageai">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>העיר – אלון מידנברג</title>
+<meta name="description" content="עיר שמסתובבים בה עם הדמות שלכם, וכל בניין הוא משחק. נכנסים בדלת — המשחק נפתח.">
+<meta name="theme-color" content="#9ed6a0">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#9ed6a0;color:#2c3a27;font-family:system-ui,Arial,sans-serif;user-select:none;-webkit-user-select:none}
+#cv{display:block;width:100%;height:100%;touch-action:none}
+#topc{position:fixed;top:max(8px,env(safe-area-inset-top));left:0;right:0;display:flex;justify-content:space-between;align-items:flex-start;padding:0 12px;gap:6px;z-index:6;pointer-events:none}
+.pill{background:#fff;border:3px solid #2c3a27;border-radius:999px;padding:5px 14px;font-weight:900;font-size:15px;white-space:nowrap;box-shadow:0 3px 0 rgba(44,58,39,.25)}
+#findBtn,#mapBtn{pointer-events:auto;cursor:pointer}
+#prompt{display:none;position:fixed;bottom:max(120px,calc(env(safe-area-inset-bottom) + 120px));left:50%;transform:translateX(-50%);background:#ffd45e;border:3px solid #2c3a27;border-radius:18px;padding:10px 22px;font-weight:900;font-size:17px;z-index:7;cursor:pointer;text-align:center;line-height:1.5;box-shadow:0 4px 0 #2c3a27;max-width:88vw}
+#prompt.on{display:block}
+#banner{position:fixed;top:13%;left:50%;transform:translateX(-50%);background:#fff;border:3px solid #2c3a27;border-radius:18px;padding:9px 20px;font-weight:900;font-size:clamp(14px,4vw,19px);z-index:8;opacity:0;transition:opacity .3s;pointer-events:none;box-shadow:0 4px 0 rgba(44,58,39,.22);max-width:90vw;text-align:center}
+#mini{position:fixed;bottom:max(12px,env(safe-area-inset-bottom));right:12px;width:132px;height:132px;border:3px solid #2c3a27;border-radius:18px;background:rgba(255,255,255,.82);z-index:6;box-shadow:0 3px 0 rgba(44,58,39,.25)}
+.ov{position:fixed;inset:0;background:rgba(44,58,39,.62);display:none;align-items:center;justify-content:center;z-index:20;padding:14px;overflow-y:auto}
+.ov.show{display:flex}
+.ovc{width:100%;max-width:460px;background:#fbfff5;border:4px solid #2c3a27;border-radius:28px;padding:20px;text-align:center;margin:auto;box-shadow:0 8px 0 rgba(44,58,39,.25)}
+.ovc h2{margin:0 0 6px;font-size:26px}
+.lb{opacity:.82;font-size:14px;margin-bottom:8px;line-height:1.6}
+.btn{display:block;width:100%;border:3px solid #2c3a27;border-radius:18px;padding:13px;margin-top:9px;font:inherit;font-size:18px;font-weight:900;color:#2c3a27;cursor:pointer;background:#ffd45e;box-shadow:0 5px 0 #2c3a27}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 #2c3a27}
+.btn.go{background:#7be36b}
+.btn.alt{background:#fff;font-size:15px;padding:10px}
+#q{width:100%;border:3px solid #2c3a27;border-radius:16px;padding:12px 14px;font:inherit;font-size:16px;font-weight:700;margin-top:8px;background:#fff;color:#2c3a27}
+#res{display:flex;flex-direction:column;gap:6px;margin-top:10px;max-height:46vh;overflow-y:auto;text-align:right}
+.ri{display:flex;align-items:center;gap:10px;background:#fff;border:2.5px solid #2c3a27;border-radius:14px;padding:8px 10px;cursor:pointer}
+.ri:active{transform:translateY(2px)}
+.ri img{width:34px;height:34px;border-radius:9px;flex:0 0 34px;background:#eee}
+.ri .n{font-weight:900;font-size:14.5px}
+.ri .t{font-size:11.5px;opacity:.6}
+#joy{position:fixed;bottom:max(16px,calc(env(safe-area-inset-bottom) + 16px));left:16px;width:112px;height:112px;border-radius:50%;border:4px solid rgba(44,58,39,.3);background:rgba(255,255,255,.45);display:none;touch-action:none;z-index:7}
+#jk{position:absolute;width:48px;height:48px;border-radius:50%;background:#fff;border:3px solid #2c3a27;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none}
+body.touch #joy{display:block}
+#fps{position:fixed;bottom:2px;left:4px;font-size:10px;opacity:.25;z-index:9;pointer-events:none}
+</style>
+</head>
+<body>
+<canvas id="cv"></canvas>
+<div id="topc">
+  <div class="pill" id="where">🏙️ העיר</div>
+  <div class="pill" id="findBtn">🔎 חיפוש משחק</div>
+  <div class="pill" id="count">0 בניינים</div>
+</div>
+<div id="banner"></div>
+<div id="prompt"></div>
+<canvas id="mini" width="264" height="264"></canvas>
+<div id="joy"><div id="jk"></div></div>
+<div id="fps"></div>
+
+<div class="ov show" id="menu"><div class="ovc">
+  <div style="font-size:50px">🏙️</div>
+  <h2>העיר</h2>
+  <div class="lb">כל בניין בעיר הוא משחק. מסתובבים ברחובות עם <b>הדמות שלכם</b>, ניגשים לדלת — והמשחק נפתח.</div>
+  <div class="lb" style="font-size:12.5px;opacity:.68"><b>WASD / חצים</b> או ג׳ויסטיק · <b>F / רווח</b> להיכנס · מפה קטנה בפינה</div>
+  <button class="btn go" id="startBtn">▶ יציאה לעיר</button>
+  <button class="btn alt" id="toHub">חזרה לרשימת המשחקים</button>
+</div></div>
+
+<div class="ov" id="find"><div class="ovc">
+  <div style="font-size:40px">🔎</div>
+  <h2 style="font-size:22px">איזה משחק מחפשים?</h2>
+  <input id="q" placeholder="שם משחק או קטגוריה…" autocomplete="off">
+  <div id="res"></div>
+  <button class="btn alt" id="findClose">סגירה</button>
+</div></div>
+
+<script src="../avatar.js"></script>
+<script>
+'use strict';
+const $=s=>document.querySelector(s);
+const clamp=(v,a,b)=>v<a?a:v>b?b:v;
+const TAU=Math.PI*2;
+
+/* ───── audio ───── */
+let AC=null;
+function ac(){if(!AC){try{AC=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}}if(AC&&AC.state==='suspended')AC.resume();return AC}
+function tone(f,d,ty,v,f2){const a=ac();if(!a)return;try{
+  const o=a.createOscillator(),g=a.createGain();o.type=ty||'triangle';
+  o.frequency.setValueAtTime(f,a.currentTime);
+  if(f2)o.frequency.exponentialRampToValueAtTime(Math.max(20,f2),a.currentTime+d);
+  g.gain.setValueAtTime(v||.05,a.currentTime);
+  g.gain.exponentialRampToValueAtTime(.0001,a.currentTime+d);
+  o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+d+.02)}catch(e){}}
+function chord(fs,d){fs.forEach((f,i)=>setTimeout(()=>tone(f,d,'sine',.045),i*70))}
+
+/* ───── canvas ───── */
+const cv=$('#cv'),X=cv.getContext('2d');
+let VW=0,VH=0,DPR=1,ZOOM=38;
+function resize(){
+  DPR=Math.min(devicePixelRatio||1,2);
+  VW=innerWidth;VH=innerHeight;
+  cv.width=Math.round(VW*DPR);cv.height=Math.round(VH*DPR);
+  cv.style.width=VW+'px';cv.style.height=VH+'px';
+  ZOOM=clamp(Math.min(VW,VH)/26,15,34);
+}
+addEventListener('resize',resize);
+const cam={x:0,y:0};
+const sx=w=>(w-cam.x)*ZOOM+VW/2;
+const sy=w=>(w-cam.y)*ZOOM+VH/2;
+function rr(x,y,w,h,r){X.beginPath();if(X.roundRect)X.roundRect(x,y,w,h,r);else X.rect(x,y,w,h)}
+function shadowEllipse(px,py,rx,ry,a){
+  X.save();X.globalAlpha=a===undefined?.16:a;X.fillStyle='#2c3a27';
+  X.beginPath();X.ellipse(px,py,rx,ry,0,0,TAU);X.fill();X.restore();
+}
+function label(px,py,txt,bg,fg,fs){
+  fs=fs||14;
+  X.save();X.font='900 '+fs+'px system-ui';
+  const w=X.measureText(txt).width+20,h=fs+14;
+  X.fillStyle='rgba(44,58,39,.22)';rr(px-w/2,py-h/2+3,w,h,h/2);X.fill();
+  X.fillStyle=bg||'#fff';rr(px-w/2,py-h/2,w,h,h/2);X.fill();
+  X.lineWidth=3;X.strokeStyle='#2c3a27';X.stroke();
+  X.fillStyle=fg||'#2c3a27';X.textAlign='center';X.textBaseline='middle';X.fillText(txt,px,py+1);
+  X.restore();
+}
+
+/* ───── districts: a colour and a feel per tag ───── */
+const DIST={
+ 'ארקייד':      {nm:'רובע הארקייד', c:'#ff6b8b', roof:'#d84a6b'},
+ 'רפלקסים':     {nm:'כיכר הרפלקסים',c:'#4fc3f7', roof:'#2a93c4'},
+ 'חשיבה':       {nm:'רובע החשיבה',  c:'#a67bff', roof:'#7a4fd4'},
+ '3D':          {nm:'העיר החדשה',   c:'#ffd45e', roof:'#d9a62a'},
+ 'ספורט':       {nm:'מתחם הספורט',  c:'#7be36b', roof:'#4aad3f'},
+ 'אסטרטגיה':    {nm:'גבעת האסטרטגיה',c:'#ff9f45',roof:'#d4761c'},
+ 'אקשן':        {nm:'רובע האקשן',   c:'#e0483f', roof:'#a82d26'},
+ 'ירי':         {nm:'מגרש הירי',    c:'#8a6bff', roof:'#5a3fd4'},
+ 'קלאסי':       {nm:'העיר העתיקה',  c:'#c9a26b', roof:'#9a763f'},
+ 'לימוד':       {nm:'אזור בתי הספר',c:'#45c4a8', roof:'#1f937a'},
+ 'פאזל':        {nm:'סמטת הפאזלים', c:'#ff8ad0', roof:'#d45aa0'},
+ 'זיכרון':      {nm:'פארק הזיכרון', c:'#9bd6ff', roof:'#5aa6d9'},
+ 'פשוט':        {nm:'הרחוב הקטן',   c:'#ffe08a', roof:'#d9b23f'}
+};
+const DEFD={nm:'רחוב ראשי',c:'#bfa9e0',roof:'#8f78b5'};
+const distOf=t=>DIST[t]||DEFD;
+
+/* ───── city layout built from games.json ───── */
+let GAMES=[],blocks=[],buildings=[],props=[],cars=[],walkers=[];
+let CW=0,CH=0;                              /* city size in world units */
+const RD=7;                                 /* road width */
+const BW=5.2,BH=4.4,GAP=1.3;                /* building footprint */
+function rnd(seed){let s=seed>>>0||1;return()=>{s^=s<<13;s>>>=0;s^=s>>17;s^=s<<5;s>>>=0;return s/4294967296}}
+
+function buildCity(list){
+  GAMES=list;
+  /* group by tag, biggest district first */
+  const byTag={};
+  for(const g of list)(byTag[g.tag||'']=byTag[g.tag||'']||[]).push(g);
+  const groups=Object.keys(byTag).sort((a,b)=>byTag[b].length-byTag[a].length).map(t=>({t,g:byTag[t]}));
+  /* merge tiny districts into one mixed block so the city is not all slivers */
+  const big=[],small=[];
+  for(const gr of groups)(gr.g.length>=3?big:small).push(gr);
+  if(small.length){
+    const merged=[];small.forEach(s=>merged.push(...s.g));
+    big.push({t:'מעורב',g:merged});
+  }
+  /* each district gets a block; blocks sit on a grid */
+  blocks=[];buildings=[];props=[];
+  const perRow=Math.ceil(Math.sqrt(big.length));
+  let bx=0,by=0,rowH=0,maxW=0;
+  big.forEach((gr,i)=>{
+    const cols=Math.min(4,Math.ceil(Math.sqrt(gr.g.length)));
+    const rows=Math.ceil(gr.g.length/cols);
+    const w=cols*(BW+GAP)+GAP, h=rows*(BH+GAP*2.1)+GAP;
+    if(i%perRow===0&&i){bx=0;by+=rowH+RD;rowH=0}
+    const blk={x:bx,y:by,w,h,tag:gr.t,d:distOf(gr.t),games:gr.g,cols,rows};
+    blocks.push(blk);
+    bx+=w+RD;rowH=Math.max(rowH,h);maxW=Math.max(maxW,bx);
+  });
+  CW=maxW+RD;CH=by+rowH+RD;
+  /* centre the city on the origin */
+  for(const b of blocks){b.x-=CW/2;b.y-=CH/2}
+  /* place the buildings inside each block, all facing the street below */
+  for(const b of blocks){
+    b.games.forEach((g,i)=>{
+      const c=i%b.cols,r=(i/b.cols)|0;
+      const x=b.x+GAP+c*(BW+GAP)+BW/2;
+      const y=b.y+GAP+r*(BH+GAP*2.1)+BH/2;
+      const R=rnd(i*7919+b.games.length*131);
+      buildings.push({g,x,y,w:BW,h:BH,d:b.d,tag:b.tag,
+        floors:2+((R()*3)|0), hue:R(), door:{x,y:y+BH/2+.1}});
+    });
+    /* trees and lamps along the block edge */
+    const R=rnd(blocks.indexOf(b)*523+7);
+    for(let i=0;i<6;i++)props.push({t:R()<.6?'tree':'lamp',x:b.x+R()*b.w,y:b.y+b.h+1.4+R()*1.6});
+  }
+  /* traffic on the horizontal avenues */
+  cars=[];
+  const lanes=[...new Set(blocks.map(b=>Math.round((b.y+b.h+RD/2)*10)/10))];
+  lanes.forEach((ly,i)=>{
+    for(let k=0;k<4;k++)cars.push({x:-CW/2+Math.random()*CW,y:ly+(k%2?1.5:-1.5),
+      v:(k%2?1:-1)*(3.2+Math.random()*2.6),col:['#e0483f','#4fc3f7','#ffd45e','#7be36b','#fff','#8a6bff'][(Math.random()*6)|0]});
+  });
+  /* townsfolk */
+  walkers=[];
+  for(let i=0;i<22;i++)walkers.push({code:randCode(),x:-CW/2+Math.random()*CW,y:-CH/2+Math.random()*CH,
+    tx:0,ty:0,t:Math.random()*9,sp:1.1+Math.random()*.9});
+  for(const w of walkers)newWalkTarget(w);
+  $('#count').textContent=buildings.length+' בניינים';
+}
+function newWalkTarget(w){
+  const b=blocks[(Math.random()*blocks.length)|0];
+  w.tx=b.x+Math.random()*b.w;w.ty=b.y+b.h+1.2+Math.random()*(RD-2.6);
+}
+
+/* ───── characters ───── */
+const AV=window.AGAv;
+function myCode(){return (AV&&AV.mine&&AV.mine())||'00000000'}
+function randCode(){
+  if(!AV)return '00000000';
+  const o={};AV.CATS.forEach(c=>{o[c.id]=(Math.random()*c.o.length)|0});
+  o.bg=0;o.hold=0;return AV.enc(o);
+}
+function drawChar(code,px,py,size,t){
+  shadowEllipse(px,py+size*.44,size*.32,size*.12);
+  if(!AV){X.fillStyle='#ff6b8b';X.beginPath();X.arc(px,py,size*.34,0,TAU);X.fill();return}
+  AV.draw(X,code,px,py,size,{bg:false,t:t||0});
+}
+
+/* ───── player ───── */
+const P={x:0,y:0,vx:0,vy:0,t:0,code:'00000000'};
+const SPD=6.2;
+function solidAt(nx,ny){
+  for(const b of buildings){
+    if(Math.abs(nx-b.x)<b.w/2+.35&&Math.abs(ny-b.y)<b.h/2+.3)return true;
+  }
+  return false;
+}
+function movePlayer(dt){
+  let fx=(key.KeyD||key.ArrowRight?1:0)-(key.KeyA||key.ArrowLeft?1:0);
+  let fy=(key.KeyS||key.ArrowDown?1:0)-(key.KeyW||key.ArrowUp?1:0);
+  if(touchDev){fx+=joyX;fy+=joyY}
+  const l=Math.hypot(fx,fy);if(l>1){fx/=l;fy/=l}
+  const sp=SPD*((key.ShiftLeft||key.ShiftRight)?1.5:1);
+  P.vx+=(fx*sp-P.vx)*Math.min(1,dt*15);
+  P.vy+=(fy*sp-P.vy)*Math.min(1,dt*15);
+  let nx=P.x+P.vx*dt,ny=P.y+P.vy*dt;
+  if(!solidAt(nx,P.y))P.x=nx;else P.vx=0;
+  if(!solidAt(P.x,ny))P.y=ny;else P.vy=0;
+  P.x=clamp(P.x,-CW/2-4,CW/2+4);P.y=clamp(P.y,-CH/2-4,CH/2+4);
+  P.t+=dt*(1+Math.hypot(P.vx,P.vy)*.4);
+}
+
+/* ───── rendering ───── */
+function draw(){
+  X.setTransform(DPR,0,0,DPR,0,0);
+  X.fillStyle='#9ed6a0';X.fillRect(0,0,VW,VH);
+  /* grass texture */
+  X.save();X.globalAlpha=.4;X.fillStyle='#8ecb90';
+  const g0=Math.floor(cam.x-VW/ZOOM/2),g1=Math.ceil(cam.x+VW/ZOOM/2);
+  const h0=Math.floor(cam.y-VH/ZOOM/2),h1=Math.ceil(cam.y+VH/ZOOM/2);
+  for(let y=h0;y<=h1;y+=3)for(let x=g0;x<=g1;x+=3)
+    if(((x*7+y*13)|0)%4===0){X.beginPath();X.ellipse(sx(x),sy(y),ZOOM*.9,ZOOM*.5,0,0,TAU);X.fill()}
+  X.restore();
+  /* roads: the gaps between blocks */
+  X.save();
+  for(const b of blocks){
+    X.fillStyle='#6e6e74';
+    X.fillRect(sx(b.x-RD/2)-1,sy(b.y+b.h)-1,(b.w+RD)*ZOOM+2,RD*ZOOM+2);
+    X.fillRect(sx(b.x+b.w)-1,sy(b.y-RD/2)-1,RD*ZOOM+2,(b.h+RD)*ZOOM+2);
+  }
+  /* lane dashes on the horizontal avenues */
+  X.strokeStyle='#e8dc84';X.lineWidth=Math.max(2,ZOOM*.08);X.setLineDash([ZOOM*.9,ZOOM*.8]);
+  for(const b of blocks){
+    const ly=b.y+b.h+RD/2;
+    X.beginPath();X.moveTo(sx(b.x-RD/2),sy(ly));X.lineTo(sx(b.x+b.w+RD/2),sy(ly));X.stroke();
+  }
+  X.setLineDash([]);
+  /* pavements */
+  X.fillStyle='#cfc9bd';
+  for(const b of blocks){
+    X.fillRect(sx(b.x-.9),sy(b.y+b.h),(b.w+1.8)*ZOOM,.9*ZOOM);
+    X.fillRect(sx(b.x-.9),sy(b.y-.9),(b.w+1.8)*ZOOM,.9*ZOOM);
+  }
+  X.restore();
+  /* district name boards */
+  for(const b of blocks){
+    const px=sx(b.x+b.w/2),py=sy(b.y-1.5);
+    if(px>-200&&px<VW+200&&py>-100&&py<VH+100)
+      label(px,py,b.d.nm,b.d.c,'#2c3a27',Math.max(12,ZOOM*.46));
+  }
+  for(const p of props)drawProp(p);
+  for(const c of cars)drawCar(c);
+  /* buildings + people sorted so nearer things cover farther ones */
+  const all=[];
+  for(const b of buildings){
+    const px=sx(b.x),py=sy(b.y);
+    if(px<-260||px>VW+260||py<-260||py>VH+260)continue;
+    all.push({y:b.y,f:()=>drawBuilding(b)});
+  }
+  for(const w of walkers){
+    const px=sx(w.x);
+    if(px<-120||px>VW+120)continue;
+    all.push({y:w.y,f:()=>drawChar(w.code,sx(w.x),sy(w.y),ZOOM*1.05,w.t)});
+  }
+  all.push({y:P.y,f:()=>{
+    drawChar(P.code,sx(P.x),sy(P.y),ZOOM*1.25,P.t);
+    label(sx(P.x),sy(P.y)-ZOOM*1.0,'אתם','#ffd45e',null,Math.max(10,ZOOM*.3));
+  }});
+  all.sort((a,b)=>a.y-b.y).forEach(o=>o.f());
+  if(guide)drawGuide();
+  drawMini();
+}
+function drawBuilding(b){
+  const px=sx(b.x),py=sy(b.y),w=b.w*ZOOM,h=b.h*ZOOM;
+  shadowEllipse(px,py+h*.5,w*.48,h*.14,.18);
+  X.save();
+  /* body */
+  X.fillStyle='#2c3a27';rr(px-w/2,py-h/2,w,h,14);X.fill();
+  X.fillStyle=b.d.c;rr(px-w/2+4,py-h/2+4,w-8,h-8,11);X.fill();
+  /* roof band */
+  X.fillStyle=b.d.roof;rr(px-w/2+4,py-h/2+4,w-8,h*.26,11);X.fill();
+  /* windows */
+  X.fillStyle='rgba(255,255,255,.55)';
+  const cols=3,rows=b.floors;
+  for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
+    const wx=px-w*.3+c*w*.3, wy=py-h*.16+r*h*.17;
+    if(wy>py+h*.26)continue;
+    rr(wx-w*.07,wy-h*.05,w*.14,h*.1,4);X.fill();
+  }
+  /* door */
+  const dw=w*.26,dh=h*.24;
+  X.fillStyle='#4a3b2a';rr(px-dw/2,py+h/2-dh-4,dw,dh,6);X.fill();
+  X.fillStyle='#ffd45e';X.beginPath();X.arc(px+dw*.3,py+h/2-dh/2-4,Math.max(1.6,w*.016),0,TAU);X.fill();
+  /* sign with the game icon */
+  const ic=icon(b.g);
+  if(ic&&ic.complete&&ic.naturalWidth){
+    const s=Math.min(w*.3,h*.3);
+    X.save();rr(px-s/2,py-h*.52-s*.2,s,s,8);X.clip();
+    X.drawImage(ic,px-s/2,py-h*.52-s*.2,s,s);X.restore();
+    X.lineWidth=3;X.strokeStyle='#2c3a27';rr(px-s/2,py-h*.52-s*.2,s,s,8);X.stroke();
+  }
+  X.restore();
+  /* name board over the door */
+  if(ZOOM>19)label(px,py+h/2+13,b.g.name,'#fff',null,Math.max(9,ZOOM*.27));
+}
+function drawProp(p){
+  const px=sx(p.x),py=sy(p.y);
+  if(px<-60||px>VW+60||py<-60||py>VH+60)return;
+  if(p.t==='tree'){
+    shadowEllipse(px,py+ZOOM*.3,ZOOM*.4,ZOOM*.15);
+    X.fillStyle='#7a5230';rr(px-ZOOM*.08,py-ZOOM*.1,ZOOM*.16,ZOOM*.4,3);X.fill();
+    X.fillStyle='#3f9e46';X.beginPath();X.arc(px,py-ZOOM*.34,ZOOM*.46,0,TAU);X.fill();
+    X.fillStyle='#4fb455';X.beginPath();X.arc(px-ZOOM*.14,py-ZOOM*.44,ZOOM*.3,0,TAU);X.fill();
+  }else{
+    shadowEllipse(px,py+ZOOM*.25,ZOOM*.2,ZOOM*.08);
+    X.fillStyle='#5a6058';rr(px-ZOOM*.05,py-ZOOM*.7,ZOOM*.1,ZOOM*.95,3);X.fill();
+    X.fillStyle='#ffe9a8';X.beginPath();X.arc(px,py-ZOOM*.76,ZOOM*.17,0,TAU);X.fill();
+  }
+}
+function drawCar(c){
+  const px=sx(c.x),py=sy(c.y);
+  if(px<-80||px>VW+80||py<-80||py>VH+80)return;
+  const w=ZOOM*1.5,h=ZOOM*.78;
+  shadowEllipse(px,py+h*.45,w*.42,h*.26,.18);
+  X.save();
+  X.fillStyle='#2c3a27';rr(px-w/2,py-h/2,w,h,h*.4);X.fill();
+  X.fillStyle=c.col;rr(px-w/2+3,py-h/2+3,w-6,h-6,h*.33);X.fill();
+  X.fillStyle='rgba(44,58,39,.35)';rr(px-w*.16,py-h*.3,w*.34,h*.6,5);X.fill();
+  X.restore();
+}
+function drawGuide(){
+  const b=guide;
+  const dx=b.x-P.x,dy=b.y-P.y,d=Math.hypot(dx,dy);
+  if(d<4){guide=null;return}
+  const a=Math.atan2(dy,dx),r=Math.min(VW,VH)*.3;
+  const px=VW/2+Math.cos(a)*r,py=VH/2+Math.sin(a)*r;
+  X.save();X.translate(px,py);X.rotate(a);
+  X.fillStyle='#ffd45e';X.strokeStyle='#2c3a27';X.lineWidth=3;
+  X.beginPath();X.moveTo(18,0);X.lineTo(-10,-12);X.lineTo(-4,0);X.lineTo(-10,12);X.closePath();
+  X.fill();X.stroke();X.restore();
+  label(px,py+26,b.g.name+' · '+Math.round(d)+'מ','#ffd45e',null,12);
+}
+/* minimap */
+const mc=$('#mini'),MX=mc.getContext('2d');
+function drawMini(){
+  MX.clearRect(0,0,264,264);
+  MX.fillStyle='rgba(158,214,160,.9)';MX.fillRect(0,0,264,264);
+  const pad=10,sc=Math.min((264-pad*2)/(CW||1),(264-pad*2)/(CH||1));
+  const mx=v=>132+v*sc, my=v=>132+v*sc;
+  for(const b of blocks){
+    MX.fillStyle=b.d.c;
+    MX.fillRect(mx(b.x),my(b.y),b.w*sc,b.h*sc);
+  }
+  if(guide){MX.fillStyle='#ff3b3b';MX.beginPath();MX.arc(mx(guide.x),my(guide.y),5,0,TAU);MX.fill()}
+  MX.fillStyle='#2c3a27';MX.beginPath();MX.arc(mx(P.x),my(P.y),4.5,0,TAU);MX.fill();
+  MX.strokeStyle='#fff';MX.lineWidth=2;MX.stroke();
+}
+
+/* ───── icons ───── */
+const icons={};
+function icon(g){
+  if(!g.icon)return null;
+  if(icons[g.id]!==undefined)return icons[g.id];
+  const im=new Image();im.src='../'+g.icon;
+  icons[g.id]=im;return im;
+}
+
+/* ───── interaction ───── */
+let nearB=null,guide=null;
+function stepProx(){
+  nearB=null;let best=1e9;
+  for(const b of buildings){
+    const d=Math.hypot(P.x-b.door.x,P.y-b.door.y);
+    if(d<2.3&&d<best){best=d;nearB=b}
+  }
+  const pr=$('#prompt');
+  pr.classList.toggle('on',!!nearB);
+  if(nearB)pr.innerHTML='🚪 '+nearB.g.name+'<br><b>'+(touchDev?'הקישו כאן':'F')+'</b>';
+  const w=$('#where');
+  let inD=null;
+  for(const b of blocks)if(P.x>b.x-RD/2&&P.x<b.x+b.w+RD/2&&P.y>b.y-RD/2&&P.y<b.y+b.h+RD/2)inD=b;
+  w.textContent=inD?('🏙️ '+inD.d.nm):'🏙️ העיר';
+}
+function enter(){
+  if(!nearB)return;
+  chord([700,950,1250],.18);
+  banner('🚪 נכנסים ל'+nearB.g.name+'…',1.4);
+  const url='../'+nearB.g.url;
+  setTimeout(()=>{location.href=url},260);
+}
+function banner(t,d){const b=$('#banner');b.textContent=t;b.style.opacity=1;clearTimeout(b._t);b._t=setTimeout(()=>b.style.opacity=0,(d||2)*1000)}
+
+/* ───── search ───── */
+function openFind(){
+  $('#find').classList.add('show');
+  $('#q').value='';renderRes('');
+  setTimeout(()=>{try{$('#q').focus()}catch(e){}},80);
+}
+function renderRes(term){
+  const R=$('#res');R.innerHTML='';
+  const t=term.trim();
+  const hits=buildings.filter(b=>!t||b.g.name.includes(t)||(b.g.tag||'').includes(t)).slice(0,40);
+  for(const b of hits){
+    const d=document.createElement('div');d.className='ri';
+    d.innerHTML='<img src="../'+(b.g.icon||'')+'" alt=""><div><div class="n">'+b.g.name+'</div><div class="t">'+(b.g.tag||'')+' · '+b.d.nm+'</div></div>';
+    d.addEventListener('pointerdown',e=>{e.preventDefault();
+      guide=b;$('#find').classList.remove('show');
+      banner('🧭 מסומן: '+b.g.name,2);tone(880,.08,'sine',.05);
+    });
+    R.appendChild(d);
+  }
+  if(!hits.length)R.innerHTML='<div class="lb">לא נמצא משחק כזה</div>';
+}
+$('#q').addEventListener('input',e=>renderRes(e.target.value));
+$('#findBtn').addEventListener('pointerdown',e=>{e.preventDefault();openFind()});
+$('#findClose').onclick=()=>$('#find').classList.remove('show');
+
+/* ───── input ───── */
+const key={};
+addEventListener('keydown',e=>{
+  if($('#find').classList.contains('show')){if(e.code==='Escape')$('#find').classList.remove('show');return}
+  if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();
+  if(e.code==='KeyF'||e.code==='Space'){enter();return}
+  if(e.code==='Escape'){openFind();return}
+  key[e.code]=1;
+});
+addEventListener('keyup',e=>{key[e.code]=0});
+addEventListener('blur',()=>{for(const k in key)key[k]=0});
+const touchDev=matchMedia('(pointer:coarse)').matches;
+if(touchDev)document.body.classList.add('touch');
+let joyX=0,joyY=0,joyId=null,joyO=null;
+(function(){
+  const joy=$('#joy'),k=$('#jk');
+  joy.addEventListener('pointerdown',e=>{e.preventDefault();joyId=e.pointerId;joyO={x:e.clientX,y:e.clientY};joy.setPointerCapture(e.pointerId)});
+  joy.addEventListener('pointermove',e=>{if(e.pointerId!==joyId||!joyO)return;
+    const dx=e.clientX-joyO.x,dy=e.clientY-joyO.y,r=Math.min(38,Math.hypot(dx,dy)),a=Math.atan2(dy,dx);
+    joyX=Math.cos(a)*r/38;joyY=Math.sin(a)*r/38;
+    k.style.left=(50+joyX*34)+'%';k.style.top=(50+joyY*34)+'%'});
+  const rst=()=>{joyX=joyY=0;joyId=null;joyO=null;k.style.left=k.style.top='50%'};
+  joy.addEventListener('pointerup',rst);joy.addEventListener('pointercancel',rst);
+  $('#prompt').addEventListener('pointerdown',e=>{e.preventDefault();enter()});
+  cv.addEventListener('pointerdown',()=>{ac();if(nearB)enter()});
+})();
+
+/* ───── loop ───── */
+let state='menu',last=performance.now(),fpsT=0,fpsN=0;
+function frame(now){
+  requestAnimationFrame(frame);
+  let dt=(now-last)/1000;last=now;if(dt>.1)dt=.1;
+  if(state==='play'){
+    movePlayer(dt);stepProx();
+    for(const c of cars){
+      c.x+=c.v*dt;
+      if(c.x>CW/2+6)c.x=-CW/2-6;
+      if(c.x<-CW/2-6)c.x=CW/2+6;
+    }
+    for(const w of walkers){
+      w.t+=dt;
+      const dx=w.tx-w.x,dy=w.ty-w.y,d=Math.hypot(dx,dy);
+      if(d<.4)newWalkTarget(w);
+      else{w.x+=dx/d*w.sp*dt;w.y+=dy/d*w.sp*dt}
+    }
+    cam.x+=(P.x-cam.x)*Math.min(1,dt*6);
+    cam.y+=(P.y-cam.y)*Math.min(1,dt*6);
+  }
+  draw();
+  fpsN++;fpsT+=dt;if(fpsT>.5){$('#fps').textContent=Math.round(fpsN/fpsT)+' fps';fpsN=0;fpsT=0}
+}
+
+/* ───── boot ───── */
+$('#startBtn').onclick=()=>{ac();$('#menu').classList.remove('show');state='play';
+  banner('🏙️ ברוכים הבאים לעיר — כל בניין הוא משחק',3)};
+$('#toHub').onclick=()=>{location.href='../'};
+addEventListener('ag-avatar',()=>{P.code=myCode()});
+
+resize();P.code=myCode();
+fetch('../games.json',{cache:'no-cache'}).then(r=>r.json()).then(list=>{
+  buildCity(list.filter(g=>g.url&&g.id!=='city'));
+  /* start on the street in front of the first district */
+  const b0=blocks[0];
+  P.x=b0.x+b0.w/2;P.y=b0.y+b0.h+RD/2;
+  cam.x=P.x;cam.y=P.y;
+}).catch(e=>{
+  banner('לא הצלחתי לטעון את רשימת המשחקים',4);
+});
+requestAnimationFrame(frame);
+</script>
+<script src="../hub.js"></script>
+</body>
+</html>

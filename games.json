@@ -704,5 +704,13 @@
   "tag": "3D",
   "icon": "arcade/icons/icon-192.png",
   "url": "arcade/"
+ },
+ {
+  "id": "city",
+  "name": "העיר",
+  "tag": "הרפתקה",
+  "description": "עיר שמסתובבים בה עם הדמות שלכם, וכל בניין הוא אחד המשחקים באתר. ניגשים לדלת — והמשחק נפתח.",
+  "icon": "city/icons/icon-192.png",
+  "url": "city/"
  }
 ]
