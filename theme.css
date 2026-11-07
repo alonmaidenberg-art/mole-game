@@ -106,3 +106,58 @@ html[data-th="night"] .ovc,html[data-th="night"] .box,html[data-th="cosmos"] .ov
 html:fullscreen:has(#cv){--ink:#eaf6ff;--ink2:#bcd8e8}
 html:fullscreen:has(#cv) body,html:fullscreen:has(#cv) h1,html:fullscreen:has(#cv) .bar,html:fullscreen:has(#cv) .sub{color:#eaf6ff!important}
 html:fullscreen #ag-sig,html.ag-amb #ag-sig{color:#eaf6ff!important;background:rgba(0,0,0,.35)!important}
+
+
+/* ═══════ הלובי: ארון ארקייד — נשאר נועז בכל ערכת נושא ═══════ */
+body.hub{--cab:#2b1659;--cabd:#140a2e;--zap:#ffd43b;--hot:#ff3d8b;--ice:#35e0ff}
+body.hub main{max-width:1180px}
+
+/* השלט המואר */
+body.hub .marquee{background:linear-gradient(180deg,#5b2bd6,#2b1659)!important;
+  border:4px solid var(--cabd)!important;border-radius:28px!important;
+  box-shadow:0 10px 0 rgba(20,10,46,.4),inset 0 0 70px rgba(255,61,139,.25)!important;
+  backdrop-filter:none!important}
+body.hub .marquee h1{color:#fff!important;text-shadow:0 3px 0 var(--hot),0 6px 0 rgba(0,0,0,.25)!important}
+body.hub .marquee p,body.hub .marquee .stat{color:#e6d9ff!important;opacity:.95!important}
+body.hub #dailyB{background:var(--zap)!important;color:#3a2400!important;
+  border:3px solid var(--cabd)!important;box-shadow:0 5px 0 var(--cabd)!important}
+body.hub #dailyB:disabled{background:rgba(255,255,255,.22)!important;color:#fff!important}
+
+/* פס עליון */
+body.hub .av{background:var(--zap)!important;color:#3a2400!important;
+  border:3px solid var(--cabd)!important;box-shadow:0 4px 0 var(--cabd)!important}
+body.hub .av small{color:#7a5200!important}
+body.hub .purse,body.hub .ico{background:#fff!important;color:#2b1659!important;
+  border:3px solid var(--cabd)!important;box-shadow:0 4px 0 var(--cabd)!important}
+
+/* חיפוש וקטגוריות */
+body.hub .sr{background:#fff!important;color:#2b1659!important;
+  border:3px solid var(--cabd)!important;box-shadow:0 4px 0 var(--cabd)!important}
+body.hub .sr::placeholder{color:#7b6aa5!important;opacity:1}
+body.hub #chips button{background:#fff!important;color:#2b1659!important;
+  border:3px solid var(--cabd)!important;box-shadow:0 3px 0 var(--cabd)!important}
+body.hub #chips button.on{background:var(--ice)!important;color:#0a2c35!important}
+
+/* קיר הקלטות */
+body.hub a.card{background:#fff!important;border:3px solid var(--cabd)!important;
+  box-shadow:0 6px 0 rgba(20,10,46,.3)!important;backdrop-filter:none!important;
+  color:#2b1659!important;border-radius:20px!important}
+body.hub a.card .t{color:#2b1659!important}
+body.hub a.card img{border:3px solid var(--cabd)!important}
+body.hub a.card:hover,body.hub a.card:focus-visible{background:#fff!important;
+  border-color:var(--hot)!important;box-shadow:0 10px 0 rgba(20,10,46,.3)!important;transform:translateY(-4px)}
+body.hub a.card:active{transform:translateY(2px);box-shadow:0 3px 0 rgba(20,10,46,.3)!important}
+body.hub .tag{background:#efe7ff!important;color:#4a2b8a!important}
+body.hub .fav{color:#b9a9e0!important}
+body.hub .fav.on{color:#ffb02e!important}
+body.hub .new{background:#6cf2a8!important;color:#0a3a22!important;border:3px solid var(--cabd)!important}
+body.hub .sec{color:#2b1659!important}
+body.hub .bossb{border:4px solid var(--cabd)!important;box-shadow:0 7px 0 var(--cabd)!important}
+
+/* בערכות הכהות הקלטות הופכות כהות גם הן */
+html[data-th="night"] body.hub a.card{background:#20356b!important;color:#e8f2ff!important}
+html[data-th="night"] body.hub a.card .t{color:#e8f2ff!important}
+html[data-th="night"] body.hub .purse,html[data-th="night"] body.hub .ico,
+html[data-th="night"] body.hub .sr,html[data-th="night"] body.hub #chips button{background:#20356b!important;color:#e8f2ff!important}
+html[data-th="night"] body.hub .sec{color:#ffd43b!important}
+html[data-th="night"] body.hub .tag{background:#33508f!important;color:#dbe8ff!important}

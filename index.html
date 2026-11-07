@@ -15,66 +15,170 @@
 <link rel="icon" type="image/svg+xml" href="assets/hub.svg">
 <link rel="icon" type="image/png" sizes="64x64" href="assets/favicon-64.png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Secular+One&family=Rubik:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
+:root{
+  --ink:#140a2e;      /* קו המתאר של הארון */
+  --deep:#1d1040;     /* רקע האולם */
+  --panel:#2b1659;    /* לוח */
+  --grape:#3a1d6e;    /* משטח מורם */
+  --zap:#ffd43b;      /* נורות המרקיזה */
+  --hot:#ff3d8b;
+  --ice:#35e0ff;
+  --mint:#6cf2a8;
+  --soft:#cdbdf2;
+}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{margin:0;min-height:100vh;font-family:system-ui,-apple-system,"Segoe UI",Arial,"Noto Sans Hebrew",sans-serif;color:#fff;
-  background:radial-gradient(900px 520px at 80% -10%,#4fcaff 0,transparent 62%),radial-gradient(700px 500px at 0% 110%,#17c3b0 0,transparent 55%),linear-gradient(180deg,#1590e0,#0a5fae) fixed}
-main{max-width:860px;margin:0 auto;padding:max(28px,env(safe-area-inset-top)) 16px 40px}
-header{text-align:center;margin-bottom:26px}
-header img{width:84px;height:84px;border-radius:22px;box-shadow:0 8px 24px rgba(0,0,0,.4)}
-h1{margin:12px 0 4px;font-size:clamp(24px,6.2vw,38px);line-height:1.15}
-header p{margin:0;opacity:.8;font-size:16px}
-#grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
-a.card{display:flex;gap:14px;align-items:center;text-decoration:none;color:inherit;background:rgba(255,255,255,.08);
-  border:2px solid rgba(255,255,255,.12);border-radius:20px;padding:14px;transition:transform .15s,background .15s}
-a.card:hover,a.card:focus-visible{transform:translateY(-3px);background:rgba(255,255,255,.14);outline:none;border-color:#ffd23f}
-a.card img{width:72px;height:72px;border-radius:16px;flex:none;background:#0003}
-.t{font-size:19px;font-weight:800;line-height:1.2}
-.d{font-size:13.5px;opacity:.8;margin-top:4px;line-height:1.4}
-.tag{display:inline-block;margin-top:6px;font-size:12px;font-weight:700;color:#193552;background:#ffd23f;border-radius:999px;padding:2px 10px}
-.empty{text-align:center;opacity:.8;grid-column:1/-1}
-footer{text-align:center;margin-top:34px;opacity:.55;font-size:13px}
-.wal{display:flex;gap:8px;justify-content:center;margin-top:12px;font-weight:800}
-.wal span{background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.15);border-radius:999px;padding:5px 14px;font-size:16px}
-.me{display:inline-flex;align-items:center;gap:10px;margin:14px 3px 0;vertical-align:middle;padding:6px 18px 6px 6px;border-radius:999px;background:rgba(255,255,255,.88);border:2px solid #fff;box-shadow:0 4px 14px rgba(20,150,140,.22);color:#0b4553;font-size:17px;text-decoration:none;text-align:start}.me img{width:46px;height:46px;border-radius:50%;background:#fff2}.me span{display:flex;flex-direction:column;line-height:1.2}.me small{opacity:.75;font-size:12px}.me:hover{background:#fff;transform:translateY(-1px)}.me small{color:#13a37a;font-weight:800}
-.key{background:none;border:0;color:#fff;opacity:.45;font-size:20px;cursor:pointer;padding:6px 10px}
-.mo{position:fixed;inset:0;background:rgba(10,5,30,.85);display:none;align-items:center;justify-content:center;z-index:50;padding:16px}.mo.show{display:flex}
-.mc{width:100%;max-width:360px;background:linear-gradient(160deg,#2e639b,#193552);border:2px solid rgba(255,255,255,.2);border-radius:24px;padding:20px;text-align:center}
-.mc h2{margin:0 0 8px}.mc p{opacity:.85;line-height:1.5;margin:6px 0}
-.mc input{width:100%;font:inherit;font-size:20px;padding:12px;border-radius:14px;border:2px solid rgba(255,255,255,.3);background:#112b46;color:#fff;text-align:center;letter-spacing:1px;direction:ltr}
-.mb{display:block;width:100%;margin-top:10px;border:0;border-radius:16px;padding:13px;font:inherit;font-size:18px;font-weight:900;color:#06322b;background:linear-gradient(180deg,#5ff7d6,#1fc9a6);cursor:pointer}
-.mb.alt{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.3);font-size:15px;padding:10px}
+body{margin:0;min-height:100vh;color:#fff;font-family:Rubik,system-ui,"Noto Sans Hebrew",Arial,sans-serif;font-weight:400;
+  background:
+    radial-gradient(820px 480px at 88% -8%,rgba(255,61,139,.30),transparent 62%),
+    radial-gradient(760px 520px at 4% 104%,rgba(53,224,255,.22),transparent 58%),
+    var(--deep) fixed}
+main{max-width:1180px;margin:0 auto;padding:calc(max(10px,env(safe-area-inset-top)) + 46px) 14px 48px}
+
+/* ── פס עליון דק: כל מה שאינו משחק ── */
+.topbar{display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding:6px 0 2px}
+.topbar .grow{flex:1 1 auto}
+.av{display:inline-flex;align-items:center;gap:9px;text-decoration:none;color:var(--ink);
+  background:var(--zap);border:3px solid var(--ink);border-radius:999px;padding:4px 16px 4px 4px;
+  box-shadow:0 4px 0 var(--ink)}
+.av img{width:38px;height:38px;border-radius:50%;background:#fff;border:2px solid var(--ink)}
+.av b{font-size:15px;font-weight:900;line-height:1.1;display:block}
+.av small{font-size:11px;opacity:.75;font-weight:700}
+.av:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
+.purse{display:inline-flex;align-items:center;gap:5px;background:var(--panel);border:3px solid var(--ink);
+  border-radius:999px;padding:6px 13px;font-weight:900;font-size:15px;box-shadow:0 4px 0 var(--ink)}
+.ico{font:inherit;font-size:19px;line-height:1;cursor:pointer;color:#fff;background:var(--panel);
+  border:3px solid var(--ink);border-radius:999px;padding:8px 12px;box-shadow:0 4px 0 var(--ink);
+  display:inline-flex;align-items:center;gap:7px;font-weight:900}
+.ico:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
+.ico b{font-size:14px}
+.ico.key{opacity:.45;font-size:16px;padding:7px 10px}
+#accT{font-size:14px;font-weight:900}
+#accS{display:none}
+@media(max-width:720px){#accT{display:none}.av small{display:none}.av b{font-size:14px}}
+
+/* ── המרקיזה: השלט המואר ── */
+.marquee{position:relative;text-align:center;margin:12px 0 16px;padding:30px 20px 26px;
+  background:linear-gradient(180deg,#45228a,#2b1659);
+  border:4px solid var(--ink);border-radius:28px;
+  box-shadow:0 10px 0 rgba(0,0,0,.45), inset 0 0 70px rgba(255,61,139,.22)}
+.marquee::before,.marquee::after{content:'';position:absolute;left:16px;right:16px;height:13px;
+  background:radial-gradient(circle,var(--zap) 0 36%,rgba(255,212,59,.18) 38%,transparent 42%) 0 0/27px 13px repeat-x;
+  filter:drop-shadow(0 0 5px rgba(255,212,59,.65))}
+.marquee::before{top:9px}
+.marquee::after{bottom:9px}
+h1{font-family:'Secular One',Rubik,system-ui;font-weight:400;margin:6px 0 6px;
+  font-size:clamp(30px,8.4vw,62px);line-height:1.04;color:#fff;letter-spacing:.4px;
+  text-shadow:0 3px 0 var(--hot),0 6px 0 rgba(0,0,0,.25)}
+.marquee p{margin:0;font-size:15px;font-weight:700;color:var(--soft)}
+.stat{margin-top:3px;font-size:13.5px;color:var(--soft);opacity:.75}
+#dailyB{margin-top:15px;font:inherit;font-family:Rubik;font-weight:900;font-size:16px;padding:11px 24px;
+  border-radius:999px;border:3px solid var(--ink);background:var(--zap);color:var(--ink);cursor:pointer;
+  box-shadow:0 5px 0 var(--ink)}
+#dailyB:active{transform:translateY(4px);box-shadow:0 1px 0 var(--ink)}
+#dailyB:disabled{background:var(--panel);color:var(--soft);cursor:default;box-shadow:0 5px 0 var(--ink)}
+
+/* ── חיפוש וקטגוריות ── */
+.tools{display:flex;gap:9px;max-width:640px;margin:0 auto 11px}
+.sr{width:100%;font:inherit;font-weight:700;font-size:16px;padding:13px 18px;border-radius:16px;
+  border:3px solid var(--ink);background:var(--panel);color:#fff;outline:none;box-shadow:0 4px 0 var(--ink)}
+.sr:focus{border-color:var(--ice)}
+.sr::placeholder{color:var(--soft);opacity:.7}
+#cmpB{width:auto;flex:none;cursor:pointer;font-weight:900;padding:13px 15px}
+#chips{display:flex;gap:7px;overflow-x:auto;padding:2px 2px 10px;margin:0 -14px 14px;
+  padding-inline:14px;scrollbar-width:none}
+#chips::-webkit-scrollbar{display:none}
+#chips button{flex:0 0 auto;font:inherit;font-weight:900;font-size:13.5px;padding:8px 15px;border-radius:999px;
+  border:3px solid var(--ink);background:var(--panel);color:#fff;cursor:pointer;box-shadow:0 3px 0 var(--ink)}
+#chips button.on{background:var(--ice);color:var(--ink)}
+
+/* ── באנר הבוס ── */
+.bossb{display:flex;align-items:center;gap:14px;text-decoration:none;color:#fff;margin:0 0 18px;padding:15px 18px;
+  border-radius:22px;background:linear-gradient(110deg,#5b2bd6,#ff3d8b);
+  border:4px solid var(--ink);box-shadow:0 7px 0 var(--ink)}
+.bossb .em{font-size:44px;filter:drop-shadow(0 3px 0 rgba(0,0,0,.35))}
+.bossb b{display:block;font-size:19px;font-weight:900}
+.bossb small{opacity:.92;font-size:13.5px}
+.bossb .bar{height:9px;background:rgba(0,0,0,.4);border-radius:5px;margin-top:8px;overflow:hidden}
+.bossb .bar i{display:block;height:100%;background:var(--zap);border-radius:5px}
+
+/* ── קיר הקלטות ── */
+#grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(146px,1fr));gap:13px}
+.sec{grid-column:1/-1;font-family:'Secular One',Rubik;font-weight:400;font-size:21px;
+  margin:16px 2px 1px;color:var(--zap)}
+.sec:first-child{margin-top:2px}
+.cw{position:relative}
+a.card{display:flex;flex-direction:column;align-items:center;text-align:center;height:100%;
+  text-decoration:none;color:#fff;background:var(--grape);
+  border:3px solid var(--ink);border-radius:20px;padding:11px 9px 11px;
+  box-shadow:0 6px 0 rgba(0,0,0,.5);transition:transform .12s,box-shadow .12s,border-color .12s}
+a.card img{width:100%;max-width:104px;aspect-ratio:1/1;height:auto;border-radius:15px;
+  border:3px solid var(--ink);background:#0004;display:block}
+.t{font-size:14.5px;font-weight:900;line-height:1.2;margin-top:9px}
+.d{display:none}
+.tag{display:inline-block;margin-top:6px;font-size:11px;font-weight:900;color:var(--ink);
+  background:var(--soft);border-radius:999px;padding:2px 9px}
+a.card:hover,a.card:focus-visible{transform:translateY(-4px);box-shadow:0 10px 0 rgba(0,0,0,.5);
+  border-color:var(--zap);outline:none}
+a.card:active{transform:translateY(2px);box-shadow:0 3px 0 rgba(0,0,0,.5)}
+.fav{position:absolute;top:5px;left:7px;background:none;border:0;font-size:21px;cursor:pointer;
+  color:#fff;opacity:.3;z-index:2;padding:3px;text-shadow:0 2px 0 rgba(0,0,0,.5)}
+.fav.on{opacity:1;color:var(--zap)}
+.new{position:absolute;top:-7px;right:-5px;background:var(--mint);color:var(--ink);font-size:11px;
+  font-weight:900;border-radius:999px;padding:3px 10px;z-index:2;border:3px solid var(--ink)}
+.empty{text-align:center;color:var(--soft);grid-column:1/-1;padding:30px 0}
+footer{text-align:center;margin-top:36px;color:var(--soft);opacity:.5;font-size:13px}
+
+/* ── תצוגה דחוסה ── */
+body.cmp #grid{grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:9px}
+body.cmp a.card{padding:8px 6px;border-radius:15px;border-width:2.5px;box-shadow:0 4px 0 rgba(0,0,0,.5)}
+body.cmp a.card img{max-width:62px;border-radius:11px;border-width:2.5px}
+body.cmp .t{font-size:12px;margin-top:6px}
+body.cmp .tag{display:none}
+body.cmp .fav{font-size:16px;top:2px;left:3px}
+body.cmp .new{font-size:9.5px;padding:2px 7px;border-width:2px}
+body.cmp .sec{font-size:18px;margin-top:11px}
+
+/* ── חלוניות ── */
+.mo{position:fixed;inset:0;background:rgba(10,5,30,.86);display:none;align-items:center;justify-content:center;z-index:50;padding:16px}
+.mo.show{display:flex}
+.mc{width:100%;max-width:372px;background:var(--panel);border:4px solid var(--ink);border-radius:26px;
+  padding:22px;text-align:center;box-shadow:0 10px 0 rgba(0,0,0,.45)}
+.mc h2{margin:0 0 8px;font-family:'Secular One',Rubik;font-weight:400;font-size:25px}
+.mc p{color:var(--soft);line-height:1.55;margin:6px 0}
+.mc input,.mc select{width:100%;font:inherit;font-weight:700;font-size:17px;padding:12px;border-radius:14px;
+  border:3px solid var(--ink);background:var(--grape);color:#fff;text-align:center}
+.mc input#admC{letter-spacing:1px;direction:ltr}
+.mb{display:block;width:100%;margin-top:10px;border:3px solid var(--ink);border-radius:16px;padding:12px;
+  font:inherit;font-weight:900;font-size:17px;color:var(--ink);background:var(--zap);cursor:pointer;
+  box-shadow:0 5px 0 var(--ink)}
+.mb:active{transform:translateY(4px);box-shadow:0 1px 0 var(--ink)}
+.mb.alt{background:var(--grape);color:#fff;font-size:15px;padding:10px}
 .err{color:#ff9bb0;min-height:22px}
 
-.tools{max-width:560px;margin:18px auto 6px}
-.sr{width:100%;font:inherit;font-size:17px;padding:12px 16px;border-radius:16px;border:2px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#fff;outline:none}
-.sr:focus{border-color:#ffd23f}.sr::placeholder{color:#fff;opacity:.55}
-#chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:12px 0 18px}
-#chips button{font:inherit;font-weight:800;font-size:14px;padding:7px 14px;border-radius:999px;border:2px solid rgba(255,255,255,.2);background:rgba(255,255,255,.07);color:#fff;cursor:pointer}
-#chips button.on{background:#ffd23f;color:#193552;border-color:#fff}
-.daily{margin-top:12px}#dailyB{font:inherit;font-weight:900;font-size:16px;padding:10px 20px;border-radius:999px;border:0;background:linear-gradient(180deg,#ffe27a,#ffb02e);color:#3a2400;cursor:pointer;box-shadow:0 4px 0 #b57400}
-#dailyB:disabled{background:rgba(255,255,255,.12);color:#fff;box-shadow:none;opacity:.7;cursor:default}
-.sec{grid-column:1/-1;font-size:18px;font-weight:900;margin:10px 4px 0;opacity:.9}
-.cw{position:relative}.cw a.card{height:100%}
-.fav{position:absolute;top:8px;left:10px;background:none;border:0;font-size:22px;cursor:pointer;color:#fff;opacity:.35;z-index:2;padding:4px}.fav.on{opacity:1;color:#ffd23f}
-.new{position:absolute;top:-6px;right:-4px;background:#ff3d71;color:#fff;font-size:11px;font-weight:900;border-radius:999px;padding:3px 9px;z-index:2;box-shadow:0 2px 6px #0006}
-.stat{opacity:.7;font-size:14px;margin-top:6px}
-
-h1{background:linear-gradient(90deg,#ffe27a,#ff9fd6,#7ae0ff);-webkit-background-clip:text;background-clip:text;color:transparent}
-a.card{background:linear-gradient(160deg,rgba(255,255,255,.12),rgba(255,255,255,.04));backdrop-filter:blur(6px)}
-a.card:hover{box-shadow:0 8px 26px rgba(255,210,63,.25)}
-.bossb{display:flex;align-items:center;gap:14px;text-decoration:none;color:#fff;margin:6px 0 18px;padding:16px 18px;border-radius:22px;background:linear-gradient(120deg,#5b36d6,#c2307a);border:2px solid rgba(255,255,255,.3);box-shadow:0 8px 28px rgba(194,48,122,.35)}
-.bossb .em{font-size:48px}.bossb b{display:block;font-size:20px}.bossb small{opacity:.9;font-size:14px}
-.bossb .bar{height:8px;background:rgba(0,0,0,.3);border-radius:4px;margin-top:8px;overflow:hidden}.bossb .bar i{display:block;height:100%;background:#ffd23f;border-radius:4px}
-body.cmp #grid{grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:8px}
-body.cmp a.card{padding:7px 9px;gap:9px;border-radius:16px;border-width:1.5px}
-body.cmp a.card img{width:40px;height:40px;border-radius:11px}
-body.cmp .t{font-size:14.5px;line-height:1.15}
-body.cmp .d{display:none}
-body.cmp .tag{margin-top:3px;font-size:10.5px;padding:1px 7px}
-body.cmp .fav{top:2px;left:4px;font-size:16px;padding:2px}
-body.cmp .sec{margin-top:6px}
-body.cmp .new{top:-5px;font-size:9.5px;padding:2px 6px}
+/* ── טלפון: לקצר את הדרך למשחקים ── */
+@media(max-width:620px){
+  main{padding-top:calc(max(8px,env(safe-area-inset-top)) + 44px)}
+  .topbar{gap:6px}
+  .av{padding:3px 13px 3px 3px}.av img{width:34px;height:34px}
+  .purse,.ico{padding:6px 11px;font-size:14px}
+  .marquee{padding:22px 14px 19px;margin:9px 0 12px;border-radius:24px}
+  .marquee::before,.marquee::after{height:11px;background-size:23px 11px}
+  .stat{font-size:12.5px}
+  #dailyB{margin-top:12px;padding:10px 20px;font-size:15px}
+  .bossb{padding:12px 14px;gap:11px;border-radius:19px;margin-bottom:14px}
+  .bossb .em{font-size:34px}
+  .bossb b{font-size:16.5px}.bossb small{font-size:12.5px}
+  #grid{grid-template-columns:repeat(auto-fill,minmax(106px,1fr));gap:10px}
+  a.card{padding:9px 7px}
+  a.card img{max-width:74px;border-radius:13px}
+  .t{font-size:12.5px;margin-top:7px}
+  .tag{display:none}
+  .sec{font-size:18px;margin-top:12px}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 <link rel="canonical" href="https://alon-maidenberg.pages.dev/">
 <meta property="og:title" content="המשחקים של אלון מידנברג">
@@ -83,17 +187,28 @@ body.cmp .new{top:-5px;font-size:9.5px;padding:2px 6px}
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"המשחקים של אלון מידנברג","url":"https://alon-maidenberg.pages.dev/","inLanguage":"he"}</script>
 <script src="loader.js" defer></script>
 </head>
-<body>
+<body class="hub">
 <main>
-  <header>
-    <img src="assets/hub.svg" alt="" width="84" height="84">
-    <h1>המשחקים של אלון מידנברג</h1>
-    <p>בחרו משחק ותתחילו לשחק 🎮</p><div class="stat" id="stat"></div>
-    <a class="me" id="meB" href="avatar/" aria-label="הדמות שלי"><img id="meI" alt="" width="46" height="46"><span><b id="meN">הדמות שלי</b><small>🎨 עצבו דמות משלכם</small></span></a> <button class="me" id="accB" type="button" style="font:inherit;cursor:pointer"><span style="font-size:30px;width:46px;text-align:center" id="accE">👤</span><span><b id="accT">התחברות</b><small id="accS">שחקו מכל מחשב</small></span></button>
-    <div class="wal"><span>🪙 <b id="wc">0</b></span><span>💎 <b id="wd">0</b></span><button class="key" id="keyB" aria-label="קוד אדמין">🔑</button></div>
-  <div class="daily"><button id="dailyB">🎁 מתנה יומית</button> <button id="lbB" style="font:inherit;font-weight:900;font-size:16px;padding:10px 20px;border-radius:999px;border:2px solid rgba(255,255,255,.3);background:rgba(255,255,255,.08);color:#fff;cursor:pointer">🏆 השיאים שלי</button> <button id="gbB" style="font:inherit;font-weight:900;font-size:16px;padding:10px 20px;border-radius:999px;border:2px solid rgba(255,255,255,.3);background:rgba(255,255,255,.08);color:#fff;cursor:pointer">🌍 לוח תוצאות</button> <button id="achB" style="font:inherit;font-weight:900;font-size:16px;padding:10px 20px;border-radius:999px;border:2px solid rgba(255,255,255,.3);background:rgba(255,255,255,.08);color:#fff;cursor:pointer">🏅 הישגים</button></div>
-    <div class="tools" style="display:flex;gap:8px"><input class="sr" id="sr" type="search" placeholder="🔍 חיפוש משחק…" autocomplete="off"><button class="sr" id="cmpB" type="button" style="width:auto;flex:none;cursor:pointer;font-weight:900" aria-label="תצוגה"></button></div>
-    <div id="chips"></div>
+  <div class="topbar">
+    <a class="av" id="meB" href="avatar/" aria-label="הדמות שלי"><img id="meI" alt="" width="38" height="38"><span><b id="meN">הדמות שלי</b><small>עצבו דמות משלכם</small></span></a>
+    <span class="grow"></span>
+    <span class="purse">🪙 <b id="wc">0</b></span>
+    <span class="purse">💎 <b id="wd">0</b></span>
+    <button class="ico" id="accB" type="button"><span id="accE">👤</span><span id="accT">התחברות</span><span id="accS"></span></button>
+    <button class="ico" id="achB" type="button" aria-label="הישגים" title="הישגים">🏅</button>
+    <button class="ico" id="lbB" type="button" aria-label="השיאים שלי" title="השיאים שלי">🏆</button>
+    <button class="ico" id="gbB" type="button" aria-label="לוח תוצאות" title="לוח תוצאות">🌍</button>
+    <button class="ico key" id="keyB" type="button" aria-label="קוד אדמין">🔑</button>
+  </div>
+
+  <header class="marquee">
+    <h1>המשחקים של אלון</h1>
+    <div class="stat" id="stat"></div>
+    <button id="dailyB">🎁 מתנה יומית</button>
+  </header>
+
+  <div class="tools"><input class="sr" id="sr" type="search" placeholder="🔍 איזה משחק בא לכם?" autocomplete="off"><button class="sr" id="cmpB" type="button" aria-label="תצוגה"></button></div>
+  <div id="chips"></div>
   <a class="bossb" id="bossB" href="boss/"><span class="em">👾</span><span style="flex:1"><b>שלבי הבוס: הגליץ׳</b><small id="bossT"></small><div class="bar"><i id="bossBar"></i></div></span></a>
   </header>
   <section id="grid" aria-label="רשימת המשחקים"><p class="empty">טוען משחקים…</p></section>
