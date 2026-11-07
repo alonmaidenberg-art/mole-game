@@ -148,7 +148,15 @@ function label(px,py,txt,bg,fg,fs){
 }
 
 /* ═══════ catalogue ═══════ */
-const COIN=[{ic:'🪙',nm:'רגיל',price:9},{ic:'💠',nm:'אולטרה',price:30},{ic:'🥽',nm:'VR',price:95}];
+/* src:'play' = מרוויחים במכונות · src:'buy' = קונים מלאי במשטח הפריקה */
+const COIN=[
+ {ic:'🪙',nm:'מטבע',  price:9,   src:'play'},
+ {ic:'💠',nm:'אולטרה',price:30,  src:'play'},
+ {ic:'🥽',nm:'VR',    price:95,  src:'play'},
+ {ic:'💿',nm:'דיסק',  price:130, src:'buy',buy:58, cap:14,need:'discs'},
+ {ic:'🎮',nm:'שלט',   price:280, src:'buy',buy:135,cap:10,need:'pads'},
+ {ic:'🎁',nm:'קונסולה',price:980,src:'buy',buy:540,cap:5, need:'console'}
+];
 const MACHINES=[
  {id:0,ic:'🌊',nm:'גלים פרו',   cost:0,    tier:0,col:'#4fc3f7'},
  {id:1,ic:'🎯',nm:'מטווח',      cost:420,  tier:0,col:'#7be36b'},
@@ -167,12 +175,17 @@ const SIZES=[
  {nm:'אולם ארקייד',w:25,h:19,slots:4,cost:16000},
  {nm:'מגה־ארקייד', w:30,h:22,slots:5,cost:42000}
 ];
+/* כל שדרוג מציב חפץ אמיתי בחנות */
 const UPG=[
- {id:'price',ic:'🏷️',nm:'תמחור',     max:4,cost:l=>300+l*420},
- {id:'seats',ic:'🛋️',nm:'ספסלים',    max:3,cost:l=>340+l*460},
- {id:'skill',ic:'🎮',nm:'אימון',     max:4,cost:l=>400+l*520},
- {id:'ad',   ic:'📣',nm:'שלט ניאון', max:3,cost:l=>420+l*520}
+ {id:'seats',  ic:'🛋️',nm:'ספסל המתנה', ds:'לקוחות בתור יושבים ומחכים בסבלנות', max:4,cost:l=>340+l*380},
+ {id:'till',   ic:'💳',nm:'קופה חכמה',   ds:'עמדת תשלום על הדלפק · +22% למכירה', max:3,cost:l=>420+l*520},
+ {id:'neon',   ic:'📣',nm:'שלט ניאון',   ds:'נתלה מעל הדלת · עוד לקוחות',        max:3,cost:l=>460+l*560},
+ {id:'plant',  ic:'🪴',nm:'עציץ',        ds:'מרענן את החנות · פחות נטישות',      max:4,cost:l=>240+l*260},
+ {id:'discs',  ic:'💿',nm:'מדף דיסקים',  ds:'פותח מכירת 💿 — קונים מלאי במשטח',  max:1,cost:()=>3800, min:1},
+ {id:'pads',   ic:'🎮',nm:'מדף שלטים',   ds:'פותח מכירת 🎮',                      max:1,cost:()=>9500, min:2},
+ {id:'console',ic:'🎁',nm:'ויטרינת קונסולות',ds:'פותח מכירת 🎁 — הפריט היקר ביותר',max:1,cost:()=>26000,min:2}
 ];
+const UPGBY=id=>UPG.find(u=>u.id===id);
 
 /* ───── save ───── */
 const SKEY='arcade_tycoon_v3';
@@ -189,12 +202,22 @@ function maxTier(){let t=0;for(const id of SAVE.own)t=Math.max(t,MACHINES[id].ti
 loadSave();
 
 /* ───── runtime ───── */
-let inv=[0,0,0],money=0,rep=100,dayT=0,DAYLEN=180,dayEarn=0,served=0,lost=0;
+let inv=[0,0,0,0,0,0],money=0,rep=100,dayT=0,DAYLEN=180,dayEarn=0,served=0,lost=0;
 let state='menu';
-function payFor(k,n){return Math.round(COIN[k].price*n*(1+up('price')*.22))}
+function payFor(k,n){return Math.round(COIN[k].price*n*(1+up('till')*.22))}
+function goodOpen(k){
+  const g=COIN[k];
+  if(g.src==='buy')return up(g.need)>0;
+  return MACHINES.some(m=>m.tier===k&&owns(m.id))||k<=maxTier();
+}
 function setInv(){
-  $('#i1').firstChild.nodeValue=inv[0];$('#i2').firstChild.nodeValue=inv[1];$('#i3').firstChild.nodeValue=inv[2];
-  const t=maxTier();$('#i2').classList.toggle('off',t<1);$('#i3').classList.toggle('off',t<2);
+  const box=$('#inv');box.innerHTML='';
+  for(let k=0;k<COIN.length;k++){
+    if(!goodOpen(k))continue;
+    const d=document.createElement('div');d.className='cell';
+    d.innerHTML=inv[k]+'<small>'+COIN[k].ic+' '+COIN[k].nm+'</small>';
+    box.appendChild(d);
+  }
 }
 function setMoney(){$('#money').textContent='💵 '+nf(money)}
 function setRep(){$('#rep').textContent='⭐ '+Math.round(rep)+'%'}
@@ -202,7 +225,7 @@ function banner(t,d){const b=$('#banner');b.textContent=t;b.style.opacity=1;clea
 
 /* ═══════ shop layout ═══════ */
 let SH={x0:-7,x1:7,y0:-6,y1:6},DOORX=0,CNT={y:0,x0:0,x1:0};
-let machines=[],plots=[],corner=[],floats=[];
+let machines=[],plots=[],corner=[],floats=[],benches=[],plants=[],shelves=[],neon=0;
 function layout(){
   const S=SIZES[SAVE.size];
   fitZoom();
@@ -228,15 +251,36 @@ function layout(){
     if(px>SH.x1-1.5)break;
     corner.push({x:px,y:SH.y1-2.1,t:Math.random()*9});
   }
+  /* ── furniture you actually bought ── */
+  benches=[];plants=[];shelves=[];neon=up('neon');
+  for(let i=0;i<up('seats');i++){
+    const side=i%2?1:-1,row=(i/2)|0;
+    benches.push({x:DOORX+side*(2.6+row*1.5),y:CNT.y+2.6+row*1.9});
+  }
+  for(let i=0;i<up('plant');i++){
+    const sp=[[SH.x0+1.0,SH.y1-1.0],[SH.x1-1.0,SH.y1-1.0],[SH.x0+1.0,SH.y0+1.0],[SH.x1-1.0,SH.y0+1.0]][i%4];
+    plants.push({x:sp[0],y:sp[1]});
+  }
+  /* shelves for bought-in stock, each with its own delivery pad */
+  const buyable=COIN.map((g,k)=>({g,k})).filter(o=>o.g.src==='buy'&&up(o.g.need));
+  buyable.forEach((o,i)=>{
+    const sx2=DOORX+(i-(buyable.length-1)/2)*4.0, sy2=SH.y0+4.5;
+    shelves.push({k:o.k,x:sx2,y:sy2});
+    plots.push({x:sx2,y:sy2+1.9,w:1.6,h:1.35,kind:'stock',ref:o.k,
+      cost:o.g.buy,fill:0,ic:o.g.ic,nm:'מלאי '+o.g.nm});
+  });
   /* one hire and one upgrade offered at a time — the floor stays readable */
   const nextStaff=STAFF.map(s=>({s,lv:stf(s.id)})).filter(o=>o.lv<o.s.max)
     .sort((a,b)=>a.s.cost(a.lv)-b.s.cost(b.lv))[0];
-  if(nextStaff)plots.push({x:SH.x0+1.7,y:CNT.y-2.6,w:2.0,h:1.8,kind:'staff',ref:nextStaff.s.id,
+  if(nextStaff)plots.push({x:SH.x0+1.7,y:CNT.y-2.4,w:2.0,h:1.8,kind:'staff',ref:nextStaff.s.id,
     cost:nextStaff.s.cost(nextStaff.lv),fill:0,ic:nextStaff.s.ic,nm:nextStaff.s.nm});
-  const nextUp=UPG.map(u=>({u,lv:up(u.id)})).filter(o=>o.lv<o.u.max)
-    .sort((a,b)=>a.u.cost(a.lv)-b.u.cost(b.lv))[0];
-  if(nextUp)plots.push({x:SH.x1-1.7,y:CNT.y-2.6,w:1.9,h:1.7,kind:'upg',ref:nextUp.u.id,
-    cost:nextUp.u.cost(nextUp.lv),fill:0,ic:nextUp.u.ic,nm:nextUp.u.nm});
+  const openUp=UPG.map(u=>({u,lv:up(u.id)}))
+    .filter(o=>o.lv<o.u.max&&SAVE.size>=(o.u.min||0))
+    .sort((a,b)=>a.u.cost(a.lv)-b.u.cost(b.lv));
+  openUp.slice(0,2).forEach((o,i)=>{
+    plots.push({x:SH.x1-1.7,y:CNT.y-2.4-i*2.9,w:1.9,h:1.7,kind:'upg',ref:o.u.id,
+      cost:o.u.cost(o.lv),fill:0,ic:o.u.ic,nm:o.u.nm,ds:o.u.ds});
+  });
   if(SAVE.size+1<SIZES.length){
     const N=SIZES[SAVE.size+1];
     plots.push({x:0,y:SH.y0-2.0,w:3.6,h:2.3,kind:'expand',ref:SAVE.size+1,cost:N.cost,fill:0,ic:'🏗️',nm:'הרחבה'});
@@ -275,13 +319,20 @@ function movePlayer(dt){
   if(Math.abs(nx)<2.0)ny=clamp(ny,SH.y0-3.1,SH.y1-m);
   else ny=clamp(ny,SH.y0+m,SH.y1-m);
   /* the counter blocks, except at the left-hand gap */
-  if(nx>CNT.x0+1.8){
+  /* the counter blocks, but there is a way round at each end */
+  const openL=nx<CNT.x0+1.9, openR=nx>CNT.x1-1.2;
+  if(!openL&&!openR){
     if(P.y<CNT.y&&ny>CNT.y-.45)ny=CNT.y-.45;
     if(P.y>CNT.y&&ny<CNT.y+.45)ny=CNT.y+.45;
   }
   for(const mc of machines){
     if(Math.abs(nx-mc.x)<1.05&&Math.abs(ny-mc.y)<.9){
       if(Math.abs(P.x-mc.x)>=1.05)nx=P.x;else ny=P.y;
+    }
+  }
+  for(const sv of shelves){
+    if(Math.abs(nx-sv.x)<1.15&&Math.abs(ny-sv.y)<.75){
+      if(Math.abs(P.x-sv.x)>=1.15)nx=P.x;else ny=P.y;
     }
   }
   P.x=nx;P.y=ny;
@@ -294,6 +345,18 @@ function stepPlots(dt){
     const p=plots[i];
     const inside=Math.abs(P.x-p.x)<p.w/2+.3&&Math.abs(P.y-p.y)<p.h/2+.3;
     p.near=inside;
+    if(p.kind==='stock'){
+      const g=COIN[p.ref];
+      if(inside&&money>=g.buy&&inv[p.ref]<g.cap){
+        p.fill+=dt*g.buy*1.6;
+        if(p.fill>=g.buy){
+          p.fill=0;money-=g.buy;inv[p.ref]++;setMoney();setInv();
+          floats.push({x:p.x,y:p.y-.5,vy:-1.6,life:.9,txt:g.ic+' +1'});
+          tone(620,.06,'sine',.04);
+        }
+      }else if(!inside)p.fill=0;
+      continue;
+    }
     if(inside&&money>0&&p.fill<p.cost){
       const rate=Math.max(p.cost/2.8,240);
       const step=Math.min(rate*dt,p.cost-p.fill,money);
@@ -320,24 +383,30 @@ function finishPlot(p){
 
 /* ───── customers ───── */
 let people=[],spawnCd=2.4;
-function queueSpot(i){return{x:DOORX,y:CNT.y+1.8+i*1.75}}
+function queueSpot(i){return{x:DOORX,y:CNT.y+1.25+i*1.75}}
 function pickWant(){
-  const t=maxTier(),r=Math.random();
-  let k=0;
-  if(t>=2)k=r<.42?0:r<.78?1:2;
-  else if(t>=1)k=r<.62?0:1;
-  const want=k===2?1:k===1?(1+((Math.random()*2)|0)):(1+((Math.random()*3)|0));
+  /* only ask for goods the shop can actually supply; cheap things stay commonest */
+  const pool=[];
+  for(let k=0;k<COIN.length;k++){
+    if(!goodOpen(k))continue;
+    const wgt=[10,6,4,4,3,2][k]||2;
+    for(let i=0;i<wgt;i++)pool.push(k);
+  }
+  const k=pool.length?pool[(Math.random()*pool.length)|0]:0;
+  const g=COIN[k];
+  const want=g.src==='buy'?(k>=5?1:1+((Math.random()*2)|0))
+           :(k===2?1:k===1?(1+((Math.random()*2)|0)):(1+((Math.random()*3)|0)));
   return{k,want};
 }
 function spawnCustomer(){
   const w=pickWant();
   people.push({code:randCode(),x:DOORX+(Math.random()*1.6-.8),y:SH.y1+1.4,
-    k:w.k,want:w.want,st:'queue',pat:1,patMax:15+up('seats')*9+stf('cleaner')*6,
+    k:w.k,want:w.want,st:'queue',seat:null,pat:1,patMax:14+up('seats')*7+up('plant')*3+stf('cleaner')*6,
     t:Math.random()*9,slot:0,play:0,corner:0});
 }
 function stepPeople(dt){
   if(state!=='play'&&state!=='mini')return;
-  spawnCd-=dt*(1+up('ad')*.3+SAVE.size*.22);
+  spawnCd-=dt*(1+up('neon')*.3+SAVE.size*.22);
   if(spawnCd<=0&&people.length<3+SAVE.size*2){spawnCd=3.4+Math.random()*2.8;spawnCustomer()}
   let qi=0;
   /* forward order so the person who arrived first stands at the front */
@@ -345,19 +414,29 @@ function stepPeople(dt){
     const c=people[i];c.t+=dt;
     let tx,ty;
     if(c.st==='queue'){
-      const s=queueSpot(qi);c.slot=qi;qi++;tx=s.x;ty=s.y;
-      if(Math.hypot(c.x-tx,c.y-ty)<.45&&c.slot===0){
-        c.pat-=dt/c.patMax;
-        if(c.pat<=0){c.st='leave';rep=Math.max(0,rep-(stf('cleaner')?2:4));lost++;setRep();
-          banner('😠 לקוח עזב בלי לקנות',1.4);tone(180,.25,'square',.06)}
+      c.slot=qi;qi++;
+      /* whoever is not at the front takes a free bench if the shop has one */
+      let seat=null;
+      if(c.slot>0&&benches.length){
+        const bi=(c.slot-1)%benches.length;
+        if(!people.some(o=>o!==c&&o.seat===bi))seat=bi;
       }
+      c.seat=seat;
+      if(seat!==null){tx=benches[seat].x;ty=benches[seat].y-.5}
+      else{const s2=queueSpot(c.slot);tx=s2.x;ty=s2.y}
+      const atSpot=Math.hypot(c.x-tx,c.y-ty)<.55;
+      if(atSpot&&c.slot===0){
+        c.pat-=dt/c.patMax;
+        if(c.pat<=0){c.st='leave';rep=Math.max(0,rep-(stf('cleaner')||up('plant')?2:4));lost++;setRep();
+          banner('😠 לקוח עזב בלי לקנות',1.4);tone(180,.25,'square',.06)}
+      }else if(atSpot&&seat!==null)c.pat=Math.min(1,c.pat+dt*.06);   /* נח על הספסל */
     }else if(c.st==='play'){
       const m=corner[c.corner]||corner[0];
       tx=m.x;ty=m.y+1.0;
       if(Math.hypot(c.x-tx,c.y-ty)<.5){
         c.play-=dt;
         if(c.play<=0){
-          const tip=Math.round((12+Math.random()*18)*(1+SAVE.size*.3)*(1+up('price')*.22));
+          const tip=Math.round((12+Math.random()*18)*(1+SAVE.size*.3)*(1+up('till')*.22));
           money+=tip;dayEarn+=tip;setMoney();
           floats.push({x:c.x,y:c.y-1,vy:-1.6,life:1.1,txt:'+'+tip+' 💵',col:'#2f9e4a'});
           tone(880,.07,'sine',.05);setTimeout(()=>tone(1180,.09,'sine',.045),70);
@@ -373,7 +452,7 @@ function stepPeople(dt){
 }
 function headCustomer(){
   const q=queueSpot(0);
-  for(const c of people)if(c.st==='queue'&&c.slot===0&&Math.hypot(c.x-q.x,c.y-q.y)<.8)return c;
+  for(const c of people)if(c.st==='queue'&&c.slot===0&&Math.hypot(c.x-q.x,c.y-q.y)<.9)return c;
   return null;
 }
 function serve(c,byStaff){
@@ -441,7 +520,7 @@ function draw(){
     if((gx+gy)&1){rr(sx(gx)+3,sy(gy)+3,ZOOM-6,ZOOM-6,11);X.fill()}
   X.globalAlpha=1;
   X.fillStyle='#ffd9e2';rr(sx(DOORX-1.7),sy(SH.y1-2.4),3.4*ZOOM,2.4*ZOOM,20);X.fill();
-  const cx0=sx(CNT.x0+1.8),cw=(CNT.x1-CNT.x0-1.8)*ZOOM,cy0=sy(CNT.y-.42),ch=.84*ZOOM;
+  const cx0=sx(CNT.x0+1.9),cw=(CNT.x1-1.2-(CNT.x0+1.9))*ZOOM,cy0=sy(CNT.y-.42),ch=.84*ZOOM;
   X.fillStyle='rgba(58,45,30,.18)';rr(cx0,cy0+8,cw,ch,16);X.fill();
   X.fillStyle='#d98b4a';rr(cx0,cy0,cw,ch,16);X.fill();
   X.fillStyle='#f3b878';rr(cx0,cy0,cw,ch*.4,16);X.fill();
@@ -453,6 +532,10 @@ function draw(){
   if(plots.some(p=>p.kind==='expand')){X.beginPath();X.moveTo(sx(-1.9),fy);X.lineTo(sx(1.9),fy);X.stroke()}
   X.restore();
 
+  for(const b of benches)drawBench(b.x,b.y);
+  for(const pl of plants)drawPlant(pl.x,pl.y);
+  for(const sv of shelves)drawShelf(sv.x,sv.y,sv.k);
+  if(neon)drawNeon();
   for(const p of plots)drawPlot(p);
   for(const m of corner)drawCabinet(m.x,m.y,'#9b7bd4','🕹️',.85);
   for(const m of machines)drawCabinet(m.x,m.y,MACHINES[m.id].col,MACHINES[m.id].ic,m.vr?1.2:1);
@@ -476,6 +559,18 @@ function draw(){
 }
 function drawPlot(p){
   const px=sx(p.x),py=sy(p.y),w=p.w*ZOOM,h=p.h*ZOOM,prog=p.fill/p.cost;
+  if(p.kind==='stock'){
+    X.save();
+    shadowEllipse(px,py+h*.42,w*.42,h*.13,.16);
+    X.fillStyle='#c98a4b';rr(px-w/2,py-h/2,w,h,12);X.fill();
+    X.lineWidth=4;X.strokeStyle='#3a2d1e';X.stroke();
+    X.fillStyle='rgba(255,255,255,.3)';rr(px-w/2+5,py-h/2+5,w-10,h*.3,7);X.fill();
+    X.fillStyle='#3a2d1e';X.font='900 '+Math.round(w*.34)+'px system-ui';
+    X.textAlign='center';X.textBaseline='middle';X.fillText('📦',px,py+h*.06);
+    if(p.fill>0){X.fillStyle='rgba(123,227,107,.5)';rr(px-w/2,py+h/2-h*(p.fill/COIN[p.ref].buy),w,h*(p.fill/COIN[p.ref].buy),10);X.fill()}
+    X.restore();
+    return;
+  }
   X.save();
   X.fillStyle='rgba(255,255,255,.3)';rr(px-w/2,py-h/2,w,h,18);X.fill();
   X.setLineDash([12,9]);X.lineWidth=4;X.strokeStyle='rgba(58,45,30,.4)';
@@ -490,9 +585,65 @@ function drawPlot(p){
     X.beginPath();X.moveTo(bx-ax*c,by);X.lineTo(bx,by);X.lineTo(bx,by-ay*c);X.stroke();
   });
   X.restore();
+  if(p.kind==='stock'){
+    const g=COIN[p.ref],full=inv[p.ref]>=g.cap;
+    label(px,py-h/2-20,full?(g.ic+' מלא'):(g.ic+' '+nf(g.buy)+' 💵'),full?'#cfe9cf':'#fff',null,14);
+    label(px,py+h/2+17,inv[p.ref]+'/'+g.cap,'#fff',null,12);
+    return;
+  }
   const below=p.kind==='expand';
   label(px,py+(below?h/2+20:-h/2-20),p.ic+' '+nf(p.cost-p.fill)+' 💵','#fff',null,15);
   if(prog>0&&prog<1)label(px,py+(below?-h/2-18:h/2+18),Math.round(prog*100)+'%','#7be36b',null,13);
+}
+function drawBench(x,y){
+  const px=sx(x),py=sy(y),w=1.7*ZOOM,h=.62*ZOOM;
+  shadowEllipse(px,py+h*.75,w*.46,h*.3,.15);
+  X.save();
+  X.fillStyle='#8a5a34';rr(px-w/2,py-h*.1,w,h,h*.45);X.fill();
+  X.lineWidth=3.5;X.strokeStyle='#3a2d1e';X.stroke();
+  X.fillStyle='#a8703f';rr(px-w/2,py-h*.72,w,h*.56,h*.3);X.fill();
+  X.lineWidth=3.5;X.strokeStyle='#3a2d1e';X.stroke();
+  X.restore();
+}
+function drawPlant(x,y){
+  const px=sx(x),py=sy(y),r=.42*ZOOM;
+  shadowEllipse(px,py+r*.9,r*.8,r*.3,.16);
+  X.save();
+  X.fillStyle='#c0763f';rr(px-r*.6,py+r*.1,r*1.2,r*.85,8);X.fill();
+  X.lineWidth=3.5;X.strokeStyle='#3a2d1e';X.stroke();
+  X.fillStyle='#4aa85a';
+  for(let i=0;i<5;i++){
+    const a=-Math.PI/2+(i-2)*.52;
+    X.beginPath();X.ellipse(px+Math.cos(a)*r*.5,py-r*.35+Math.sin(a)*r*.35,r*.46,r*.22,a,0,TAU);X.fill();
+  }
+  X.restore();
+}
+function drawShelf(x,y,k){
+  const px=sx(x),py=sy(y),w=1.9*ZOOM,h=1.25*ZOOM;
+  shadowEllipse(px,py+h*.5,w*.44,h*.16,.17);
+  X.save();
+  X.fillStyle='#3a2d1e';rr(px-w/2,py-h/2,w,h,12);X.fill();
+  X.fillStyle='#e6c38e';rr(px-w/2+4,py-h/2+4,w-8,h-8,9);X.fill();
+  X.fillStyle='rgba(58,45,30,.2)';rr(px-w/2+4,py-h*.06,w-8,4,2);X.fill();
+  const n=Math.min(6,inv[k]);
+  X.font='900 '+Math.round(h*.36)+'px system-ui';X.textAlign='center';X.textBaseline='middle';
+  for(let i=0;i<n;i++){
+    const row=i<3?0:1,col=i%3;
+    X.fillText(COIN[k].ic,px-w*.26+col*w*.26,py-h*.22+row*h*.42);
+  }
+  if(!n){X.fillStyle='rgba(58,45,30,.4)';X.font='900 '+Math.round(h*.26)+'px system-ui';X.fillText('ריק',px,py)}
+  X.restore();
+}
+function drawNeon(){
+  const px=sx(DOORX),py=sy(SH.y1)+6,w=4.2*ZOOM,h=.8*ZOOM;
+  X.save();
+  const t=performance.now()/400;
+  X.fillStyle='#3a2d1e';rr(px-w/2,py-h/2,w,h,h/2);X.fill();
+  X.fillStyle=['#ff4fa3','#4fe8ff','#ffd45e'][Math.floor(t)%3];
+  rr(px-w/2+4,py-h/2+4,w-8,h-8,h/2);X.fill();
+  X.fillStyle='#3a2d1e';X.font='900 '+Math.round(h*.52)+'px system-ui';
+  X.textAlign='center';X.textBaseline='middle';X.fillText('🕹️ ARCADE 🕹️',px,py+1);
+  X.restore();
 }
 function drawCabinet(x,y,col,ic,sc){
   sc=sc||1;
@@ -722,7 +873,7 @@ function stepProx(){
   nearAct=null;
   if(state!=='play')return;
   const c=headCustomer();
-  if(c&&Math.hypot(P.x-c.x,P.y-c.y)<2.3){
+  if(c&&Math.hypot(P.x-c.x,P.y-c.y)<3.4){
     nearAct={t:'serve',c,txt:'מכירה '+COIN[c.k].ic+'×'+c.want+' · '+payFor(c.k,c.want)+' 💵'+(inv[c.k]<c.want?'  (חסר!)':'')};
     return;
   }
