@@ -83,6 +83,10 @@ html,body{margin:0;height:100%;background:#07030f;color:#fff;overflow:hidden;
 .boss canvas{flex:0 0 auto;border-radius:16px;background:#0f0828}
 .boss .nm{font:900 19px Rubik,system-ui;line-height:1.15}
 .boss .nm small{display:block;font:700 12.5px Rubik,system-ui;opacity:.7;margin-top:2px}
+.aitag{flex:0 0 auto;align-self:flex-start;font:900 11px Rubik,system-ui;background:rgba(255,255,255,.14);
+  border-radius:999px;padding:4px 9px;white-space:nowrap}
+.dots{letter-spacing:3px;animation:bl 1.1s steps(3,end) infinite}
+@keyframes bl{0%{opacity:.35}50%{opacity:1}100%{opacity:.35}}
 #chat{background:#0f0828;border-radius:18px;padding:12px;max-height:40vh;min-height:150px;overflow:auto;
   display:flex;flex-direction:column;gap:8px}
 .bub{max-width:86%;padding:9px 12px;border-radius:16px;font-size:14.5px;line-height:1.45;
@@ -116,7 +120,8 @@ details.adv summary{cursor:pointer;font:900 14px Rubik,system-ui;opacity:.85;pad
 <div id="mk"><div class="mkc">
   <div class="boss"><canvas id="bossFace" width="120" height="120"
       style="width:60px;height:60px"></canvas>
-    <div class="nm">הגליץ׳<small>בונה לכם שורט. פשוט תגידו מה אתם רוצים.</small></div></div>
+    <div class="nm">הגליץ׳<small>בונה לכם שורט. פשוט תגידו מה אתם רוצים.</small></div>
+    <span id="aiTag" class="aitag">⚡ מצב מהיר</span></div>
   <div id="chat"></div>
   <div id="chips"></div>
   <div class="say"><input id="mkSay" autocomplete="off" placeholder="לדוגמה: משחק קפיצה ממש קשה בוורוד">
@@ -169,6 +174,11 @@ function dot(g,x,y,r,c){g.fillStyle=c;g.beginPath();g.arc(x,y,r,0,6.283);g.fill(
 function txt(g,s,x,y,size,c,al){g.fillStyle=c;g.font='900 '+size+'px Rubik,system-ui';
   g.textAlign=al||'center';g.textBaseline='middle';g.fillText(s,x,y)}
 
+/* every short carries its own speed and size, so two shorts of the same game
+   do not have to feel the same */
+function SP(c){var v=+c.sp;return isFinite(v)&&v>0?Math.min(1.6,Math.max(.6,v)):1}
+function SZ(c){var v=+c.sz;return isFinite(v)&&v>0?Math.min(1.6,Math.max(.6,v)):1}
+
 /* ---------- the games ----------
    Each one gets a config {d:1..5 difficulty, len:seconds, th:palette} and returns an
    object with step(dt,inp,w,h) and draw(g,w,h). It sets this.done to 'win' or 'lose'
@@ -176,7 +186,7 @@ function txt(g,s,x,y,size,c,al){g.fillStyle=c;g.font='900 '+size+'px Rubik,syste
 var GAMES=[
 {id:'jump',nm:'קפיצה',em:'🦘',hint:'לחיצה = קפיצה',goal:function(c){return 'שרדו '+c.len+' שניות'},
  mk:function(c){return{
-  t:0,score:0,done:null,y:0,vy:0,on:1,obs:[],next:.9,sp:3.4+c.d*1.0,
+  t:0,score:0,done:null,y:0,vy:0,on:1,obs:[],next:.9,sp:(3.4+c.d*1.0)*SP(c),
   step:function(dt,inp,w,h){
     var gy=h*.78,size=h*.055;this.t+=dt;
     if(inp.tap&&this.on){this.vy=-h*.0145;this.on=0}
@@ -184,7 +194,7 @@ var GAMES=[
     if(this.y>0){this.y=0;this.vy=0;this.on=1}
     this.next-=dt;
     if(this.next<=0){this.next=(1.5-c.d*.12)+Math.random()*.7;
-      this.obs.push({x:w+40,w:size*(.6+Math.random()*.5),h:size*(.7+Math.random()*.9)})}
+      this.obs.push({x:w+40,w:size*(.6+Math.random()*.5)*SZ(c),h:size*(.7+Math.random()*.9)*SZ(c)})}
     var px=w*.26,pw=size*.8;
     for(var i=this.obs.length-1;i>=0;i--){var o=this.obs[i];o.x-=this.sp*dt*60*(w/430);
       if(o.x+o.w<px&&!o.p){o.p=1;this.score++}
@@ -207,8 +217,8 @@ var GAMES=[
     if(this.y<.02||this.y>.95)this.done='lose';
     this.next-=dt;
     if(this.next<=0){this.next=1.35-c.d*.09;
-      this.gates.push({x:1.1,y:.22+Math.random()*.5,g:.30-c.d*.022})}
-    for(var i=this.gates.length-1;i>=0;i--){var o=this.gates[i];o.x-=dt*(.30+c.d*.035);
+      this.gates.push({x:1.1,y:.22+Math.random()*.5,g:(.30-c.d*.022)/SZ(c)})}
+    for(var i=this.gates.length-1;i>=0;i--){var o=this.gates[i];o.x-=dt*(.30+c.d*.035)*SP(c);
       if(o.x<.3&&o.x>.16){if(Math.abs(this.y-o.y)>o.g/2)this.done='lose'}
       if(o.x<.16&&!o.p){o.p=1;this.score++;if(this.score>=need)this.done='win'}
       if(o.x<-.2)this.gates.splice(i,1)}},
@@ -223,9 +233,9 @@ var GAMES=[
 
 {id:'stop',nm:'עצור בזמן',em:'🎯',hint:'לחצו כשהמחוג בירוק',goal:function(c){return (3+c.d)+' פגיעות'},
  mk:function(c){var need=3+c.d;return{
-  t:0,score:0,done:null,p:0,dir:1,zw:.26-c.d*.025,zc:.5,need:need,flash:0,
+  t:0,score:0,done:null,p:0,dir:1,zw:(.26-c.d*.025)*SZ(c),zc:.5,need:need,flash:0,
   step:function(dt,inp){this.t+=dt;this.flash=Math.max(0,this.flash-dt);
-    this.p+=this.dir*dt*(.55+c.d*.12+this.score*.07);
+    this.p+=this.dir*dt*(.55+c.d*.12+this.score*.07)*SP(c);
     if(this.p>1){this.p=1;this.dir=-1}if(this.p<0){this.p=0;this.dir=1}
     if(inp.tap){
       if(Math.abs(this.p-this.zc)<this.zw/2){this.score++;this.flash=.3;
@@ -247,7 +257,7 @@ var GAMES=[
     this.y=Math.max(.08,Math.min(.95,this.y));this.x=Math.max(.05,Math.min(.95,this.x));
     this.next-=dt;
     if(this.next<=0){this.next=Math.max(.13,.55-c.d*.07);
-      this.rocks.push({x:Math.random(),y:-.06,v:.22+Math.random()*.1+c.d*.035,r:.018+Math.random()*.02})}
+      this.rocks.push({x:Math.random(),y:-.06,v:(.22+Math.random()*.1+c.d*.035)*SP(c),r:(.018+Math.random()*.02)*SZ(c)})}
     for(var i=this.rocks.length-1;i>=0;i--){var o=this.rocks[i];o.y+=o.v*dt;
       var dx=(o.x-this.x)*w,dy=(o.y-this.y)*h;
       if(Math.sqrt(dx*dx+dy*dy)<(o.r+.026)*h)this.done='lose';
@@ -262,9 +272,9 @@ var GAMES=[
 
 {id:'ring',nm:'בול בזמן',em:'⭕',hint:'לחצו כשהעיגול מתאים',goal:function(c){return (3+c.d)+' פגיעות'},
  mk:function(c){var need=3+c.d;return{
-  t:0,score:0,done:null,r:1,tol:.085-c.d*.009,need:need,flash:0,
+  t:0,score:0,done:null,r:1,tol:(.085-c.d*.009)*SZ(c),need:need,flash:0,
   step:function(dt,inp){this.t+=dt;this.flash=Math.max(0,this.flash-dt);
-    this.r-=dt*(.42+c.d*.1+this.score*.05);
+    this.r-=dt*(.42+c.d*.1+this.score*.05)*SP(c);
     if(this.r<.12){this.done='lose'}
     if(inp.tap){
       if(Math.abs(this.r-.42)<this.tol){this.score++;this.flash=.3;this.r=1;
@@ -281,8 +291,8 @@ var GAMES=[
  mk:function(c){return{
   t:0,score:0,done:null,fill:0,need:1,
   step:function(dt,inp){this.t+=dt;
-    if(inp.tap){this.fill+=.055-c.d*.006;this.score++}
-    this.fill-=dt*(.17+c.d*.035);
+    if(inp.tap){this.fill+=(.055-c.d*.006)*SZ(c);this.score++}
+    this.fill-=dt*(.17+c.d*.035)*SP(c);
     if(this.fill<0)this.fill=0;
     if(this.fill>=1)this.done='win';
     if(this.t>=c.len)this.done=this.fill>=1?'win':'lose'},
@@ -298,8 +308,8 @@ var GAMES=[
   t:0,score:0,done:null,bs:[],next:0,need:need,pops:[],
   step:function(dt,inp,w,h){this.t+=dt;this.next-=dt;
     if(this.next<=0){this.next=Math.max(.3,1-c.d*.12);
-      this.bs.push({x:.1+Math.random()*.8,y:1.1,v:.16+Math.random()*.08+c.d*.025,
-        r:.045-c.d*.003,sw:Math.random()*6})}
+      this.bs.push({x:.1+Math.random()*.8,y:1.1,v:(.16+Math.random()*.08+c.d*.025)*SP(c),
+        r:(.045-c.d*.003)*SZ(c),sw:Math.random()*6})}
     for(var i=this.bs.length-1;i>=0;i--){var o=this.bs[i];o.y-=o.v*dt;o.sw+=dt*2;
       if(o.y<-.12)this.bs.splice(i,1)}
     for(i=this.pops.length-1;i>=0;i--){this.pops[i].a-=dt*3;if(this.pops[i].a<=0)this.pops.splice(i,1)}
@@ -331,7 +341,7 @@ var GAMES=[
             this.at=0;this.tmr=.35;this.lit=-1;return}
           this.mode='play';this.at=0;this.lit=-1}
         else{this.lit=this.lit<0?this.seq[this.at]:-1;
-          if(this.lit<0)this.at++;this.tmr=this.lit<0?.16:.42}}
+          if(this.lit<0)this.at++;this.tmr=(this.lit<0?.16:.42)/SP(c)}}
       return}
     if(inp.tap&&inp.has){
       var i=this.hit(inp.x,inp.y,w,h);if(i<0)return;
@@ -358,14 +368,22 @@ function gameById(id){for(var i=0;i<GAMES.length;i++)if(GAMES[i].id===id)return 
 function b64(s){try{return btoa(unescape(encodeURIComponent(s))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}catch(e){return''}}
 function ub64(s){try{s=String(s).replace(/-/g,'+').replace(/_/g,'/');
   return decodeURIComponent(escape(atob(s)))}catch(e){return''}}
-function encodeShort(s){return['S1',s.g,s.d,s.len,s.th,b64(s.cap||''),b64(s.by||'')].join('.')}
+function x10(v,dflt){var n=Math.round((+v||dflt)*10);return Math.min(16,Math.max(6,n))}
+function encodeShort(s){
+  var sp=x10(s.sp,1),sz=x10(s.sz,1);
+  var out=['S1',s.g,s.d,s.len,s.th,b64(s.cap||''),b64(s.by||'')];
+  if(sp!==10||sz!==10)out.push(sp,sz);          /* older, shorter codes stay valid */
+  return out.join('.')}
 function decodeShort(code){
   var p=String(code||'').trim().split('.');
   if(p[0]!=='S1'||p.length<5)return null;
   var g=gameById(p[1]);if(g.id!==p[1])return null;
   var d=Math.max(1,Math.min(5,+p[2]||3)),len=Math.max(5,Math.min(40,+p[3]||15)),
       th=Math.max(0,Math.min(TH.length-1,+p[4]||0));
-  return{g:p[1],d:d,len:len,th:th,cap:(ub64(p[5]||'')||'').slice(0,60),by:(ub64(p[6]||'')||'').slice(0,20),made:1}}
+  var sp=p[7]?Math.min(1.6,Math.max(.6,(+p[7]||10)/10)):1,
+      sz=p[8]?Math.min(1.6,Math.max(.6,(+p[8]||10)/10)):1;
+  return{g:p[1],d:d,len:len,th:th,cap:(ub64(p[5]||'')||'').slice(0,60),
+    by:(ub64(p[6]||'')||'').slice(0,20),sp:sp,sz:sz,made:1}}
 
 /* ---------- the feed ---------- */
 var CAPS=['מי מצליח בלי למות?','נראה אותך.','זה קל. בטוח.','שלחו לחבר שיתעצבן.','נסו פעם אחת בלבד.',
@@ -397,6 +415,7 @@ function fix(s){
   s.len=Math.max(5,Math.min(40,Math.round(+s.len)||15));
   s.th=Math.max(0,Math.min(TH.length-1,Math.round(+s.th)||0));
   s.cap=String(s.cap||'').slice(0,60);s.by=String(s.by||'אלון').slice(0,20);
+  s.sp=Math.min(1.6,Math.max(.6,+s.sp||1));s.sz=Math.min(1.6,Math.max(.6,+s.sz||1));
   return s}
 function addCard(i){
   var s=FEED[i]=fix(FEED[i]),G=gameById(s.g),T=TH[s.th];
@@ -442,7 +461,12 @@ function bindInput(el){
   el.addEventListener('pointerup',function(){inp.held=0});
   el.addEventListener('pointercancel',function(){inp.held=0})}
 bindInput(cv);
-addEventListener('keydown',function(e){if(e.key===' '||e.key==='ArrowUp'){e.preventDefault();inp.tap=1;inp.held=1;inp.has=0}});
+/* space jumps - but not while someone is typing a sentence to the Glitch */
+function typing(e){var t=e.target,n=t&&t.tagName;
+  return n==='INPUT'||n==='TEXTAREA'||n==='SELECT'||(t&&t.isContentEditable)||
+    document.getElementById('mk').classList.contains('show')}
+addEventListener('keydown',function(e){if(typing(e))return;
+  if(e.key===' '||e.key==='ArrowUp'){e.preventDefault();inp.tap=1;inp.held=1;inp.has=0}});
 addEventListener('keyup',function(e){if(e.key===' ')inp.held=0});
 
 var cur=null;              /* the running game instance */
@@ -455,7 +479,8 @@ function start(i,force){
   ph.querySelector('.poster').style.display='none';
   size();
   /* a breath before the clock starts, so nobody dies while still reading the card */
-  cur={inst:c.G.mk({d:c.s.d,len:c.s.len,th:TH[c.s.th]}),card:c,i:i,over:0,acc:0,warm:1.1};
+  cur={inst:c.G.mk({d:c.s.d,len:c.s.len,th:TH[c.s.th],sp:c.s.sp,sz:c.s.sz}),
+    card:c,i:i,over:0,acc:0,warm:1.1};
 }
 function stop(){
   if(!cur)return;
@@ -533,10 +558,10 @@ var io=new IntersectionObserver(function(es){
   })},{threshold:[0,.6,1]});
 
 /* ---------- the maker ---------- */
-var draft={g:'jump',d:3,len:15,th:0,cap:'',by:''};
+var draft={g:'jump',d:3,len:15,th:0,cap:'',by:'',sp:1,sz:1};
 function openMaker(from){
   if(from)draft={g:from.g,d:from.d,len:from.len,th:from.th,cap:from.cap||'',by:myName(),
-    set_g:1,set_d:1,set_cap:from.cap?1:0};
+    sp:from.sp||1,sz:from.sz||1,set_g:1,set_d:1,set_cap:from.cap?1:0};
   else draft.by=myName();
   var pick=document.getElementById('mkPick');pick.textContent='';
   GAMES.forEach(function(G){var b=document.createElement('button');
@@ -556,7 +581,7 @@ function openMaker(from){
   document.getElementById('mkCap').value=draft.cap;
   document.getElementById('mkMsg').textContent='';
   refresh();document.getElementById('mk').classList.add('show');
-  if(!chatStarted)greet();
+  aiProbe();if(!chatStarted)greet();
   setTimeout(function(){document.getElementById('mkSay').focus()},150)}
 function refresh(){
   draft.d=+document.getElementById('mkD').value;
@@ -629,12 +654,55 @@ function askFor(what){
   lastAsk=''}
 var NM={jump:'קפיצה',flap:'טפיחה',stop:'עצור בזמן',dodge:'התחמקות',ring:'בול בזמן',
   taps:'הקשה מהירה',pop:'בלונים',memo:'זיכרון'};
+/* ---------- the real one ----------
+   /api/ai runs a model on Cloudflare's servers. If the binding is not set up
+   it answers {ok:false} and we fall back to the word matcher, silently. */
+var AI='?';                                  /* '?' unknown, true live, false local */
+function aiProbe(){
+  if(AI!=='?')return;
+  AI=null;                                   /* in flight */
+  fetch('/api/ai',{cache:'no-store'}).then(function(r){return r.json()})
+    .then(function(j){AI=!!(j&&j.ok);aiBadge()})
+    .catch(function(){AI=false;aiBadge()})}
+function aiBadge(){
+  var e=document.getElementById('aiTag');if(!e)return;
+  e.textContent=AI?'🧠 AI אמיתי':'⚡ מצב מהיר';
+  e.title=AI?'מודל אמיתי שרץ על השרת':'בלי שרת: הגליץ׳ מזהה את המילים שבמשפט';}
+function aiAsk(text){
+  return fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({msg:text,state:{g:draft.g,d:draft.d,len:draft.len,th:draft.th,cap:draft.cap}})})
+   .then(function(r){return r.json()})
+   .then(function(j){if(!j||!j.ok)throw 0;return j})}
+
 function say(text){
   text=String(text||'').trim();if(!text)return;
   bub('me',text.replace(/[<>&]/g,''));
   document.getElementById('mkSay').value='';
   document.getElementById('chips').textContent='';
+  if(AI===true){
+    var t=bub('b','<span class="dots">●●●</span>');
+    aiAsk(text).then(function(j){t.remove();aiAnswer(text,j)})
+      .catch(function(){t.remove();AI=false;aiBadge();answer(text)});
+    return}
   setTimeout(function(){answer(text)},260)}
+
+/* what came back from the model, applied the same way as a local reading */
+function aiAnswer(text,j){
+  var set=j.set||{},said=[];
+  if(set.g){draft.g=gameById(set.g).id;draft.set_g=1}
+  if(set.d!==undefined){draft.d=set.d;draft.set_d=1}
+  if(set.len!==undefined)draft.len=set.len;
+  if(set.th!==undefined)draft.th=set.th;
+  if(set.sp!==undefined)draft.sp=set.sp;
+  if(set.sz!==undefined)draft.sz=set.sz;
+  if(set.cap!==undefined){var c=AGBoard.cleanText(set.cap,48);if(c){draft.cap=c;draft.set_cap=1}}
+  syncControls();
+  bub('b',(j.say||'סידרתי.').replace(/[<>]/g,''));
+  /* an explicit order still works through the model */
+  var r=AGBoss.read(text);
+  if(!r.hit.length&&r.publish)return publish();
+  if(!r.hit.length&&r.play)return tryIt();
+  next()}
 function answer(text){
   var r=AGBoss.read(text),said=[];
   /* "בלי כיתוב" and friends, when that is what we just asked about */
@@ -709,7 +777,8 @@ var fLast=0;
 
 function tryIt(){
   document.getElementById('mk').classList.remove('show');
-  insertNext({g:draft.g,d:draft.d,len:draft.len,th:draft.th,cap:draft.cap,by:draft.by,made:1})}
+  insertNext({g:draft.g,d:draft.d,len:draft.len,th:draft.th,cap:draft.cap,by:draft.by,
+    sp:draft.sp,sz:draft.sz,made:1})}
 document.getElementById('mkCopy').onclick=function(){copyTo(encodeShort(draft),'הקוד הועתק ✅')};
 document.getElementById('mkLink').onclick=function(){
   copyTo(location.origin+location.pathname+'?s='+encodeShort(draft),'הקישור הועתק ✅')};
@@ -729,7 +798,8 @@ function publish(){
     bub('b','בשביל לפרסם אני צריך שם שלכם — בלי שם אי אפשר לדעת מי בנה את זה.');return}
   var cap=AGBoard.cleanText(draft.cap,48);
   if(draft.cap&&!cap){m.textContent='הכיתוב לא מתאים.';bub('b','הכיתוב לא עובר. תחליפו אותו ואז נפרסם.');return}
-  var code=encodeShort({g:draft.g,d:draft.d,len:draft.len,th:draft.th,cap:cap,by:who});
+  var code=encodeShort({g:draft.g,d:draft.d,len:draft.len,th:draft.th,cap:cap,by:who,
+    sp:draft.sp,sz:draft.sz});
   m.textContent='מפרסם…';
   var btn=document.getElementById('mkPub');btn.disabled=true;
   AGBoard.get().then(function(b){
@@ -745,7 +815,8 @@ function publish(){
      COMMUNITY=b.shorts;btn.disabled=false;m.textContent='פורסם 🌍';
      bub('b','פרסמתי! מעכשיו <b>'+NM[draft.g]+'</b> שלכם מופיע בפיד של כל מי שנכנס.');
      chips(['בוא ננסה','נבנה עוד אחד']);
-     insertNext({g:draft.g,d:draft.d,len:draft.len,th:draft.th,cap:cap,by:who,made:1,pub:1})})
+     insertNext({g:draft.g,d:draft.d,len:draft.len,th:draft.th,cap:cap,by:who,
+       sp:draft.sp,sz:draft.sz,made:1,pub:1})})
    .catch(function(e){btn.disabled=false;
      m.textContent=e==='dup'?'השורט הזה כבר מפורסם.':e==='banned'?'אין לכם הרשאה לפרסם.':'לא הצלחנו לפרסם. נסו שוב.';
      bub('b',e==='dup'?'את זה כבר פרסמתם. תשנו משהו קטן ונפרסם שוב.':'משהו השתבש בדרך לשרת. ננסה עוד פעם?')})}
