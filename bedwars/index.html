@@ -1,0 +1,701 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta name="author" content="Alon Maidenberg - אלון מידנברג"><meta name="copyright" content="© 2026 אלון מידנברג. כל הזכויות שמורות.">
+<!-- © 2026 Alon Maidenberg (אלון מידנברג). All rights reserved. Copying, republishing or modifying this game without written permission is not allowed. -->
+<meta name="robots" content="noai, noimageai">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>מלחמת המיטות – אלון מידנברג</title>
+<meta name="description" content="הגנו על המיטה שלכם ושברו את המיטות של האחרים. בלי מיטה אין ריספאון – הקבוצה האחרונה שנשארה מנצחת.">
+<meta name="theme-color" content="#0a1626">
+<link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:#0a1626;color:#fff;overflow:hidden;
+  font-family:Rubik,"Segoe UI",system-ui,sans-serif;overscroll-behavior:none;user-select:none}
+#cv{display:block;width:100%;height:100%;touch-action:none}
+.ov{position:fixed;inset:0;display:none;place-items:center;z-index:30;padding:16px;
+  background:rgba(5,11,22,.88)}
+.ov.show{display:grid}
+.ovc{background:#15294a;border:4px solid #050b16;border-radius:22px;padding:18px;max-width:460px;width:100%;
+  box-shadow:0 12px 0 #050b16;max-height:90vh;overflow:auto;text-align:center}
+.ovc h2{margin:0 0 6px;font:900 25px Rubik,system-ui}
+.ovc p{margin:7px 0;font-size:14.5px;line-height:1.55;opacity:.92}
+.btn{border:3px solid #050b16;border-radius:15px;background:#ffd43b;color:#2b1659;
+  font:900 15px Rubik,system-ui;padding:11px 16px;cursor:pointer;box-shadow:0 5px 0 #050b16;margin:5px}
+.btn:active{transform:translateY(3px);box-shadow:0 2px 0 #050b16}
+.btn.g{background:#5ff7d6}.btn.r{background:#ff6b81;color:#fff}.btn.d{background:#8a9ab5;color:#0a1626}
+.teams{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}
+.teams button{border:3px solid #050b16;border-radius:16px;padding:12px 4px;cursor:pointer;
+  font:900 13px Rubik,system-ui;color:#0a1626;box-shadow:0 4px 0 #050b16}
+.teams button.on{outline:4px solid #fff;outline-offset:2px}
+/* shop */
+#shop{position:fixed;inset:auto 0 0 0;z-index:25;background:rgba(10,22,38,.97);
+  border-top:4px solid #050b16;padding:12px 12px max(12px,env(safe-area-inset-bottom));display:none}
+#shop.show{display:block}
+#shop .hd{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+#shop .hd b{font:900 17px Rubik,system-ui;flex:1}
+.items{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px;
+  max-height:40vh;overflow:auto}
+.items button{border:3px solid #050b16;border-radius:14px;background:#1d3761;color:#fff;cursor:pointer;
+  padding:9px 6px;font:900 12.5px Rubik,system-ui;display:grid;gap:3px;justify-items:center;text-align:center}
+.items button .em{font-size:23px}
+.items button .pr{font-size:11.5px;opacity:.9}
+.items button[disabled]{opacity:.42;cursor:default}
+.items button.has{outline:3px solid #5ff7d6}
+/* touch controls */
+#pad{position:fixed;inset:0;z-index:20;pointer-events:none;display:none}
+body.touch #pad{display:block}
+#stick{position:absolute;inset-inline-start:18px;bottom:max(18px,env(safe-area-inset-bottom));
+  width:132px;height:132px;border-radius:50%;background:rgba(255,255,255,.1);pointer-events:auto}
+#nub{position:absolute;left:41px;top:41px;width:50px;height:50px;border-radius:50%;background:rgba(255,255,255,.5)}
+.abtn{position:absolute;width:74px;height:74px;border-radius:50%;border:3px solid rgba(0,0,0,.4);
+  background:rgba(255,255,255,.82);color:#0a1626;font:900 27px system-ui;pointer-events:auto;
+  display:grid;place-items:center}
+#bHit{inset-inline-end:18px;bottom:max(96px,calc(env(safe-area-inset-bottom) + 96px))}
+#bPut{inset-inline-end:102px;bottom:max(26px,calc(env(safe-area-inset-bottom) + 26px))}
+#bShop{inset-inline-end:18px;bottom:max(26px,calc(env(safe-area-inset-bottom) + 26px));font-size:22px}
+.tip{position:fixed;inset-inline:0;top:52px;text-align:center;z-index:18;pointer-events:none;
+  font:900 15px Rubik,system-ui;text-shadow:0 2px 4px rgba(0,0,0,.8);opacity:0;transition:opacity .25s}
+.tip.show{opacity:1}
+</style>
+</head>
+<body>
+<canvas id="cv"></canvas>
+
+<div id="pad">
+  <div id="stick"><div id="nub"></div></div>
+  <button class="abtn" id="bHit">⚔️</button>
+  <button class="abtn" id="bPut">🧱</button>
+  <button class="abtn" id="bShop">🛒</button>
+</div>
+<div class="tip" id="tip"></div>
+
+<div id="shop"><div class="hd"><b>🛒 החנות</b>
+  <span id="shopRes"></span><button class="btn d" id="shopX" style="padding:7px 12px;margin:0">סגור</button></div>
+  <div class="items" id="shopItems"></div></div>
+
+<div class="ov show" id="menu"><div class="ovc">
+  <div style="font-size:50px">🛏️</div>
+  <h2>מלחמת המיטות</h2>
+  <p>לכל קבוצה יש מיטה. כל עוד המיטה שלכם שלמה אתם חוזרים לחיים אחרי כל מוות.
+     שברו את המיטה של הקבוצות האחרות — ואז, כשהן ימותו, הן לא יחזרו.</p>
+  <p>הגנרטור בבסיס מייצר ברזל וזהב לבד. קונים בחנות צמר להגן על המיטה, חרבות, שריון ומכוש
+     (בלי מכוש אי אפשר לשבור צמר).</p>
+  <div class="teams" id="teamPick"></div>
+  <p style="font-size:13px;opacity:.75" id="ctrl"></p>
+  <button class="btn g" id="go">קדימה</button>
+</div></div>
+
+<div class="ov" id="endM"><div class="ovc">
+  <div style="font-size:50px" id="endE">🏆</div>
+  <h2 id="endT"></h2><p id="endP"></p>
+  <button class="btn g" id="again">↻ משחק חדש</button>
+</div></div>
+
+<script src="../hub.js"></script>
+<script>
+'use strict';
+/* © 2026 Alon Maidenberg. Bed Wars: hold your bed, break theirs. */
+
+/* ---------- map ---------- */
+var W=46,H=34,TS=26;
+var VOID=0,STONE=1,WOOL=2,BEDH=3,BEDF=4,GEN=5,SHOP=6;
+var M=new Uint8Array(W*H),OWN=new Uint8Array(W*H),ORIG=new Uint8Array(W*H);
+/* OWN: which team a bed/gen/shop belongs to, +1. ORIG: the island as it was built,
+   so breaking a block that was placed on the floor leaves the floor, not a hole. */
+function clearTile(id){M[id]=(ORIG[id]===VOID?VOID:ORIG[id]);OWN[id]=0}
+function mi(x,y){return y*W+x}
+function at(x,y){return(x<0||y<0||x>=W||y>=H)?VOID:M[mi(x,y)]}
+function walk(x,y){var t=at(x,y);return t!==VOID}
+function blocked(x,y){var t=at(x,y);return t===WOOL}
+var TEAMS=[
+  {nm:'אדומים',c:'#ff5470',c2:'#b4253f',bx:23,by:5, dir:'צפון'},
+  {nm:'כחולים',c:'#4da6ff',c2:'#1d5fa8',bx:41,by:17,dir:'מזרח'},
+  {nm:'ירוקים',c:'#5ddc6a',c2:'#248a2f',bx:23,by:29,dir:'דרום'},
+  {nm:'צהובים',c:'#ffd43b',c2:'#c79412',bx:5, by:17,dir:'מערב'}];
+var BASE=[{x0:18,y0:2,x1:28,y1:8},{x0:36,y0:13,x1:44,y1:21},
+          {x0:18,y0:26,x1:28,y1:32},{x0:2,y0:13,x1:10,y1:21}];
+
+function rect(x0,y0,x1,y1,t){for(var y=y0;y<=y1;y++)for(var x=x0;x<=x1;x++)if(x>=0&&y>=0&&x<W&&y<H)M[mi(x,y)]=t}
+function buildMap(){
+  M.fill(VOID);OWN.fill(0);
+  rect(19,13,27,21,STONE);                     /* middle island */
+  BASE.forEach(function(b){rect(b.x0,b.y0,b.x1,b.y1,STONE)});
+  rect(22,8,24,13,STONE);rect(22,21,24,26,STONE);   /* north + south bridges */
+  rect(10,16,19,18,STONE);rect(27,16,36,18,STONE);  /* west + east bridges */
+  TEAMS.forEach(function(t,i){
+    var bx=t.bx,by=t.by;
+    M[mi(bx,by)]=BEDH;OWN[mi(bx,by)]=i+1;
+    var d=i===0?[0,-1]:i===1?[1,0]:i===2?[0,1]:[-1,0];      /* bed foot points outward */
+    M[mi(bx+d[0],by+d[1])]=BEDF;OWN[mi(bx+d[0],by+d[1])]=i+1;
+    var g=[[bx,by+2],[bx-2,by],[bx,by-2],[bx+2,by]][i];
+    M[mi(g[0],g[1])]=GEN;OWN[mi(g[0],g[1])]=i+1;
+    var s=[[bx-3,by+1],[bx-1,by-3],[bx+3,by-1],[bx+1,by+3]][i];
+    M[mi(s[0],s[1])]=SHOP;OWN[mi(s[0],s[1])]=i+1;
+    t.gen={x:(g[0]+.5)*TS,y:(g[1]+.5)*TS};t.shop={x:(s[0]+.5)*TS,y:(s[1]+.5)*TS}});
+  ORIG.set(M)}
+
+/* Breadth-first over the tiles you can actually stand on. The islands are
+   joined by narrow bridges, so walking straight at a goal means walking off
+   the edge; this returns a route that stays on solid ground. */
+var _prev=new Int32Array(W*H),_q=new Int32Array(W*H);
+function route(sx,sy,gx,gy,team){
+  if(sx<0||sy<0||sx>=W||sy>=H)return null;
+  _prev.fill(-1);
+  var s=sy*W+sx,g=gy*W+gx,head=0,tail=0;
+  _prev[s]=s;_q[tail++]=s;
+  var best=s,bestD=Math.abs(sx-gx)+Math.abs(sy-gy);
+  while(head<tail){
+    var c=_q[head++];
+    if(c===g){best=c;break}
+    var cxx=c%W,cyy=(c/W)|0;
+    var d=Math.abs(cxx-gx)+Math.abs(cyy-gy);
+    if(d<bestD){bestD=d;best=c}
+    for(var k=0;k<4;k++){
+      var nx=cxx+(k===0?1:k===1?-1:0),ny=cyy+(k===2?1:k===3?-1:0);
+      if(nx<0||ny<0||nx>=W||ny>=H)continue;
+      var id=ny*W+nx;if(_prev[id]!==-1)continue;
+      var t=M[id];
+      if(t===VOID)continue;
+      if(t===WOOL&&OWN[id]!==team+1)continue;   /* enemy wool is a wall until it is broken */
+      _prev[id]=c;_q[tail++]=id}}
+  var out=[],c2=best,guard=0;
+  while(c2!==s&&guard++<W*H){out.push(c2);c2=_prev[c2]}
+  out.reverse();
+  return out.length?out:null}
+function stepTo(b,gx,gy){
+  b.routeT=(b.routeT||0)-1/60;
+  var tx=Math.floor(b.x/TS),ty=Math.floor(b.y/TS);
+  if(!b.route||!b.route.length||b.routeT<=0||b.rgx!==gx||b.rgy!==gy){
+    b.route=route(tx,ty,gx,gy,b.team)||[];b.rt=0;b.routeT=1.1;b.rgx=gx;b.rgy=gy}
+  while(b.rt<b.route.length){
+    var id=b.route[b.rt],wx=(id%W+.5)*TS,wy=((id/W|0)+.5)*TS;
+    if(Math.hypot(wx-b.x,wy-b.y)<TS*.55){b.rt++;continue}
+    return {x:wx,y:wy}}
+  return {x:(gx+.5)*TS,y:(gy+.5)*TS}}
+
+/* ---------- shop ---------- */
+var ITEMS=[
+  {id:'wool', em:'🧱',nm:'צמר ×8', cost:{i:4}, give:function(p){p.blocks+=8}},
+  {id:'wood', em:'🪵',nm:'עץ ×12', cost:{i:8}, give:function(p){p.blocks+=12;p.hard=1}},
+  {id:'sw1',  em:'🗡️',nm:'חרב ברזל',cost:{i:12},once:1,need:function(p){return p.sword<2},give:function(p){p.sword=2}},
+  {id:'sw2',  em:'⚔️',nm:'חרב זהב', cost:{g:5}, once:1,need:function(p){return p.sword<3},give:function(p){p.sword=3}},
+  {id:'ar1',  em:'🦺',nm:'שריון עור',cost:{i:16},once:1,need:function(p){return p.armor<1},give:function(p){p.armor=1}},
+  {id:'ar2',  em:'🛡️',nm:'שריון ברזל',cost:{g:8},once:1,need:function(p){return p.armor<2},give:function(p){p.armor=2}},
+  {id:'pick', em:'⛏️',nm:'מכוש',    cost:{i:10},once:1,need:function(p){return !p.pick},give:function(p){p.pick=1}},
+  {id:'heal', em:'🍎',nm:'תפוח',    cost:{i:6}, give:function(p){p.hp=Math.min(p.maxhp,p.hp+6)}},
+  {id:'speed',em:'🥤',nm:'מהירות',  cost:{g:4}, give:function(p){p.fast=12}},
+  {id:'tnt',  em:'🧨',nm:'חבילת TNT',cost:{g:6}, give:function(p){p.tnt+=2}}];
+function canPay(p,c){return (p.iron>=(c.i||0))&&(p.gold>=(c.g||0))}
+function pay(p,c){p.iron-=c.i||0;p.gold-=c.g||0}
+
+/* ---------- entities ---------- */
+var P=null,BOTS=[],ents=[],drops=[],tnts=[],fx=[],ME=0,over=false,clock=0;
+function mkEnt(team,human){
+  var t=TEAMS[team];
+  return {team:team,human:human,x:(t.bx+.5)*TS,y:(t.by+1.6)*TS,vx:0,vy:0,
+    hp:20,maxhp:20,sword:1,armor:0,pick:0,blocks:0,iron:0,gold:0,tnt:0,fast:0,hard:0,
+    alive:true,out:false,dead:0,cd:0,face:1,hurt:0,kills:0,
+    st:'gather',goal:null,path:[],pi:0,think:0,target:-1}
+}
+function bedAlive(team){
+  for(var i=0;i<M.length;i++)if((M[i]===BEDH||M[i]===BEDF)&&OWN[i]===team+1)return true;
+  return false}
+function teamLives(team){var e=all();for(var i=0;i<e.length;i++)if(e[i].team===team&&!e[i].out)return true;return false}
+function all(){return [P].concat(BOTS)}
+
+/* ---------- input ---------- */
+var key={},mouse={x:0,y:0,down:0,rdown:0},touch=matchMedia('(pointer:coarse)').matches;
+if(touch)document.body.classList.add('touch');
+addEventListener('keydown',function(e){
+  if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].indexOf(e.key)>=0)e.preventDefault();
+  key[e.key.toLowerCase()]=1;
+  if(e.key.toLowerCase()==='e')toggleShop();
+  if(e.key===' ')placeBlock();
+  if(e.key.toLowerCase()==='q')dropTnt()});
+addEventListener('keyup',function(e){key[e.key.toLowerCase()]=0});
+var cv=document.getElementById('cv'),cx=cv.getContext('2d');
+cv.addEventListener('pointerdown',function(e){if(e.button===2)return;mouse.down=1;aimAt(e)});
+cv.addEventListener('pointermove',aimAt);
+cv.addEventListener('pointerup',function(){mouse.down=0});
+cv.addEventListener('contextmenu',function(e){e.preventDefault();placeBlock()});
+function aimAt(e){var r=cv.getBoundingClientRect();mouse.x=e.clientX-r.left;mouse.y=e.clientY-r.top}
+/* joystick */
+var stick={ax:0,ay:0,id:null};
+(function(){
+  var el=document.getElementById('stick'),nub=document.getElementById('nub');
+  function set(e){var r=el.getBoundingClientRect(),dx=e.clientX-r.left-66,dy=e.clientY-r.top-66;
+    var d=Math.hypot(dx,dy),m=Math.min(1,d/46);
+    if(d>0){stick.ax=dx/d*m;stick.ay=dy/d*m}else{stick.ax=stick.ay=0}
+    nub.style.left=(41+stick.ax*46)+'px';nub.style.top=(41+stick.ay*46)+'px'}
+  el.addEventListener('pointerdown',function(e){e.preventDefault();stick.id=e.pointerId;el.setPointerCapture(e.pointerId);set(e)});
+  el.addEventListener('pointermove',function(e){if(stick.id===e.pointerId)set(e)});
+  function end(e){if(stick.id!==e.pointerId)return;stick.id=null;stick.ax=stick.ay=0;
+    nub.style.left='41px';nub.style.top='41px'}
+  el.addEventListener('pointerup',end);el.addEventListener('pointercancel',end)})();
+document.getElementById('bHit').addEventListener('pointerdown',function(e){e.preventDefault();mouse.down=1});
+document.getElementById('bHit').addEventListener('pointerup',function(){mouse.down=0});
+document.getElementById('bPut').addEventListener('pointerdown',function(e){e.preventDefault();placeBlock()});
+document.getElementById('bShop').addEventListener('pointerdown',function(e){e.preventDefault();toggleShop()});
+
+/* ---------- player actions ---------- */
+function facing(p){
+  if(p.human&&!touch){var a=Math.atan2(mouse.y-(cv.clientHeight/2),mouse.x-(cv.clientWidth/2));
+    return {x:Math.cos(a),y:Math.sin(a)}}
+  /* a bot pinned against a wall has no velocity to face by, so it faces where it is headed */
+  if(!p.human&&p.goal){
+    var gx=p.goal.x-p.x,gy=p.goal.y-p.y,gd=Math.hypot(gx,gy);
+    if(gd>1)return {x:gx/gd,y:gy/gd}}
+  var d=Math.hypot(p.vx,p.vy);
+  if(d>.01)return {x:p.vx/d,y:p.vy/d};
+  return {x:p.face,y:0}}
+function frontTile(p){
+  var f=facing(p);
+  return {x:Math.floor((p.x+f.x*TS*.9)/TS),y:Math.floor((p.y+f.y*TS*.9)/TS)}}
+function placeBlock(){
+  if(over||!P||!P.alive)return;
+  if(P.blocks<=0){tip('אין לכם בלוקים. קנו צמר בחנות 🛒');return}
+  var t=frontTile(P);
+  if(at(t.x,t.y)!==VOID)return;
+  if(t.x<0||t.y<0||t.x>=W||t.y>=H)return;
+  M[mi(t.x,t.y)]=WOOL;OWN[mi(t.x,t.y)]=P.team+1;P.blocks--;
+  fx.push({x:(t.x+.5)*TS,y:(t.y+.5)*TS,a:1,c:TEAMS[P.team].c})}
+function dropTnt(){
+  if(over||!P||!P.alive||P.tnt<=0)return;
+  P.tnt--;tnts.push({x:P.x,y:P.y,t:2.2,team:P.team})}
+function tip(s){var e=document.getElementById('tip');e.textContent=s;e.classList.add('show');
+  clearTimeout(tip.t);tip.t=setTimeout(function(){e.classList.remove('show')},1800)}
+
+/* ---------- shop ---------- */
+function nearShop(p){
+  var tx=Math.floor(p.x/TS),ty=Math.floor(p.y/TS);
+  for(var y=ty-2;y<=ty+2;y++)for(var x=tx-2;x<=tx+2;x++)
+    if(at(x,y)===SHOP&&OWN[mi(x,y)]===p.team+1)return true;
+  return false}
+function toggleShop(){
+  var el=document.getElementById('shop');
+  if(el.classList.contains('show')){el.classList.remove('show');return}
+  if(!P||!P.alive)return;
+  if(!nearShop(P)){tip('החנות נמצאת בבסיס שלכם 🛒');return}
+  drawShop();el.classList.add('show')}
+document.getElementById('shopX').onclick=function(){document.getElementById('shop').classList.remove('show')};
+function drawShop(){
+  document.getElementById('shopRes').textContent='⚙️ '+P.iron+'   🪙 '+P.gold;
+  var box=document.getElementById('shopItems');box.textContent='';
+  ITEMS.forEach(function(it){
+    var owned=it.need&&!it.need(P);
+    var b=document.createElement('button');
+    b.innerHTML='<span class="em">'+it.em+'</span>'+it.nm+
+      '<span class="pr">'+(it.cost.i?it.cost.i+' ⚙️':'')+(it.cost.g?it.cost.g+' 🪙':'')+'</span>';
+    if(owned){b.className='has';b.disabled=true;b.querySelector('.pr').textContent='יש לכם'}
+    else if(!canPay(P,it.cost))b.disabled=true;
+    b.onclick=function(){if(owned||!canPay(P,it.cost))return;
+      pay(P,it.cost);it.give(P);tip('קניתם '+it.nm);drawShop()};
+    box.append(b)})}
+
+/* ---------- combat ---------- */
+function swingRange(p){return TS*(1.0+p.sword*.12)}
+function dmgOf(p){return [0,4,6,9][p.sword]||4}
+function hurt(p,by,dmg){
+  if(!p.alive)return;
+  var red=[0,.22,.4][p.armor]||0;
+  p.hp-=dmg*(1-red);p.hurt=.25;
+  var a=Math.atan2(p.y-by.y,p.x-by.x);
+  p.vx+=Math.cos(a)*180;p.vy+=Math.sin(a)*180;
+  if(p.hp<=0)die(p,by)}
+function die(p,by){
+  p.alive=false;p.hp=0;
+  /* drop what you were carrying */
+  if(p.iron+p.gold>0)drops.push({x:p.x,y:p.y,i:Math.floor(p.iron*.6),g:Math.floor(p.gold*.6),t:18});
+  p.iron=Math.floor(p.iron*.4);p.gold=Math.floor(p.gold*.4);p.blocks=0;
+  if(by&&by!==p)by.kills++;
+  if(bedAlive(p.team)){p.dead=3.2}
+  else{p.out=true;
+    if(p===P)setTimeout(function(){finish(false)},700);
+    checkWin()}
+  for(var k=0;k<14;k++)fx.push({x:p.x,y:p.y,a:1,c:TEAMS[p.team].c,
+    vx:(Math.random()-.5)*220,vy:(Math.random()-.5)*220})}
+function respawn(p){
+  var t=TEAMS[p.team],sx=t.bx,sy=t.by+1;
+  /* find a clear tile next to the bed - the floor may have been blown about */
+  outer:for(var r=1;r<=4;r++)for(var yy=t.by-r;yy<=t.by+r;yy++)for(var xx=t.bx-r;xx<=t.bx+r;xx++){
+    var q=at(xx,yy);
+    if(q===STONE||q===GEN||q===SHOP){sx=xx;sy=yy;break outer}}
+  p.x=(sx+.5)*TS;p.y=(sy+.5)*TS;
+  p.vx=p.vy=0;p.hp=p.maxhp;p.alive=true;p.st='gather';p.route=null;p.tgt=null;p.fast=0;
+  p.mode='gather';p.stuckT=0}            /* restock before heading out again */
+function breakAt(p,tx,ty){
+  var t=at(tx,ty),id=mi(tx,ty);
+  if(t===WOOL){
+    if(!p.pick&&OWN[id]!==p.team+1){if(p===P)tip('צריך מכוש כדי לשבור צמר של יריב ⛏️');return false}
+    clearTile(id);
+    for(var k=0;k<6;k++)fx.push({x:(tx+.5)*TS,y:(ty+.5)*TS,a:1,c:'#dcd4ea',
+      vx:(Math.random()-.5)*140,vy:(Math.random()-.5)*140});
+    return true}
+  if(t===BEDH||t===BEDF){
+    var team=OWN[id]-1;
+    if(team===p.team){if(p===P)tip('זאת המיטה שלכם!');return false}
+    /* a bed goes only when nothing is stacked around it */
+    for(var y=ty-1;y<=ty+1;y++)for(var x=tx-1;x<=tx+1;x++)
+      if(at(x,y)===WOOL){if(p===P)tip('תשברו קודם את הצמר מסביב');return false}
+    for(var i=0;i<M.length;i++)if((M[i]===BEDH||M[i]===BEDF)&&OWN[i]===team+1){M[i]=STONE;OWN[i]=0}
+    for(k=0;k<22;k++)fx.push({x:(tx+.5)*TS,y:(ty+.5)*TS,a:1,c:TEAMS[team].c,
+      vx:(Math.random()-.5)*300,vy:(Math.random()-.5)*300});
+    say('💥 המיטה של ה'+TEAMS[team].nm+' נשברה!');
+    checkWin();
+    return true}
+  return false}
+function attack(p){
+  if(p.cd>0||!p.alive)return;
+  p.cd=.42;
+  var f=facing(p),hx=p.x+f.x*TS*.8,hy=p.y+f.y*TS*.8;
+  fx.push({x:hx,y:hy,a:.6,c:'#fff',sw:1});
+  var e=all();
+  for(var i=0;i<e.length;i++){var o=e[i];
+    if(o===p||!o.alive||o.team===p.team)continue;
+    if(Math.hypot(o.x-hx,o.y-hy)<swingRange(p))hurt(o,p,dmgOf(p))}
+  var t=frontTile(p);breakAt(p,t.x,t.y)}
+
+/* ---------- generators ---------- */
+var genT=[0,0,0,0],midT=0;
+function genTick(dt){
+  for(var i=0;i<4;i++){
+    genT[i]-=dt;
+    if(genT[i]<=0){genT[i]=1.25;
+      for(var k=0;k<M.length;k++)if(M[k]===GEN&&OWN[k]===i+1){
+        var x=(k%W+.5)*TS,y=((k/W|0)+.5)*TS;
+        drops.push({x:x+(Math.random()-.5)*18,y:y+(Math.random()-.5)*18,i:1,g:0,t:26})}}}
+  midT-=dt;
+  if(midT<=0){midT=7;
+    drops.push({x:(23+.5)*TS,y:(17+.5)*TS,i:0,g:1,t:40})}}
+
+/* ---------- bots ---------- */
+function botThink(b,dt){
+  b.think-=dt;
+  /* someone hostile within reach always comes first */
+  var e=all(),threat=null,bd=1e9;
+  for(var i=0;i<e.length;i++){var o=e[i];
+    if(o===b||!o.alive||o.team===b.team)continue;
+    var d=Math.hypot(o.x-b.x,o.y-b.y);
+    if(d<TS*5&&d<bd){bd=d;threat=o}}
+  if(threat){b.st='fight';b.tgt={x:Math.floor(threat.x/TS),y:Math.floor(threat.y/TS)};b.foe=threat;return}
+  if(b.think>0)return;
+  b.think=.7;
+  var T0=TEAMS[b.team];
+
+  /* spend, in a sensible order, whenever we are standing at our own shop */
+  if(nearShop(b)){
+    if(!b.pick&&b.iron>=10){b.iron-=10;b.pick=1}
+    else if(b.sword<2&&b.iron>=12){b.iron-=12;b.sword=2}
+    else if(b.blocks<16&&b.iron>=4){b.iron-=4;b.blocks+=8}
+    else if(b.armor<1&&b.iron>=16){b.iron-=16;b.armor=1}
+    else if(b.sword<3&&b.gold>=5){b.gold-=5;b.sword=3}
+    else if(b.armor<2&&b.gold>=8){b.gold-=8;b.armor=2}}
+
+  var ready=(b.pick&&b.sword>=2&&b.blocks>=8);
+  /* once a bot sets out to raid it keeps going, so fresh iron at its feet
+     can never pin it at home for the whole match */
+  if(b.mode==='raid'&&(b.target<0||!bedAlive(b.target)||b.target===b.team))b.mode='gather';
+  if(b.mode!=='raid'&&ready&&clock>18)b.mode='raid';
+  if(!ready&&b.mode!=='raid')b.mode='gather';
+
+  if(b.mode==='gather'){
+    b.st='gather';
+    /* shopping trip when there is something worth buying */
+    var wants=(!b.pick&&b.iron>=10)||(b.sword<2&&b.iron>=12)||(b.blocks<16&&b.iron>=4)||
+              (b.armor<1&&b.iron>=16)||(b.sword<3&&b.gold>=5)||(b.armor<2&&b.gold>=8);
+    if(wants&&!nearShop(b)){b.tgt={x:Math.floor(T0.shop.x/TS),y:Math.floor(T0.shop.y/TS)};return}
+    var best=null,bdd=TS*8;
+    for(i=0;i<drops.length;i++){var dr=drops[i],dd=Math.hypot(dr.x-b.x,dr.y-b.y);
+      if(dd<bdd){bdd=dd;best=dr}}
+    b.tgt=best?{x:Math.floor(best.x/TS),y:Math.floor(best.y/TS)}
+               :{x:Math.floor(T0.gen.x/TS),y:Math.floor(T0.gen.y/TS)};
+    return}
+
+  /* raiding */
+  if(b.target<0||!bedAlive(b.target)||b.target===b.team){
+    var opts=[];
+    for(i=0;i<4;i++)if(i!==b.team&&bedAlive(i))opts.push(i);
+    if(!opts.length){
+      for(i=0;i<e.length;i++)if(e[i].alive&&e[i].team!==b.team){
+        b.st='fight';b.tgt={x:Math.floor(e[i].x/TS),y:Math.floor(e[i].y/TS)};b.foe=e[i];return}
+      b.mode='gather';b.st='gather';b.tgt=null;return}
+    b.target=opts[(Math.random()*opts.length)|0]}
+  b.st='raid';
+  var tg=TEAMS[b.target];
+  b.tgt={x:tg.bx,y:tg.by}}
+
+function botAct(b){
+  if(!b.tgt)return;
+  b.goal=stepTo(b,b.tgt.x,b.tgt.y);
+  var dx=b.goal.x-b.x,dy=b.goal.y-b.y,d=Math.hypot(dx,dy);
+  if(d>4){b.vx+=dx/d*48;b.vy+=dy/d*48}
+  if(b.st==='fight'&&b.foe&&b.foe.alive&&d<swingRange(b)*1.1)attack(b);
+  if(b.st==='raid'){
+    /* anything breakable in the eight tiles around us is worth a swing */
+    var mx=Math.floor(b.x/TS),my=Math.floor(b.y/TS),hit=null;
+    for(var yy=my-1;yy<=my+1&&!hit;yy++)for(var xx=mx-1;xx<=mx+1;xx++){
+      var q=at(xx,yy);
+      if((q===BEDH||q===BEDF)&&OWN[mi(xx,yy)]!==b.team+1){hit={x:xx,y:yy};break}
+      if(q===WOOL&&OWN[mi(xx,yy)]!==b.team+1&&!hit)hit={x:xx,y:yy}}
+    if(hit){b.goal={x:(hit.x+.5)*TS,y:(hit.y+.5)*TS};breakAt(b,hit.x,hit.y)}
+    var t=frontTile(b);
+    var tt=at(t.x,t.y);
+    if(tt===WOOL||((tt===BEDH||tt===BEDF)&&OWN[mi(t.x,t.y)]!==b.team+1))attack(b);
+  }
+  if(b.st==='gather'&&b.blocks>4&&Math.random()<.02){
+    /* wrap our own bed, but never on top of ourselves or right next to us */
+    var tm=TEAMS[b.team],mx=Math.floor(b.x/TS),my=Math.floor(b.y/TS);
+    for(var y=tm.by-1;y<=tm.by+1;y++)for(var x=tm.bx-1;x<=tm.bx+1;x++){
+      if(Math.abs(x-mx)<=1&&Math.abs(y-my)<=1)continue;
+      if(at(x,y)===STONE&&Math.random()<.5){M[mi(x,y)]=WOOL;OWN[mi(x,y)]=b.team+1;b.blocks--;return}}}
+  /* if a bot has been pressed against something for a while, dig it out */
+  b.stuckT=(b.stuckT||0);
+  var moved=Math.hypot(b.x-(b.lx||0),b.y-(b.ly||0));
+  b.lx=b.x;b.ly=b.y;
+  if(b.goal&&moved<0.6)b.stuckT+=1/60;else b.stuckT=0;
+  if(b.stuckT>1.6){
+    b.stuckT=0;
+    var g=b.goal,a=Math.atan2(g.y-b.y,g.x-b.x);
+    var fx2=Math.floor((b.x+Math.cos(a)*TS*.9)/TS),fy2=Math.floor((b.y+Math.sin(a)*TS*.9)/TS);
+    if(at(fx2,fy2)===WOOL&&(OWN[mi(fx2,fy2)]===b.team+1||b.pick))clearTile(mi(fx2,fy2));
+    else if(at(fx2,fy2)===VOID&&b.blocks>0){M[mi(fx2,fy2)]=WOOL;OWN[mi(fx2,fy2)]=b.team+1;b.blocks--}
+    else{b.vx+=(Math.random()-.5)*400;b.vy+=(Math.random()-.5)*400;b.think=0;b.route=null}}}
+
+/* ---------- physics ---------- */
+function move(p,dt){
+  var sp=(p.fast>0?1.65:1)*(p.human?1:.92);
+  p.vx*=.82;p.vy*=.82;
+  var nx=p.x+p.vx*dt*sp,ny=p.y+p.vy*dt*sp;
+  var r=TS*.33;
+  if(!solidBox(nx,p.y,r))p.x=nx;else p.vx=0;
+  if(!solidBox(p.x,ny,r))p.y=ny;else p.vy=0;
+  if(p.fast>0)p.fast-=dt;
+  if(p.hurt>0)p.hurt-=dt;
+  if(p.cd>0)p.cd-=dt;
+  /* standing over nothing: you fall */
+  if(!walk(Math.floor(p.x/TS),Math.floor(p.y/TS))&&p.alive)die(p,null);
+  /* pick up what is lying around */
+  for(var i=drops.length-1;i>=0;i--){var d=drops[i];
+    if(Math.hypot(d.x-p.x,d.y-p.y)<TS*.8){p.iron+=d.i;p.gold+=d.g;drops.splice(i,1);
+      if(p===P&&document.getElementById('shop').classList.contains('show'))drawShop()}}}
+function solidBox(x,y,r){
+  return blocked(Math.floor((x-r)/TS),Math.floor((y-r)/TS))||
+         blocked(Math.floor((x+r)/TS),Math.floor((y-r)/TS))||
+         blocked(Math.floor((x-r)/TS),Math.floor((y+r)/TS))||
+         blocked(Math.floor((x+r)/TS),Math.floor((y+r)/TS))}
+
+/* ---------- loop ---------- */
+var last=0,acc=0,says=[];
+function say(s){says.push({s:s,t:3.4})}
+var SUDDEN=200;
+function step(dt){
+  if(over)return;
+  clock+=dt;genTick(dt);
+  /* nobody should be stuck in a stalemate: after a few minutes every bed goes */
+  if(clock>SUDDEN-20&&!step.warned){step.warned=1;say('⏳ עוד 20 שניות כל המיטות נשברות!')}
+  if(clock>SUDDEN&&!step.sudden){step.sudden=1;
+    for(var q=0;q<M.length;q++)if(M[q]===BEDH||M[q]===BEDF){M[q]=STONE;OWN[q]=0}
+    say('💥 מוות פתאומי — אין יותר מיטות!');checkWin()}
+  /* player input */
+  if(P.alive){
+    var ax=(key['arrowright']||key['d']?1:0)-(key['arrowleft']||key['a']?1:0)+stick.ax;
+    var ay=(key['arrowdown']||key['s']?1:0)-(key['arrowup']||key['w']?1:0)+stick.ay;
+    var d=Math.hypot(ax,ay);if(d>1){ax/=d;ay/=d}
+    P.vx+=ax*56;P.vy+=ay*56;
+    if(ax)P.face=ax>0?1:-1;
+    if(mouse.down)attack(P)}
+  var e=all();
+  for(var i=0;i<e.length;i++){var p=e[i];
+    if(p.out)continue;
+    if(!p.alive){p.dead-=dt;if(p.dead<=0)respawn(p);continue}
+    if(!p.human){botThink(p,dt);botAct(p)}
+    move(p,dt)}
+  for(i=drops.length-1;i>=0;i--){drops[i].t-=dt;if(drops[i].t<=0)drops.splice(i,1)}
+  for(i=tnts.length-1;i>=0;i--){var b=tnts[i];b.t-=dt;
+    if(b.t<=0){boom(b);tnts.splice(i,1)}}
+  for(i=fx.length-1;i>=0;i--){var f=fx[i];f.a-=dt*(f.sw?4:1.6);
+    if(f.vx){f.x+=f.vx*dt;f.y+=f.vy*dt;f.vx*=.94;f.vy*=.94}
+    if(f.a<=0)fx.splice(i,1)}
+  for(i=says.length-1;i>=0;i--){says[i].t-=dt;if(says[i].t<=0)says.splice(i,1)}}
+function boom(b){
+  var tx=Math.floor(b.x/TS),ty=Math.floor(b.y/TS);
+  for(var y=ty-2;y<=ty+2;y++)for(var x=tx-2;x<=tx+2;x++){
+    if(Math.hypot(x-tx,y-ty)>2.4)continue;
+    if(at(x,y)===WOOL&&OWN[mi(x,y)]!==b.team+1)clearTile(mi(x,y))}
+  var e=all();
+  for(var i=0;i<e.length;i++){var o=e[i];if(!o.alive)continue;
+    var d=Math.hypot(o.x-b.x,o.y-b.y);
+    if(d<TS*2.6)hurt(o,b,10*(1-d/(TS*2.6)))}
+  for(i=0;i<26;i++)fx.push({x:b.x,y:b.y,a:1,c:i%2?'#ffb545':'#ff5470',
+    vx:(Math.random()-.5)*420,vy:(Math.random()-.5)*420})}
+
+function checkWin(){
+  if(over)return;
+  var live=[];for(var i=0;i<4;i++)if(teamLives(i))live.push(i);
+  if(live.length<=1)finish(live[0]===ME)}
+function finish(won){
+  if(over)return;over=true;
+  document.getElementById('shop').classList.remove('show');
+  document.getElementById('endE').textContent=won?'🏆':'💀';
+  document.getElementById('endT').textContent=won?'ניצחתם!':'נפלתם';
+  document.getElementById('endP').textContent=
+    (won?'הקבוצה שלכם נשארה אחרונה. ':'המיטה שלכם נשברה ולא הייתה חזרה. ')+
+    'הפלתם '+P.kills+(P.kills===1?' יריב':' יריבים')+' · '+Math.floor(clock)+' שניות.';
+  document.getElementById('endM').classList.add('show');
+  if(won&&window.AG)AG.add(40,1);else if(window.AG)AG.add(8,0);
+  try{var k='bedwars_best',old=+localStorage.getItem(k)||0;
+    if(won&&P.kills+1>old)localStorage.setItem(k,String(P.kills+1))}catch(e){}}
+
+/* ---------- drawing ---------- */
+var cam={x:0,y:0};
+function resize(){var d=Math.min(2,devicePixelRatio||1);
+  cv.width=Math.round(cv.clientWidth*d);cv.height=Math.round(cv.clientHeight*d);
+  cx.setTransform(d,0,0,d,0,0)}
+addEventListener('resize',resize);
+function rr(x,y,w,h,r){cx.beginPath();cx.moveTo(x+r,y);cx.arcTo(x+w,y,x+w,y+h,r);cx.arcTo(x+w,y+h,x,y+h,r);
+  cx.arcTo(x,y+h,x,y,r);cx.arcTo(x,y,x+w,y,r);cx.closePath()}
+function draw(){
+  var w=cv.clientWidth,h=cv.clientHeight;
+  var zoom=Math.max(.7,Math.min(1.15,Math.min(w/(TS*26),h/(TS*19))));
+  cam.x+=((P.x)-cam.x)*.14;cam.y+=((P.y)-cam.y)*.14;
+  cx.fillStyle='#0a1626';cx.fillRect(0,0,w,h);
+  cx.save();cx.translate(w/2,h/2);cx.scale(zoom,zoom);cx.translate(-cam.x,-cam.y);
+  var x0=Math.max(0,Math.floor((cam.x-w/2/zoom)/TS)-1),x1=Math.min(W-1,Math.ceil((cam.x+w/2/zoom)/TS)+1),
+      y0=Math.max(0,Math.floor((cam.y-h/2/zoom)/TS)-1),y1=Math.min(H-1,Math.ceil((cam.y+h/2/zoom)/TS)+1);
+  for(var y=y0;y<=y1;y++)for(var x=x0;x<=x1;x++){
+    var t=M[mi(x,y)];if(t===VOID)continue;
+    var px=x*TS,py=y*TS,o=OWN[mi(x,y)]-1;
+    if(t===STONE){cx.fillStyle=((x+y)&1)?'#2b4568':'#26405f';cx.fillRect(px,py,TS,TS)}
+    else if(t===WOOL){cx.fillStyle=o>=0?TEAMS[o].c:'#cfd6e4';rr(px+1,py+1,TS-2,TS-2,5);cx.fill();
+      cx.fillStyle='rgba(255,255,255,.22)';rr(px+3,py+3,TS-6,TS*.32,4);cx.fill()}
+    else if(t===GEN){cx.fillStyle='#3b5a84';cx.fillRect(px,py,TS,TS);
+      cx.fillStyle='#9fd0ff';rr(px+5,py+5,TS-10,TS-10,4);cx.fill();
+      cx.globalAlpha=.4+Math.sin(clock*4)*.3;cx.fillStyle='#fff';rr(px+9,py+9,TS-18,TS-18,3);cx.fill();cx.globalAlpha=1}
+    else if(t===SHOP){cx.fillStyle='#4a3a76';cx.fillRect(px,py,TS,TS);
+      cx.font='900 '+(TS*.7)+'px system-ui';cx.textAlign='center';cx.textBaseline='middle';
+      cx.fillText('🛒',px+TS/2,py+TS/2+1)}
+    else if(t===BEDH||t===BEDF){
+      cx.fillStyle=o>=0?TEAMS[o].c2:'#555';cx.fillRect(px,py,TS,TS);
+      cx.fillStyle=o>=0?TEAMS[o].c:'#888';rr(px+2,py+2,TS-4,TS-4,5);cx.fill();
+      if(t===BEDH){cx.fillStyle='#fff';rr(px+5,py+5,TS-10,TS*.42,4);cx.fill()}}}
+  /* dropped resources */
+  for(var i=0;i<drops.length;i++){var d=drops[i];
+    var bob=Math.sin(clock*5+d.x)*2;
+    cx.fillStyle=d.g?'#ffd43b':'#cfd8e8';
+    rr(d.x-5,d.y-5+bob,10,10,3);cx.fill();
+    cx.fillStyle='rgba(255,255,255,.5)';rr(d.x-3,d.y-3+bob,4,3,1);cx.fill()}
+  /* tnt */
+  for(i=0;i<tnts.length;i++){var b=tnts[i];
+    cx.fillStyle=Math.sin(clock*18)>0?'#ff5470':'#fff';rr(b.x-9,b.y-9,18,18,4);cx.fill()}
+  /* players */
+  var e=all();
+  for(i=0;i<e.length;i++){var p=e[i];if(!p.alive||p.out)continue;
+    var T=TEAMS[p.team],r=TS*.36;
+    cx.fillStyle='rgba(0,0,0,.3)';cx.beginPath();cx.ellipse(p.x,p.y+r*.9,r*.9,r*.4,0,0,6.3);cx.fill();
+    cx.fillStyle=p.hurt>0?'#fff':T.c;cx.beginPath();cx.arc(p.x,p.y,r,0,6.3);cx.fill();
+    cx.fillStyle=T.c2;cx.beginPath();cx.arc(p.x,p.y,r,-0.5,0.5);cx.lineTo(p.x,p.y);cx.fill();
+    if(p.armor){cx.strokeStyle=p.armor>1?'#dfe8f5':'#c08a4a';cx.lineWidth=3;
+      cx.beginPath();cx.arc(p.x,p.y,r+2.5,0,6.3);cx.stroke()}
+    var f=facing(p);
+    cx.strokeStyle=['#fff','#cfd8e8','#dfe8f5','#ffd43b'][p.sword];cx.lineWidth=3.5;cx.lineCap='round';
+    cx.beginPath();cx.moveTo(p.x+f.x*r*.7,p.y+f.y*r*.7);
+    cx.lineTo(p.x+f.x*r*1.7,p.y+f.y*r*1.7);cx.stroke();
+    /* health bar */
+    cx.fillStyle='rgba(0,0,0,.45)';rr(p.x-14,p.y-r-11,28,5,2.5);cx.fill();
+    cx.fillStyle=p.hp>10?'#5ddc6a':'#ff5470';rr(p.x-14,p.y-r-11,28*Math.max(0,p.hp/p.maxhp),5,2.5);cx.fill();
+    if(p===P){cx.fillStyle='#fff';cx.font='900 11px Rubik,system-ui';cx.textAlign='center';
+      cx.fillText('אתם',p.x,p.y-r-17)}}
+  /* effects */
+  for(i=0;i<fx.length;i++){var fl=fx[i];cx.globalAlpha=Math.max(0,fl.a);
+    if(fl.sw){cx.strokeStyle='#fff';cx.lineWidth=3;cx.beginPath();cx.arc(fl.x,fl.y,TS*.6,0,6.3);cx.stroke()}
+    else{cx.fillStyle=fl.c;rr(fl.x-3,fl.y-3,6,6,2);cx.fill()}}
+  cx.globalAlpha=1;
+  cx.restore();
+  drawHud(w,h)}
+function drawHud(w,h){
+  /* team strip, below the row of floating buttons the hub puts at the top */
+  cx.direction='ltr';
+  cx.font='900 13px Rubik,system-ui';cx.textBaseline='middle';cx.textAlign='center';
+  var bw=Math.min(96,(w-24)/4),top=58;
+  for(var i=0;i<4;i++){
+    var x=12+i*(bw+4),alive=bedAlive(i),lives=teamLives(i);
+    cx.globalAlpha=lives?1:.33;
+    cx.fillStyle=TEAMS[i].c;rr(x,top,bw,30,9);cx.fill();
+    cx.fillStyle='#0a1626';
+    cx.fillText((alive?'🛏️ ':lives?'💀 ':'❌ ')+TEAMS[i].nm,x+bw/2,top+16);
+    if(i===ME){cx.strokeStyle='#fff';cx.lineWidth=3;rr(x,top,bw,30,9);cx.stroke()}
+    cx.globalAlpha=1}
+  /* my purse */
+  cx.textAlign='left';cx.font='900 16px Rubik,system-ui';
+  var hudY=h-18;
+  cx.fillStyle='rgba(5,11,22,.6)';rr(10,hudY-26,206,34,10);cx.fill();
+  cx.fillStyle='#fff';
+  cx.fillText('⚙️ '+P.iron+'  🪙 '+P.gold+'  🧱 '+P.blocks+(P.tnt?'  🧨 '+P.tnt:''),20,hudY-9);
+  if(!P.alive&&!P.out){
+    cx.textAlign='center';cx.font='900 30px Rubik,system-ui';cx.fillStyle='#fff';
+    cx.fillText('חוזרים בעוד '+Math.ceil(P.dead),w/2,h/2)}
+  /* minimap */
+  var ms=Math.min(132,w*.22),sc=ms/W,mh=H*sc,mx0=w-ms-12,my0=58;
+  cx.fillStyle='rgba(5,11,22,.62)';rr(mx0-4,my0-4,ms+8,mh+8,8);cx.fill();
+  for(var y2=0;y2<H;y2++)for(var x2=0;x2<W;x2++){
+    var t2=M[mi(x2,y2)];if(t2===VOID)continue;
+    var o2=OWN[mi(x2,y2)]-1;
+    cx.fillStyle=(t2===BEDH||t2===BEDF)?(o2>=0?TEAMS[o2].c:'#888'):
+                 t2===WOOL?(o2>=0?TEAMS[o2].c:'#ccc'):'#35537d';
+    cx.fillRect(mx0+x2*sc,my0+y2*sc,Math.ceil(sc),Math.ceil(sc))}
+  var ee=all();
+  for(var q=0;q<ee.length;q++){var pp=ee[q];if(!pp.alive||pp.out)continue;
+    cx.fillStyle=pp===P?'#fff':TEAMS[pp.team].c;
+    cx.beginPath();cx.arc(mx0+pp.x/TS*sc,my0+pp.y/TS*sc,pp===P?3.4:2.6,0,6.3);cx.fill()}
+  /* messages */
+  cx.textAlign='center';cx.font='900 15px Rubik,system-ui';
+  for(var k=0;k<says.length;k++){cx.globalAlpha=Math.min(1,says[k].t);
+    cx.fillStyle='rgba(5,11,22,.72)';var tw=cx.measureText(says[k].s).width+22;
+    rr(w/2-tw/2,100+k*30,tw,25,8);cx.fill();
+    cx.fillStyle='#fff';cx.fillText(says[k].s,w/2,113+k*30);cx.globalAlpha=1}}
+
+function frame(ts){
+  requestAnimationFrame(frame);
+  var dt=Math.min(.05,(ts-last)/1000||0);last=ts;
+  if(!P)return;
+  acc+=dt;var guard=0;
+  while(acc>=1/60&&guard++<5){step(1/60);acc-=1/60}
+  draw()}
+
+/* ---------- start ---------- */
+function startGame(team){
+  ME=team;over=false;clock=0;drops=[];tnts=[];fx=[];says=[];genT=[0,0,0,0];midT=5;
+  step.warned=0;step.sudden=0;
+  buildMap();
+  P=mkEnt(team,true);
+  BOTS=[];for(var i=0;i<4;i++)if(i!==team)BOTS.push(mkEnt(i,false));
+  BOTS.forEach(function(b){b.iron=2});
+  document.getElementById('menu').classList.remove('show');
+  document.getElementById('endM').classList.remove('show');
+  resize();
+  say('הגנו על המיטה שלכם 🛏️');
+  setTimeout(function(){tip(touch?'🛒 בבסיס שלכם קונים ציוד':'E = חנות · רווח = להניח בלוק · Q = TNT')},900)}
+(function(){
+  var pickT=0,box=document.getElementById('teamPick');
+  TEAMS.forEach(function(t,i){var b=document.createElement('button');
+    b.style.background=t.c;b.textContent=t.nm;b.title=t.dir;
+    if(i===0)b.className='on';
+    b.onclick=function(){pickT=i;[].forEach.call(box.children,function(e,j){e.className=j===i?'on':''})};
+    box.append(b)});
+  document.getElementById('ctrl').textContent=touch?
+    'ג׳ויסטיק לתזוזה · ⚔️ מכה · 🧱 בלוק · 🛒 חנות':
+    'WASD או חיצים לתזוזה · לחיצה = מכה · רווח = בלוק · E = חנות · Q = TNT';
+  document.getElementById('go').onclick=function(){startGame(pickT)};
+  document.getElementById('again').onclick=function(){
+    document.getElementById('endM').classList.remove('show');
+    document.getElementById('menu').classList.add('show')};
+  resize();requestAnimationFrame(frame)})();
+</script>
+</body>
+</html>
