@@ -264,6 +264,7 @@ body.cmp .sec{font-size:18px;margin-top:11px}
   <div id="plMsg" style="min-height:20px;font-size:14px;margin:6px 0;opacity:.9"></div>
   <div id="plList"></div><button class="mb alt" id="plX">סגור</button></div></div>
 <script src="hub.js"></script>
+<script src="board.js"></script>
 <script>
 var LIST=[],cat='הכל',q='';
 var FAV=ld('ag_fav',[]),RECENT=ld('ag_recent',[]);
@@ -443,12 +444,11 @@ $('lbB').onclick=lbOpen;
     var o=document.createElement('option');o.value='_all';o.textContent=T('🏅 כללי (נקודות)','🏅 Overall (points)');sel.append(o);
     LIST.forEach(function(x){if(G&&G[x.id]&&G[x.id].length){var p=document.createElement('option');p.value=x.id;p.textContent=x.name;sel.append(p)}});
     if(cur&&[].some.call(sel.options,function(q){return q.value===cur}))sel.value=cur}
-  /* JSONBin-backed board (access key is Read+Update only). (c) Alon Maidenberg 2026 */
-  var JB_BIN='6aeb5887ac6210605a6c4c6a',JB_KEY='$2a$10$V.Rz3BoGAuOqV3rf.yhVUuM.u.gCBl5Qdg3FHw.2YSHkR.VIEFZH2',JB_URL='https://api.jsonbin.io/v3/b/'+JB_BIN,TOP=30;
-  var BAD=/(fuck|shit|bitch|cunt|dick|porn|nazi|hitler|rape|sex|nigg|http|www|\.com|זונה|שרמוט|כוס|זין|מניאק|הומו|נאצי|היטלר|אנס|סקס)/i;
-  function jbGet(){return fetch(JB_URL+'/latest',{cache:'no-store',headers:{'X-Access-Key':JB_KEY,'X-Bin-Meta':'false'}}).then(function(r){if(!r.ok)throw r.status;return r.json()}).then(function(d){d=d&&d.record?d.record:d;if(!d||typeof d!=='object')d={};d.g=d.g||{};d.banned=d.banned||[];return d})}
-  function jbPut(b){return fetch(JB_URL,{method:'PUT',headers:{'Content-Type':'application/json','X-Access-Key':JB_KEY},body:JSON.stringify(b)}).then(function(r){if(!r.ok)throw r.status;return b})}
-  function cleanName(n){n=String(n||'').replace(/[\u0000-\u001f<>&"'`\\]/g,'').replace(/\s+/g,' ').trim().slice(0,14);return n.length>=2&&!BAD.test(n.replace(/[\s._-]/g,''))?n:''}
+  /* the shared board lives in board.js, so shorts/ can publish to the same record */
+  var JB_BIN=AGBoard.on,TOP=30;
+  function jbGet(){return AGBoard.get()}
+  function jbPut(b){return AGBoard.put(b)}
+  function cleanName(n){return AGBoard.clean(n)}
   function load(){if(!JB_BIN){$('gbList').textContent=T('לוח התוצאות עוד לא הופעל.','The leaderboard is not switched on yet.');return}
     jbGet().then(function(b){G=b.g;fill();paint()}).catch(function(){$('gbList').textContent=T('אין חיבור לשרת. נסו שוב מאוחר יותר.','No connection. Try again later.')})}
   function send(){var n0=nm.value.trim(),n=cleanName(n0);if(n0.length<2){msg(T('כתבו כינוי (לפחות 2 תווים)','Enter a nickname (at least 2 characters)'));return}

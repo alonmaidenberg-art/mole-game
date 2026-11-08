@@ -25,7 +25,10 @@ html,body{margin:0;height:100%;background:#07030f;color:#fff;overflow:hidden;
   overflow:hidden;background:#140a2e;box-shadow:0 18px 60px rgba(0,0,0,.6)}
 .phone canvas{display:block;width:100%;height:100%;touch-action:none}
 .poster{position:absolute;inset:0;display:grid;place-items:center;text-align:center;gap:4px;padding:30px}
-.poster .em{font-size:74px;filter:drop-shadow(0 6px 0 rgba(0,0,0,.3))}
+.poster .em{font-size:74px;filter:drop-shadow(0 6px 0 rgba(0,0,0,.3));position:relative;display:inline-block}
+.poster .em::after{content:'';position:absolute;inset:-26%;border-radius:50%;z-index:-1;
+  background:radial-gradient(circle,rgba(255,255,255,.22),transparent 68%);animation:glow 3.4s ease-in-out infinite}
+@keyframes glow{0%,100%{transform:scale(.86);opacity:.5}50%{transform:scale(1.1);opacity:1}}
 .poster b{font:900 26px Rubik,system-ui;display:block;margin-top:8px}
 .poster small{opacity:.8;font-size:14px}
 .meta{position:absolute;inset-inline:0;bottom:0;padding:16px 18px 36px;pointer-events:none;
@@ -53,7 +56,8 @@ html,body{margin:0;height:100%;background:#07030f;color:#fff;overflow:hidden;
 .swipe{position:absolute;inset-inline-start:76px;inset-inline-end:8px;bottom:134px;text-align:center;font:900 13px Rubik,system-ui;
   opacity:.75;animation:up 1.9s ease-in-out infinite;pointer-events:none;z-index:3}
 @keyframes up{0%,100%{transform:translateY(0);opacity:.45}50%{transform:translateY(-9px);opacity:.95}}
-#mk{position:fixed;inset:0;z-index:40;background:rgba(7,3,15,.93);display:none;overflow:auto;padding:16px}
+#mk{position:fixed;inset:0;z-index:40;background:rgba(7,3,15,.93);display:none;overflow:auto;
+  padding:64px 16px 16px}
 #mk.show{display:block}
 .mkc{max-width:430px;margin:0 auto;background:#1a0f3d;border-radius:24px;padding:18px}
 .mkc h2{margin:0 0 4px;font:900 23px Rubik,system-ui}
@@ -74,6 +78,35 @@ html,body{margin:0;height:100%;background:#07030f;color:#fff;overflow:hidden;
 .sw button{width:38px;height:38px;border-radius:50%;border:3px solid transparent;cursor:pointer}
 .sw button.on{border-color:#fff}
 #mkMsg{min-height:18px;font-size:13.5px;margin-top:10px;opacity:.9}
+/* ---- the Glitch, who you talk to ---- */
+.boss{display:flex;align-items:center;gap:11px;margin-bottom:12px}
+.boss canvas{flex:0 0 auto;border-radius:16px;background:#0f0828}
+.boss .nm{font:900 19px Rubik,system-ui;line-height:1.15}
+.boss .nm small{display:block;font:700 12.5px Rubik,system-ui;opacity:.7;margin-top:2px}
+#chat{background:#0f0828;border-radius:18px;padding:12px;max-height:40vh;min-height:150px;overflow:auto;
+  display:flex;flex-direction:column;gap:8px}
+.bub{max-width:86%;padding:9px 12px;border-radius:16px;font-size:14.5px;line-height:1.45;
+  animation:pop .22s ease-out}
+@keyframes pop{from{transform:translateY(6px) scale(.97);opacity:0}}
+.bub.b{background:#2a1a5e;border-start-start-radius:5px;align-self:flex-start}
+.bub.me{background:#ff3d8b;color:#fff;border-start-end-radius:5px;align-self:flex-end}
+.bub.b b{color:#ffd43b}
+#chips{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 4px}
+#chips button{border:2px solid rgba(255,255,255,.22);background:#0f0828;color:#fff;border-radius:999px;
+  padding:7px 12px;font:900 13px Rubik,system-ui;cursor:pointer}
+#chips button:active{transform:translateY(2px)}
+.say{display:flex;gap:7px;margin-top:8px}
+.say input{flex:1}
+.say button{flex:0 0 auto;padding:11px 15px;border:0;border-radius:14px;background:#ffd43b;color:#2b1659;
+  font:900 15px Rubik,system-ui;cursor:pointer}
+.card0{display:flex;align-items:center;gap:11px;background:#0f0828;border-radius:18px;padding:11px;margin-top:12px}
+.card0 .ic{width:54px;height:54px;border-radius:14px;display:grid;place-items:center;font-size:27px;flex:0 0 auto}
+.card0 b{display:block;font:900 16px Rubik,system-ui}
+.card0 small{display:block;font-size:12.5px;opacity:.78;margin-top:2px;line-height:1.4}
+details.adv{margin-top:12px}
+details.adv summary{cursor:pointer;font:900 14px Rubik,system-ui;opacity:.85;padding:6px 0}
+.gbadge{position:absolute;top:50px;inset-inline-start:12px;z-index:3;font:900 12px Rubik,system-ui;
+  background:rgba(255,255,255,.16);backdrop-filter:blur(6px);border-radius:999px;padding:5px 11px}
 @media(max-width:470px){.phone{max-width:none;border-radius:0;box-shadow:none}.card{padding:0}}
 </style>
 </head>
@@ -81,26 +114,41 @@ html,body{margin:0;height:100%;background:#07030f;color:#fff;overflow:hidden;
 <div id="feed"></div>
 
 <div id="mk"><div class="mkc">
-  <h2>✨ שורט משלכם</h2>
-  <p class="sub">בוחרים משחק, מכוונים אותו, וכותבים כיתוב. יוצא קוד קצר שאפשר לשלוח לחברים.</p>
-  <label>המשחק</label><div class="pick" id="mkPick"></div>
-  <label>קושי</label><div class="sl"><input type="range" id="mkD" min="1" max="5" value="3"><b id="mkDv"></b></div>
-  <label>אורך</label><div class="sl"><input type="range" id="mkL" min="8" max="30" value="15"><b id="mkLv"></b></div>
-  <label>צבע</label><div class="sw" id="mkTh"></div>
-  <label>כיתוב</label><input id="mkCap" maxlength="48" placeholder="נסו לעבור את זה…">
-  <div style="margin-top:16px">
+  <div class="boss"><canvas id="bossFace" width="120" height="120"
+      style="width:60px;height:60px"></canvas>
+    <div class="nm">הגליץ׳<small>בונה לכם שורט. פשוט תגידו מה אתם רוצים.</small></div></div>
+  <div id="chat"></div>
+  <div id="chips"></div>
+  <div class="say"><input id="mkSay" autocomplete="off" placeholder="לדוגמה: משחק קפיצה ממש קשה בוורוד">
+    <button id="mkSend">שלח</button></div>
+
+  <div class="card0" id="mkCard"><div class="ic" id="mkIc">🎮</div>
+    <div style="flex:1;min-width:0"><b id="mkTitle"></b><small id="mkSub"></small></div></div>
+
+  <div style="margin-top:14px">
     <button class="btn g" id="mkTry">▶ נסו אותו</button>
-    <button class="btn" id="mkSave">💾 הוסיפו לפיד שלי</button>
+    <button class="btn" id="mkPub">🌍 פרסמו לכולם</button>
     <button class="btn d" id="mkX">סגור</button>
   </div>
-  <label>הקוד לשיתוף</label><textarea id="mkCode" readonly></textarea>
-  <div><button class="btn" id="mkCopy">העתקת קוד</button><button class="btn" id="mkLink">העתקת קישור</button></div>
-  <label>פתיחת קוד של חבר</label><input id="mkIn" placeholder="הדביקו קוד כאן">
-  <div><button class="btn g" id="mkGo">פתחו אותו</button></div>
   <div id="mkMsg"></div>
+
+  <details class="adv"><summary>⚙️ לכוון ידנית, קודים וקישורים</summary>
+    <label>המשחק</label><div class="pick" id="mkPick"></div>
+    <label>קושי</label><div class="sl"><input type="range" id="mkD" min="1" max="5" value="3"><b id="mkDv"></b></div>
+    <label>אורך</label><div class="sl"><input type="range" id="mkL" min="8" max="30" value="15"><b id="mkLv"></b></div>
+    <label>צבע</label><div class="sw" id="mkTh"></div>
+    <label>כיתוב</label><input id="mkCap" maxlength="48" placeholder="נסו לעבור את זה…">
+    <label>הקוד לשיתוף</label><textarea id="mkCode" readonly></textarea>
+    <div><button class="btn" id="mkCopy">העתקת קוד</button><button class="btn" id="mkLink">העתקת קישור</button>
+      <button class="btn" id="mkSave">💾 רק לפיד שלי</button></div>
+    <label>פתיחת קוד של חבר</label><input id="mkIn" placeholder="הדביקו קוד כאן">
+    <div><button class="btn g" id="mkGo">פתחו אותו</button></div>
+  </details>
 </div></div>
 
 <script src="../hub.js"></script>
+<script src="../board.js"></script>
+<script src="boss.js"></script>
 <script>
 'use strict';
 /* © 2026 Alon Maidenberg. Shorts: a scrolling feed of very small one-touch games. */
@@ -336,10 +384,22 @@ var feed=document.getElementById('feed'),FEED=[],cards=[],active=-1,runs={};
 function pushMore(n){
   var mine=myShorts();
   for(var i=0;i<n;i++){
-    var s=(mine.length&&Math.random()<.3)?mine[(Math.random()*mine.length)|0]:randomShort();
+    var r=Math.random(),s;
+    if(COMMUNITY.length&&r<.45)s=COMMUNITY[(Math.random()*COMMUNITY.length)|0];
+    else if(mine.length&&r<.6)s=mine[(Math.random()*mine.length)|0];
+    else s=randomShort();
     FEED.push(s);addCard(FEED.length-1)}}
+/* a short can arrive from a code somebody typed, so never trust its numbers */
+function fix(s){
+  s=s||{};
+  s.g=gameById(s.g).id;
+  s.d=Math.max(1,Math.min(5,Math.round(+s.d)||3));
+  s.len=Math.max(5,Math.min(40,Math.round(+s.len)||15));
+  s.th=Math.max(0,Math.min(TH.length-1,Math.round(+s.th)||0));
+  s.cap=String(s.cap||'').slice(0,60);s.by=String(s.by||'אלון').slice(0,20);
+  return s}
 function addCard(i){
-  var s=FEED[i],G=gameById(s.g),T=TH[s.th];
+  var s=FEED[i]=fix(FEED[i]),G=gameById(s.g),T=TH[s.th];
   var sec=document.createElement('section');sec.className='card';sec.dataset.i=i;
   var ph=document.createElement('div');ph.className='phone';
   ph.style.background='linear-gradient(170deg,'+T.bg[0]+','+T.bg[1]+')';
@@ -347,7 +407,8 @@ function addCard(i){
     '<div class="poster"><div><div class="em">'+G.em+'</div><b>'+G.nm+'</b>'+
       '<small>'+G.goal(s)+'</small></div></div>'+
     '<div class="top"><span class="t">'+G.nm+'</span><span class="pill">'+'★'.repeat(s.d)+'</span></div>'+
-    '<div class="meta"><div class="who">@'+(s.by||'אלון')+(s.made?' · שורט של שחקן':'')+'</div>'+
+    (s.pub?'<div class="gbadge">🌍 מהקהילה</div>':'')+
+    '<div class="meta"><div class="who">@'+(s.by||'אלון')+(s.pub?' · פרסם שורט':s.made?' · שורט של שחקן':'')+'</div>'+
       '<div class="cap">'+(s.cap||'')+'</div><div class="hint">'+G.hint+' · '+G.goal(s)+'</div></div>'+
     '<div class="swipe">⌃ גללו לשורט הבא</div>';
   var rail=document.createElement('div');rail.className='rail';
@@ -360,7 +421,14 @@ function addCard(i){
   again.onclick=function(e){e.stopPropagation();start(i,true)};
   var make=document.createElement('button');make.textContent='✨';
   make.onclick=function(e){e.stopPropagation();openMaker(s)};
-  rail.append(like,again,make);ph.append(rail);
+  rail.append(like,again,make);
+  if(s.pub&&s.code&&window.AG&&AG.isAdmin&&AG.isAdmin()){
+    var del=document.createElement('button');del.textContent='🗑️';del.title='להוריד מהפיד של כולם';
+    del.onclick=function(e){e.stopPropagation();
+      if(!confirm('להוריד את השורט של '+s.by+' מהפיד של כולם?'))return;
+      del.textContent='⏳';unpublish(s.code,function(ok){del.textContent=ok?'✅':'🗑️'})};
+    rail.append(del)}
+  ph.append(rail);
   sec.append(ph);feed.append(sec);cards.push({sec:sec,ph:ph,s:s,G:G});
 }
 
@@ -467,7 +535,8 @@ var io=new IntersectionObserver(function(es){
 /* ---------- the maker ---------- */
 var draft={g:'jump',d:3,len:15,th:0,cap:'',by:''};
 function openMaker(from){
-  if(from)draft={g:from.g,d:from.d,len:from.len,th:from.th,cap:from.cap||'',by:myName()};
+  if(from)draft={g:from.g,d:from.d,len:from.len,th:from.th,cap:from.cap||'',by:myName(),
+    set_g:1,set_d:1,set_cap:from.cap?1:0};
   else draft.by=myName();
   var pick=document.getElementById('mkPick');pick.textContent='';
   GAMES.forEach(function(G){var b=document.createElement('button');
@@ -478,7 +547,7 @@ function openMaker(from){
     pick.append(b)});
   var sw=document.getElementById('mkTh');sw.textContent='';
   TH.forEach(function(t,j){var b=document.createElement('button');b.title=t.nm;
-    b.style.background='linear-gradient(140deg,'+t.bg[0]+','+t.a+')';
+    b.style.background='linear-gradient(140deg,'+t.bg[0]+' 10%,'+t.ink+')';
     if(j===draft.th)b.className='on';
     b.onclick=function(){draft.th=j;[].forEach.call(sw.children,function(e,k){e.className=k===j?'on':''});refresh()};
     sw.append(b)});
@@ -486,20 +555,32 @@ function openMaker(from){
   document.getElementById('mkL').value=draft.len;
   document.getElementById('mkCap').value=draft.cap;
   document.getElementById('mkMsg').textContent='';
-  refresh();document.getElementById('mk').classList.add('show')}
+  refresh();document.getElementById('mk').classList.add('show');
+  if(!chatStarted)greet();
+  setTimeout(function(){document.getElementById('mkSay').focus()},150)}
 function refresh(){
   draft.d=+document.getElementById('mkD').value;
   draft.len=+document.getElementById('mkL').value;
   draft.cap=document.getElementById('mkCap').value.slice(0,48);
   document.getElementById('mkDv').textContent='★'.repeat(draft.d);
   document.getElementById('mkLv').textContent=draft.len+' שנ׳';
-  document.getElementById('mkCode').value=encodeShort(draft)}
+  document.getElementById('mkCode').value=encodeShort(draft);
+  var G=gameById(draft.g),T=TH[draft.th];
+  document.getElementById('mkIc').textContent=G.em;
+  document.getElementById('mkIc').style.background='linear-gradient(140deg,'+T.bg[0]+' 10%,'+T.ink+')';
+  document.getElementById('mkTitle').textContent=G.nm+' · '+'★'.repeat(draft.d);
+  document.getElementById('mkSub').textContent=draft.len+' שניות · '+T.nm+' · '+(draft.cap||'בלי כיתוב')}
+function syncControls(){
+  document.getElementById('mkD').value=draft.d;
+  document.getElementById('mkL').value=draft.len;
+  document.getElementById('mkCap').value=draft.cap;
+  [].forEach.call(document.getElementById('mkPick').children,function(e,j){e.className=GAMES[j].id===draft.g?'on':''});
+  [].forEach.call(document.getElementById('mkTh').children,function(e,k){e.className=k===draft.th?'on':''});
+  refresh()}
 ['mkD','mkL','mkCap'].forEach(function(id){
   document.getElementById(id).addEventListener('input',refresh)});
 document.getElementById('mkX').onclick=function(){document.getElementById('mk').classList.remove('show')};
-document.getElementById('mkTry').onclick=function(){
-  document.getElementById('mk').classList.remove('show');
-  insertNext({g:draft.g,d:draft.d,len:draft.len,th:draft.th,cap:draft.cap,by:draft.by,made:1})};
+document.getElementById('mkTry').onclick=function(){tryIt()};
 document.getElementById('mkSave').onclick=function(){
   var a=myShorts();a.unshift({g:draft.g,d:draft.d,len:draft.len,th:draft.th,cap:draft.cap,by:draft.by,made:1});
   putShorts(a);document.getElementById('mkMsg').textContent='נשמר! הוא יופיע לכם בפיד.'};
@@ -508,6 +589,127 @@ function copyTo(s,msg){
   if(navigator.clipboard&&navigator.clipboard.writeText)
     navigator.clipboard.writeText(s).then(function(){m.textContent=msg},function(){m.textContent='סמנו את הקוד והעתיקו ידנית'});
   else m.textContent='סמנו את הקוד והעתיקו ידנית'}
+document.getElementById('mkPub').onclick=function(){publish()};
+
+/* ---------- הגליץ׳ ----------
+   He has no brain anywhere else: boss.js reads the Hebrew you typed for the
+   things a short is made of, and this part keeps the conversation going. */
+var chatStarted=false,asked=[],lastAsk='';
+function bub(who,html){
+  var c=document.getElementById('chat'),d=document.createElement('div');
+  d.className='bub '+who;d.innerHTML=html;c.append(d);c.scrollTop=c.scrollHeight;
+  if(who==='b')blink=.45;
+  return d}
+function chips(list){
+  var c=document.getElementById('chips');c.textContent='';
+  list.forEach(function(t){var b=document.createElement('button');b.textContent=t;
+    b.onclick=function(){say(t)};c.append(b)})}
+function pick(a){return a[(Math.random()*a.length)|0]}
+function greet(){
+  chatStarted=true;
+  var n=myName();
+  bub('b','שלום '+(n==='אורח'?'':'<b>'+n+'</b>')+'! אני <b>הגליץ׳</b>. תגידו לי איזה משחק לבנות ואני אבנה אותו, ואז אפשר לפרסם אותו לכל מי שנכנס לאתר.');
+  setTimeout(function(){
+    bub('b','אפשר פשוט לכתוב משפט, למשל: <b>"משחק בלונים קשה בוורוד"</b>. או לבחור מלמטה.');
+    chips(['משחק קפיצה','בלונים','זיכרון','תפתיע אותי'])},420)}
+function missing(){
+  if(!draft.set_g)return 'g';
+  if(!draft.set_d)return 'd';
+  if(!draft.cap)return 'cap';
+  return ''}
+function askFor(what){
+  lastAsk=what;
+  if(what==='g'){bub('b',pick(['איזה סוג משחק?','במה נשחק?','מה הולך להיות שם?']));
+    chips(['קפיצה','בלונים','זיכרון','התחמקות']);return}
+  if(what==='d'){bub('b',pick(['כמה קשה שיהיה?','קל או רצח?','רמת קושי?']));
+    chips(['קל','רגיל','קשה','בלתי אפשרי']);return}
+  if(what==='cap'){bub('b',pick(['מה שיהיה כתוב מתחת לשורט?','תנו לו כיתוב.','מה אומרים לאנשים?']));
+    chips(['מי מצליח בלי למות?','נראה אותך','זה קל. בטוח.','בלי כיתוב']);return}
+  bub('b','מוכן. לנסות או לפרסם?');chips(['בוא ננסה','תפרסם לכולם','תשנה את הצבע']);
+  lastAsk=''}
+var NM={jump:'קפיצה',flap:'טפיחה',stop:'עצור בזמן',dodge:'התחמקות',ring:'בול בזמן',
+  taps:'הקשה מהירה',pop:'בלונים',memo:'זיכרון'};
+function say(text){
+  text=String(text||'').trim();if(!text)return;
+  bub('me',text.replace(/[<>&]/g,''));
+  document.getElementById('mkSay').value='';
+  document.getElementById('chips').textContent='';
+  setTimeout(function(){answer(text)},260)}
+function answer(text){
+  var r=AGBoss.read(text),said=[];
+  /* "בלי כיתוב" and friends, when that is what we just asked about */
+  if(lastAsk==='cap'&&/^בלי כיתוב$/.test(text.trim())){draft.cap='';draft.set_cap=1;
+    bub('b','בסדר, בלי כיתוב.');syncControls();return next()}
+  if(r.surprise&&!r.hit.length){
+    var s=randomShort();draft.g=s.g;draft.d=s.d;draft.len=s.len;draft.th=s.th;draft.cap=s.cap;
+    draft.set_g=draft.set_d=draft.set_cap=1;syncControls();
+    bub('b','הפתעה: <b>'+NM[draft.g]+'</b>, '+'★'.repeat(draft.d)+', '+draft.len+' שניות.');
+    return next()}
+  if(r.set.g!==undefined){draft.g=r.set.g;draft.set_g=1;said.push('<b>'+NM[draft.g]+'</b>')}
+  if(r.set.d!==undefined){draft.d=r.set.d;draft.set_d=1;said.push('קושי '+'★'.repeat(draft.d))}
+  if(r.set.len!==undefined){draft.len=r.set.len;said.push(draft.len+' שניות')}
+  if(r.set.th!==undefined){draft.th=r.set.th;said.push('צבע '+TH[draft.th].nm)}
+  if(r.set.cap!==undefined){draft.cap=AGBoard.cleanText(r.set.cap,48);draft.set_cap=1;
+    if(draft.cap)said.push('כיתוב "'+draft.cap+'"');else bub('b','הכיתוב הזה לא יעבור. נסו אחר.')}
+  /* an answer to the question just asked, in plain words */
+  if(!said.length&&lastAsk==='cap'){var c=AGBoard.cleanText(text,48);
+    if(c){draft.cap=c;draft.set_cap=1;said.push('כיתוב "'+c+'"')}
+    else bub('b','הכיתוב הזה לא יעבור. נסו אחר.')}
+  syncControls();
+  /* a bare "בוא ננסה" is an order; the same words inside a longer request are not,
+     because Hebrew hides "שחק" inside "משחק" */
+  var orderOnly=!r.hit.length;
+  if(said.length)bub('b',pick(['רשמתי: ','הבנתי: ','סגור: '])+said.join(' · ')+'.');
+  else if(orderOnly&&r.publish)return publish();
+  else if(orderOnly&&r.play)return tryIt();
+  else if(!said.length&&!r.yes&&!r.no)
+    bub('b',pick(['לא הבנתי את זה. אפשר להגיד "קפיצה קשה בוורוד", או לבחור מלמטה.',
+      'את זה פספסתי. כתבו איזה משחק, כמה קשה ואיזה צבע.']));
+  next()}
+function next(){
+  var m=missing();
+  setTimeout(function(){
+    if(m)askFor(m);
+    else{bub('b','<b>'+NM[draft.g]+'</b> · '+'★'.repeat(draft.d)+' · '+draft.len+' שניות · '+TH[draft.th].nm+
+      (draft.cap?'<br>"'+draft.cap+'"':'')+'<br>מוכן. לנסות או לפרסם לכולם?');
+      chips(['בוא ננסה','תפרסם לכולם','תעשה יותר קשה','תחליף צבע'])}},380)}
+document.getElementById('mkSend').onclick=function(){say(document.getElementById('mkSay').value)};
+document.getElementById('mkSay').addEventListener('keydown',function(e){
+  if(e.key==='Enter'){e.preventDefault();say(this.value)}});
+
+/* the face, drawn so it can blink and react */
+var face=document.getElementById('bossFace'),fg=face.getContext('2d'),blink=0,ft=0;
+function drawFace(dt){
+  ft+=dt;blink=Math.max(0,blink-dt);
+  var w=120,h=120,T=TH[draft.th]||TH[0];
+  fg.clearRect(0,0,w,h);
+  var gr=fg.createLinearGradient(0,0,0,h);gr.addColorStop(0,T.bg[0]);gr.addColorStop(1,'#0f0828');
+  fg.fillStyle=gr;rr(fg,0,0,w,h,26);fg.fill();
+  /* scan lines, because he is a glitch */
+  fg.globalAlpha=.1;fg.fillStyle='#fff';
+  for(var y=(ft*26)%6;y<h;y+=6)fg.fillRect(0,y,w,1.6);
+  fg.globalAlpha=1;
+  var off=blink>0?Math.sin(ft*60)*2.5:0;
+  var open=blink>.18?.25:1;
+  fg.fillStyle=T.ink;
+  rr(fg,26+off,40,22,24*open,8);fg.fill();
+  rr(fg,72+off,40,22,24*open,8);fg.fill();
+  fg.fillStyle='#0f0828';
+  if(open>.5){dot(fg,37+off+Math.sin(ft*1.2)*3,52,5,'#0f0828');dot(fg,83+off+Math.sin(ft*1.2)*3,52,5,'#0f0828')}
+  fg.strokeStyle=T.a;fg.lineWidth=6;fg.lineCap='round';fg.beginPath();
+  var sm=blink>0?10:5;
+  fg.moveTo(40,84);fg.quadraticCurveTo(60,84+sm,80,84);fg.stroke();
+  /* the glitch slice */
+  if(Math.sin(ft*1.7)>.93){fg.globalAlpha=.75;
+    fg.drawImage(face,0,54,w,12,7,54,w,12);fg.globalAlpha=1}}
+var fLast=0;
+(function faceLoop(ts){requestAnimationFrame(faceLoop);
+  var dt=Math.min(.05,(ts-fLast)/1000||0);fLast=ts;
+  if(document.getElementById('mk').classList.contains('show'))drawFace(dt)})(0);
+
+function tryIt(){
+  document.getElementById('mk').classList.remove('show');
+  insertNext({g:draft.g,d:draft.d,len:draft.len,th:draft.th,cap:draft.cap,by:draft.by,made:1})}
 document.getElementById('mkCopy').onclick=function(){copyTo(encodeShort(draft),'הקוד הועתק ✅')};
 document.getElementById('mkLink').onclick=function(){
   copyTo(location.origin+location.pathname+'?s='+encodeShort(draft),'הקישור הועתק ✅')};
@@ -515,6 +717,52 @@ document.getElementById('mkGo').onclick=function(){
   var s=decodeShort(document.getElementById('mkIn').value);
   if(!s){document.getElementById('mkMsg').textContent='הקוד לא תקין.';return}
   document.getElementById('mk').classList.remove('show');insertNext(s)};
+/* ---------- shorts everybody sees ----------
+   A published short is one line on the shared board: its code, who made it and
+   when. The newest 60 are kept, and every feed mixes them in. */
+var PUBMAX=60,COMMUNITY=[];
+function publish(){
+  var m=document.getElementById('mkMsg');
+  if(!AGBoard.on){m.textContent='הפרסום לא מופעל.';return}
+  var who=AGBoard.clean(myName());
+  if(!who){m.textContent='כדי לפרסם צריך שם. סגרו, לחצו על 🏠 ותכתבו שם.';
+    bub('b','בשביל לפרסם אני צריך שם שלכם — בלי שם אי אפשר לדעת מי בנה את זה.');return}
+  var cap=AGBoard.cleanText(draft.cap,48);
+  if(draft.cap&&!cap){m.textContent='הכיתוב לא מתאים.';bub('b','הכיתוב לא עובר. תחליפו אותו ואז נפרסם.');return}
+  var code=encodeShort({g:draft.g,d:draft.d,len:draft.len,th:draft.th,cap:cap,by:who});
+  m.textContent='מפרסם…';
+  var btn=document.getElementById('mkPub');btn.disabled=true;
+  AGBoard.get().then(function(b){
+    b.shorts=Array.isArray(b.shorts)?b.shorts:[];
+    if((b.banned||[]).indexOf(AGBoard.bare(who))>=0)throw 'banned';
+    var mine=b.shorts.filter(function(x){return AGBoard.bare(x.by)===AGBoard.bare(who)});
+    if(mine.length>=8)b.shorts.splice(b.shorts.indexOf(mine[mine.length-1]),1);  /* 8 each, newest kept */
+    if(b.shorts.some(function(x){return x.c===code}))throw 'dup';
+    b.shorts.unshift({c:code,by:who,t:Date.now()});
+    if(b.shorts.length>PUBMAX)b.shorts.length=PUBMAX;
+    return AGBoard.put(b)})
+   .then(function(b){
+     COMMUNITY=b.shorts;btn.disabled=false;m.textContent='פורסם 🌍';
+     bub('b','פרסמתי! מעכשיו <b>'+NM[draft.g]+'</b> שלכם מופיע בפיד של כל מי שנכנס.');
+     chips(['בוא ננסה','נבנה עוד אחד']);
+     insertNext({g:draft.g,d:draft.d,len:draft.len,th:draft.th,cap:cap,by:who,made:1,pub:1})})
+   .catch(function(e){btn.disabled=false;
+     m.textContent=e==='dup'?'השורט הזה כבר מפורסם.':e==='banned'?'אין לכם הרשאה לפרסם.':'לא הצלחנו לפרסם. נסו שוב.';
+     bub('b',e==='dup'?'את זה כבר פרסמתם. תשנו משהו קטן ונפרסם שוב.':'משהו השתבש בדרך לשרת. ננסה עוד פעם?')})}
+function loadCommunity(){
+  if(!AGBoard.on)return Promise.resolve([]);
+  return AGBoard.get().then(function(b){
+    COMMUNITY=(Array.isArray(b.shorts)?b.shorts:[]).map(function(x){
+      var s=decodeShort(x.c);if(!s)return null;
+      s.by=AGBoard.clean(x.by)||s.by;s.made=1;s.pub=1;s.code=x.c;s.t=x.t;return s})
+      .filter(Boolean);
+    return COMMUNITY}).catch(function(){return []})}
+function unpublish(code,done){
+  AGBoard.get().then(function(b){
+    b.shorts=(b.shorts||[]).filter(function(x){return x.c!==code});
+    return AGBoard.put(b)}).then(function(){COMMUNITY=COMMUNITY.filter(function(s){return s.code!==code});
+      if(done)done(true)}).catch(function(){if(done)done(false)})}
+
 function insertNext(s){
   FEED.push(s);addCard(FEED.length-1);
   var c=cards[cards.length-1];io.observe(c.sec);
@@ -529,6 +777,16 @@ function insertNext(s){
   for(i=FEED.length;i<8;i++)FEED.push(randomShort());
   FEED.forEach(function(_,i){addCard(i)});
   cards.forEach(function(c){io.observe(c.sec)});
+  /* what everyone else built, slotted in just below the first card */
+  loadCommunity().then(function(list){
+    if(!list.length)return;
+    var at=Math.min(2,FEED.length);
+    list.slice(0,6).forEach(function(s,k){FEED.splice(at+k,0,s)});
+    /* rebuild the cards so the new ones land in the right order */
+    feed.textContent='';cards.length=0;
+    FEED.forEach(function(_,i){addCard(i)});
+    cards.forEach(function(c){io.observe(c.sec)});
+    if(active>=0){var keep=active;active=-1;cur=null;start(Math.min(keep,cards.length-1))}});
   /* a maker button that floats over the feed */
   var fab=document.createElement('button');fab.textContent='✨ צרו שורט';
   fab.style.cssText='position:fixed;inset-inline-end:14px;bottom:34px;z-index:20;border:0;border-radius:999px;'+
