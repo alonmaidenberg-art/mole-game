@@ -136,7 +136,7 @@ body[data-ph="drive"] #secHud,body[data-ph="drive"] #prompt{display:none!importa
 <div class="ov show" id="menu"><div class="ovc">
   <div style="font-size:54px">🏦</div>
   <h2>נלחמים בשומרים</h2>
-  <div class="lb">עולם ווקסלים הרסיק לגמרי. פוצצו קירות, פרצו את הכספת, קחו כמה שאתם מעיזים — וצאו לפני שהזמן נגמר.</div>
+  <div class="lb" id="introLb">עולם ווקסלים הרסיק לגמרי. פוצצו קירות, פרצו את הכספת, קחו כמה שאתם מעיזים — וצאו לפני שהזמן נגמר.</div>
   <div class="lb" style="color:#ff9a9a"><b>🚨 נגמר הזמן?</b> המשטרה מקיפה את הבניין. רוצו למכונית הבריחה ושרדו את המרדף.</div>
   <div class="lb" style="font-size:12px;opacity:.6"><b>WASD</b> תנועה · <b>Shift</b> ריצה · <b>רווח</b> קפיצה · <b>עכבר</b> הסתכלות/ירי · <b>1-6</b> כלים</div>
   <div id="walletBar">💰 <b id="wBank">0</b> · <b id="wRank">מתחיל</b></div>
@@ -146,7 +146,23 @@ body[data-ph="drive"] #secHud,body[data-ph="drive"] #prompt{display:none!importa
   <button class="btn" id="shopBtn" style="background:linear-gradient(180deg,#b6f5c0,#4fc46a);box-shadow:0 5px 0 #1f7a35">🛒 חנות הגנבים</button>
   <button class="btn alt" id="goBtn">🏦 מצב בנק קלאסי</button>
   <div class="row"><button class="btn alt" id="lvDn">◀</button><button class="btn alt" id="lvLbl" style="flex:2">בנק 1</button><button class="btn alt" id="lvUp">▶</button></div>
+  <button class="btn alt" id="setBtn">⚙️ הגדרות</button>
   <div style="margin-top:10px;opacity:.7;font-size:13px">שיא בשלב יחיד: <b id="best">0</b> 💰</div>
+</div></div>
+
+<div class="ov" id="setts"><div class="ovc" style="max-width:420px">
+  <div style="font-size:42px">⚙️</div>
+  <h2 style="font-size:25px">הגדרות</h2>
+  <div class="lb" id="setState"></div>
+  <div class="lb" style="font-size:13px;opacity:.75">במשחק הרגיל אין כסף — נלחמים בשומרים עד שהבית נקי ואז יוצאים.
+    יש קוד סודי שמדליק את מצב הכסף: כספות, שלל, שקים וחנות.</div>
+  <input id="setCode" inputmode="numeric" autocomplete="off" placeholder="קוד סודי"
+    style="width:100%;font:900 20px Rubik,system-ui;text-align:center;letter-spacing:6px;padding:12px;
+    border-radius:14px;border:3px solid #0d0624;background:#1a1040;color:#fff;margin:6px 0">
+  <div id="setMsg" style="min-height:20px;font-size:14px;margin:4px 0"></div>
+  <button class="btn" id="setGo">בדקו את הקוד</button>
+  <button class="btn alt" id="setOffBtn" style="display:none">כבו את מצב הכסף</button>
+  <button class="btn alt" id="setX">סגור</button>
 </div></div>
 
 <div class="ov" id="shop"><div class="ovc" style="max-width:480px">
@@ -462,7 +478,19 @@ function stepItems(dt){
 
 /* ════════ damage / destruction ════════ */
 let cash=0,lootTotal=0,lootGot=0;
-function addCash(v){cash+=v;$('#cash').textContent='💰 '+cash}
+/* The game is about the guards. Money is off unless somebody puts the code
+   into the settings, and then the old loot game comes back on top of it. */
+const MKEY='heist3d_money';
+let CASHMODE=(()=>{try{return localStorage.getItem(MKEY)==='1'}catch(e){return false}})();
+function setMoney(on){CASHMODE=!!on;try{localStorage.setItem(MKEY,on?'1':'0')}catch(e){}}
+function guardsLeft(){let n=0;for(const g of guards)if(!g.down&&!g.cop)n++;return n}
+function addCash(v){if(!CASHMODE)return;cash+=v;$('#cash').textContent='💰 '+cash}
+function paintGoal(){
+  const el=$('#cash');if(!el)return;
+  if(CASHMODE){el.textContent='💰 '+cash;return}
+  const n=guardsLeft();
+  el.textContent=n?('🎯 '+n+(n===1?' שומר':' שומרים')):'✅ השטח נקי';
+  el.style.color=n?'':'#9bff6a'}
 /* כספות וזהב מפילים שק שצריך לאסוף; חבילות כסף נכנסות ישר לכיס */
 function collectMat(m,x,y,z,fling){
   if(m===SAFE||m===GOLD){
@@ -740,10 +768,13 @@ function downGuard(g,fling){
   if(g.down)return;
   if(g.ar>1){g.ar--;g.stunned=.8;noise(.1,.12,1400);tone(300,.1,'square',.05);
     banner((ETYPE[g.type]||ETYPE.guard).ic+' שריון החזיק!',.8);return}
-  g.down=true;g.state='down';
+  g.down=true;g.state='down';downedCount++;
   g.g.rotation.set(0,g.a,Math.PI*.47);
   g.g.position.set(g.x,g.y+.34,g.z);
-  if(Math.random()<.55){dropBag(g.x,g.y+.9,g.z,55+lvl*7,fling||4);banner('💰 הפיל שק כסף',1.1)}
+  if(CASHMODE&&Math.random()<.55){dropBag(g.x,g.y+.9,g.z,55+lvl*7,fling||4);banner('💰 הפיל שק כסף',1.1)}
+  if(!CASHMODE){paintGoal();
+    const n=guardsLeft();
+    banner(n?('שומר ירד · נשארו '+n):'🎉 כל השומרים ירדו — לרכב המילוט!',n?.9:2.2)}
   noise(.22,.15,800);tone(150,.26,'sawtooth',.07,60);
 }
 function stepGuard(g,dt){
@@ -1552,7 +1583,8 @@ function startRaid(){
   tone(110,.8,'sawtooth',.1);
   for(let i=0;i<Math.min(7,3+lvl);i++){
     const ang=(i/7)*Math.PI*2;
-    guards.push(mkGuard(clamp(startPos.x+Math.cos(ang)*13,2,WX-3),clamp(exitZ+Math.sin(ang)*9,2,WZ-3),raidTypeFor(lvl)));
+    {const rg=mkGuard(clamp(startPos.x+Math.cos(ang)*13,2,WX-3),clamp(exitZ+Math.sin(ang)*9,2,WZ-3),raidTypeFor(lvl));
+     rg.cop=true;guards.push(rg)}
   }
   for(const g of guards)if(!g.cop&&!g.down){g.cop=true;g.state='chase';g.sp=Math.max(g.sp,5.2)}
   $('#timer').classList.add('urgent');
@@ -1852,13 +1884,18 @@ function startLevel(n,m){
   tool=0;refreshHotbar();
   lvlTime=(mode==='mansion'?(VILLA?VILLA.time:220):110+n*12);timeLeft=lvlTime;playT=0;lastSec=-1;
   alarm=0;cool=0;shake=0;
-  $('#cash').textContent='💰 0';
+  downedCount=0;guardsAtStart=guardsLeft();
+  paintGoal();
   drawHearts();
   $('#timer').textContent='⏱ '+lvlTime;$('#timer').classList.remove('urgent');
   state='play';
   if(!touchDev)cvEl.requestPointerLock&&cvEl.requestPointerLock().catch&&cvEl.requestPointerLock().catch(()=>{});
 }
-function stars(){const f=lootTotal?lootGot/lootTotal:0;return f>=.85?3:f>=.5?2:1}
+let downedCount=0,guardsAtStart=0;
+function stars(){
+  if(!CASHMODE){const f=guardsAtStart?downedCount/guardsAtStart:1;
+    return P.hp>=maxHP()*.7?3:f>=1?2:1}
+  const f=lootTotal?lootGot/lootTotal:0;return f>=.85?3:f>=.5?2:1}
 function levelClear(){
   state='clear';sirenStop();if(locked)document.exitPointerLock();
   chord([880,1100,1320,1760],.5);
@@ -1866,9 +1903,11 @@ function levelClear(){
   const earn=Math.floor(cash/140)+s;
   if(window.AG&&earn>0)AG.add(earn,s>=3?1:0);
   $('#clIcon').textContent='🌟';
-  $('#clT').textContent='יצאת עם השלל!';
-  $('#clS').textContent='💰 '+cash;
-  $('#clM').textContent='⭐'.repeat(s)+' · '+Math.round((lootTotal?lootGot/lootTotal:0)*100)+'% מהשלל · +'+earn+' 🪙'+(s>=3?' +1 💎':'');
+  $('#clT').textContent=CASHMODE?'יצאת עם השלל!':'ניקית את הבית!';
+  $('#clS').textContent=CASHMODE?('💰 '+cash):('🎯 '+downedCount+(downedCount===1?' שומר':' שומרים'));
+  $('#clM').textContent='⭐'.repeat(s)+' · '+
+    (CASHMODE?Math.round((lootTotal?lootGot/lootTotal:0)*100)+'% מהשלל':'יצאת עם '+P.hp+' לבבות')+
+    ' · +'+earn+' 🪙'+(s>=3?' +1 💎':'');
   $('#clear').classList.add('show');
 }
 function escaped(){
@@ -1908,8 +1947,9 @@ function nearEsc(){
 function checkExit(){
   if(!ESC)return;
   if(nearEsc()){
-    if(cash<=0){
-      if(performance.now()-ESC.warn>2600){ESC.warn=performance.now();banner('אין טעם לברוח בידיים ריקות 🫙',1.8)}
+    if(CASHMODE?cash<=0:guardsLeft()>0){
+      if(performance.now()-ESC.warn>2600){ESC.warn=performance.now();
+        banner(CASHMODE?'אין טעם לברוח בידיים ריקות 🫙':('עוד נשארו '+guardsLeft()+' שומרים 🎯'),1.8)}
       return;
     }
     startDrive(ESC.air);
@@ -2023,6 +2063,35 @@ $('#vDn').onclick=()=>{menuVilla=Math.max(1,menuVilla-1);refreshMenu()};
 $('#goBtn').onclick=()=>{ac();$('#menu').classList.remove('show');startLevel(menuLvl,'bank')};
 $('#villaBtn').onclick=()=>{ac();$('#menu').classList.remove('show');startLevel(menuVilla,'mansion')};
 $('#shopBtn').onclick=()=>{ac();openShop()};
+
+/* ---- settings, and the code that turns money on ---- */
+const MONEY_CODE='123';
+function paintSetts(){
+  $('#setState').innerHTML=CASHMODE
+    ? '<b style="color:#ffd05a">מצב כסף דלוק 💰</b> — כספות, שלל וחנות פעילים.'
+    : '<b style="color:#9bff6a">מצב קרב 🎯</b> — אין כסף, מפילים את כל השומרים ויוצאים.';
+  $('#setOffBtn').style.display=CASHMODE?'':'none';
+  $('#shopBtn').style.display=CASHMODE?'':'none';
+  $('#walletBar').style.display=CASHMODE?'':'none';
+  $('#best').parentElement.style.display=CASHMODE?'':'none';
+  $('#introLb').textContent=CASHMODE
+    ? 'עולם ווקסלים הרסיק לגמרי. פוצצו קירות, פרצו את הכספת, קחו כמה שאתם מעיזים — וצאו לפני שהזמן נגמר.'
+    : 'עולם ווקסלים הרסיק לגמרי. הפילו את כל השומרים בבית, ואז צאו לרכב המילוט לפני שהמשטרה מגיעה.';
+  $('#setCode').value='';$('#setMsg').textContent='';}
+function openSetts(){paintSetts();$('#setts').classList.add('show')}
+$('#setBtn').onclick=()=>{ac();openSetts()};
+$('#setX').onclick=()=>$('#setts').classList.remove('show');
+$('#setGo').onclick=()=>{
+  const v=$('#setCode').value.replace(/\D/g,'');
+  if(v===MONEY_CODE){setMoney(true);paintSetts();refreshMenu&&refreshMenu();
+    $('#setMsg').innerHTML='<b style="color:#9bff6a">נכון! מצב הכסף נדלק 💰</b>';
+    chord&&chord([660,880,1320],.4)}
+  else{$('#setMsg').innerHTML='<b style="color:#ff9a9a">קוד לא נכון.</b>';
+    $('#setCode').value='';tone&&tone(180,.18,'square',.05)}};
+$('#setOffBtn').onclick=()=>{setMoney(false);paintSetts();refreshMenu&&refreshMenu();
+  $('#setMsg').textContent='חזרנו למצב קרב 🎯'};
+$('#setCode').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('#setGo').click()}});
+paintSetts();
 $('#shopClose').onclick=()=>$('#shop').classList.remove('show');
 $('#clShop').onclick=()=>openShop();
 $('#ovShop').onclick=()=>openShop();
