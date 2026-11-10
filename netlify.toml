@@ -1,0 +1,15 @@
+# © 2026 Alon Maidenberg (אלון מידנברג). All rights reserved.
+# The site is plain files, so there is no build step - Netlify just publishes
+# this folder. The only moving part is the functions directory.
+
+[build]
+  publish = "."
+  functions = "netlify/functions"
+  command = ""
+
+# the page calls /api/ai; the function itself lives at /.netlify/functions/ai
+[[redirects]]
+  from = "/api/ai"
+  to = "/.netlify/functions/ai"
+  status = 200
+  force = true

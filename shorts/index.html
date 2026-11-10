@@ -704,6 +704,16 @@ function aiAnswer(text,j){
   if(!r.hit.length&&r.play)return tryIt();
   next()}
 function answer(text){
+  /* the two offers made when publishing is blocked */
+  if(/^שמרו לי בפיד$/.test(text.trim())){
+    var a2=myShorts();a2.unshift({g:draft.g,d:draft.d,len:draft.len,th:draft.th,
+      cap:draft.cap,by:draft.by,sp:draft.sp,sz:draft.sz,made:1});
+    putShorts(a2);bub('b','שמרתי. הוא יופיע לכם בפיד שלכם.');
+    return chips(['בוא ננסה','נבנה עוד אחד'])}
+  if(/^העתיקו קוד$/.test(text.trim())){
+    copyTo(encodeShort(draft),'הקוד הועתק ✅');
+    bub('b','הקוד הועתק. שלחו אותו לחבר והוא ייפתח אצלו.');
+    return chips(['בוא ננסה','נבנה עוד אחד'])}
   var r=AGBoss.read(text),said=[];
   /* "בלי כיתוב" and friends, when that is what we just asked about */
   if(lastAsk==='cap'&&/^בלי כיתוב$/.test(text.trim())){draft.cap='';draft.set_cap=1;
@@ -804,7 +814,10 @@ function publish(){
   var btn=document.getElementById('mkPub');btn.disabled=true;
   AGBoard.get().then(function(b){
     b.shorts=Array.isArray(b.shorts)?b.shorts:[];
-    if((b.banned||[]).indexOf(AGBoard.bare(who))>=0)throw 'banned';
+    var meK=AGBoard.bare(who),admin=window.AG&&AG.isAdmin&&AG.isAdmin();
+    if((b.banned||[]).indexOf(meK)>=0)throw 'banned';
+    if(!admin&&(b.noPub||[]).indexOf(meK)>=0)throw 'blocked';
+    if(!admin&&b.pubOff)throw 'off';
     var mine=b.shorts.filter(function(x){return AGBoard.bare(x.by)===AGBoard.bare(who)});
     if(mine.length>=8)b.shorts.splice(b.shorts.indexOf(mine[mine.length-1]),1);  /* 8 each, newest kept */
     if(b.shorts.some(function(x){return x.c===code}))throw 'dup';
@@ -818,8 +831,13 @@ function publish(){
      insertNext({g:draft.g,d:draft.d,len:draft.len,th:draft.th,cap:cap,by:who,
        sp:draft.sp,sz:draft.sz,made:1,pub:1})})
    .catch(function(e){btn.disabled=false;
-     m.textContent=e==='dup'?'השורט הזה כבר מפורסם.':e==='banned'?'אין לכם הרשאה לפרסם.':'לא הצלחנו לפרסם. נסו שוב.';
-     bub('b',e==='dup'?'את זה כבר פרסמתם. תשנו משהו קטן ונפרסם שוב.':'משהו השתבש בדרך לשרת. ננסה עוד פעם?')})}
+     var say={dup:['השורט הזה כבר מפורסם.','את זה כבר פרסמתם. תשנו משהו קטן ונפרסם שוב.'],
+       banned:['אין לכם הרשאה לפרסם.','אי אפשר לפרסם מהחשבון הזה.'],
+       blocked:['הפרסום שלכם חסום.','אלון חסם לכם את הפרסום. אפשר עדיין לשחק בשורט ולשלוח אותו בקוד.'],
+       off:['הפרסום סגור כרגע.','אלון סגר את הפרסום לכולם לבינתיים. אפשר לשמור את השורט ולשלוח אותו בקוד.']}[e]
+       ||['לא הצלחנו לפרסם. נסו שוב.','משהו השתבש בדרך לשרת. ננסה עוד פעם?'];
+     m.textContent=say[0];bub('b',say[1]);
+     if(e==='blocked'||e==='off')chips(['שמרו לי בפיד','העתיקו קוד'])})}
 function loadCommunity(){
   if(!AGBoard.on)return Promise.resolve([]);
   return AGBoard.get().then(function(b){

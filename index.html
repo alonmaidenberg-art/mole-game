@@ -261,6 +261,10 @@ body.cmp .sec{font-size:18px;margin-top:11px}
   <button class="mb alt" id="admX">סגור</button></div></div>
 <div class="mo" id="plM"><div class="mc" style="max-height:88vh;overflow:auto"><h2>👥 השחקנים</h2>
   <input id="plQ" autocomplete="off" placeholder="חיפוש שם…" style="width:100%;font:inherit;font-size:16px;padding:10px;border-radius:12px;border:2px solid rgba(255,255,255,.25);background:#2e639b;color:#fff;margin-bottom:6px">
+  <label style="display:flex;align-items:center;gap:9px;background:rgba(255,255,255,.08);border-radius:12px;
+      padding:9px 11px;margin:8px 0;font-size:14px;cursor:pointer;text-align:start">
+    <input type="checkbox" id="plOff" style="width:20px;height:20px;accent-color:#ff3d8b">
+    <span style="flex:1">לנעול פרסום שורטים לכולם<br><small style="opacity:.75">רק אתם תוכלו לפרסם</small></span></label>
   <div id="plMsg" style="min-height:20px;font-size:14px;margin:6px 0;opacity:.9"></div>
   <div id="plList"></div><button class="mb alt" id="plX">סגור</button></div></div>
 <script src="hub.js"></script>
@@ -511,10 +515,15 @@ $('lbB').onclick=lbOpen;
         b.style.cssText='border:0;border-radius:10px;padding:6px 9px;font:900 12.5px system-ui;cursor:pointer;background:'+(col||'#ffd23f')+';color:#222';
         b.onclick=fn;bar.append(b)}
       btn(banned?'✅ ביטול חסימה':'🚫 חסימה',function(){order(r,banned?{unban:1}:{ban:1})},banned?'#9be7a5':'#ff9a9a');
+      var noPub=(PL.noPub||[]).indexOf(r.k)>=0;
+      btn(noPub?'📢 החזרת פרסום':'📢✖ חסימת פרסום',function(){order(r,noPub?{unblock:1}:{block:1})},
+        noPub?'#9be7a5':'#ffb3c6');
       btn('⭐✖ הורדת צוות',function(){order(r,{unmini:1})});
       btn('💸 איפוס כסף',function(){order(r,{wipe:1})});
       btn('🗑️ מחיקת שיאים',function(){if(confirm(T('למחוק את כל השיאים של ','Delete every record of ')+r.n+'?'))del(r.n)},'#cfc9df');
       d.append(h,bar);
+      if(noPub){var np=document.createElement('span');np.style.cssText='font-size:12px;opacity:.85;white-space:nowrap';
+        np.textContent='📢✖';h.insertBefore(np,sc)}
       var st=[];if(o.wipe)st.push(T('איפוס כסף','wallet reset'));if(o.unmini)st.push(T('הורדת צוות','team mode removed'));
       if(st.length){var s2=document.createElement('div');s2.style.cssText='font-size:12px;opacity:.75;margin-top:5px';
         s2.textContent='⏳ '+T('מחכה שייכנס לאתר: ','waiting for them to visit: ')+st.join(' · ');d.append(s2)}
@@ -529,6 +538,9 @@ $('lbB').onclick=lbOpen;
       if(what.unmini)o.unmini=now;
       if(what.ban&&b.banned.indexOf(r.k)<0)b.banned.push(r.k);
       if(what.unban)b.banned=b.banned.filter(function(x){return x!==r.k});
+      b.noPub=Array.isArray(b.noPub)?b.noPub:[];
+      if(what.block&&b.noPub.indexOf(r.k)<0)b.noPub.push(r.k);
+      if(what.unblock)b.noPub=b.noPub.filter(function(x){return x!==r.k});
       if(o.wipe||o.unmini)b.orders[r.k]=o;
       Object.keys(b.orders).forEach(function(k){var x=b.orders[k];   /* drop orders older than two months */
         if(Math.max(+x.wipe||0,+x.unmini||0)<Date.now()-62*864e5)delete b.orders[k]});
@@ -537,7 +549,15 @@ $('lbB').onclick=lbOpen;
      .catch(function(){$('plMsg').textContent=T('משהו השתבש','Something went wrong')})}
   function plOpen(){if(!AG.isAdmin())return;PL=null;plq='';$('plQ').value='';$('plMsg').textContent='';
     $('plM').classList.add('show');plPaint();
-    jbGet().then(function(b){PL=b;plPaint()}).catch(function(){$('plList').textContent=T('אין חיבור לשרת.','No connection.')})}
+    jbGet().then(function(b){PL=b;$('plOff').checked=!!b.pubOff;plPaint()})
+      .catch(function(){$('plList').textContent=T('אין חיבור לשרת.','No connection.')})}
+  $('plOff').onchange=function(){
+    if(!AG.isAdmin())return;
+    var want=this.checked,self=this;self.disabled=true;$('plMsg').textContent=T('שומר…','Saving…');
+    jbGet().then(function(b){b.pubOff=want?1:0;return jbPut(b)})
+     .then(function(b){PL=b;self.disabled=false;
+       $('plMsg').textContent=want?T('פרסום נעול 🔒','Publishing locked 🔒'):T('פרסום פתוח 🌍','Publishing open 🌍')})
+     .catch(function(){self.disabled=false;self.checked=!want;$('plMsg').textContent=T('לא נשמר','Not saved')})};
   $('a5').onclick=plOpen;$('plX').onclick=function(){$('plM').classList.remove('show')};
   $('plQ').addEventListener('input',function(){plq=bare(this.value);plPaint()});
 
