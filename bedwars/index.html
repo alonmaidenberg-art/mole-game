@@ -48,8 +48,8 @@ html,body{margin:0;height:100%;background:#0a1626;color:#fff;overflow:hidden;
 .items button[disabled]{opacity:.42;cursor:default}
 .items button.has{outline:3px solid #5ff7d6}
 /* touch controls */
-#pad{position:fixed;inset:0;z-index:20;pointer-events:none;display:none}
-body.touch #pad{display:block}
+#pad{position:fixed;inset:0;z-index:20;pointer-events:none;display:block}
+body.nopad #pad{display:none}
 #stick{position:absolute;inset-inline-start:18px;bottom:max(18px,env(safe-area-inset-bottom));
   width:132px;height:132px;border-radius:50%;background:rgba(255,255,255,.1);pointer-events:auto}
 #nub{position:absolute;left:41px;top:41px;width:50px;height:50px;border-radius:50%;background:rgba(255,255,255,.5)}
@@ -226,12 +226,14 @@ cv.addEventListener('pointerup',function(){mouse.down=0});
 cv.addEventListener('contextmenu',function(e){e.preventDefault();placeBlock()});
 function aimAt(e){var r=cv.getBoundingClientRect();mouse.x=e.clientX-r.left;mouse.y=e.clientY-r.top}
 /* joystick */
-var stick={ax:0,ay:0,id:null};
+var stick={ax:0,ay:0,id:null,last:0};
+function stickRecent(){return Date.now()-stick.last<900}
 (function(){
   var el=document.getElementById('stick'),nub=document.getElementById('nub');
   function set(e){var r=el.getBoundingClientRect(),dx=e.clientX-r.left-66,dy=e.clientY-r.top-66;
     var d=Math.hypot(dx,dy),m=Math.min(1,d/46);
     if(d>0){stick.ax=dx/d*m;stick.ay=dy/d*m}else{stick.ax=stick.ay=0}
+    stick.last=Date.now();
     nub.style.left=(41+stick.ax*46)+'px';nub.style.top=(41+stick.ay*46)+'px'}
   el.addEventListener('pointerdown',function(e){e.preventDefault();stick.id=e.pointerId;el.setPointerCapture(e.pointerId);set(e)});
   el.addEventListener('pointermove',function(e){if(stick.id===e.pointerId)set(e)});
@@ -245,7 +247,8 @@ document.getElementById('bShop').addEventListener('pointerdown',function(e){e.pr
 
 /* ---------- player actions ---------- */
 function facing(p){
-  if(p.human&&!touch){var a=Math.atan2(mouse.y-(cv.clientHeight/2),mouse.x-(cv.clientWidth/2));
+  if(p.human&&stick.id===null&&!stickRecent()&&!touch){
+    var a=Math.atan2(mouse.y-(cv.clientHeight/2),mouse.x-(cv.clientWidth/2));
     return {x:Math.cos(a),y:Math.sin(a)}}
   /* a bot pinned against a wall has no velocity to face by, so it faces where it is headed */
   if(!p.human&&p.goal){
@@ -328,7 +331,7 @@ function respawn(p){
     if(q===STONE||q===GEN||q===SHOP){sx=xx;sy=yy;break outer}}
   p.x=(sx+.5)*TS;p.y=(sy+.5)*TS;
   p.vx=p.vy=0;p.hp=p.maxhp;p.alive=true;p.st='gather';p.route=null;p.tgt=null;p.fast=0;
-  p.mode='gather';p.stuckT=0}            /* restock before heading out again */
+  p.mode='gather';p.stuckT=0;p.air=0}    /* restock before heading out again */
 function breakAt(p,tx,ty){
   var t=at(tx,ty),id=mi(tx,ty);
   if(t===WOOL){
@@ -478,8 +481,11 @@ function move(p,dt){
   if(p.fast>0)p.fast-=dt;
   if(p.hurt>0)p.hurt-=dt;
   if(p.cd>0)p.cd-=dt;
-  /* standing over nothing: you fall */
-  if(!walk(Math.floor(p.x/TS),Math.floor(p.y/TS))&&p.alive)die(p,null);
+  /* over the edge: you teeter for a moment and can still steer back */
+  if(!walk(Math.floor(p.x/TS),Math.floor(p.y/TS))&&p.alive){
+    p.air=(p.air||0)+dt;
+    if(p.air>.45)die(p,null)}
+  else p.air=0;
   /* pick up what is lying around */
   for(var i=drops.length-1;i>=0;i--){var d=drops[i];
     if(Math.hypot(d.x-p.x,d.y-p.y)<TS*.8){p.iron+=d.i;p.gold+=d.g;drops.splice(i,1);
@@ -609,6 +615,8 @@ function draw(){
     /* health bar */
     cx.fillStyle='rgba(0,0,0,.45)';rr(p.x-14,p.y-r-11,28,5,2.5);cx.fill();
     cx.fillStyle=p.hp>10?'#5ddc6a':'#ff5470';rr(p.x-14,p.y-r-11,28*Math.max(0,p.hp/p.maxhp),5,2.5);cx.fill();
+    if(p.air>0){cx.strokeStyle='#ff5470';cx.lineWidth=3;cx.globalAlpha=.5+Math.sin(clock*30)*.4;
+      cx.beginPath();cx.arc(p.x,p.y,r+7,0,6.3);cx.stroke();cx.globalAlpha=1}
     if(p===P){cx.fillStyle='#fff';cx.font='900 11px Rubik,system-ui';cx.textAlign='center';
       cx.fillText('אתם',p.x,p.y-r-17)}}
   /* effects */
@@ -690,7 +698,7 @@ function startGame(team){
     box.append(b)});
   document.getElementById('ctrl').textContent=touch?
     'ג׳ויסטיק לתזוזה · ⚔️ מכה · 🧱 בלוק · 🛒 חנות':
-    'WASD או חיצים לתזוזה · לחיצה = מכה · רווח = בלוק · E = חנות · Q = TNT';
+    'ג׳ויסטיק או WASD/חיצים · ⚔️ מכה (או לחיצה) · 🧱 בלוק (או רווח) · 🛒 חנות (או E) · Q = TNT';
   document.getElementById('go').onclick=function(){startGame(pickT)};
   document.getElementById('again').onclick=function(){
     document.getElementById('endM').classList.remove('show');

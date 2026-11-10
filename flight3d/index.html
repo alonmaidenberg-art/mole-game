@@ -74,10 +74,11 @@ const stripes=[];for(let i=0;i<14;i++){const s=new THREE.Mesh(new THREE.PlaneGeo
 const sun=new THREE.Mesh(new THREE.SphereGeometry(10,16,12),new THREE.MeshBasicMaterial({color:0xfff2a0}));sun.position.set(60,60,-220);scene.add(sun);
 const plane=new THREE.Group();const fu=new THREE.Mesh(new THREE.CylinderGeometry(.5,.35,4,10),M(0xf2f2f2));fu.rotation.x=Math.PI/2;const wing=new THREE.Mesh(new THREE.BoxGeometry(6,.12,1.2),M(0xe8433f));wing.position.z=.2;const tail=new THREE.Mesh(new THREE.BoxGeometry(2,.1,.8),M(0xe8433f));tail.position.z=1.7;const fin=new THREE.Mesh(new THREE.BoxGeometry(.1,1,.8),M(0xe8433f));fin.position.set(0,.5,1.7);const cp=new THREE.Mesh(new THREE.SphereGeometry(.45,10,8),M(0x9fd8ff));cp.position.set(0,.35,-.3);const pr=new THREE.Mesh(new THREE.BoxGeometry(2.2,.1,.1),M(0x333));pr.position.z=-2.1;plane.add(fu,wing,tail,fin,cp,pr);scene.add(plane);
 let state='menu',px,py,vx,vy,speed,dist,obs,rings,score,hp,frame,got,tdrag=null,bank,combo,tilt={x:0,y:0};
-const LIM_X=18,LIM_Y=[-6,16];
+const LIM_X=18,LIM_Y=[-6,13];
 function reset(){for(const o of(obs||[]).concat(rings||[]))scene.remove(o.m);obs=[];rings=[];px=0;py=4;vx=0;vy=0;speed=.9;dist=0;score=0;hp=3;frame=0;got=0;combo=0;bank=0;state='play'}
-function mkMountain(z){const x=(Math.random()<.5?-1:1)*rnd(6,40);const h=rnd(14,34);const m=new THREE.Mesh(new THREE.ConeGeometry(rnd(7,13),h,7),M(0x7a6a5a));m.position.set(x,-14+h/2,z);const sn=new THREE.Mesh(new THREE.ConeGeometry(2.8,h*.28,7),M(0xffffff));sn.position.y=h*.36;m.add(sn);scene.add(m);obs.push({m,x,z,r:Math.max(5,m.geometry.parameters.radius*.7),top:-14+h,kind:'m'})}
-function mkCloud(z){const x=rnd(-20,20),y=rnd(-2,15);const g=new THREE.Group();for(let i=0;i<5;i++){const s=new THREE.Mesh(new THREE.SphereGeometry(rnd(1.6,2.6),8,8),M(0x4a4a5a));s.position.set(rnd(-2.5,2.5),rnd(-.6,.6),rnd(-1,1));g.add(s)}g.position.set(x,y,z);scene.add(g);obs.push({m:g,x,y,z,r:3.6,kind:'c'})}
+function mkMountain(z){const x=Math.random()<.3?rnd(-11,11):(Math.random()<.5?-1:1)*rnd(6,40);const h=rnd(14,34);const m=new THREE.Mesh(new THREE.ConeGeometry(rnd(7,13),h,7),M(0x7a6a5a));m.position.set(x,-14+h/2,z);const sn=new THREE.Mesh(new THREE.ConeGeometry(2.8,h*.28,7),M(0xffffff));sn.position.y=h*.36;m.add(sn);scene.add(m);obs.push({m,x,z,r:Math.max(5,m.geometry.parameters.radius*.7),top:-14+h,kind:'m'})}
+function mkCloud(z,aim){const x=aim?clamp(px+rnd(-7,7),-18,18):rnd(-20,20),
+    y=aim?clamp(py+rnd(-2.5,2.5),-4,12.5):rnd(-3,12.5);const g=new THREE.Group();for(let i=0;i<5;i++){const s=new THREE.Mesh(new THREE.SphereGeometry(rnd(1.6,2.6),8,8),M(0x4a4a5a));s.position.set(rnd(-2.5,2.5),rnd(-.6,.6),rnd(-1,1));g.add(s)}g.position.set(x,y,z);scene.add(g);obs.push({m:g,x,y,z,r:3.6,kind:'c'})}
 function mkRing(z,px0,py0){const x=clamp(px0+rnd(-9,9),-LIM_X+2,LIM_X-2),y=clamp(py0+rnd(-5,5),LIM_Y[0]+2,LIM_Y[1]-1);const m=new THREE.Mesh(new THREE.TorusGeometry(2.8,.28,8,24),M(0xffcb2f));m.position.set(x,y,z);scene.add(m);rings.push({m,x,y,z,hit:false})}
 function mkCloudFar(){}
 let nextObs=0,nextRing=0,lastRing={x:0,y:4};
@@ -88,10 +89,11 @@ function step(){frame++;speed=Math.min(2.1,.9+frame/2400);dist+=speed;
   vx+=(ax*.5-vx)*.1;vy+=(ay*.4-vy)*.1;px=clamp(px+vx,-LIM_X,LIM_X);py=clamp(py+vy,LIM_Y[0],LIM_Y[1]);bank+=(-vx*.9-bank)*.15;
   plane.position.set(px,py,0);plane.rotation.z=bank;plane.rotation.x=vy*.5;plane.rotation.y=-vx*.3;pr.rotation.z+=1;
   for(const s of stripes){s.position.z+=speed;if(s.position.z>50)s.position.z-=840}sun.position.z=-220;
-  nextObs-=speed;if(nextObs<=0){Math.random()<.55?mkMountain(-230):mkCloud(-230);if(Math.random()<.2)mkCloud(-220);nextObs=rnd(13,24)-speed*2}
+  nextObs-=speed;if(nextObs<=0){Math.random()<.55?mkMountain(-230):mkCloud(-230);
+    if(Math.random()<.45)mkCloud(-220,true);nextObs=rnd(13,24)-speed*2}
   nextRing-=speed;if(nextRing<=0){mkRing(-210,lastRing.x,lastRing.y);const r=rings[rings.length-1];lastRing={x:r.x,y:r.y};nextRing=rnd(40,60)}
   for(const o of obs){o.m.position.z+=speed;o.z=o.m.position.z;if(Math.abs(o.z)<2.2&&!o.hit){let hit=false;if(o.kind==='m'){hit=Math.abs(px-o.x)<o.r&&py<o.top+1}else{hit=Math.hypot(px-o.x,py-o.y)<o.r}if(hit){o.hit=true;hurt()}}}
-  for(const r of rings){r.m.position.z+=speed;r.z=r.m.position.z;r.m.rotation.z+=.03;if(!r.hit&&r.z>-1&&r.z<1.5){r.hit=true;const d=Math.hypot(px-r.x,py-r.y);if(d<3.4){combo++;got++;score+=100+combo*20;tone(700+combo*40,.12);r.m.material.color.set(0x5ff7d6)}else{combo=0;r.m.material.color.set(0x888888)}}if(r.z>4&&!r.hit&&!r.miss){r.miss=1;combo=0}}
+  for(const r of rings){r.m.position.z+=speed;r.z=r.m.position.z;r.m.rotation.z+=.03;if(!r.hit&&r.z>-1&&r.z<1.5){r.hit=true;const d=Math.hypot(px-r.x,py-r.y);if(d<3.4){combo++;got++;score+=100+combo*20;tone(700+combo*40,.12);r.m.material.color.set(0x5ff7d6)}else{combo=0;r.m.material.color.set(0x888888)}}if(r.z>4&&!r.hit&&!r.miss){r.miss=1;combo=0;score=Math.max(0,score-40)}}
   obs=obs.filter(o=>{if(o.m.position.z>12){scene.remove(o.m);return false}return true});rings=rings.filter(r=>{if(r.m.position.z>12){scene.remove(r.m);return false}return true});
   cam.position.set(px*.6,py*.5+4,9);cam.lookAt(px*.4,py*.6+1,-18);$('#hud').textContent=(score+Math.floor(dist/10))+' ⭐ · טבעות '+got+(combo>1?' · קומבו x'+combo:'')+' · '+'❤️'.repeat(hp)}
 function hurt(){hp--;combo=0;tone(110,.4,'sawtooth',.12);if(hp<=0){state='dead';const sc=score+Math.floor(dist/10);saveBest(sc);setTimeout(()=>endGame('התרסקת!',sc,'עברת '+got+' טבעות',Math.floor(sc/60)+got,sc>=3000?1:0),700)}}
