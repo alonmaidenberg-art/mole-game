@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta name="author" content="Alon Maidenberg - אלון מידנברג"><meta name="copyright" content="© 2026 אלון מידנברג. כל הזכויות שמורות.">
+<!-- © 2026 Alon Maidenberg (אלון מידנברג). All rights reserved. Copying, republishing or modifying this game without written permission is not allowed. -->
+<meta name="robots" content="noai, noimageai">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>הגנת המגדלים – אלון מידנברג</title>
+<meta name="description" content="בנו מגדלים לאורך השביל, שדרגו אותם ועצרו 20 גלים של אויבים לפני שיגיעו לשער.">
+<meta name="theme-color" content="#121a14">
+<link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:#121a14;color:#fff;overflow:hidden;
+  font-family:Rubik,"Segoe UI",system-ui,sans-serif;overscroll-behavior:none;user-select:none}
+#cv{display:block;width:100%;height:100%;touch-action:none}
+.ov{position:fixed;inset:0;display:none;place-items:center;z-index:30;padding:16px;background:rgba(7,12,9,.9)}
+.ov.show{display:grid}
+.ovc{background:#1c2a20;border:4px solid #070c09;border-radius:22px;padding:18px;max-width:460px;width:100%;
+  box-shadow:0 12px 0 #070c09;max-height:90vh;overflow:auto;text-align:center}
+.ovc h2{margin:0 0 6px;font:900 26px Rubik,system-ui}
+.ovc p{margin:7px 0;font-size:14.5px;line-height:1.55;opacity:.92}
+.btn{border:3px solid #070c09;border-radius:15px;background:#9bff6a;color:#121a14;
+  font:900 15px Rubik,system-ui;padding:11px 16px;cursor:pointer;box-shadow:0 5px 0 #070c09;margin:5px}
+.btn:active{transform:translateY(3px);box-shadow:0 2px 0 #070c09}
+.btn.d{background:#8a9a8f;color:#121a14}
+.tw{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:12px 0}
+.tw div{background:rgba(255,255,255,.07);border-radius:12px;padding:8px 4px;font:900 11.5px Rubik,system-ui}
+.tw div span{display:block;font-size:22px;margin-bottom:2px}
+/* build bar */
+#bar{position:fixed;inset-inline:0;bottom:0;z-index:22;display:flex;gap:7px;justify-content:center;
+  padding:9px 9px max(9px,env(safe-area-inset-bottom));background:linear-gradient(transparent,rgba(7,12,9,.92) 40%)}
+#bar button{border:3px solid #070c09;border-radius:15px;background:#23362a;color:#fff;cursor:pointer;
+  padding:8px 7px;font:900 12px Rubik,system-ui;display:grid;gap:1px;justify-items:center;min-width:72px}
+#bar button .em{font-size:21px}
+#bar button .pr{font-size:11px;opacity:.9}
+#bar button.on{background:#9bff6a;color:#121a14}
+#bar button[disabled]{opacity:.45;cursor:default}
+#sel{position:fixed;inset-inline-start:12px;bottom:92px;z-index:22;background:rgba(7,12,9,.92);
+  border:3px solid #070c09;border-radius:16px;padding:10px 12px;display:none;min-width:168px}
+#sel.show{display:block}
+#sel b{display:block;font:900 15px Rubik,system-ui;margin-bottom:4px}
+#sel small{display:block;font-size:12.5px;opacity:.85;line-height:1.5}
+#sel .row{display:flex;gap:6px;margin-top:8px}
+#sel .row button{flex:1;border:0;border-radius:10px;padding:7px 8px;font:900 12.5px Rubik,system-ui;cursor:pointer}
+#up{background:#ffd43b;color:#2b1659}#sellB{background:#ff9a9a;color:#3b0d14}
+.tip{position:fixed;inset-inline:0;top:56px;text-align:center;z-index:18;pointer-events:none;
+  font:900 16px Rubik,system-ui;text-shadow:0 2px 5px rgba(0,0,0,.9);opacity:0;transition:opacity .25s}
+.tip.show{opacity:1}
+</style>
+</head>
+<body>
+<canvas id="cv"></canvas>
+<div id="bar"></div>
+<div id="sel"><b id="selN"></b><small id="selD"></small>
+  <div class="row"><button id="up">שדרוג</button><button id="sellB">מכירה</button></div></div>
+<div class="tip" id="tip"></div>
+
+<div class="ov show" id="menu"><div class="ovc">
+  <div style="font-size:52px">🏰</div>
+  <h2>הגנת המגדלים</h2>
+  <p>האויבים הולכים לאורך השביל אל השער שלכם. בנו מגדלים בצדדים, שדרגו אותם,
+     ועצרו 20 גלים. כל אויב שעובר גוזל לכם לב.</p>
+  <div class="tw" id="twList"></div>
+  <p style="font-size:13px;opacity:.75">בוחרים מגדל מלמטה ולוחצים על הדשא. לחיצה על מגדל קיים פותחת שדרוג ומכירה.</p>
+  <button class="btn" id="go">▶ שחק</button>
+  <div style="opacity:.8;margin-top:8px;font-size:14px">השיא שלכם: גל <b id="best">0</b></div>
+</div></div>
+
+<div class="ov" id="endM"><div class="ovc">
+  <div style="font-size:52px" id="endE">🏁</div><h2 id="endT"></h2><p id="endP"></p>
+  <button class="btn" id="again">↻ עוד פעם</button>
+</div></div>
+
+<script src="../hub.js"></script>
+<script>
+'use strict';
+/* © 2026 Alon Maidenberg. Tower defence, written from scratch. */
+const cv=document.getElementById('cv'),cx=cv.getContext('2d');
+const $=s=>document.getElementById(s);
+const CS=56;let GW=16,GH=11,W=GW*CS,H=GH*CS;
+const clamp=(v,a,b)=>v<a?a:v>b?b:v;
+function rr(x,y,w,h,r){cx.beginPath();cx.moveTo(x+r,y);cx.arcTo(x+w,y,x+w,y+h,r);cx.arcTo(x+w,y+h,x,y+h,r);
+  cx.arcTo(x,y+h,x,y,r);cx.arcTo(x,y,x+w,y,r);cx.closePath()}
+function dot(x,y,r,c){cx.fillStyle=c;cx.beginPath();cx.arc(x,y,r,0,6.283);cx.fill()}
+
+/* ---------- towers ---------- */
+const TOWERS=[
+ {id:'gun', em:'🔫',nm:'מקלע', cost:60, rng:135,rate:.46,dmg:9, c:'#6ad8ff',c2:'#1d6b8c',
+  d:'יורה מהר על מטרה אחת'},
+ {id:'ice', em:'❄️',nm:'קפאון',cost:85, rng:120,rate:1.1,dmg:3, c:'#9fe9ff',c2:'#3d7f9a',slow:.45,
+  d:'מאט את מי שנפגע'},
+ {id:'bomb',em:'💣',nm:'מרגמה',cost:120,rng:180,rate:1.5,dmg:22,c:'#ffb545',c2:'#a86a10',splash:62,
+  d:'פגיעה שמתפוצצת על כמה'},
+ {id:'zap', em:'⚡',nm:'ברק',  cost:170,rng:150,rate:1.9,dmg:16,c:'#d7a3ff',c2:'#6b3d8c',chain:3,
+  d:'קופץ בין שלושה אויבים'}];
+const T=id=>TOWERS.find(t=>t.id===id);
+function lvlStat(t,lv){return{dmg:t.dmg*(1+lv*.55),rng:t.rng*(1+lv*.12),rate:t.rate*(1-lv*.13)}}
+function upCost(t,lv){return Math.round(t.cost*(0.8+lv*0.85))}
+
+/* ---------- enemies ---------- */
+const FOES=[
+ {id:'grunt',nm:'חייל', c:'#c86a6a',c2:'#7a2f2f',r:13,hp:30, sp:64,cash:7, leak:1},
+ {id:'fast', nm:'זריז', c:'#e8d85c',c2:'#8a7c18',r:11,hp:20, sp:122,cash:8, leak:1},
+ {id:'tank', nm:'משוריין',c:'#8f9aa8',c2:'#49525e',r:19,hp:170,sp:48,cash:22,leak:2,armor:.35},
+ {id:'swarm',nm:'נחיל', c:'#b07ad6',c2:'#5e3a78',r:8, hp:11, sp:92,cash:3, leak:1},
+ {id:'heal', nm:'מרפא', c:'#5fe0b0',c2:'#1f7a5c',r:15,hp:70, sp:56,cash:18,leak:1,heals:1},
+ {id:'boss', nm:'ענק',  c:'#ff5470',c2:'#8a1d33',r:28,hp:1100,sp:42,cash:160,leak:6,armor:.25}];
+const F=id=>FOES.find(f=>f.id===id);
+function wavePlan(n){
+  const out=[],add=(id,c)=>{for(let i=0;i<c;i++)out.push(id)};
+  add('grunt',5+n*2);
+  if(n>=3)add('fast',Math.floor(n*1.2));
+  if(n>=5)add('swarm',n*2);
+  if(n>=6)add('tank',Math.floor((n-4)/2));
+  if(n>=9)add('heal',Math.floor((n-7)/3));
+  if(n%5===0)add('boss',Math.floor(n/10)+1);
+  /* shuffle so the shapes arrive mixed */
+  for(let i=out.length-1;i>0;i--){const j=(Math.random()*(i+1))|0;const t=out[i];out[i]=out[j];out[j]=t}
+  return out}
+
+/* ---------- the path ---------- */
+let path=[],onPath,towers,foes,shots,parts,cash,lives,wave,state,spawnQ,spawnT,clock,says,
+    pick=null,selected=null,best=0,leaked=0;
+try{best=+localStorage.getItem('towers_best')||0}catch(e){}
+function buildPath(){
+  /* a clean S: three straight runs joined at alternating ends, never crossing */
+  const r0=2,r1=Math.floor(GH/2),r2=GH-3,L=2,R=GW-3;
+  const pts=[{x:-1,y:r0},{x:R,y:r0},{x:R,y:r1},{x:L,y:r1},{x:L,y:r2},{x:GW,y:r2}];
+  path=[];
+  for(let i=0;i<pts.length-1;i++){
+    const a=pts[i],b=pts[i+1];
+    const dx=Math.sign(b.x-a.x),dy=Math.sign(b.y-a.y),n=Math.abs(b.x-a.x)+Math.abs(b.y-a.y);
+    for(let k=0;k<n;k++)path.push({x:a.x+dx*k,y:a.y+dy*k})}
+  path.push(pts[pts.length-1]);
+  onPath=new Uint8Array(GW*GH);
+  for(const p of path)if(p.x>=0&&p.y>=0&&p.x<GW&&p.y<GH)onPath[p.y*GW+p.x]=1}
+function pathPos(d){
+  const i=clamp(Math.floor(d),0,path.length-1),j=clamp(i+1,0,path.length-1),f=d-i;
+  return{x:(path[i].x+(path[j].x-path[i].x)*f+.5)*CS,y:(path[i].y+(path[j].y-path[i].y)*f+.5)*CS}}
+
+function fitBoard(){
+  const w=cv.clientWidth||innerWidth,h=cv.clientHeight||innerHeight;
+  if(h>w*1.1){GW=11;GH=17}else{GW=17;GH=11}
+  W=GW*CS;H=GH*CS}
+function startGame(){
+  fitBoard();buildPath();
+  towers=[];foes=[];shots=[];parts=[];says=[];
+  cash=220;lives=20;wave=0;clock=0;leaked=0;pick=null;selected=null;
+  state='build';spawnQ=[];spawnT=0;
+  document.getElementById('menu').classList.remove('show');
+  document.getElementById('endM').classList.remove('show');
+  drawBar();say('בנו מגדלים ואז התחילו את הגל',2.6)}
+function nextWave(){
+  wave++;spawnQ=wavePlan(wave);spawnT=0;state='play';
+  say('🌊 גל '+wave+(wave%5===0?' · ענק!':''),2);
+  if(wave>best){best=wave;try{localStorage.setItem('towers_best',String(best))}catch(e){}}
+  drawBar()}
+
+/* ---------- placing ---------- */
+function canPlace(gx,gy){
+  if(gx<0||gy<0||gx>=GW||gy>=GH)return false;
+  if(onPath[gy*GW+gx])return false;
+  return !towers.some(t=>t.gx===gx&&t.gy===gy)}
+function place(gx,gy){
+  const t=T(pick);if(!t)return;
+  if(cash<t.cost){say('אין מספיק כסף',1.3);return}
+  if(!canPlace(gx,gy)){say('אי אפשר לבנות כאן',1.3);return}
+  cash-=t.cost;
+  towers.push({t,gx,gy,x:(gx+.5)*CS,y:(gy+.5)*CS,lv:0,cd:0,ang:0,spent:t.cost});
+  drawBar()}
+function sell(tw){
+  cash+=Math.round(tw.spent*.6);
+  towers.splice(towers.indexOf(tw),1);selected=null;$('sel').classList.remove('show');drawBar()}
+function upgrade(tw){
+  const c=upCost(tw.t,tw.lv);
+  if(tw.lv>=4){say('המגדל במקסימום',1.2);return}
+  if(cash<c){say('אין מספיק כסף',1.3);return}
+  cash-=c;tw.lv++;tw.spent+=c;showSel(tw);drawBar()}
+function showSel(tw){
+  selected=tw;
+  const s=lvlStat(tw.t,tw.lv);
+  $('selN').textContent=tw.t.em+' '+tw.t.nm+' · דרגה '+(tw.lv+1);
+  $('selD').innerHTML='נזק ⁦'+Math.round(s.dmg)+'⁩ · טווח ⁦'+Math.round(s.rng)+
+    '⁩<br>'+tw.t.d;
+  $('up').textContent=tw.lv>=4?'מקסימום':'שדרוג · '+upCost(tw.t,tw.lv)+' 💰';
+  $('up').disabled=tw.lv>=4;
+  $('sellB').textContent='מכירה · '+Math.round(tw.spent*.6)+' 💰';
+  $('sel').classList.add('show')}
+function drawBar(){
+  const bar=$('bar');bar.textContent='';
+  for(const t of TOWERS){
+    const b=document.createElement('button');
+    b.innerHTML='<span class="em">'+t.em+'</span>'+t.nm+'<span class="pr">'+t.cost+' 💰</span>';
+    if(pick===t.id)b.className='on';
+    if(cash<t.cost)b.disabled=true;
+    b.onclick=()=>{pick=pick===t.id?null:t.id;selected=null;$('sel').classList.remove('show');drawBar()};
+    bar.append(b)}
+  const go=document.createElement('button');
+  go.style.minWidth='96px';
+  go.innerHTML=state==='build'
+    ?'<span class="em">▶</span>התחילו גל<span class="pr">'+(wave+1)+' / 20</span>'
+    :'<span class="em">🌊</span>גל '+wave+'<span class="pr">'+(spawnQ?spawnQ.length:0)+' בדרך</span>';
+  go.disabled=state!=='build';
+  go.onclick=()=>{if(state==='build')nextWave()};
+  bar.append(go)}
+
+/* ---------- combat ---------- */
+function hurt(f,d){
+  const red=f.k.armor||0;
+  f.hp-=d*(1-red);
+  f.hurt=.12;
+  if(f.hp<=0){
+    const i=foes.indexOf(f);if(i<0)return;
+    foes.splice(i,1);cash+=f.k.cash;
+    for(let k=0;k<(f.k.id==='boss'?24:7);k++)
+      parts.push({x:f.x,y:f.y,vx:(Math.random()-.5)*260,vy:(Math.random()-.5)*260,a:.7,c:f.k.c2,r:3});
+    drawBar()}}
+function fire(tw,dt){
+  tw.cd-=dt;if(tw.cd>0)return;
+  const s=lvlStat(tw.t,tw.lv);
+  let target=null,bd=-1;
+  for(const f of foes){
+    const d=Math.hypot(f.x-tw.x,f.y-tw.y);
+    if(d<=s.rng&&f.d>bd){bd=f.d;target=f}}     /* whoever is furthest along */
+  if(!target)return;
+  tw.cd=s.rate;tw.ang=Math.atan2(target.y-tw.y,target.x-tw.x);
+  shots.push({x:tw.x,y:tw.y,tx:target.x,ty:target.y,t:0,
+    tw,dmg:s.dmg,c:tw.t.c,kind:tw.t.id,target})}
+function landShot(sh){
+  const t=sh.tw.t;
+  if(t.splash){
+    for(const f of foes.slice())if(Math.hypot(f.x-sh.tx,f.y-sh.ty)<t.splash)hurt(f,sh.dmg);
+    for(let k=0;k<12;k++)parts.push({x:sh.tx,y:sh.ty,vx:(Math.random()-.5)*300,vy:(Math.random()-.5)*300,
+      a:.6,c:'#ffb545',r:3})}
+  else if(t.chain){
+    let last={x:sh.tx,y:sh.ty},hit=[];
+    for(let n=0;n<t.chain;n++){
+      let b=null,bd=120;
+      for(const f of foes)if(!hit.includes(f)){const d=Math.hypot(f.x-last.x,f.y-last.y);
+        if(d<bd){bd=d;b=f}}
+      if(!b)break;
+      hit.push(b);parts.push({x:b.x,y:b.y,vx:0,vy:-40,a:.5,c:'#d7a3ff',r:4});
+      hurt(b,sh.dmg*(n?.75:1));last=b}}
+  else{
+    if(sh.target&&foes.includes(sh.target)){
+      hurt(sh.target,sh.dmg);
+      if(t.slow){sh.target.slow=Math.max(sh.target.slow||0,t.slow);sh.target.slowT=1.6}}}}
+
+function step(dt){
+  if(state==='over')return;
+  clock+=dt;
+  for(const tw of towers)fire(tw,dt);
+  /* spawn */
+  if(state==='play'){
+    spawnT-=dt;
+    if(spawnQ.length&&spawnT<=0){
+      const k=F(spawnQ.shift());
+      const hp=k.hp*(1+wave*.14);
+      foes.push({k,d:0,x:0,y:0,hp,maxhp:hp,hurt:0,slow:0,slowT:0,cd:0});
+      spawnT=Math.max(.16,.62-wave*.015);drawBar()}
+    if(!spawnQ.length&&!foes.length){
+      if(wave>=20){win();return}
+      state='build';cash+=60+wave*14;
+      say('✅ גל '+wave+' נעצר · בונוס '+(60+wave*14)+' 💰',2.4);
+      if(window.AG)AG.add(12+wave*3,wave%5===0?1:0);
+      drawBar()}}
+  /* enemies walk */
+  for(const f of foes.slice()){
+    if(f.hurt>0)f.hurt-=dt;
+    if(f.slowT>0){f.slowT-=dt;if(f.slowT<=0)f.slow=0}
+    f.d+=f.k.sp*(1-(f.slow||0))*dt/CS;
+    const p=pathPos(f.d);f.x=p.x;f.y=p.y;
+    if(f.k.heals){f.cd-=dt;
+      if(f.cd<=0){f.cd=1.5;
+        for(const o of foes)if(o!==f&&Math.hypot(o.x-f.x,o.y-f.y)<110&&o.hp<o.maxhp){
+          o.hp=Math.min(o.maxhp,o.hp+10);
+          parts.push({x:o.x,y:o.y-10,vx:0,vy:-40,a:.5,c:'#5fe0b0',r:3})}}}
+    if(f.d>=path.length-1){
+      foes.splice(foes.indexOf(f),1);
+      lives-=f.k.leak;leaked++;
+      say('💔 '+f.k.nm+' עבר!',1.4);
+      if(lives<=0){lose();return}}}
+  /* shots */
+  for(let i=shots.length-1;i>=0;i--){const sh=shots[i];
+    sh.t+=dt*5.5;
+    if(sh.t>=1){landShot(sh);shots.splice(i,1)}}
+  for(let i=parts.length-1;i>=0;i--){const q=parts[i];
+    q.x+=q.vx*dt;q.y+=q.vy*dt;q.vx*=.92;q.vy*=.92;q.a-=dt*1.6;
+    if(q.a<=0)parts.splice(i,1)}
+  for(let i=says.length-1;i>=0;i--){says[i].t-=dt;if(says[i].t<=0)says.splice(i,1)}}
+function win(){
+  state='over';$('endE').textContent='🏆';$('endT').textContent='החזקתם מעמד!';
+  $('endP').textContent='עברתם את כל 20 הגלים עם '+lives+' לבבות · '+towers.length+' מגדלים';
+  $('endM').classList.add('show');if(window.AG)AG.add(140,2)}
+function lose(){
+  state='over';$('endE').textContent='💔';$('endT').textContent='השער נפרץ';
+  $('endP').textContent='הגעתם לגל '+wave+' מתוך 20 · '+leaked+' אויבים עברו';
+  $('endM').classList.add('show');if(window.AG)AG.add(15+wave*5,wave>=10?1:0)}
+
+/* ---------- input ---------- */
+function toBoard(e){
+  const r=cv.getBoundingClientRect(),s=Math.min(r.width/W,r.height/H);
+  const ox=(r.width-W*s)/2,oy=(r.height-H*s)/2;
+  return{x:(e.clientX-r.left-ox)/s,y:(e.clientY-r.top-oy)/s}}
+let hover=null;
+cv.addEventListener('pointermove',e=>{const p=toBoard(e);
+  hover={gx:Math.floor(p.x/CS),gy:Math.floor(p.y/CS)}});
+cv.addEventListener('pointerleave',()=>hover=null);
+cv.addEventListener('pointerdown',e=>{
+  if(state==='over')return;
+  const p=toBoard(e),gx=Math.floor(p.x/CS),gy=Math.floor(p.y/CS);
+  hover={gx,gy};
+  const hit=towers.find(t=>t.gx===gx&&t.gy===gy);
+  if(hit){pick=null;showSel(hit);drawBar();return}
+  $('sel').classList.remove('show');selected=null;
+  if(pick)place(gx,gy)});
+$('up').onclick=()=>selected&&upgrade(selected);
+$('sellB').onclick=()=>selected&&sell(selected);
+addEventListener('keydown',e=>{
+  if(/^[1-4]$/.test(e.key)){pick=TOWERS[+e.key-1].id;drawBar()}
+  if(e.key===' '){e.preventDefault();if(state==='build')nextWave()}
+  if(e.key==='Escape'){pick=null;selected=null;$('sel').classList.remove('show');drawBar()}});
+
+/* ---------- drawing ---------- */
+function say(s,t){says.push({s,t:t||2})}
+function draw(){
+  const w=cv.clientWidth,h=cv.clientHeight,dpr=Math.min(2,devicePixelRatio||1);
+  cx.setTransform(dpr,0,0,dpr,0,0);
+  cx.fillStyle='#0b120d';cx.fillRect(0,0,w,h);
+  if(!towers)return;
+  const s=Math.min(w/W,h/H);
+  cx.save();cx.translate((w-W*s)/2,(h-H*s)/2);cx.scale(s,s);
+  cx.direction='ltr';
+  /* grass */
+  for(let y=0;y<GH;y++)for(let x=0;x<GW;x++){
+    cx.fillStyle=((x+y)&1)?'#1d3523':'#1a3020';cx.fillRect(x*CS,y*CS,CS,CS)}
+  /* road */
+  for(const p of path){
+    if(p.x<0||p.y<0||p.x>=GW||p.y>=GH)continue;
+    cx.fillStyle='#6b5a3e';cx.fillRect(p.x*CS,p.y*CS,CS,CS);
+    cx.fillStyle='#7d6a49';cx.fillRect(p.x*CS+3,p.y*CS+3,CS-6,CS-6)}
+  /* the gate at the end */
+  const endP=path[path.length-2];
+  if(endP){cx.fillStyle='#b8452f';rr(endP.x*CS+4,endP.y*CS+4,CS-8,CS-8,8);cx.fill();
+    cx.fillStyle='#fff';cx.font='900 26px system-ui';cx.textAlign='center';cx.textBaseline='middle';
+    cx.fillText('🚪',endP.x*CS+CS/2,endP.y*CS+CS/2)}
+  /* build preview */
+  if(pick&&hover&&state!=='over'){
+    const t=T(pick),ok=canPlace(hover.gx,hover.gy)&&cash>=t.cost;
+    const s2=lvlStat(t,0);
+    cx.globalAlpha=.18;dot((hover.gx+.5)*CS,(hover.gy+.5)*CS,s2.rng,ok?'#9bff6a':'#ff5470');cx.globalAlpha=1;
+    cx.strokeStyle=ok?'#9bff6a':'#ff5470';cx.lineWidth=3;
+    cx.strokeRect(hover.gx*CS+2,hover.gy*CS+2,CS-4,CS-4)}
+  /* towers */
+  for(const tw of towers){
+    const st=lvlStat(tw.t,tw.lv);
+    if(selected===tw){cx.globalAlpha=.14;dot(tw.x,tw.y,st.rng,tw.t.c);cx.globalAlpha=1;
+      cx.strokeStyle='#fff';cx.lineWidth=2;cx.beginPath();cx.arc(tw.x,tw.y,st.rng,0,6.283);cx.stroke()}
+    cx.fillStyle=tw.t.c2;rr(tw.x-CS*.38,tw.y-CS*.38,CS*.76,CS*.76,9);cx.fill();
+    cx.fillStyle=tw.t.c;rr(tw.x-CS*.3,tw.y-CS*.3,CS*.6,CS*.6,7);cx.fill();
+    cx.save();cx.translate(tw.x,tw.y);cx.rotate(tw.ang);
+    cx.fillStyle=tw.t.c2;rr(0,-4,CS*.42,8,4);cx.fill();cx.restore();
+    cx.font='900 17px system-ui';cx.textAlign='center';cx.textBaseline='middle';
+    cx.fillText(tw.t.em,tw.x,tw.y);
+    for(let i=0;i<tw.lv;i++){
+      cx.fillStyle='#ffd43b';
+      cx.beginPath();cx.arc(tw.x-12+i*8,tw.y+CS*.3,3,0,6.283);cx.fill()}}
+  /* enemies */
+  for(const f of foes){
+    cx.fillStyle='rgba(0,0,0,.3)';cx.beginPath();cx.ellipse(f.x,f.y+f.k.r*.8,f.k.r*.9,f.k.r*.35,0,0,6.3);cx.fill();
+    dot(f.x,f.y,f.k.r,f.hurt>0?'#fff':f.k.c);
+    cx.fillStyle=f.k.c2;cx.beginPath();cx.arc(f.x,f.y,f.k.r,-.6,.6);cx.lineTo(f.x,f.y);cx.fill();
+    if(f.slow>0){cx.strokeStyle='#9fe9ff';cx.lineWidth=2.5;
+      cx.beginPath();cx.arc(f.x,f.y,f.k.r+3,0,6.283);cx.stroke()}
+    if(f.hp<f.maxhp){cx.fillStyle='rgba(0,0,0,.5)';rr(f.x-f.k.r,f.y-f.k.r-8,f.k.r*2,4,2);cx.fill();
+      cx.fillStyle=f.k.id==='boss'?'#ff5470':'#9bff6a';
+      rr(f.x-f.k.r,f.y-f.k.r-8,f.k.r*2*Math.max(0,f.hp/f.maxhp),4,2);cx.fill()}}
+  /* shots */
+  for(const sh of shots){
+    const x=sh.x+(sh.tx-sh.x)*sh.t,y=sh.y+(sh.ty-sh.y)*sh.t;
+    if(sh.kind==='zap'){cx.strokeStyle=sh.c;cx.lineWidth=3;
+      cx.beginPath();cx.moveTo(sh.x,sh.y);cx.lineTo(x,y);cx.stroke()}
+    else dot(x,y,sh.kind==='bomb'?6:4,sh.c)}
+  for(const q of parts){cx.globalAlpha=Math.max(0,q.a);dot(q.x,q.y,q.r,q.c)}
+  cx.globalAlpha=1;
+  cx.restore();
+  hud(w,h)}
+function hud(w,h){
+  cx.direction='ltr';cx.textBaseline='middle';
+  cx.textAlign='right';cx.font='900 21px Rubik,system-ui';cx.fillStyle='#fff';
+  cx.fillText('💰 '+cash+'   ❤️ '+lives+'   🌊 '+wave+'/20',w-16,30);
+  cx.textAlign='center';cx.font='900 17px Rubik,system-ui';
+  says.forEach((m,i)=>{cx.globalAlpha=Math.min(1,m.t);
+    const tw=cx.measureText(m.s).width+24;
+    cx.fillStyle='rgba(7,12,9,.72)';cx.fillRect(w/2-tw/2,62+i*34,tw,28);
+    cx.fillStyle='#fff';cx.fillText(m.s,w/2,76+i*34);cx.globalAlpha=1})}
+function resize(){const d=Math.min(2,devicePixelRatio||1);
+  cv.width=Math.round(cv.clientWidth*d);cv.height=Math.round(cv.clientHeight*d);
+  cx.setTransform(d,0,0,d,0,0)}
+addEventListener('resize',resize);
+let last=0,acc=0;
+function frame(ts){
+  requestAnimationFrame(frame);
+  const dt=Math.min(.05,(ts-last)/1000||0);last=ts;
+  if(towers){acc+=dt;let g=0;while(acc>=1/60&&g++<5){step(1/60);acc-=1/60}}
+  draw()}
+(function(){
+  const L=$('twList');
+  TOWERS.forEach(t=>{const d=document.createElement('div');
+    d.innerHTML='<span>'+t.em+'</span>'+t.nm;L.append(d)});
+  $('best').textContent=best;
+  $('go').onclick=()=>{startGame();resize()};
+  $('again').onclick=()=>{document.getElementById('endM').classList.remove('show');
+    document.getElementById('menu').classList.add('show');$('best').textContent=best};
+  resize();requestAnimationFrame(frame)})();
+</script>
+</body>
+</html>
