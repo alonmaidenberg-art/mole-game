@@ -1,0 +1,540 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta name="author" content="Alon Maidenberg - אלון מידנברג"><meta name="copyright" content="© 2026 אלון מידנברג. כל הזכויות שמורות.">
+<!-- © 2026 Alon Maidenberg (אלון מידנברג). All rights reserved. Copying, republishing or modifying this game without written permission is not allowed. -->
+<meta name="robots" content="noai, noimageai">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>גלי הזומבים – אלון מידנברג</title>
+<meta name="description" content="גל אחרי גל של זומבים. שישה סוגים, בוס בכל גל חמישי, וחנות נשקים ושדרוגים בין הגלים.">
+<meta name="theme-color" content="#0d1410">
+<link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:#0d1410;color:#fff;overflow:hidden;
+  font-family:Rubik,"Segoe UI",system-ui,sans-serif;overscroll-behavior:none;user-select:none}
+#cv{display:block;width:100%;height:100%;touch-action:none}
+.ov{position:fixed;inset:0;display:none;place-items:center;z-index:30;padding:16px;background:rgba(5,10,7,.9)}
+.ov.show{display:grid}
+.ovc{background:#17251c;border:4px solid #050a07;border-radius:22px;padding:18px;max-width:470px;width:100%;
+  box-shadow:0 12px 0 #050a07;max-height:90vh;overflow:auto;text-align:center}
+.ovc h2{margin:0 0 6px;font:900 26px Rubik,system-ui}
+.ovc p{margin:7px 0;font-size:14.5px;line-height:1.55;opacity:.92}
+.btn{border:3px solid #050a07;border-radius:15px;background:#9bff6a;color:#0d1410;
+  font:900 15px Rubik,system-ui;padding:11px 16px;cursor:pointer;box-shadow:0 5px 0 #050a07;margin:5px}
+.btn:active{transform:translateY(3px);box-shadow:0 2px 0 #050a07}
+.btn.a{background:#ffd43b}.btn.d{background:#7d8f84;color:#0d1410}
+.kinds{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:12px 0;text-align:center}
+.kinds div{background:rgba(255,255,255,.07);border-radius:12px;padding:8px 4px;font:900 11.5px Rubik,system-ui}
+.kinds div span{display:block;font-size:22px;margin-bottom:2px}
+/* shop */
+#shop{position:fixed;inset:auto 0 0 0;z-index:25;background:rgba(13,20,16,.97);border-top:4px solid #050a07;
+  padding:12px 12px max(12px,env(safe-area-inset-bottom));display:none}
+#shop.show{display:block}
+#shop .hd{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+#shop .hd b{font:900 17px Rubik,system-ui;flex:1}
+.items{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px;max-height:44vh;overflow:auto}
+.items button{border:3px solid #050a07;border-radius:14px;background:#1f3328;color:#fff;cursor:pointer;
+  padding:9px 6px;font:900 12.5px Rubik,system-ui;display:grid;gap:3px;justify-items:center;text-align:center}
+.items button .em{font-size:23px}
+.items button .pr{font-size:11.5px;opacity:.9}
+.items button[disabled]{opacity:.42;cursor:default}
+.items button.has{outline:3px solid #9bff6a}
+/* touch controls */
+#pad{position:fixed;inset:0;z-index:20;pointer-events:none}
+body.nopad #pad{display:none}
+#stick{position:absolute;inset-inline-start:18px;bottom:max(18px,env(safe-area-inset-bottom));
+  width:132px;height:132px;border-radius:50%;background:rgba(255,255,255,.1);pointer-events:auto}
+#nub{position:absolute;left:41px;top:41px;width:50px;height:50px;border-radius:50%;background:rgba(255,255,255,.5)}
+.abtn{position:absolute;width:76px;height:76px;border-radius:50%;border:3px solid rgba(0,0,0,.4);
+  background:rgba(255,255,255,.84);color:#0d1410;font:900 27px system-ui;pointer-events:auto;display:grid;place-items:center}
+#bFire{inset-inline-end:18px;bottom:max(100px,calc(env(safe-area-inset-bottom) + 100px))}
+#bShop{inset-inline-end:20px;bottom:max(26px,calc(env(safe-area-inset-bottom) + 26px));width:62px;height:62px;font-size:22px}
+.tip{position:fixed;inset-inline:0;top:56px;text-align:center;z-index:18;pointer-events:none;
+  font:900 15px Rubik,system-ui;text-shadow:0 2px 5px rgba(0,0,0,.9);opacity:0;transition:opacity .25s}
+.tip.show{opacity:1}
+</style>
+</head>
+<body>
+<canvas id="cv"></canvas>
+<div id="pad">
+  <div id="stick"><div id="nub"></div></div>
+  <button class="abtn" id="bFire">🔫</button>
+  <button class="abtn" id="bShop">🛒</button>
+</div>
+<div class="tip" id="tip"></div>
+
+<div id="shop"><div class="hd"><b>🛒 בין הגלים</b><span id="shopRes"></span>
+  <span id="shopClock" style="font:900 14px Rubik,system-ui;opacity:.85"></span>
+  <button class="btn d" id="shopGo" style="padding:7px 12px;margin:0">מוכנים!</button></div>
+  <div class="items" id="shopItems"></div></div>
+
+<div class="ov show" id="menu"><div class="ovc">
+  <div style="font-size:52px">🧟</div>
+  <h2>גלי הזומבים</h2>
+  <p>גל אחרי גל, וכל גל קשה יותר. הורגים — נופל כסף. בין הגלים נפתחת חנות: נשקים חדשים,
+     תחמושת, לבבות ושדרוגים. כל גל חמישי מגיע בוס.</p>
+  <div class="kinds" id="kinds"></div>
+  <p style="font-size:13px;opacity:.75" id="ctrl"></p>
+  <button class="btn" id="go">▶ שחק</button>
+  <div style="opacity:.8;margin-top:8px;font-size:14px">השיא שלכם: גל <b id="best">0</b></div>
+</div></div>
+
+<div class="ov" id="endM"><div class="ovc">
+  <div style="font-size:52px">💀</div><h2 id="endT"></h2><p id="endP"></p>
+  <button class="btn" id="again">↻ עוד פעם</button>
+</div></div>
+
+<script src="../hub.js"></script>
+<script>
+'use strict';
+/* © 2026 Alon Maidenberg. Zombie waves: original work, written from scratch. */
+
+const cv=document.getElementById('cv'),cx=cv.getContext('2d');
+/* The arena is drawn whole and scaled to fit, so its shape has to match the
+   screen or a phone gets a postage stamp. The shape is chosen when a game
+   starts and then left alone, so rotating mid-game only letterboxes. */
+let W=1000,H=700;
+function fitArena(){
+  const w=cv.clientWidth||innerWidth,h=cv.clientHeight||innerHeight;
+  if(h>w*1.15){W=760;H=1120}            /* portrait phone */
+  else if(w>h*1.6){W=1180;H=700}        /* wide desktop */
+  else{W=1000;H=760}}
+const $=s=>document.getElementById(s);
+function rr(x,y,w,h,r){cx.beginPath();cx.moveTo(x+r,y);cx.arcTo(x+w,y,x+w,y+h,r);cx.arcTo(x+w,y+h,x,y+h,r);
+  cx.arcTo(x,y+h,x,y,r);cx.arcTo(x,y,x+w,y,r);cx.closePath()}
+function dot(x,y,r,c){cx.fillStyle=c;cx.beginPath();cx.arc(x,y,r,0,6.283);cx.fill()}
+const rnd=(a,b)=>a+Math.random()*(b-a);
+const clamp=(v,a,b)=>v<a?a:v>b?b:v;
+
+/* ---------- the zombies ---------- */
+const KINDS=[
+ {id:'walk', nm:'רקוב',   em:'🧟', c:'#6f9e52',c2:'#3d5c2c',r:15,hp:16, sp:42, dmg:6, cash:9,  w:1},
+ {id:'run',  nm:'רץ',     em:'🏃', c:'#c9d94a',c2:'#7d8a22',r:13,hp:11, sp:96, dmg:5, cash:12, w:1},
+ {id:'tank', nm:'שמן',    em:'🪨', c:'#8a7a5c',c2:'#4f452f',r:23,hp:70, sp:30, dmg:13,cash:30, w:0},
+ {id:'spit', nm:'יורק',   em:'🤮', c:'#7fe0a8',c2:'#2f7a50',r:15,hp:20, sp:38, dmg:4, cash:22, w:0,range:230},
+ {id:'bomb', nm:'מתפוצץ', em:'💣', c:'#e07a4a',c2:'#8a3f1d',r:16,hp:14, sp:70, dmg:0, cash:20, w:0,boom:26},
+ {id:'swarm',nm:'זעיר',   em:'🐛', c:'#d7a3e8',c2:'#7b4b8c',r:8, hp:5,  sp:118,dmg:3, cash:5,  w:0},
+ {id:'heal', nm:'מרפא',   em:'💚', c:'#4ad2c0',c2:'#1d6b61',r:16,hp:34, sp:34, dmg:4, cash:34, w:0,heals:1},
+ {id:'boss', nm:'בוס',    em:'👹', c:'#e04a6a',c2:'#8a1d33',r:38,hp:520,sp:34, dmg:22,cash:220,w:0,boss:1}];
+const K=id=>KINDS.find(k=>k.id===id);
+/* which kinds a wave may send, and how many */
+function waveplan(n){
+  const out=[];
+  const add=(id,c)=>{for(let i=0;i<c;i++)out.push(id)};
+  add('walk',4+Math.floor(n*1.5));
+  if(n>=2)add('run',Math.floor(n*0.9));
+  if(n>=4)add('swarm',Math.floor(n*1.3));
+  if(n>=5)add('tank',Math.floor((n-3)/2));
+  if(n>=6)add('spit',Math.floor((n-4)/2));
+  if(n>=8)add('bomb',Math.floor((n-6)/2));
+  if(n>=10)add('heal',Math.floor((n-8)/3));
+  if(n%5===0)add('boss',Math.floor(n/10)+1);
+  return out}
+
+/* ---------- guns ---------- */
+const GUNS=[
+ {id:'pistol',nm:'אקדח',   em:'🔫',dmg:9, rate:.33,spread:.05,speed:620,mag:12,reload:1.0,pellets:1,cost:0},
+ {id:'smg',   nm:'תת-מקלע',em:'🧨',dmg:7, rate:.10,spread:.13,speed:680,mag:30,reload:1.4,pellets:1,cost:320},
+ {id:'shot',  nm:'רובה ציד',em:'💥',dmg:6,rate:.72,spread:.30,speed:560,mag:6, reload:1.7,pellets:7,cost:520},
+ {id:'rifle', nm:'רובה כבד',em:'🎯',dmg:26,rate:.42,spread:.03,speed:900,mag:10,reload:1.6,pellets:1,cost:900}];
+const G=id=>GUNS.find(g=>g.id===id);
+
+/* ---------- state ---------- */
+let P,zs,bullets,spits,cash,wave,state,parts,drops,crates,shopT,spawnQ,spawnT,best=0,clock=0,kills=0,waveStall=0;
+try{best=+localStorage.getItem('zombies_best')||0}catch(e){}
+function newPlayer(){return{x:W/2,y:H/2,r:14,hp:100,maxhp:100,sp:168,
+  gun:'pistol',owned:{pistol:1},ammo:{},mag:{},reloadT:0,cd:0,face:0,
+  dmgUp:0,rateUp:0,maxhpUp:0,spUp:0,hurt:0,inv:0,kills:0}}
+function startGame(){
+  fitArena();
+  P=newPlayer();zs=[];bullets=[];spits=[];parts=[];drops=[];cash=60;wave=0;kills=0;clock=0;waveStall=0;
+  P.mag.pistol=G('pistol').mag;P.ammo.pistol=9999;
+  crates=[];
+  for(let i=0;i<7;i++){const w=rnd(44,86),h=rnd(40,70);
+    crates.push({x:rnd(90,W-90-w),y:rnd(90,H-90-h),w,h})}
+  /* never box the player in at spawn */
+  crates=crates.filter(c=>!(P.x>c.x-60&&P.x<c.x+c.w+60&&P.y>c.y-60&&P.y<c.y+c.h+60));
+  state='play';document.getElementById('menu').classList.remove('show');
+  document.getElementById('endM').classList.remove('show');
+  nextWave()}
+function nextWave(){
+  wave++;spawnQ=waveplan(wave);spawnT=0;
+  say('🌊 גל '+wave+(wave%5===0?' · בוס!':''),2);
+  if(wave>best){best=wave;try{localStorage.setItem('zombies_best',String(best))}catch(e){}}}
+
+/* ---------- input ---------- */
+const key={},mouse={x:W/2,y:0,down:0};
+let touch=matchMedia('(pointer:coarse)').matches;
+addEventListener('keydown',e=>{
+  if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault();
+  key[e.key.toLowerCase()]=1;
+  if(e.key.toLowerCase()==='r')reload();
+  if(e.key.toLowerCase()==='e')toggleShop();
+  if(/^[1-4]$/.test(e.key))pickGun(+e.key-1)});
+addEventListener('keyup',e=>key[e.key.toLowerCase()]=0);
+function toWorld(e){const r=cv.getBoundingClientRect();
+  const s=Math.min(r.width/W,r.height/H),ox=(r.width-W*s)/2,oy=(r.height-H*s)/2;
+  return{x:(e.clientX-r.left-ox)/s,y:(e.clientY-r.top-oy)/s}}
+cv.addEventListener('pointerdown',e=>{const p=toWorld(e);mouse.x=p.x;mouse.y=p.y;mouse.down=1});
+cv.addEventListener('pointermove',e=>{const p=toWorld(e);mouse.x=p.x;mouse.y=p.y});
+addEventListener('pointerup',()=>mouse.down=0);
+let stick={ax:0,ay:0,id:null,last:0};
+(function(){const el=$('stick'),nub=$('nub');
+  function set(e){const r=el.getBoundingClientRect(),dx=e.clientX-r.left-66,dy=e.clientY-r.top-66;
+    const d=Math.hypot(dx,dy),m=Math.min(1,d/46);
+    if(d>0){stick.ax=dx/d*m;stick.ay=dy/d*m}else{stick.ax=stick.ay=0}
+    stick.last=Date.now();nub.style.left=(41+stick.ax*46)+'px';nub.style.top=(41+stick.ay*46)+'px'}
+  el.addEventListener('pointerdown',e=>{e.preventDefault();stick.id=e.pointerId;el.setPointerCapture(e.pointerId);set(e)});
+  el.addEventListener('pointermove',e=>{if(stick.id===e.pointerId)set(e)});
+  const end=e=>{if(stick.id!==e.pointerId)return;stick.id=null;stick.ax=stick.ay=0;
+    nub.style.left='41px';nub.style.top='41px'};
+  el.addEventListener('pointerup',end);el.addEventListener('pointercancel',end)})();
+let firing=0;
+$('bFire').addEventListener('pointerdown',e=>{e.preventDefault();firing=1});
+$('bFire').addEventListener('pointerup',()=>firing=0);
+$('bFire').addEventListener('pointercancel',()=>firing=0);
+$('bShop').addEventListener('pointerdown',e=>{e.preventDefault();toggleShop()});
+
+/* ---------- shooting ---------- */
+function gunOf(){return G(P.gun)}
+function aim(){
+  /* mouse when it is being used, otherwise the nearest zombie - so the
+     joystick and the fire button are enough on their own */
+  if(!touch&&Date.now()-stick.last>900&&mouse.x!==undefined&&(mouse.down||!firing)){
+    const a=Math.atan2(mouse.y-P.y,mouse.x-P.x);
+    if(isFinite(a))return a}
+  let best=null,bd=1e9;
+  for(const z of zs){const d=Math.hypot(z.x-P.x,z.y-P.y);if(d<bd){bd=d;best=z}}
+  if(best)return Math.atan2(best.y-P.y,best.x-P.x);
+  return P.face}
+function reload(){
+  const g=gunOf();
+  if(P.reloadT>0||P.mag[P.gun]>=g.mag)return;
+  if((P.ammo[P.gun]||0)<=0&&P.gun!=='pistol'){say('אין תחמושת ל'+g.nm,1.2);return}
+  P.reloadT=g.reload}
+function shoot(){
+  const g=gunOf();
+  if(P.cd>0||P.reloadT>0)return;
+  if((P.mag[P.gun]||0)<=0){reload();return}
+  P.mag[P.gun]--;P.cd=g.rate*(1-P.rateUp*.11);
+  const a=aim();P.face=a;
+  for(let i=0;i<g.pellets;i++){
+    const sp=a+rnd(-g.spread,g.spread);
+    bullets.push({x:P.x+Math.cos(a)*16,y:P.y+Math.sin(a)*16,
+      vx:Math.cos(sp)*g.speed,vy:Math.sin(sp)*g.speed,
+      dmg:g.dmg+P.dmgUp*3,life:.9})}
+  kick(a)}
+function kick(a){for(let i=0;i<4;i++)parts.push({x:P.x+Math.cos(a)*18,y:P.y+Math.sin(a)*18,
+  vx:Math.cos(a)*rnd(40,150)+rnd(-40,40),vy:Math.sin(a)*rnd(40,150)+rnd(-40,40),a:.4,c:'#ffd97a',r:2.5})}
+
+/* ---------- zombies ---------- */
+function spawnOne(id){
+  const k=K(id),side=(Math.random()*4)|0;
+  let x,y;
+  if(side===0){x=rnd(0,W);y=-30}else if(side===1){x=W+30;y=rnd(0,H)}
+  else if(side===2){x=rnd(0,W);y=H+30}else{x=-30;y=rnd(0,H)}
+  const hp=k.hp*(1+wave*0.085);
+  zs.push({k,x,y,r:k.r,hp,maxhp:hp,cd:0,hurt:0,wig:Math.random()*6,boom:0,inside:false})}
+function hitZ(z,d,fx,fy){
+  z.hp-=d;z.hurt=.14;
+  z.x+=fx*2.2;z.y+=fy*2.2;
+  for(let i=0;i<3;i++)parts.push({x:z.x,y:z.y,vx:rnd(-90,90),vy:rnd(-90,90),a:.5,c:z.k.c,r:2.5});
+  if(z.hp<=0)killZ(z)}
+function killZ(z){
+  const i=zs.indexOf(z);if(i<0)return;
+  zs.splice(i,1);kills++;P.kills++;
+  drops.push({x:z.x,y:z.y,v:Math.round(z.k.cash*(1+wave*.05)),t:16,bob:Math.random()*6});
+  for(let k2=0;k2<(z.k.boss?26:9);k2++)
+    parts.push({x:z.x,y:z.y,vx:rnd(-220,220),vy:rnd(-220,220),a:.8,c:z.k.c2,r:rnd(2,4)});
+  if(z.k.boom)explode(z.x,z.y,z.k.boom,false)}
+function explode(x,y,dmg,hurtPlayer){
+  for(let i=0;i<22;i++)parts.push({x,y,vx:rnd(-320,320),vy:rnd(-320,320),a:.7,
+    c:i%2?'#ffb545':'#ff5470',r:rnd(2,5)});
+  for(const z of zs.slice())if(Math.hypot(z.x-x,z.y-y)<86)hitZ(z,dmg,0,0);
+  if(hurtPlayer){const d=Math.hypot(P.x-x,P.y-y);if(d<96)hurtP(dmg*(1-d/96))}}
+function hurtP(d){
+  if(P.inv>0)return;
+  P.hp-=d;P.hurt=.3;P.inv=.45;
+  if(P.hp<=0)die()}
+
+/* ---------- shop ---------- */
+const UPG=[
+ {id:'ammo', em:'📦',nm:'תחמושת ×60',cost:()=>70,  buy:()=>{P.ammo[P.gun]=(P.ammo[P.gun]||0)+60},
+  can:()=>P.gun!=='pistol'},
+ {id:'heal', em:'❤️',nm:'ערכת עזרה', cost:()=>90,  buy:()=>{P.hp=Math.min(P.maxhp,P.hp+45)}},
+ {id:'maxhp',em:'🫀',nm:'עוד לב',    cost:()=>260+P.maxhpUp*120,buy:()=>{P.maxhpUp++;P.maxhp+=30;P.hp+=30}},
+ {id:'dmg',  em:'💪',nm:'נזק +',     cost:()=>240+P.dmgUp*150, buy:()=>{P.dmgUp++}, max:()=>P.dmgUp>=6},
+ {id:'rate', em:'⚡',nm:'קצב אש +',  cost:()=>260+P.rateUp*160,buy:()=>{P.rateUp++}, max:()=>P.rateUp>=5},
+ {id:'speed',em:'👟',nm:'מהירות +',  cost:()=>200+P.spUp*140,  buy:()=>{P.spUp++;P.sp+=22},max:()=>P.spUp>=4}];
+function shopList(){
+  const out=[];
+  for(const g of GUNS){
+    const have=!!P.owned[g.id];
+    if(have){
+      out.push({em:g.em,nm:g.nm,cost:0,have:1,equipped:P.gun===g.id,
+        buy:()=>{P.gun=g.id;P.reloadT=0}});
+      continue}
+    out.push({em:g.em,nm:g.nm,cost:g.cost,
+      buy:()=>{P.owned[g.id]=1;P.mag[g.id]=g.mag;P.ammo[g.id]=g.mag*4;P.gun=g.id}})}
+  for(const u of UPG){
+    if(u.can&&!u.can())continue;
+    const maxed=u.max&&u.max();
+    out.push({em:u.em,nm:u.nm,cost:u.cost(),owned:maxed,buy:u.buy})}
+  return out}
+function drawShop(){
+  $('shopRes').textContent='💵 '+cash;
+  const box=$('shopItems');box.textContent='';
+  for(const it of shopList()){
+    const b=document.createElement('button');
+    const label=it.have?(it.equipped?'ביד':'להחזיק'):it.owned?'מקסימום':it.cost+' 💵';
+    b.innerHTML='<span class="em">'+it.em+'</span>'+it.nm+'<span class="pr">'+label+'</span>';
+    if(it.equipped||it.owned){b.className='has';b.disabled=!!it.owned||!!it.equipped}
+    else if(!it.have&&cash<it.cost)b.disabled=true;
+    b.onclick=()=>{
+      if(it.have){it.buy();say('החלפתם ל'+it.nm,1);drawShop();return}
+      if(it.owned||cash<it.cost)return;
+      cash-=it.cost;it.buy();say('קניתם '+it.nm,1);drawShop()};
+    box.append(b)}}
+function toggleShop(){
+  const el=$('shop');
+  if(el.classList.contains('show')){el.classList.remove('show');return}
+  if(state!=='shop'){say('החנות נפתחת בין הגלים 🛒',1.4);return}
+  drawShop();el.classList.add('show')}
+$('shopGo').onclick=()=>{$('shop').classList.remove('show');shopT=0};
+
+function pickGun(i){const g=GUNS[i];if(!g||!P.owned[g.id])return;P.gun=g.id;P.reloadT=0}
+
+/* ---------- loop ---------- */
+let says=[];
+function say(s,t){says.push({s,t:t||2})}
+function tip(s){const e=$('tip');e.textContent=s;e.classList.add('show');
+  clearTimeout(tip.t);tip.t=setTimeout(()=>e.classList.remove('show'),1600)}
+function blocked(x,y,r){
+  for(const c of crates)
+    if(x+r>c.x&&x-r<c.x+c.w&&y+r>c.y&&y-r<c.y+c.h)return true;
+  return false}
+function step(dt){
+  clock+=dt;
+  if(P.hurt>0)P.hurt-=dt;
+  if(P.inv>0)P.inv-=dt;
+  if(P.cd>0)P.cd-=dt;
+  if(P.reloadT>0){P.reloadT-=dt;
+    if(P.reloadT<=0){const g=gunOf();
+      if(P.gun==='pistol'){P.mag.pistol=g.mag}
+      else{const take=Math.min(g.mag,P.ammo[P.gun]||0);P.ammo[P.gun]-=take;P.mag[P.gun]=take}}}
+  /* move */
+  let ax=(key['arrowright']||key['d']?1:0)-(key['arrowleft']||key['a']?1:0)+stick.ax;
+  let ay=(key['arrowdown']||key['s']?1:0)-(key['arrowup']||key['w']?1:0)+stick.ay;
+  const m=Math.hypot(ax,ay);if(m>1){ax/=m;ay/=m}
+  const nx=P.x+ax*P.sp*dt,ny=P.y+ay*P.sp*dt;
+  if(!blocked(nx,P.y,P.r))P.x=clamp(nx,P.r,W-P.r);
+  if(!blocked(P.x,ny,P.r))P.y=clamp(ny,P.r,H-P.r);
+  if(mouse.down||firing||key[' '])shoot();
+  P.face=aim();
+
+  if(state==='shop'){
+    shopT-=dt;$('shopClock').textContent='⏳ '+Math.ceil(Math.max(0,shopT));
+    if(shopT<=0){$('shop').classList.remove('show');state='play';nextWave()}
+    return}
+
+  /* spawn the wave a few at a time */
+  spawnT-=dt;
+  if(spawnQ.length&&spawnT<=0){
+    spawnOne(spawnQ.shift());
+    spawnT=Math.max(.12,.75-wave*.02)}
+  /* a wave that drags gets a push: stragglers speed up so it always ends */
+  if(!spawnQ.length&&zs.length&&zs.length<=3){
+    waveStall+=dt;
+    if(waveStall>12)for(const z of zs){const dx=P.x-z.x,dy=P.y-z.y,d=Math.hypot(dx,dy)||1;
+      z.x+=dx/d*34*dt;z.y+=dy/d*34*dt}}
+  else waveStall=0;
+  /* wave cleared */
+  if(!spawnQ.length&&!zs.length){
+    state='shop';shopT=18;drawShop();$('shop').classList.add('show');
+    cash+=40+wave*12;say('✅ גל '+wave+' נוקה · בונוס '+(40+wave*12)+' 💵',2.4);
+    if(window.AG)AG.add(14+wave*4,wave%5===0?1:0);
+    return}
+
+  /* zombies */
+  for(const z of zs){
+    const dx=P.x-z.x,dy=P.y-z.y,d=Math.hypot(dx,dy)||1;
+    if(z.hurt>0)z.hurt-=dt;
+    z.wig+=dt*6;
+    if(z.cd>0)z.cd-=dt;
+    const k=z.k;
+    if(k.range&&d<k.range){
+      /* spitters hang back and throw acid */
+      if(d<k.range*.65){
+        const bx=z.x-dx/d*k.sp*dt*.6,by=z.y-dy/d*k.sp*dt*.6;
+        if(bx>z.r+6&&bx<W-z.r-6)z.x=bx;
+        if(by>z.r+6&&by<H-z.r-6)z.y=by}
+      if(z.cd<=0){z.cd=2.1;
+        spits.push({x:z.x,y:z.y,vx:dx/d*260,vy:dy/d*260,life:2})}
+    }else if(k.boom){
+      z.x+=dx/d*k.sp*dt;z.y+=dy/d*k.sp*dt;
+      if(d<z.r+P.r+8){explode(z.x,z.y,k.boom,true);killZ(z);continue}
+    }else{
+      const wob=Math.sin(z.wig)*(k.boss?0:10);
+      z.x+=(dx/d*k.sp+(-dy/d)*wob*.02)*dt;
+      z.y+=(dy/d*k.sp+(dx/d)*wob*.02)*dt;
+      if(d<z.r+P.r&&z.cd<=0){z.cd=.8;hurtP(k.dmg)}}
+    if(k.heals&&z.cd<=0){z.cd=1.6;
+      for(const o of zs)if(o!==z&&Math.hypot(o.x-z.x,o.y-z.y)<120&&o.hp<o.maxhp){
+        o.hp=Math.min(o.maxhp,o.hp+8);
+        parts.push({x:o.x,y:o.y-10,vx:0,vy:-40,a:.6,c:'#4ad2c0',r:3})}}
+    /* crates are cover, not walls, for the big ones */
+    if(!k.boss&&blocked(z.x,z.y,z.r)){z.x-=dx/d*k.sp*dt*1.4;z.y-=dy/d*k.sp*dt*1.4}
+    /* once a zombie is in the arena it stays in it. Without this a spitter backs
+       away past the wall, bullets expire before reaching it, and the wave can
+       never be finished. */
+    if(!z.inside&&z.x>z.r&&z.x<W-z.r&&z.y>z.r&&z.y<H-z.r)z.inside=true;
+    if(z.inside){z.x=clamp(z.x,z.r,W-z.r);z.y=clamp(z.y,z.r,H-z.r)}
+    else{z.x=clamp(z.x,-40,W+40);z.y=clamp(z.y,-40,H+40)}}
+  /* keep them from stacking into one dot */
+  for(let i=0;i<zs.length;i++)for(let j=i+1;j<zs.length;j++){
+    const a=zs[i],b=zs[j],dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy)||1,o=a.r+b.r-d;
+    if(o>0){const px=dx/d*o*.5,py=dy/d*o*.5;a.x-=px;a.y-=py;b.x+=px;b.y+=py}}
+
+  /* bullets */
+  for(let i=bullets.length-1;i>=0;i--){const b=bullets[i];
+    b.x+=b.vx*dt;b.y+=b.vy*dt;b.life-=dt;
+    let gone=b.life<=0||b.x<-20||b.x>W+20||b.y<-20||b.y>H+20||blocked(b.x,b.y,2);
+    if(!gone)for(const z of zs)if(Math.hypot(z.x-b.x,z.y-b.y)<z.r){
+      hitZ(z,b.dmg,b.vx/700,b.vy/700);gone=true;break}
+    if(gone)bullets.splice(i,1)}
+  /* acid */
+  for(let i=spits.length-1;i>=0;i--){const s=spits[i];
+    s.x+=s.vx*dt;s.y+=s.vy*dt;s.life-=dt;
+    if(Math.hypot(P.x-s.x,P.y-s.y)<P.r+7){hurtP(7);spits.splice(i,1);continue}
+    if(s.life<=0)spits.splice(i,1)}
+  /* money on the floor */
+  for(let i=drops.length-1;i>=0;i--){const d=drops[i];d.t-=dt;
+    const dist=Math.hypot(P.x-d.x,P.y-d.y);
+    if(dist<70){d.x+=(P.x-d.x)*dt*5;d.y+=(P.y-d.y)*dt*5}
+    if(dist<22){cash+=d.v;drops.splice(i,1);continue}
+    if(d.t<=0)drops.splice(i,1)}
+  for(let i=parts.length-1;i>=0;i--){const q=parts[i];
+    q.x+=q.vx*dt;q.y+=q.vy*dt;q.vx*=.93;q.vy*=.93;q.a-=dt*1.5;
+    if(q.a<=0)parts.splice(i,1)}
+  for(let i=says.length-1;i>=0;i--){says[i].t-=dt;if(says[i].t<=0)says.splice(i,1)}}
+
+function die(){
+  if(state==='dead')return;
+  state='dead';$('shop').classList.remove('show');
+  $('endT').textContent='הזומבים ניצחו';
+  $('endP').textContent='הגעתם לגל '+wave+' · '+kills+' הריגות · '+Math.floor(clock)+' שניות';
+  $('endM').classList.add('show');
+  if(window.AG)AG.add(20+wave*6,wave>=10?1:0)}
+
+/* ---------- drawing ---------- */
+function draw(){
+  const w=cv.clientWidth,h=cv.clientHeight,s=Math.min(w/W,h/H);
+  const dpr=Math.min(2,devicePixelRatio||1);
+  cx.setTransform(dpr,0,0,dpr,0,0);          /* keep the device-pixel scale */
+  cx.fillStyle='#0d1410';cx.fillRect(0,0,w,h);
+  cx.translate((w-W*s)/2,(h-H*s)/2);cx.scale(s,s);
+  cx.direction='ltr';
+  /* ground */
+  cx.fillStyle='#16241a';cx.fillRect(0,0,W,H);
+  cx.strokeStyle='rgba(255,255,255,.035)';cx.lineWidth=1;
+  for(let x=0;x<W;x+=50){cx.beginPath();cx.moveTo(x,0);cx.lineTo(x,H);cx.stroke()}
+  for(let y=0;y<H;y+=50){cx.beginPath();cx.moveTo(0,y);cx.lineTo(W,y);cx.stroke()}
+  cx.strokeStyle='#2c4433';cx.lineWidth=6;cx.strokeRect(3,3,W-6,H-6);
+  for(const c of crates){cx.fillStyle='#3b3022';rr(c.x,c.y,c.w,c.h,7);cx.fill();
+    cx.fillStyle='#55452f';rr(c.x+4,c.y+4,c.w-8,c.h*.42,5);cx.fill()}
+  /* money */
+  for(const d of drops){const b=Math.sin(clock*6+d.bob)*2;
+    cx.fillStyle='#8ee36b';rr(d.x-9,d.y-6+b,18,12,3);cx.fill();
+    cx.fillStyle='#2f5a22';cx.font='900 9px Rubik,system-ui';cx.textAlign='center';cx.textBaseline='middle';
+    cx.fillText('$',d.x,d.y+b)}
+  /* acid */
+  for(const s2 of spits)dot(s2.x,s2.y,7,'#7fe0a8');
+  /* zombies */
+  for(const z of zs){
+    const k=z.k,lean=Math.sin(z.wig)*.12;
+    cx.fillStyle='rgba(0,0,0,.3)';cx.beginPath();cx.ellipse(z.x,z.y+z.r*.8,z.r*.9,z.r*.4,0,0,6.3);cx.fill();
+    cx.save();cx.translate(z.x,z.y);cx.rotate(lean);
+    dot(0,0,z.r,z.hurt>0?'#ffffff':k.c);
+    cx.fillStyle=k.c2;cx.beginPath();cx.arc(0,0,z.r,-0.6,0.6);cx.lineTo(0,0);cx.fill();
+    dot(-z.r*.3,-z.r*.22,z.r*.16,'#20120f');dot(z.r*.3,-z.r*.22,z.r*.16,'#20120f');
+    cx.strokeStyle='#20120f';cx.lineWidth=Math.max(1.6,z.r*.1);
+    cx.beginPath();cx.moveTo(-z.r*.36,z.r*.38);cx.lineTo(z.r*.36,z.r*.38);cx.stroke();
+    cx.restore();
+    if(z.hp<z.maxhp){cx.fillStyle='rgba(0,0,0,.5)';rr(z.x-z.r,z.y-z.r-9,z.r*2,4,2);cx.fill();
+      cx.fillStyle=k.boss?'#ff5470':'#9bff6a';rr(z.x-z.r,z.y-z.r-9,z.r*2*Math.max(0,z.hp/z.maxhp),4,2);cx.fill()}}
+  /* bullets */
+  for(const b of bullets){cx.strokeStyle='#ffe9a8';cx.lineWidth=3;cx.lineCap='round';
+    cx.beginPath();cx.moveTo(b.x,b.y);cx.lineTo(b.x-b.vx*.012,b.y-b.vy*.012);cx.stroke()}
+  /* player */
+  cx.fillStyle='rgba(0,0,0,.35)';cx.beginPath();cx.ellipse(P.x,P.y+P.r*.85,P.r,P.r*.42,0,0,6.3);cx.fill();
+  dot(P.x,P.y,P.r,P.hurt>0?'#fff':'#6ad8ff');
+  cx.fillStyle='#19455c';cx.beginPath();cx.arc(P.x,P.y,P.r,P.face-.55,P.face+.55);cx.lineTo(P.x,P.y);cx.fill();
+  cx.strokeStyle='#e8f6ff';cx.lineWidth=5;cx.lineCap='round';
+  cx.beginPath();cx.moveTo(P.x+Math.cos(P.face)*8,P.y+Math.sin(P.face)*8);
+  cx.lineTo(P.x+Math.cos(P.face)*24,P.y+Math.sin(P.face)*24);cx.stroke();
+  /* particles */
+  for(const q of parts){cx.globalAlpha=Math.max(0,q.a);dot(q.x,q.y,q.r,q.c)}
+  cx.globalAlpha=1;
+  hud();
+  cx.setTransform(dpr,0,0,dpr,0,0)}
+function hud(){
+  cx.textBaseline='middle';
+  /* wave + cash, top right - the hub keeps the top left corner */
+  cx.textAlign='right';cx.font='900 20px Rubik,system-ui';cx.fillStyle='#fff';
+  cx.fillText('wave '+wave+'   $'+cash+'   x'+kills,W-16,30);
+  /* health, just under it */
+  const hw=240,hx=W-16-hw;
+  cx.fillStyle='rgba(0,0,0,.45)';rr(hx,48,hw,28,10);cx.fill();
+  cx.fillStyle=P.hp>P.maxhp*.3?'#9bff6a':'#ff5470';
+  rr(hx+4,52,(hw-8)*Math.max(0,P.hp/P.maxhp),20,8);cx.fill();
+  cx.fillStyle='#0d1410';cx.font='900 14px Rubik,system-ui';cx.textAlign='center';
+  cx.fillText(Math.max(0,Math.ceil(P.hp))+' / '+P.maxhp,hx+hw/2,63);
+  /* gun, centred at the bottom so the thumb buttons never cover it */
+  const g=gunOf(),gw=280;
+  cx.textAlign='center';cx.font='900 17px Rubik,system-ui';
+  cx.fillStyle='rgba(0,0,0,.5)';rr((W-gw)/2,H-50,gw,36,10);cx.fill();
+  cx.fillStyle=P.reloadT>0?'#ffd43b':'#fff';
+  const magTxt=P.reloadT>0?'טוען…':(P.mag[P.gun]||0)+(P.gun==='pistol'?'':' / '+(P.ammo[P.gun]||0));
+  cx.fillText(g.em+' '+g.nm+'   \u2066'+magTxt+'\u2069',W/2,H-32);
+  /* messages */
+  cx.textAlign='center';cx.font='900 22px Rubik,system-ui';
+  says.forEach((m,i)=>{cx.globalAlpha=Math.min(1,m.t);
+    cx.fillStyle='rgba(0,0,0,.55)';const tw=cx.measureText(m.s).width+26;
+    rr(W/2-tw/2,92+i*38,tw,32,9);cx.fill();
+    cx.fillStyle='#fff';cx.fillText(m.s,W/2,109+i*38);cx.globalAlpha=1})}
+
+function resize(){const d=Math.min(2,devicePixelRatio||1);
+  cv.width=Math.round(cv.clientWidth*d);cv.height=Math.round(cv.clientHeight*d);
+  cx.setTransform(d,0,0,d,0,0)}
+addEventListener('resize',resize);
+let last=0,acc=0;
+function frame(ts){
+  requestAnimationFrame(frame);
+  const dt=Math.min(.05,(ts-last)/1000||0);last=ts;
+  if(!P)return;
+  if(state==='play'||state==='shop'){acc+=dt;let g=0;
+    while(acc>=1/60&&g++<5){step(1/60);acc-=1/60}}
+  draw()}
+
+/* ---------- menu ---------- */
+(function(){
+  const kb=$('kinds');
+  KINDS.filter(k=>!k.boss).concat([K('boss')]).forEach(k=>{
+    const d=document.createElement('div');
+    d.innerHTML='<span>'+k.em+'</span>'+k.nm;kb.append(d)});
+  $('ctrl').textContent=touch
+    ?'ג׳ויסטיק לתזוזה · 🔫 ירי · 🛒 חנות'
+    :'WASD/חיצים לתזוזה · עכבר לכוון · לחיצה לירות · R טעינה · 1-4 נשק · E חנות';
+  $('best').textContent=best;
+  $('go').onclick=()=>{startGame();resize()};
+  $('again').onclick=()=>{document.getElementById('endM').classList.remove('show');
+    document.getElementById('menu').classList.add('show');$('best').textContent=best};
+  resize();requestAnimationFrame(frame)})();
+</script>
+</body>
+</html>
