@@ -109,6 +109,32 @@ const $=s=>document.getElementById(s);
 function rr(x,y,w,h,r){cx.beginPath();cx.moveTo(x+r,y);cx.arcTo(x+w,y,x+w,y+h,r);cx.arcTo(x+w,y+h,x,y+h,r);
   cx.arcTo(x,y+h,x,y,r);cx.arcTo(x,y,x+w,y,r);cx.closePath()}
 function dot(x,y,r,c){cx.fillStyle=c;cx.beginPath();cx.arc(x,y,r,0,6.283);cx.fill()}
+/* a limb: a thick round-capped line. Cheap, and it reads as an arm or a leg. */
+function limb(x1,y1,x2,y2,w,c){cx.strokeStyle=c;cx.lineWidth=w;cx.lineCap='round';
+  cx.beginPath();cx.moveTo(x1,y1);cx.lineTo(x2,y2);cx.stroke()}
+function oval(x,y,rx,ry,c,a){cx.fillStyle=c;cx.beginPath();cx.ellipse(x,y,rx,ry,a||0,0,6.283);cx.fill()}
+/* turn a toward b by at most s, the short way round */
+function turn(a,b,s){let d=((b-a+Math.PI*3)%(Math.PI*2))-Math.PI;
+  if(d>s)d=s;else if(d<-s)d=-s;return a+d}
+/* how each kind is built. Gameplay numbers stay in KINDS; this is only the body. */
+const V={
+ walk :{wide:1.00,armF:.95,legL:.50,head:.46,hunch:.10,arms:2},
+ run  :{wide:0.84,armF:.45,legL:.66,head:.42,hunch:.30,arms:2},
+ tank :{wide:1.34,armF:.78,legL:.32,head:.32,hunch:.04,arms:2},
+ spit :{wide:1.06,armF:.55,legL:.42,head:.50,hunch:.00,arms:2},
+ bomb :{wide:1.12,armF:.88,legL:.44,head:.38,hunch:.08,arms:2},
+ heal :{wide:1.00,armF:.68,legL:.46,head:.46,hunch:.00,arms:2},
+ boss :{wide:1.24,armF:.92,legL:.40,head:.40,hunch:.06,arms:2},
+ swarm:{wide:1.00,armF:0,  legL:.70,head:.40,hunch:0,  arms:0}};
+/* blood and scorch stay on the ground: one offscreen layer, stamped once, drawn once */
+let dec=null,dcx=null;
+function decFit(){dec=document.createElement('canvas');dec.width=W;dec.height=H;
+  dcx=dec.getContext('2d');dcx.clearRect(0,0,W,H)}
+function splat(x,y,r,c,n){if(!dcx)return;dcx.globalAlpha=.42;dcx.fillStyle=c;
+  for(let i=0;i<(n||6);i++){const a=Math.random()*6.283,d=Math.random()*r;
+    dcx.beginPath();dcx.ellipse(x+Math.cos(a)*d,y+Math.sin(a)*d,
+      r*rnd(.18,.42),r*rnd(.14,.34),a,0,6.283);dcx.fill()}
+  dcx.globalAlpha=1}
 const rnd=(a,b)=>a+Math.random()*(b-a);
 const clamp=(v,a,b)=>v<a?a:v>b?b:v;
 
@@ -147,13 +173,16 @@ const G=id=>GUNS.find(g=>g.id===id);
 
 /* ---------- state ---------- */
 let P,zs,bullets,spits,cash,wave,state,parts,drops,crates,shopT,spawnQ,spawnT,best=0,clock=0,kills=0,waveStall=0;
+let corpses=[],shk=0,flash=0;
 try{best=+localStorage.getItem('zombies_best')||0}catch(e){}
 function newPlayer(){return{x:W/2,y:H/2,r:14,hp:100,maxhp:100,sp:168,
   gun:'pistol',owned:{pistol:1},ammo:{},mag:{},reloadT:0,cd:0,face:0,
-  dmgUp:0,rateUp:0,maxhpUp:0,spUp:0,hurt:0,inv:0,kills:0}}
+  dmgUp:0,rateUp:0,maxhpUp:0,spUp:0,hurt:0,inv:0,kills:0,
+  ph:0,mv:0,rec:0,step:0}}
 function startGame(){
   fitArena();
   P=newPlayer();zs=[];bullets=[];spits=[];parts=[];drops=[];cash=60;wave=0;kills=0;clock=0;waveStall=0;
+  corpses=[];shk=0;flash=0;decFit();
   P.mag.pistol=G('pistol').mag;P.ammo.pistol=9999;
   crates=[];
   for(let i=0;i<7;i++){const w=rnd(44,86),h=rnd(40,70);
@@ -229,6 +258,10 @@ function shoot(){
     bullets.push({x:P.x+Math.cos(a)*16,y:P.y+Math.sin(a)*16,
       vx:Math.cos(sp)*g.speed,vy:Math.sin(sp)*g.speed,
       dmg:g.dmg+P.dmgUp*3,life:.9})}
+  /* the gun kicks back and lights up, and the heavier it is the harder it shoves */
+  P.rec=g.id==='shot'?1:g.id==='rifle'?.9:g.id==='smg'?.42:.6;
+  P.flash=g.id==='shot'?.07:.05;
+  shk=Math.max(shk,g.id==='shot'?.5:g.id==='rifle'?.42:.16);
   kick(a)}
 function kick(a){for(let i=0;i<4;i++)parts.push({x:P.x+Math.cos(a)*18,y:P.y+Math.sin(a)*18,
   vx:Math.cos(a)*rnd(40,150)+rnd(-40,40),vy:Math.sin(a)*rnd(40,150)+rnd(-40,40),a:.4,c:'#ffd97a',r:2.5})}
@@ -240,7 +273,8 @@ function spawnOne(id){
   if(side===0){x=rnd(0,W);y=-30}else if(side===1){x=W+30;y=rnd(0,H)}
   else if(side===2){x=rnd(0,W);y=H+30}else{x=-30;y=rnd(0,H)}
   const hp=k.hp*(1+wave*0.085);
-  zs.push({k,x,y,r:k.r,hp,maxhp:hp,cd:0,hurt:0,wig:Math.random()*6,boom:0,inside:false})}
+  zs.push({k,x,y,r:k.r,hp,maxhp:hp,cd:0,hurt:0,wig:Math.random()*6,boom:0,inside:false,
+    ph:Math.random()*6.283,fc:Math.atan2(H/2-y,W/2-x),limp:Math.random()<.5?1:-1})}
 function hitZ(z,d,fx,fy){
   z.hp-=d;z.hurt=.14;
   z.x+=fx*2.2;z.y+=fy*2.2;
@@ -252,15 +286,24 @@ function killZ(z){
   drops.push({x:z.x,y:z.y,v:Math.round(z.k.cash*(1+wave*.05)),t:16,bob:Math.random()*6});
   for(let k2=0;k2<(z.k.boss?26:9);k2++)
     parts.push({x:z.x,y:z.y,vx:rnd(-220,220),vy:rnd(-220,220),a:.8,c:z.k.c2,r:rnd(2,4)});
+  /* it leaves a body and a stain behind instead of just vanishing */
+  splat(z.x,z.y,z.r*(z.k.boss?2.4:1.5),z.k.c2,z.k.boss?12:6);
+  corpses.push({k:z.k,x:z.x,y:z.y,fc:z.fc,t:z.k.boss?12:7,max:z.k.boss?12:7,
+    ph:z.ph,limp:z.limp,r:z.r});
+  if(corpses.length>26)corpses.shift();
+  if(z.k.boss)shk=1.1;
   if(z.k.boom)explode(z.x,z.y,z.k.boom,false)}
 function explode(x,y,dmg,hurtPlayer){
   for(let i=0;i<22;i++)parts.push({x,y,vx:rnd(-320,320),vy:rnd(-320,320),a:.7,
     c:i%2?'#ffb545':'#ff5470',r:rnd(2,5)});
+  splat(x,y,44,'#1b1410',9);
+  shk=Math.max(shk,.85);flash=Math.max(flash,.5);
   for(const z of zs.slice())if(Math.hypot(z.x-x,z.y-y)<86)hitZ(z,dmg,0,0);
   if(hurtPlayer){const d=Math.hypot(P.x-x,P.y-y);if(d<96)hurtP(dmg*(1-d/96))}}
 function hurtP(d){
   if(P.inv>0)return;
   P.hp-=d;P.hurt=.3;P.inv=.45;
+  shk=Math.max(shk,.55);
   if(P.hp<=0)die()}
 
 /* ---------- shop ---------- */
@@ -333,10 +376,25 @@ function step(dt){
   let ay=(key['arrowdown']||key['s']?1:0)-(key['arrowup']||key['w']?1:0)+stick.ay;
   const m=Math.hypot(ax,ay);if(m>1){ax/=m;ay/=m}
   const nx=P.x+ax*P.sp*dt,ny=P.y+ay*P.sp*dt;
+  const wx=P.x,wy=P.y;
   if(!blocked(nx,P.y,P.r))P.x=clamp(nx,P.r,W-P.r);
   if(!blocked(P.x,ny,P.r))P.y=clamp(ny,P.r,H-P.r);
   if(mouse.down||firing||key[' '])shoot();
   P.face=aim();
+  /* legs follow where he is going, the torso follows where he is aiming */
+  const pmx=P.x-wx,pmy=P.y-wy,pmd=Math.hypot(pmx,pmy);
+  P.ph+=pmd/7;
+  if(pmd>.01)P.mv=turn(P.mv,Math.atan2(pmy,pmx),dt*12);
+  /* a puff of dust each time a foot lands */
+  P.step+=pmd;
+  if(P.step>26){P.step=0;
+    parts.push({x:P.x+rnd(-5,5),y:P.y+P.r*.7,vx:rnd(-16,16),vy:rnd(-6,10),a:.28,c:'#4c6b4f',r:2})}
+  if(P.rec>0)P.rec=Math.max(0,P.rec-dt*5.5);
+  if(P.flash>0)P.flash=Math.max(0,P.flash-dt);
+  if(shk>0)shk=Math.max(0,shk-dt*13);
+  if(flash>0)flash=Math.max(0,flash-dt*26);
+  /* corpses lie where they fell, then sink away */
+  for(let i=corpses.length-1;i>=0;i--){corpses[i].t-=dt;if(corpses[i].t<=0)corpses.splice(i,1)}
 
   if(state==='shop'){
     shopT-=dt;$('shopClock').textContent='⏳ '+Math.ceil(Math.max(0,shopT));
@@ -364,6 +422,7 @@ function step(dt){
   /* zombies */
   for(const z of zs){
     const dx=P.x-z.x,dy=P.y-z.y,d=Math.hypot(dx,dy)||1;
+    const wasx=z.x,wasy=z.y;
     if(z.hurt>0)z.hurt-=dt;
     z.wig+=dt*6;
     if(z.cd>0)z.cd-=dt;
@@ -395,7 +454,13 @@ function step(dt){
        never be finished. */
     if(!z.inside&&z.x>z.r&&z.x<W-z.r&&z.y>z.r&&z.y<H-z.r)z.inside=true;
     if(z.inside){z.x=clamp(z.x,z.r,W-z.r);z.y=clamp(z.y,z.r,H-z.r)}
-    else{z.x=clamp(z.x,-40,W+40);z.y=clamp(z.y,-40,H+40)}}
+    else{z.x=clamp(z.x,-40,W+40);z.y=clamp(z.y,-40,H+40)}
+    /* the gait is driven by the ground it actually covered, so a zombie that is
+       stuck against a crate stops walking on the spot */
+    const mx=z.x-wasx,my=z.y-wasy,md=Math.hypot(mx,my);
+    z.ph+=md/Math.max(4,z.r*.42);
+    if(md>.01)z.fc=turn(z.fc,Math.atan2(my,mx),dt*7);
+    else z.fc=turn(z.fc,Math.atan2(dy,dx),dt*3)}
   /* keep them from stacking into one dot */
   for(let i=0;i<zs.length;i++)for(let j=i+1;j<zs.length;j++){
     const a=zs[i],b=zs[j],dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy)||1,o=a.r+b.r-d;
@@ -433,21 +498,176 @@ function die(){
   if(window.AG)AG.add(20+wave*6,wave>=10?1:0)}
 
 /* ---------- drawing ---------- */
+/* One zombie, built from limbs and animated by its gait phase.
+   Local space after the rotate: +x is the way it faces, +y is its right side.
+   a = 1 while alive, or how solid a corpse still is. */
+/* One zombie, built from limbs and animated by its gait phase.
+   Local space after the rotate: +x is the way it faces, +y is its right side.
+   Everything is drawn with a dark outline under it, which is what keeps the
+   limbs readable against the body at the size these are actually played at.
+   a = 1 while alive, or how solid a corpse still is. */
+const OL='#141c13';
+function oLimb(x1,y1,x2,y2,w,c,ow){limb(x1,y1,x2,y2,w+(ow||0),OL);limb(x1,y1,x2,y2,w,c)}
+function oOval(x,y,rx,ry,c,lw,ang){cx.fillStyle=c;cx.strokeStyle=OL;cx.lineWidth=lw;
+  cx.beginPath();cx.ellipse(x,y,rx,ry,ang||0,0,6.283);cx.fill();cx.stroke()}
+function body(z,a,dead){
+  const k=z.k,v=V[k.id]||V.walk,r=z.r;
+  const sw=Math.sin(z.ph),sw2=Math.sin(z.ph+Math.PI);
+  const skin=z.hurt>0?'#ffffff':k.c, dark=z.hurt>0?'#d8d8d8':k.c2;
+  const ow=Math.max(1.6,r*.17);           /* how far the outline sticks out */
+  cx.save();
+  if(dead){cx.globalAlpha=a;cx.translate(z.x,z.y);cx.rotate(z.fc);cx.scale(1,.74)}
+  else{
+    cx.fillStyle='rgba(0,0,0,.32)';
+    cx.beginPath();cx.ellipse(z.x,z.y+r*.9,r*.95,r*.36,0,0,6.283);cx.fill();
+    cx.translate(z.x,z.y);cx.rotate(z.fc);
+    /* the whole body rocks, and a limp makes it rock unevenly */
+    cx.rotate(sw*.055*z.limp);
+    cx.translate(Math.abs(sw)*r*.06,0)}
+
+  if(v.arms===0){
+    /* the little ones scuttle on three pairs of legs */
+    for(let i=-1;i<2;i++){const o=-r*.1+i*r*.42,p=Math.sin(z.ph+i*1.2);
+      oLimb(o,r*.1,o+p*r*.7,r*1.15,Math.max(1.3,r*.19),dark,ow*.7);
+      oLimb(o,-r*.1,o-p*r*.7,-r*1.15,Math.max(1.3,r*.19),dark,ow*.7)}
+    oOval(0,0,r*.92,r*.70,skin,Math.max(1.4,r*.2));
+    oOval(r*.52,0,r*.36,r*.30,dark,Math.max(1.2,r*.16));
+    dot(r*.66,-r*.26,Math.max(1,r*.15),'#1a0f14');dot(r*.66,r*.26,Math.max(1,r*.15),'#1a0f14');
+    cx.restore();return}
+
+  const lw=Math.max(2.4,r*.30), aw=Math.max(2.2,r*.26);
+  /* LEGS. Seen from above you only catch the feet swinging out past the body,
+     so the hips sit near the middle and the stride carries them clear of it. */
+  const hip=-r*.14, stride=r*v.legL*1.45;
+  oLimb(hip,-r*.28, hip+sw *stride, -r*.34, lw, dark, ow);
+  oLimb(hip, r*.28, hip+sw2*stride,  r*.34, lw, dark, ow);
+  /* ARMS from the shoulders. A zombie reaches; a runner throws them back. */
+  const reach=r*(v.armF*.62+.72)+Math.abs(sw)*r*.10;
+  if(k.id==='run'){
+    oLimb(0,-r*.56, -r*.95, -r*.80-sw*r*.18, aw, skin, ow);
+    oLimb(0, r*.56, -r*.95,  r*.80+sw2*r*.18, aw, skin, ow)}
+  else{
+    const h1=-r*.34+sw*r*.14, h2=r*.34+sw2*r*.14;
+    oLimb(0,-r*.56, reach, h1, aw, skin, ow);
+    oLimb(0, r*.56, reach, h2, aw, skin, ow);
+    dot(reach,h1,aw*.70,dark);dot(reach,h2,aw*.70,dark)}
+  /* TORSO: the shoulders, wider across than front to back */
+  oOval(0,0,r*.62,r*.80*v.wide,skin,Math.max(1.6,r*.2));
+  /* a band of rotted clothing, which reads as a body rather than a blob */
+  cx.save();cx.beginPath();cx.ellipse(0,0,r*.62,r*.80*v.wide,0,0,6.283);cx.clip();
+  cx.fillStyle=dark;cx.fillRect(-r*.46,-r,r*.40,r*2);
+  cx.fillStyle='rgba(0,0,0,.18)';cx.fillRect(-r*.1,-r,r*.8,r*2);
+  cx.restore();
+  /* HEAD, sitting on the shoulders and lolling as it walks */
+  const hx=r*(.22+v.hunch), hy=Math.sin(z.ph*.5)*r*.10;
+  oOval(hx,hy,r*v.head,r*v.head*.96,skin,Math.max(1.5,r*.18));
+  cx.fillStyle='rgba(255,255,255,.16)';
+  cx.beginPath();cx.ellipse(hx,hy,r*v.head*.94,r*v.head*.9,0,0,6.283);cx.fill();
+  dot(hx+r*v.head*.40,hy-r*.20,Math.max(1,r*.09),'#140c10');
+  dot(hx+r*v.head*.40,hy+r*.20,Math.max(1,r*.09),'#140c10');
+  /* a slack, open mouth */
+  cx.fillStyle='#160d11';cx.beginPath();
+  cx.ellipse(hx+r*v.head*.72,hy,r*.11,r*.15,0,0,6.283);cx.fill();
+
+  /* what makes each kind its own thing */
+  if(k.id==='tank'){ /* slabs of armour across the shoulders */
+    cx.fillStyle='rgba(0,0,0,.3)';rr(-r*.34,-r*.80*v.wide,r*.52,r*1.6*v.wide,r*.16);cx.fill()}
+  if(k.id==='spit'){ /* sacs of acid on its back */
+    for(let i=-1;i<2;i+=2)oOval(-r*.44,i*r*.36,r*.26,r*.22,'#9cf5c4',Math.max(1,r*.1));
+    oOval(-r*.66,0,r*.22,r*.2,'#9cf5c4',Math.max(1,r*.1))}
+  if(k.id==='bomb'){ /* a fuse burning down */
+    const g=.5+.5*Math.sin(clock*13);
+    cx.globalAlpha=(dead?a:1)*(.3+g*.45);dot(0,0,r*.58,'#ff7a3c');cx.globalAlpha=dead?a:1;
+    dot(-r*.56,0,r*.18,'#ffd05a')}
+  if(k.id==='heal'){ /* a ring of care for its friends */
+    cx.strokeStyle='rgba(110,245,225,'+(.3+.2*Math.sin(clock*4))+')';cx.lineWidth=2;
+    cx.beginPath();cx.arc(0,0,r*1.6,0,6.283);cx.stroke()}
+  if(k.boss){ /* horns off the head, and a ribcage across the back */
+    cx.strokeStyle='rgba(255,235,240,.4)';cx.lineWidth=Math.max(1.4,r*.055);cx.lineCap='round';
+    for(let i=-1;i<2;i++){cx.beginPath();
+      cx.moveTo(-r*.42,i*r*.26);cx.lineTo(r*.0,i*r*.26);cx.stroke()}
+    cx.strokeStyle='#f6dde2';cx.lineWidth=Math.max(2.4,r*.13);
+    cx.beginPath();cx.moveTo(hx-r*.1,hy-r*v.head*.8);
+    cx.quadraticCurveTo(hx+r*.3,hy-r*.86,hx+r*.56,hy-r*.52);cx.stroke();
+    cx.beginPath();cx.moveTo(hx-r*.1,hy+r*v.head*.8);
+    cx.quadraticCurveTo(hx+r*.3,hy+r*.86,hx+r*.56,hy+r*.52);cx.stroke()}
+  cx.restore()}
+
+function drawPlayer(){
+  const r=P.r,sw=Math.sin(P.ph),sw2=Math.sin(P.ph+Math.PI);
+  const g=gunOf();
+  const skin=P.hurt>0?'#ffffff':'#7fe0ff', dark=P.hurt>0?'#d8d8d8':'#1d5775';
+  const ow=Math.max(1.8,r*.18), lw=Math.max(2.6,r*.32), aw=Math.max(2.4,r*.27);
+  cx.fillStyle='rgba(0,0,0,.35)';
+  cx.beginPath();cx.ellipse(P.x,P.y+r*.92,r*1.0,r*.38,0,0,6.283);cx.fill();
+  /* a ring on the ground, so you can always find yourself in a crowd */
+  cx.strokeStyle=P.hurt>0?'rgba(255,120,140,.9)':'rgba(130,230,255,.42)';
+  cx.lineWidth=2.2;cx.beginPath();cx.ellipse(P.x,P.y+r*.3,r*1.5,r*1.0,0,0,6.283);cx.stroke();
+  /* the legs run on the way he is going */
+  cx.save();cx.translate(P.x,P.y);cx.rotate(P.mv);
+  const hip=-r*.12,stride=r*.78;
+  oLimb(hip,-r*.28, hip+sw *stride,-r*.34,lw,dark,ow);
+  oLimb(hip, r*.28, hip+sw2*stride, r*.34,lw,dark,ow);
+  cx.restore();
+  /* the torso on the way he is aiming */
+  cx.save();cx.translate(P.x,P.y);cx.rotate(P.face);
+  cx.translate(-P.rec*3.4,0);                 /* the recoil shoves him back */
+  const gl=g.id==='rifle'?r*2.1:g.id==='shot'?r*1.75:g.id==='smg'?r*1.45:r*1.2;
+  /* the gun, with both arms up on it */
+  oLimb(r*.1,0, gl,0, Math.max(2.4,r*.24),'#30363f',ow*.8);
+  oLimb(r*.0,0, r*.72,0, Math.max(2.8,r*.34),'#424a56',ow*.7);  /* the receiver */
+  if(g.id==='shot')oLimb(r*.6,0,gl*.86,0,Math.max(2,r*.2),'#30363f',0);  /* a second barrel */
+  if(g.id!=='pistol')oLimb(r*.5,-r*.04,r*.42,r*.5,Math.max(2,r*.19),'#30363f',ow*.6);
+  oLimb(0,-r*.54, gl*.60,-r*.14,aw,skin,ow);
+  oLimb(0, r*.54, gl*.50, r*.16,aw,skin,ow);
+  oOval(0,0,r*.62,r*.80,skin,Math.max(1.8,r*.2));
+  /* a vest across the shoulders */
+  cx.save();cx.beginPath();cx.ellipse(0,0,r*.62,r*.80,0,0,6.283);cx.clip();
+  cx.fillStyle=dark;cx.fillRect(-r*.46,-r,r*.44,r*2);
+  cx.restore();
+  /* the head, sitting on the shoulders, with a cap over it */
+  oOval(r*.16,0,r*.46,r*.44,'#f3dcc2',Math.max(1.5,r*.17));
+  cx.fillStyle=dark;cx.beginPath();
+  cx.ellipse(r*.12,0,r*.44,r*.42,0,-2.1,2.1);cx.fill();
+  cx.strokeStyle=OL;cx.lineWidth=Math.max(1.2,r*.12);cx.stroke();
+  /* the muzzle flash */
+  if(P.flash>0){const f=Math.min(1,P.flash/.05);
+    cx.globalAlpha=f;
+    oval(gl+r*.26,0,r*.56*f,r*.38*f,'#fff6c8');
+    oval(gl+r*.56,0,r*.32*f,r*.18*f,'#ffcf52');
+    for(let i=-1;i<2;i+=2)oval(gl+r*.3,i*r*.3*f,r*.2*f,r*.12*f,'#ffcf52');
+    cx.globalAlpha=1}
+  cx.restore()}
+
+
 function draw(){
   const w=cv.clientWidth,h=cv.clientHeight,s=Math.min(w/W,h/H);
   const dpr=Math.min(2,devicePixelRatio||1);
   cx.setTransform(dpr,0,0,dpr,0,0);          /* keep the device-pixel scale */
   cx.fillStyle='#0d1410';cx.fillRect(0,0,w,h);
   cx.translate((w-W*s)/2,(h-H*s)/2);cx.scale(s,s);
+  /* the whole arena jolts on a hit or a blast */
+  if(shk>0)cx.translate(rnd(-1,1)*shk*7,rnd(-1,1)*shk*7);
   cx.direction='ltr';
   /* ground */
   cx.fillStyle='#16241a';cx.fillRect(0,0,W,H);
   cx.strokeStyle='rgba(255,255,255,.035)';cx.lineWidth=1;
   for(let x=0;x<W;x+=50){cx.beginPath();cx.moveTo(x,0);cx.lineTo(x,H);cx.stroke()}
   for(let y=0;y<H;y+=50){cx.beginPath();cx.moveTo(0,y);cx.lineTo(W,y);cx.stroke()}
+  /* every stain anything has left, in one go */
+  if(dec)cx.drawImage(dec,0,0);
   cx.strokeStyle='#2c4433';cx.lineWidth=6;cx.strokeRect(3,3,W-6,H-6);
-  for(const c of crates){cx.fillStyle='#3b3022';rr(c.x,c.y,c.w,c.h,7);cx.fill();
-    cx.fillStyle='#55452f';rr(c.x+4,c.y+4,c.w-8,c.h*.42,5);cx.fill()}
+  /* the bodies lie where they dropped and sink away */
+  for(const c of corpses)body(c,Math.min(1,c.t/1.6)*.8,true);
+  for(const c of crates){
+    cx.fillStyle='rgba(0,0,0,.3)';rr(c.x+3,c.y+5,c.w,c.h,7);cx.fill();
+    cx.fillStyle='#3b3022';rr(c.x,c.y,c.w,c.h,7);cx.fill();
+    cx.fillStyle='#55452f';rr(c.x+4,c.y+4,c.w-8,c.h*.42,5);cx.fill();
+    cx.strokeStyle='rgba(0,0,0,.35)';cx.lineWidth=2;
+    cx.beginPath();cx.moveTo(c.x+6,c.y+c.h*.62);cx.lineTo(c.x+c.w-6,c.y+c.h*.62);cx.stroke();
+    cx.fillStyle='rgba(255,255,255,.12)';
+    for(const p of [[c.x+7,c.y+7],[c.x+c.w-7,c.y+7],[c.x+7,c.y+c.h-7],[c.x+c.w-7,c.y+c.h-7]])
+      {cx.beginPath();cx.arc(p[0],p[1],2,0,6.283);cx.fill()}}
   /* money */
   for(const d of drops){const b=Math.sin(clock*6+d.bob)*2;
     cx.fillStyle='#8ee36b';rr(d.x-9,d.y-6+b,18,12,3);cx.fill();
@@ -456,31 +676,26 @@ function draw(){
   /* acid */
   for(const s2 of spits)dot(s2.x,s2.y,7,'#7fe0a8');
   /* zombies */
-  for(const z of zs){
-    const k=z.k,lean=Math.sin(z.wig)*.12;
-    cx.fillStyle='rgba(0,0,0,.3)';cx.beginPath();cx.ellipse(z.x,z.y+z.r*.8,z.r*.9,z.r*.4,0,0,6.3);cx.fill();
-    cx.save();cx.translate(z.x,z.y);cx.rotate(lean);
-    dot(0,0,z.r,z.hurt>0?'#ffffff':k.c);
-    cx.fillStyle=k.c2;cx.beginPath();cx.arc(0,0,z.r,-0.6,0.6);cx.lineTo(0,0);cx.fill();
-    dot(-z.r*.3,-z.r*.22,z.r*.16,'#20120f');dot(z.r*.3,-z.r*.22,z.r*.16,'#20120f');
-    cx.strokeStyle='#20120f';cx.lineWidth=Math.max(1.6,z.r*.1);
-    cx.beginPath();cx.moveTo(-z.r*.36,z.r*.38);cx.lineTo(z.r*.36,z.r*.38);cx.stroke();
-    cx.restore();
-    if(z.hp<z.maxhp){cx.fillStyle='rgba(0,0,0,.5)';rr(z.x-z.r,z.y-z.r-9,z.r*2,4,2);cx.fill();
-      cx.fillStyle=k.boss?'#ff5470':'#9bff6a';rr(z.x-z.r,z.y-z.r-9,z.r*2*Math.max(0,z.hp/z.maxhp),4,2);cx.fill()}}
-  /* bullets */
-  for(const b of bullets){cx.strokeStyle='#ffe9a8';cx.lineWidth=3;cx.lineCap='round';
-    cx.beginPath();cx.moveTo(b.x,b.y);cx.lineTo(b.x-b.vx*.012,b.y-b.vy*.012);cx.stroke()}
+  for(const z of zs)body(z,1);
+  for(const z of zs)if(z.hp<z.maxhp){
+    cx.fillStyle='rgba(0,0,0,.5)';rr(z.x-z.r,z.y-z.r-11,z.r*2,4,2);cx.fill();
+    cx.fillStyle=z.k.boss?'#ff5470':'#9bff6a';
+    rr(z.x-z.r,z.y-z.r-11,z.r*2*Math.max(0,z.hp/z.maxhp),4,2);cx.fill()}
+  /* bullets: a hot core inside a soft trail */
+  cx.lineCap='round';
+  for(const b of bullets){
+    cx.strokeStyle='rgba(255,210,120,.35)';cx.lineWidth=6;
+    cx.beginPath();cx.moveTo(b.x,b.y);cx.lineTo(b.x-b.vx*.018,b.y-b.vy*.018);cx.stroke();
+    cx.strokeStyle='#fff6d2';cx.lineWidth=2.2;
+    cx.beginPath();cx.moveTo(b.x,b.y);cx.lineTo(b.x-b.vx*.010,b.y-b.vy*.010);cx.stroke()}
   /* player */
-  cx.fillStyle='rgba(0,0,0,.35)';cx.beginPath();cx.ellipse(P.x,P.y+P.r*.85,P.r,P.r*.42,0,0,6.3);cx.fill();
-  dot(P.x,P.y,P.r,P.hurt>0?'#fff':'#6ad8ff');
-  cx.fillStyle='#19455c';cx.beginPath();cx.arc(P.x,P.y,P.r,P.face-.55,P.face+.55);cx.lineTo(P.x,P.y);cx.fill();
-  cx.strokeStyle='#e8f6ff';cx.lineWidth=5;cx.lineCap='round';
-  cx.beginPath();cx.moveTo(P.x+Math.cos(P.face)*8,P.y+Math.sin(P.face)*8);
-  cx.lineTo(P.x+Math.cos(P.face)*24,P.y+Math.sin(P.face)*24);cx.stroke();
+  drawPlayer();
   /* particles */
   for(const q of parts){cx.globalAlpha=Math.max(0,q.a);dot(q.x,q.y,q.r,q.c)}
   cx.globalAlpha=1;
+  /* a blast washes the screen out for an instant */
+  if(flash>0){cx.globalAlpha=Math.min(.5,flash);cx.fillStyle='#ffd9a0';
+    cx.fillRect(0,0,W,H);cx.globalAlpha=1}
   hud();
   cx.setTransform(dpr,0,0,dpr,0,0)}
 function hud(){
