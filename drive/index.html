@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta name="author" content="Alon Maidenberg - אלון מידנברג"><meta name="copyright" content="© 2026 אלון מידנברג. כל הזכויות שמורות.">
+<!-- © 2026 Alon Maidenberg (אלון מידנברג). All rights reserved. Copying, republishing or modifying this game without written permission is not allowed. -->
+<meta name="robots" content="noai, noimageai">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>נהיגה מטורפת – אלון מידנברג</title>
+<meta name="description" content="רכב שלא מפסיק להתהפך, 20 מסלולי מכשולים. גז, בלם, ובאוויר מסובבים את עצמכם. תגיעו לדגל בשלם.">
+<meta name="theme-color" content="#1b2740">
+<link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:#1b2740;color:#fff;overflow:hidden;
+  font-family:Rubik,"Segoe UI",system-ui,sans-serif;overscroll-behavior:none;user-select:none}
+#cv{display:block;width:100%;height:100%;touch-action:none}
+.ov{position:fixed;inset:0;display:none;place-items:center;z-index:30;padding:16px;background:rgba(10,16,28,.9)}
+.ov.show{display:grid}
+.ovc{background:#24314f;border:4px solid #0a101c;border-radius:22px;padding:18px;max-width:460px;width:100%;
+  box-shadow:0 12px 0 #0a101c;max-height:90vh;overflow:auto;text-align:center}
+.ovc h2{margin:0 0 6px;font:900 26px Rubik,system-ui}
+.ovc p{margin:7px 0;font-size:14.5px;line-height:1.55;opacity:.92}
+.btn{border:3px solid #0a101c;border-radius:15px;background:#ffd43b;color:#24314f;
+  font:900 15px Rubik,system-ui;padding:11px 16px;cursor:pointer;box-shadow:0 5px 0 #0a101c;margin:5px}
+.btn:active{transform:translateY(3px);box-shadow:0 2px 0 #0a101c}
+.btn.g{background:#5ff7d6}.btn.d{background:#8a93a8;color:#0a101c}
+#lvls{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin:12px 0}
+#lvls button{border:3px solid #0a101c;border-radius:13px;padding:11px 2px;cursor:pointer;
+  font:900 15px Rubik,system-ui;background:#35456b;color:#fff;box-shadow:0 4px 0 #0a101c}
+#lvls button.done{background:#5ff7d6;color:#0a101c}
+#lvls button.lock{opacity:.4;cursor:default}
+#pads{position:fixed;inset:0;z-index:20;pointer-events:none}
+.pbtn{position:absolute;bottom:max(20px,env(safe-area-inset-bottom));width:96px;height:96px;
+  border-radius:50%;border:3px solid rgba(0,0,0,.4);background:rgba(255,255,255,.85);
+  color:#17233c;font:900 34px system-ui;pointer-events:auto;display:grid;place-items:center}
+#bGas{inset-inline-end:20px}
+#bBrk{inset-inline-start:20px}
+#top{position:fixed;inset-inline:0;top:52px;z-index:19;text-align:center;pointer-events:none;
+  font:900 19px Rubik,system-ui;text-shadow:0 2px 5px rgba(0,0,0,.8)}
+#retry{position:fixed;inset-inline-end:16px;top:92px;z-index:21;border:3px solid #0a101c;border-radius:14px;
+  background:rgba(255,255,255,.85);color:#17233c;font:900 14px Rubik,system-ui;padding:8px 12px;cursor:pointer}
+</style>
+</head>
+<body>
+<canvas id="cv"></canvas>
+<div id="pads"><button class="pbtn" id="bBrk">◀</button><button class="pbtn" id="bGas">▶</button></div>
+<div id="top"></div>
+<button id="retry">↻ מחדש</button>
+
+<div class="ov show" id="menu"><div class="ovc">
+  <div style="font-size:52px">🚜</div>
+  <h2>נהיגה מטורפת</h2>
+  <p>הרכב שלכם לא יציב בכלל. גז קדימה, בלם אחורה — ובאוויר אותם כפתורים מסובבים אתכם,
+     אז אפשר לתקן נחיתה באמצע קפיצה.</p>
+  <p><b>אם הראש נוגע בקרקע — מתחילים את השלב מחדש.</b> תגיעו לדגל בשלם.</p>
+  <div id="lvls"></div>
+  <p style="font-size:13px;opacity:.75" id="ctrl"></p>
+  <button class="btn" id="go">▶ שחק</button>
+</div></div>
+
+<div class="ov" id="endM"><div class="ovc">
+  <div style="font-size:52px" id="endE">🏁</div><h2 id="endT"></h2><p id="endP"></p>
+  <button class="btn g" id="nextB">▶ השלב הבא</button>
+  <button class="btn" id="againB">↻ שוב</button>
+  <button class="btn d" id="menuB">לתפריט</button>
+</div></div>
+
+<script src="../hub.js"></script>
+<script>
+'use strict';
+/* © 2026 Alon Maidenberg. A wobbly vehicle on obstacle courses.
+   Physics written from scratch: two verlet wheels, a rod between them, and
+   circle-against-segment collision. */
+const cv=document.getElementById('cv'),cx=cv.getContext('2d');
+const $=s=>document.getElementById(s);
+const LEVELS=20;
+const G=1750;                       /* gravity px/s^2 */
+let segs,car,level,state,camx,camy,parts,t0,tries,flag,best={},deaths,fin;
+try{best=JSON.parse(localStorage.getItem('drive_done')||'{}')||{}}catch(e){best={}}
+
+/* ---------- building a course ----------
+   Every level is the same alphabet of pieces, dealt out by a seed, so the
+   twenty courses are all different but all fair. */
+function rngFor(n){let h=(n*2654435761)>>>0;
+  return()=>{h^=h<<13;h>>>=0;h^=h>>17;h^=h<<5;h>>>=0;return h/4294967296}}
+function seg(x1,y1,x2,y2,kind){segs.push({x1,y1,x2,y2,kind:kind||'ground'})}
+function buildLevel(n){
+  segs=[];const R=rngFor(n+7);
+  const hard=(n-1)/(LEVELS-1);          /* 0 .. 1 */
+  let x=0,y=430;
+  seg(x,y,x+520,y);x+=520;              /* room to get up to speed */
+  const pieces=6+Math.round(hard*6);
+  /* no slope steeper than about 38 degrees - the car simply cannot climb more */
+  const rise=(run,want)=>Math.min(want,run*0.78);
+  for(let i=0;i<pieces;i++){
+    const p=R();
+    if(p<.20){                           /* a hill */
+      const w=240+R()*200,h=rise(w/2,(50+R()*90)*(.5+hard));
+      seg(x,y,x+w/2,y-h);seg(x+w/2,y-h,x+w,y);x+=w}
+    else if(p<.38){                      /* a ramp and a gap to clear */
+      /* a jump is only fair with a straight to build speed on first */
+      const runup=240+R()*120;seg(x,y,x+runup,y);x+=runup;
+      const w=170+R()*100,h=rise(w,70+R()*70*(.6+hard));
+      seg(x,y,x+w,y-h);x+=w;
+      const gap=120+R()*120*(.5+hard);
+      const drop=(R()-.4)*90;
+      x+=gap;y=y-h+40+drop;
+      seg(x,y,x+150,y);x+=150}
+    else if(p<.52){                      /* steps down */
+      const n2=2+((R()*3)|0);
+      for(let k=0;k<n2;k++){const w=110+R()*60,d=34+R()*42;
+        seg(x,y,x+w,y);x+=w;seg(x,y,x,y+d);y+=d}
+      seg(x,y,x+90,y);x+=90}
+    else if(p<.66){                      /* a bump field */
+      const n2=3+((R()*4)|0);
+      for(let k=0;k<n2;k++){const w=118+R()*70,h=rise(w/2,16+R()*26*(.6+hard));
+        seg(x,y,x+w/2,y-h);seg(x+w/2,y-h,x+w,y);x+=w}
+      seg(x,y,x+70,y);x+=70}
+    else if(p<.80){                      /* a ceiling you must duck under */
+      const w=170+R()*120;
+      seg(x,y,x+w,y);
+      /* the car plus its driver stands about 64px tall, so a 96px ceiling at
+         the hardest setting left two pixels of clearance and simply stopped it */
+      const head=135-hard*25;
+      seg(x+20,y-head-110,x+20,y-head,'wall');
+      seg(x+20,y-head,x+w-20,y-head,'wall');
+      seg(x+w-20,y-head,x+w-20,y-head-110,'wall');
+      x+=w}
+    else if(p<.90){                      /* a long jump over nothing */
+      const runup=280+R()*140;seg(x,y,x+runup,y);x+=runup;
+      const up=rise(150,90+R()*60);
+      seg(x,y,x+150,y-up);x+=150;y-=up;
+      const gap=200+R()*180*(.5+hard);
+      x+=gap;y+=40+R()*70;
+      seg(x,y,x+190,y);x+=190}
+    else{                                /* a slope down then straight up */
+      const w=180+R()*120,d=90+R()*90;
+      seg(x,y,x+w,y+d);x+=w;y+=d;
+      seg(x,y,x+120,y);x+=120}
+    /* keep the course on screen-ish */
+    if(y<170){seg(x,y,x+150,y+90);x+=150;y+=90}
+    if(y>640){const up=rise(150,90);seg(x,y,x+150,y-up);x+=150;y-=up}}
+  seg(x,y,x+320,y);
+  flag={x:x+230,y:y};
+  x+=320;
+  /* a floor far below, so falling off ends the attempt cleanly */
+  seg(-400,1100,x+600,1100,'void')}
+
+/* ---------- the vehicle ----------
+   Two wheels integrated as points, held a fixed distance apart. That is
+   enough for it to roll, wheelie, flip and land on its roof. */
+function makeCar(){
+  const y=flagStartY();
+  return{
+    w:[{x:120,y:y-24,px:120,py:y-24,r:17},
+       {x:178,y:y-24,px:178,py:y-24,r:17}],
+    L:58,spin:0,gas:0,on:0,dead:0}}
+function flagStartY(){return 430}
+function reset(keepTries){
+  buildLevel(level);
+  car=makeCar();parts=[];camx=0;camy=0;
+  state='play';t0=performance.now();fin=0;
+  if(!keepTries)tries=0; else tries++;
+  $('endM').classList.remove('show')}
+
+/* ---------- physics ---------- */
+function closestOnSeg(s,px,py){
+  const dx=s.x2-s.x1,dy=s.y2-s.y1,l2=dx*dx+dy*dy;
+  let t=l2?((px-s.x1)*dx+(py-s.y1)*dy)/l2:0;
+  t=t<0?0:t>1?1:t;
+  return{x:s.x1+dx*t,y:s.y1+dy*t}}
+function collideWheel(w,applyVel){
+  let hit=null;w.near=false;
+  for(const s of segs){
+    if(Math.max(s.x1,s.x2)<w.x-80||Math.min(s.x1,s.x2)>w.x+80)continue;
+    const c=closestOnSeg(s,w.x,w.y);
+    const dx=w.x-c.x,dy=w.y-c.y,d=Math.hypot(dx,dy);
+    /* a small skin, so a wheel resting exactly on the ground still counts as
+       touching it - without this the last solver pass always reported mid-air */
+    if(d<w.r+2.5&&s.kind!=='void')w.near=true;
+    if(d<w.r&&d>0.0001){
+      const nx=dx/d,ny=dy/d,push=w.r-d;
+      w.x+=nx*push;w.y+=ny*push;
+      /* The velocity response runs once per step, on the last solver pass.
+         Doing it on every pass applied the friction six times over and the
+         car could barely move. */
+      if(applyVel){
+        let vx=w.x-w.px,vy=w.y-w.py;
+        const vn=vx*nx+vy*ny;
+        if(vn<0){vx-=nx*vn*1.25;vy-=ny*vn*1.25}
+        const tx=-ny,ty=nx,vt=vx*tx+vy*ty;
+        vx-=tx*vt*0.035;vy-=ty*vt*0.035;
+        w.px=w.x-vx;w.py=w.y-vy}
+      hit={nx,ny,s};
+      if(s.kind==='void')car.dead=1}}
+  return hit}
+function physics(dt){
+  const c=car;
+  c.on=0;
+  for(const w of c.w){
+    let vx=w.x-w.px,vy=w.y-w.py;
+    vx*=0.995;vy*=0.995;
+    w.px=w.x;w.py=w.y;
+    w.x+=vx;w.y+=vy+G*dt*dt}
+  /* torque: push the wheels in opposite directions around the axle, which
+     both drives the car on the ground and spins it in the air */
+  const ax=c.w[1].x-c.w[0].x,ay=c.w[1].y-c.w[0].y,al=Math.hypot(ax,ay)||1;
+  const ux=ax/al,uy=ay/al;
+  /* (uy,-ux) is the axle's perpendicular pointing UP while driving right */
+  const nx=uy,ny=-ux;
+  /* On the ground the torque only lifts the nose a little; most of the gas
+     goes into the forward push below. In the air it is the only control,
+     so it is strong enough to turn the car right round in about a second. */
+  const torque=c.gas*(c.onGround?380:700)*dt*dt;
+  c.w[1].x+=nx*torque;c.w[1].y+=ny*torque;      /* gas lifts the nose */
+  c.w[0].x-=nx*torque;c.w[0].y-=ny*torque;
+  /* a little straight push while the wheels are down, so it actually drives */
+  if(c.onGround){const f=c.gas*1550*dt*dt;
+    for(const w of c.w){w.x+=ux*f;w.y+=uy*f}}
+  /* hold the axle rigid */
+  for(let k=0;k<6;k++){
+    const dx=c.w[1].x-c.w[0].x,dy=c.w[1].y-c.w[0].y,d=Math.hypot(dx,dy)||1;
+    const diff=(d-c.L)/d*.5;
+    c.w[0].x+=dx*diff;c.w[0].y+=dy*diff;
+    c.w[1].x-=dx*diff;c.w[1].y-=dy*diff;
+    for(const w of c.w)collideWheel(w,k===5)}
+  c.onGround=c.w[0].near||c.w[1].near;
+  /* the driver's head: touching anything ends the run */
+  const mx=(c.w[0].x+c.w[1].x)/2,my=(c.w[0].y+c.w[1].y)/2;
+  const hx=mx+nx*36,hy=my+ny*36;                /* the driver sits above the axle */
+  c.head={x:hx,y:hy};
+  for(const s of segs){
+    if(s.kind==='void')continue;
+    if(Math.max(s.x1,s.x2)<hx-60||Math.min(s.x1,s.x2)>hx+60)continue;
+    const p=closestOnSeg(s,hx,hy);
+    if(Math.hypot(hx-p.x,hy-p.y)<15){c.dead=1;break}}
+  if(my>1200)c.dead=1}
+
+/* ---------- loop ---------- */
+const key={};
+let gas=0;
+addEventListener('keydown',e=>{
+  if(['ArrowRight','ArrowLeft','ArrowUp','ArrowDown',' '].includes(e.key))e.preventDefault();
+  key[e.key.toLowerCase()]=1;
+  if(e.key.toLowerCase()==='r')reset(true)});
+addEventListener('keyup',e=>key[e.key.toLowerCase()]=0);
+function hold(id,v){const el=$(id);
+  const on=e=>{e.preventDefault();gas=v},off=e=>{e.preventDefault();if(gas===v)gas=0};
+  el.addEventListener('pointerdown',on);el.addEventListener('pointerup',off);
+  el.addEventListener('pointercancel',off);el.addEventListener('pointerleave',off)}
+hold('bGas',1);hold('bBrk',-1);
+$('retry').onclick=()=>reset(true);
+
+function step(dt){
+  if(state!=='play')return;
+  const k=(key['arrowright']||key['d']?1:0)-(key['arrowleft']||key['a']?1:0);
+  car.gas=k||gas;
+  physics(dt);
+  for(let i=parts.length-1;i>=0;i--){const q=parts[i];
+    q.x+=q.vx*dt;q.y+=q.vy*dt;q.vy+=900*dt;q.a-=dt*1.5;
+    if(q.a<=0)parts.splice(i,1)}
+  const mx=(car.w[0].x+car.w[1].x)/2,my=(car.w[0].y+car.w[1].y)/2;
+  if(!fin&&mx>flag.x-26&&Math.abs(my-flag.y)<160){fin=1;win()}
+  if(car.dead&&state==='play')crash();
+  /* wedged? say so rather than leaving them to wonder */
+  const nowx=(car.w[0].x+car.w[1].x)/2;
+  if(Math.abs(nowx-(car.lastx||0))<1.5)car.stuck=(car.stuck||0)+dt;else car.stuck=0;
+  car.lastx=nowx}
+function crash(){
+  state='dead';deaths=(deaths||0)+1;
+  const mx=(car.w[0].x+car.w[1].x)/2,my=(car.w[0].y+car.w[1].y)/2;
+  for(let i=0;i<22;i++)parts.push({x:mx,y:my,vx:(Math.random()-.5)*420,vy:-Math.random()*420,
+    a:1,c:i%2?'#ffd43b':'#ff5470'});
+  setTimeout(()=>{if(state==='dead')reset(true)},750)}
+function win(){
+  state='over';
+  const secs=(performance.now()-t0)/1000;
+  best[level]=Math.min(best[level]||999,Math.round(secs*10)/10);
+  try{localStorage.setItem('drive_done',JSON.stringify(best))}catch(e){}
+  try{const done=Object.keys(best).length;localStorage.setItem('drive_best',String(done))}catch(e){}
+  $('endE').textContent='🏁';
+  $('endT').textContent='שלב '+level+' הושלם!';
+  $('endP').textContent='⁦'+secs.toFixed(1)+'⁩ שניות · '+tries+(tries===1?' ניסיון':' ניסיונות');
+  $('nextB').style.display=level<LEVELS?'':'none';
+  $('endM').classList.add('show');
+  if(window.AG)AG.add(25+level*4,level%5===0?1:0)}
+
+/* ---------- drawing ---------- */
+function draw(){
+  const w=cv.clientWidth,h=cv.clientHeight,dpr=Math.min(2,devicePixelRatio||1);
+  cx.setTransform(dpr,0,0,dpr,0,0);
+  const sky=cx.createLinearGradient(0,0,0,h);
+  sky.addColorStop(0,'#2b3d66');sky.addColorStop(1,'#16203a');
+  cx.fillStyle=sky;cx.fillRect(0,0,w,h);
+  if(!car)return;
+  const zoom=Math.min(1.05,Math.max(.5,Math.min(w,h)/760));
+  const mx=(car.w[0].x+car.w[1].x)/2,my=(car.w[0].y+car.w[1].y)/2;
+  camx+=(mx-camx)*.12;camy+=(my-camy)*.09;
+  cx.save();cx.translate(w/2,h*.6);cx.scale(zoom,zoom);cx.translate(-camx,-camy);
+  /* far hills */
+  cx.fillStyle='#223154';
+  for(let i=-2;i<24;i++){const bx=i*260-((camx*.3)%260);
+    cx.beginPath();cx.moveTo(bx,700);cx.lineTo(bx+130,520);cx.lineTo(bx+260,700);cx.fill()}
+  /* course */
+  for(const s of segs){
+    if(s.kind==='void')continue;
+    cx.strokeStyle=s.kind==='wall'?'#8a5a3a':'#4e6b3c';
+    cx.lineWidth=s.kind==='wall'?16:18;cx.lineCap='round';
+    cx.beginPath();cx.moveTo(s.x1,s.y1);cx.lineTo(s.x2,s.y2);cx.stroke();
+    if(s.kind!=='wall'){cx.strokeStyle='#6f9550';cx.lineWidth=7;
+      cx.beginPath();cx.moveTo(s.x1,s.y1-5);cx.lineTo(s.x2,s.y2-5);cx.stroke()}}
+  /* flag */
+  cx.strokeStyle='#e8eef7';cx.lineWidth=5;
+  cx.beginPath();cx.moveTo(flag.x,flag.y);cx.lineTo(flag.x,flag.y-92);cx.stroke();
+  cx.fillStyle='#5ff7d6';cx.beginPath();cx.moveTo(flag.x,flag.y-92);
+  cx.lineTo(flag.x+54,flag.y-74);cx.lineTo(flag.x,flag.y-56);cx.fill();
+  /* the vehicle */
+  const ax=car.w[1].x-car.w[0].x,ay=car.w[1].y-car.w[0].y,al=Math.hypot(ax,ay)||1;
+  const ux=ax/al,uy=ay/al,nx=-uy,ny=ux;
+  cx.save();cx.translate(mx,my);cx.rotate(Math.atan2(ay,ax));
+  cx.fillStyle='#c74b3a';
+  cx.beginPath();cx.roundRect?cx.roundRect(-42,-28,84,30,8):cx.rect(-42,-28,84,30);cx.fill();
+  cx.fillStyle='#e8653f';
+  cx.beginPath();cx.roundRect?cx.roundRect(-14,-46,36,22,7):cx.rect(-14,-46,36,22);cx.fill();
+  cx.restore();
+  /* head */
+  cx.fillStyle=car.dead?'#ff5470':'#ffd9b0';
+  cx.beginPath();cx.arc(car.head.x,car.head.y,11,0,6.283);cx.fill();
+  /* wheels */
+  for(const wl of car.w){
+    cx.fillStyle='#1b2029';cx.beginPath();cx.arc(wl.x,wl.y,wl.r,0,6.283);cx.fill();
+    cx.fillStyle='#55606f';cx.beginPath();cx.arc(wl.x,wl.y,wl.r*.45,0,6.283);cx.fill()}
+  for(const q of parts){cx.globalAlpha=Math.max(0,q.a);cx.fillStyle=q.c;
+    cx.fillRect(q.x-3,q.y-3,6,6)}
+  cx.globalAlpha=1;
+  cx.restore();
+  /* how far along */
+  const pc=Math.max(0,Math.min(1,(mx-120)/(flag.x-120)));
+  cx.fillStyle='rgba(10,16,28,.5)';cx.fillRect(w*.18,h-26,w*.64,10);
+  cx.fillStyle='#5ff7d6';cx.fillRect(w*.18,h-26,w*.64*pc,10);
+  $('top').textContent=(car.stuck>3.5&&state==='play')
+    ?'תקועים? לחצו ↻ מחדש'
+    :'שלב '+level+' / '+LEVELS+(tries?'  ·  ניסיון '+(tries+1):'')}
+function resize(){const d=Math.min(2,devicePixelRatio||1);
+  cv.width=Math.round(cv.clientWidth*d);cv.height=Math.round(cv.clientHeight*d);
+  cx.setTransform(d,0,0,d,0,0)}
+addEventListener('resize',resize);
+let last=0,acc=0;
+function frame(ts){
+  requestAnimationFrame(frame);
+  const dt=Math.min(.05,(ts-last)/1000||0);last=ts;
+  if(car){acc+=dt;let g=0;
+    while(acc>=1/120&&g++<10){step(1/120);acc-=1/120}}
+  draw()}
+
+/* ---------- menu ---------- */
+function drawLvls(){
+  const box=$('lvls');box.textContent='';
+  const done=Object.keys(best).length;
+  for(let i=1;i<=LEVELS;i++){
+    const b=document.createElement('button');b.textContent=i;
+    const open=i<=done+1;
+    if(best[i])b.className='done';else if(!open)b.className='lock';
+    if(open)b.onclick=()=>{level=i;deaths=0;reset(false);resize();
+      document.getElementById('menu').classList.remove('show')};
+    box.append(b)}}
+$('go').onclick=()=>{const done=Object.keys(best).length;
+  level=Math.min(LEVELS,done+1);deaths=0;reset(false);resize();
+  document.getElementById('menu').classList.remove('show')};
+$('nextB').onclick=()=>{level=Math.min(LEVELS,level+1);reset(false)};
+$('againB').onclick=()=>reset(false);
+$('menuB').onclick=()=>{$('endM').classList.remove('show');drawLvls();
+  document.getElementById('menu').classList.add('show')};
+$('ctrl').textContent=matchMedia('(pointer:coarse)').matches
+  ?'▶ גז · ◀ בלם · באוויר הם מסובבים אתכם'
+  :'חץ ימינה גז · חץ שמאלה בלם · R מתחילים מחדש';
+drawLvls();resize();requestAnimationFrame(frame);
+</script>
+</body>
+</html>
