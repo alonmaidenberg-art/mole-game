@@ -17,7 +17,8 @@
   /* record which games were opened (for Boss mode unlock) */
   try{var rel=location.href.slice(ROOT.length).split(/[?#]/)[0].replace(/index\.html$/,'').replace(/\/$/,'');
     if(rel&&rel.indexOf('/')<0&&rel!=='boss'&&rel!=='lib'&&rel!=='assets'){var pl=JSON.parse(localStorage.getItem('ag_played')||'[]');if(pl.indexOf(rel)<0){pl.push(rel);localStorage.setItem('ag_played',JSON.stringify(pl))}
-      qBump(function(o){if(o.g.indexOf(rel)<0)o.g.push(rel)})}}catch(e){}
+      qBump(function(o){if(o.g.indexOf(rel)<0)o.g.push(rel)});
+      bpWeek(function(w){if(w.g.indexOf(rel)<0)w.g.push(rel)})}}catch(e){}
   var K='ag_wallet',KA='ag_admin',subs=[];
 
   /* ---------- counters for the daily missions ----------
@@ -31,6 +32,40 @@
     o.g=Array.isArray(o.g)?o.g:[];o.done=Array.isArray(o.done)?o.done:[];
     o.sec=+o.sec||0;o.rec=+o.rec||0;o.coin=+o.coin||0;o.all=+o.all||0;return o}catch(e){return qBlank()}}
   function qPut(o){try{localStorage.setItem(KQ,JSON.stringify(o))}catch(e){}}
+
+  /* ---------- battle pass ----------
+     One 30-day season for everybody, counted from a fixed date so every player
+     is on the same one. XP comes from ordinary play, not from a separate grind:
+     coins earned, diamonds found, records broken and missions finished. */
+  var KB='ag_bp',SEASON0=Date.UTC(2026,10,1),SEASON_MS=30*864e5,TIERS=50;
+  function seasonNow(){return Math.max(0,Math.floor((Date.now()-SEASON0)/SEASON_MS))}
+  function seasonEnds(){return SEASON0+(seasonNow()+1)*SEASON_MS}
+  function xpFor(tier){return 120+tier*28}            /* each tier costs a little more */
+  function bpBlank(){return{s:seasonNow(),xp:0,got:[],gold:0,wk:{w:-1,g:[],done:[]}}}
+  function bpGet(){try{
+      var o=JSON.parse(localStorage.getItem(KB)||'null');
+      if(!o||typeof o!=='object')return bpBlank();
+      if(o.s!==seasonNow())return bpBlank();          /* a new season wipes the slate */
+      o.xp=Math.max(0,+o.xp||0);o.got=Array.isArray(o.got)?o.got:[];
+      o.gold=o.gold?1:0;o.wk=(o.wk&&typeof o.wk==='object')?o.wk:{w:-1,g:[],done:[]};
+      o.wk.g=Array.isArray(o.wk.g)?o.wk.g:[];o.wk.done=Array.isArray(o.wk.done)?o.wk.done:[];
+      return o}catch(e){return bpBlank()}}
+  function bpPut(o){try{localStorage.setItem(KB,JSON.stringify(o))}catch(e){}}
+  function bpTier(xp){var t=0,n=0;
+    while(t<TIERS&&n+xpFor(t)<=xp){n+=xpFor(t);t++}
+    return{tier:t,into:xp-n,need:t<TIERS?xpFor(t):0}}
+  /* the weekly tallies the battle-pass missions count against. One week for
+     everybody, reset the moment the week number changes. */
+  function weekNo(){return Math.floor((Date.now()-SEASON0)/(7*864e5))}
+  function bpWeek(f){
+    var o=bpGet(),w=o.wk;
+    if(w.w!==weekNo())o.wk=w={w:weekNo(),g:[],done:[],rec:0,coin:0,min:0,days:[],daily:0};
+    w.g=w.g||[];w.days=w.days||[];
+    try{f(w)}catch(e){}
+    bpPut(o);return w}
+  function bpAdd(n){n=Math.floor(n)||0;if(n<=0)return;
+    var o=bpGet();o.xp+=n;bpPut(o);
+    try{window.dispatchEvent(new CustomEvent('ag-xp',{detail:{xp:o.xp,add:n}}))}catch(e){}}
   function qBump(f){var o=qGet();try{f(o)}catch(e){}qPut(o)}
   /* anti-cheat: the wallet is signed; a hand-edited wallet is reset. (A deterrent only - real protection would need a server.) */
   function sig(c,d){var t='ag|'+c+'|'+d+'|k7Qx',h=2166136261;for(var i=0;i<t.length;i++){h^=t.charCodeAt(i);h=Math.imul(h,16777619)>>>0}return h.toString(36)}
@@ -51,8 +86,12 @@
     played:function(){try{return JSON.parse(localStorage.getItem('ag_played')||'[]').length}catch(e){return 0}},
     coins:function(){return rd().c},
     diamonds:function(){return rd().d},
-    add:function(c,d){c=c||0;d=d||0;if((c>0||d>0)&&localStorage.getItem(KA)!==HASH&&!miniOk(localStorage.getItem(KM))&&!allow(Math.max(0,c),Math.max(0,d)))return;if(c>0&&AG.coinMult)c=Math.floor(c*AG.coinMult());var w=rd();w.c=Math.max(0,w.c+c);w.d=Math.max(0,w.d+d);wr(w);if(c>0)qBump(function(o){o.coin+=c})},
+    add:function(c,d){c=c||0;d=d||0;if((c>0||d>0)&&localStorage.getItem(KA)!==HASH&&!miniOk(localStorage.getItem(KM))&&!allow(Math.max(0,c),Math.max(0,d)))return;if(c>0&&AG.coinMult)c=Math.floor(c*AG.coinMult());var w=rd();w.c=Math.max(0,w.c+c);w.d=Math.max(0,w.d+d);wr(w);if(c>0)qBump(function(o){o.coin+=c});
+      if(c>0||d>0){bpAdd(Math.floor(Math.max(0,c)/4)+Math.max(0,d)*6);
+        if(c>0)bpWeek(function(w){w.coin=(+w.coin||0)+c})}},
     miniCap:function(){return MINICAP},
+    bp:bpGet,bpPut:bpPut,bpAdd:bpAdd,bpTier:bpTier,bpTiers:TIERS,bpWeek:bpWeek,bpWeekNo:weekNo,
+    bpSeason:seasonNow,bpEnds:seasonEnds,bpXpFor:xpFor,
     today:dayStr,
     quests:qGet,
     questPut:qPut,

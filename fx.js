@@ -45,13 +45,14 @@
     Storage.prototype.setItem=function(k,v){
       try{if(this===localStorage&&/best/i.test(k)&&!/^ag_/.test(k)){var old=+localStorage.getItem(k)||0,nv=+v;
         if(isFinite(nv)&&old>0&&nv>old&&Date.now()-lastCel>4000&&document.body){lastCel=Date.now();confetti();toast(T('🏆 שיא חדש!','🏆 New best!'));
-          if(window.AG){AG.add(5,0);if(AG.questBump)AG.questBump(function(q){q.rec++})}}}}catch(e){}
+          if(window.AG){AG.add(5,0);if(AG.questBump)AG.questBump(function(q){q.rec++});if(AG.bpAdd)AG.bpAdd(12);if(AG.bpWeek)AG.bpWeek(function(w){w.rec=(+w.rec||0)+1})}}}}catch(e){}
       return so.apply(this,arguments)};
   }catch(e){}
 
   /* ---------- play time ---------- */
   setInterval(function(){if(document.visibilityState!=='visible'||ID==='hub')return;try{var o=JSON.parse(ls('ag_time')||'{}');o[ID]=(o[ID]||0)+5;ls('ag_time',JSON.stringify(o));
-    if(window.AG&&AG.questBump)AG.questBump(function(q){q.sec+=5})}catch(e){}},5000);
+    if(window.AG&&AG.questBump)AG.questBump(function(q){q.sec+=5});
+    if(window.AG&&AG.bpWeek)AG.bpWeek(function(w){w.min=(+w.min||0)+5})}catch(e){}},5000);
 
 
   /* ---------- trolls (admin pranks; harmless, visual, a few seconds) ---------- */
