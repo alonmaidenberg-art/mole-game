@@ -48,6 +48,7 @@ html,body{margin:0;height:100%;background:#0a1626;color:#fff;overflow:hidden;
 .items button[disabled]{opacity:.42;cursor:default}
 .items button.has{outline:3px solid #5ff7d6}
 /* touch controls */
+#pad,#pad *{touch-action:none;-webkit-user-select:none;user-select:none}
 #pad{position:fixed;inset:0;z-index:20;pointer-events:none;display:block}
 body.nopad #pad{display:none}
 #stick{position:absolute;inset-inline-start:18px;bottom:max(18px,env(safe-area-inset-bottom));
