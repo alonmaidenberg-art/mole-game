@@ -31,38 +31,167 @@
      plug: 0 = התקע הישראלי מתאים, 1 = צריך מתאם בריטי, 2 = צריך מתאם אמריקאי.
      cl: אקלים — med ים תיכוני, euro אירופה, trop טרופי, desert מדברי, usne מזרח ארה"ב. */
   var DEST = [
-    { k: 'ath', n: 'יוון · אתונה', f: 2, cur: 'אירו', lang: 'יוונית', plug: 0, cl: 'med',
-      see: ['האקרופוליס', 'שכונת פלאקה', 'שוק מונסטיראקי', 'שייט ליום באי קרוב'] },
-    { k: 'lca', n: 'קפריסין · לרנקה', f: 1, cur: 'אירו', lang: 'יוונית', plug: 1, cl: 'med',
-      see: ['חוף פיניקודס', 'כנסיית לזרוס', 'אגם המלח', 'פארק מים'] },
-    { k: 'rom', n: 'איטליה · רומא', f: 3.5, cur: 'אירו', lang: 'איטלקית', plug: 0, cl: 'med',
-      see: ['הקולוסיאום', 'מזרקת טרווי', 'הוותיקן', 'הפנתיאון', 'גלידה בטרסטוורה'] },
-    { k: 'bcn', n: 'ספרד · ברצלונה', f: 4.75, cur: 'אירו', lang: 'ספרדית', plug: 0, cl: 'med',
-      see: ['סגרדה פמיליה', 'פארק גואל', 'הרמבלס', 'חוף ברצלונטה', 'קאמפ נואו'] },
-    { k: 'ist', n: 'טורקיה · איסטנבול', f: 2, cur: 'לירה טורקית', lang: 'טורקית', plug: 0, cl: 'med',
-      see: ['איה סופיה', 'הבזאר הגדול', 'שייט בבוספורוס', 'ארמון טופקאפי'] },
-    { k: 'par', n: 'צרפת · פריז', f: 4.75, cur: 'אירו', lang: 'צרפתית', plug: 0, cl: 'euro',
-      see: ['מגדל אייפל', 'הלובר', 'דיסנילנד פריז', 'שאנז אליזה', 'שייט בסן'] },
-    { k: 'lon', n: 'בריטניה · לונדון', f: 5.25, cur: 'לירה שטרלינג', lang: 'אנגלית', plug: 1, cl: 'euro',
-      see: ['לונדון איי', 'ביג בן', 'המוזיאון הבריטי', 'מוזיאון הטבע', 'קמדן מרקט'] },
-    { k: 'ams', n: 'הולנד · אמסטרדם', f: 4.75, cur: 'אירו', lang: 'הולנדית', plug: 0, cl: 'euro',
-      see: ['שייט בתעלות', 'מוזיאון ואן גוך', 'פארק וונדל', 'כפר זאנסה סחאנס'] },
-    { k: 'ber', n: 'גרמניה · ברלין', f: 4, cur: 'אירו', lang: 'גרמנית', plug: 0, cl: 'euro',
-      see: ['שער ברנדנבורג', 'חומת ברלין', 'אי המוזיאונים', 'מגדל הטלוויזיה'] },
-    { k: 'prg', n: 'צ׳כיה · פראג', f: 3.6, cur: 'קרונה צ׳כית', lang: 'צ׳כית', plug: 0, cl: 'euro',
-      see: ['גשר קארל', 'כיכר העיר העתיקה', 'השעון האסטרונומי', 'מצודת פראג'] },
-    { k: 'tbs', n: 'גאורגיה · טביליסי', f: 3, cur: 'לארי', lang: 'גאורגית', plug: 0, cl: 'euro',
-      see: ['העיר העתיקה', 'מצודת נריקלה', 'הרכבל', 'טיול להרים'] },
-    { k: 'dxb', n: 'דובאי', f: 3.25, cur: 'דירהם', lang: 'ערבית ואנגלית', plug: 1, cl: 'desert',
-      see: ['בורג׳ חליפה', 'ספארי במדבר', 'דובאי מול', 'מזרקות דובאי', 'פארק מים'] },
-    { k: 'bkk', n: 'תאילנד · בנגקוק', f: 10.5, cur: 'באט', lang: 'תאית', plug: 0, cl: 'trop',
-      see: ['הארמון הגדול', 'שוק צ׳טוצ׳ק', 'שוק צף', 'מקדש וואט פו'] },
-    { k: 'nyc', n: 'ארה״ב · ניו יורק', f: 11.5, cur: 'דולר', lang: 'אנגלית', plug: 2, cl: 'usne',
-      see: ['סנטרל פארק', 'טיימס סקוור', 'פסל החירות', 'אמפייר סטייט', 'גשר ברוקלין'] },
-    { k: 'eth', n: 'אילת', f: 0, cur: 'שקל', lang: 'עברית', plug: 0, cl: 'desert',
-      see: ['המצפה התת-ימי', 'חוף הדקל', 'שמורת האלמוגים', 'פארק תימנע', 'קניון האייס'] }
+    { k: 'ath', n: 'יוון · אתונה', en: 'Athens', cc: 'יוון', f: 2, cur: 'אירו', iso: 'EUR',
+      lang: 'יוונית', plug: 0, cl: 'med', em: '112',
+      see: ['האקרופוליס', 'שכונת פלאקה', 'שוק מונסטיראקי', 'שייט ליום באי קרוב'],
+      ar: [{ n: 'פלאקה', q: 'Plaka, Athens', d: 'ממש מתחת לאקרופוליס, הכול בהליכה' },
+           { n: 'מונסטיראקי', q: 'Monastiraki, Athens', d: 'השווקים, הכי תוסס' },
+           { n: 'סינטגמה', q: 'Syntagma, Athens', d: 'מרכזי, רכבת ישירה משדה התעופה' },
+           { n: 'קוקאקי', q: 'Koukaki, Athens', d: 'שקט ונעים, ליד מוזיאון האקרופוליס' },
+           { n: 'גליפדה', q: 'Glyfada, Athens', d: 'על הים, חופים ומסעדות' }] },
+    { k: 'lca', n: 'קפריסין · לרנקה', en: 'Larnaca', cc: 'קפריסין', f: 1, cur: 'אירו', iso: 'EUR',
+      lang: 'יוונית', plug: 1, cl: 'med', em: '112',
+      see: ['חוף פיניקודס', 'כנסיית לזרוס', 'אגם המלח', 'פארק מים'],
+      ar: [{ n: 'פיניקודס', q: 'Finikoudes, Larnaca', d: 'על הטיילת ועל החוף' },
+           { n: 'מקנזי', q: 'Mackenzie Beach, Larnaca', d: 'חוף ומסעדות, קרוב לשדה התעופה' },
+           { n: 'מרכז לרנקה', q: 'Larnaca city centre', d: 'חנויות והכול בהליכה' },
+           { n: 'איה נאפה', q: 'Ayia Napa', d: 'רבע שעה נסיעה, חופים ופארקי מים' }] },
+    { k: 'rom', n: 'איטליה · רומא', en: 'Rome', cc: 'איטליה', f: 3.5, cur: 'אירו', iso: 'EUR',
+      lang: 'איטלקית', plug: 0, cl: 'med', em: '112',
+      see: ['הקולוסיאום', 'מזרקת טרווי', 'הוותיקן', 'הפנתיאון', 'גלידה בטרסטוורה'],
+      ar: [{ n: 'המרכז ההיסטורי', q: 'Centro Storico, Rome', d: 'הפנתיאון ומזרקת טרווי בהליכה' },
+           { n: 'טרסטוורה', q: 'Trastevere, Rome', d: 'סמטאות ומסעדות, הכי יפה בערב' },
+           { n: 'מונטי', q: 'Monti, Rome', d: 'ליד הקולוסיאום, שכונתי' },
+           { n: 'פראטי', q: 'Prati, Rome', d: 'שקט ונקי, צמוד לוותיקן' },
+           { n: 'טרמיני', q: 'Termini, Rome', d: 'ליד תחנת הרכבת, בדרך כלל הכי זול' }] },
+    { k: 'bcn', n: 'ספרד · ברצלונה', en: 'Barcelona', cc: 'ספרד', f: 4.75, cur: 'אירו', iso: 'EUR',
+      lang: 'ספרדית', plug: 0, cl: 'med', em: '112',
+      see: ['סגרדה פמיליה', 'פארק גואל', 'הרמבלס', 'חוף ברצלונטה', 'קאמפ נואו'],
+      ar: [{ n: 'אשמפלה', q: 'Eixample, Barcelona', d: 'מרכזי ורחב, ליד סגרדה פמיליה' },
+           { n: 'הרובע הגותי', q: 'Gothic Quarter, Barcelona', d: 'העיר העתיקה, סמטאות' },
+           { n: 'ברסלונטה', q: 'Barceloneta, Barcelona', d: 'על החוף' },
+           { n: 'גרסיה', q: 'Gracia, Barcelona', d: 'שכונתי ושקט, כיכרות קטנות' },
+           { n: 'סנטס', q: 'Sants, Barcelona', d: 'ליד תחנת הרכבת, יותר זול' }] },
+    { k: 'ist', n: 'טורקיה · איסטנבול', en: 'Istanbul', cc: 'טורקיה', f: 2, cur: 'לירה טורקית', iso: 'TRY',
+      lang: 'טורקית', plug: 0, cl: 'med', em: '112',
+      see: ['איה סופיה', 'הבזאר הגדול', 'שייט בבוספורוס', 'ארמון טופקאפי'],
+      ar: [{ n: 'סולטנאחמט', q: 'Sultanahmet, Istanbul', d: 'העיר העתיקה, כל האתרים בהליכה' },
+           { n: 'ביאולו וטקסים', q: 'Beyoglu, Istanbul', d: 'רחוב איסטיקלאל, חנויות ואוכל' },
+           { n: 'קדיקוי', q: 'Kadikoy, Istanbul', d: 'בצד האסייתי, מקומי ויותר זול' },
+           { n: 'בשיקטאש', q: 'Besiktas, Istanbul', d: 'על הבוספורוס, צעיר ותוסס' }] },
+    { k: 'par', n: 'צרפת · פריז', en: 'Paris', cc: 'צרפת', f: 4.75, cur: 'אירו', iso: 'EUR',
+      lang: 'צרפתית', plug: 0, cl: 'euro', em: '112',
+      see: ['מגדל אייפל', 'הלובר', 'דיסנילנד פריז', 'שאנז אליזה', 'שייט בסן'],
+      ar: [{ n: 'המארה', q: 'Le Marais, Paris', d: 'מרכזי, סמטאות ומסעדות' },
+           { n: 'הרובע הלטיני', q: 'Latin Quarter, Paris', d: 'ליד נוטרדאם, צעיר' },
+           { n: 'מונמארטר', q: 'Montmartre, Paris', d: 'על הגבעה, נוף על כל פריז' },
+           { n: 'ליד מגדל אייפל', q: 'Eiffel Tower, Paris', d: 'שקט, המגדל מהחלון' },
+           { n: 'ליד גאר דו נור', q: 'Gare du Nord, Paris', d: 'צומת רכבות, בדרך כלל זול יותר' }] },
+    { k: 'lon', n: 'בריטניה · לונדון', en: 'London', cc: 'בריטניה', f: 5.25, cur: 'לירה שטרלינג', iso: 'GBP',
+      lang: 'אנגלית', plug: 1, cl: 'euro', em: '999',
+      see: ['לונדון איי', 'ביג בן', 'המוזיאון הבריטי', 'מוזיאון הטבע', 'קמדן מרקט'],
+      ar: [{ n: 'וסטמינסטר והגדה הדרומית', q: 'Westminster, London', d: 'ביג בן והלונדון איי בהליכה' },
+           { n: 'קובנט גארדן וסוהו', q: 'Covent Garden, London', d: 'הכי מרכזי, תיאטראות ומסעדות' },
+           { n: 'קנזינגטון', q: 'Kensington, London', d: 'שקט, ליד המוזיאונים הגדולים' },
+           { n: 'קמדן', q: 'Camden, London', d: 'השוק המפורסם, יותר זול' },
+           { n: 'קינגס קרוס', q: "King's Cross, London", d: 'צומת רכבות, נוח להגיע מכל מקום' }] },
+    { k: 'ams', n: 'הולנד · אמסטרדם', en: 'Amsterdam', cc: 'הולנד', f: 4.75, cur: 'אירו', iso: 'EUR',
+      lang: 'הולנדית', plug: 0, cl: 'euro', em: '112',
+      see: ['שייט בתעלות', 'מוזיאון ואן גוך', 'פארק וונדל', 'כפר זאנסה סחאנס'],
+      ar: [{ n: 'המרכז', q: 'Amsterdam Centrum', d: 'על התעלות, הכול בהליכה' },
+           { n: 'יורדאן', q: 'Jordaan, Amsterdam', d: 'השכונה הכי יפה, שקטה' },
+           { n: 'דה פייפ', q: 'De Pijp, Amsterdam', d: 'שוק אלברט קאופ ומסעדות' },
+           { n: 'מוזיאומפליין', q: 'Museumplein, Amsterdam', d: 'צמוד למוזיאונים ולפארק' },
+           { n: 'אמסטרדם צפון', q: 'Amsterdam Noord', d: 'מעבר לנהר במעבורת חינם, זול יותר' }] },
+    { k: 'ber', n: 'גרמניה · ברלין', en: 'Berlin', cc: 'גרמניה', f: 4, cur: 'אירו', iso: 'EUR',
+      lang: 'גרמנית', plug: 0, cl: 'euro', em: '112',
+      see: ['שער ברנדנבורג', 'חומת ברלין', 'אי המוזיאונים', 'מגדל הטלוויזיה'],
+      ar: [{ n: 'מיטה', q: 'Mitte, Berlin', d: 'המרכז, רוב האתרים בהליכה' },
+           { n: 'פרנצלאואר ברג', q: 'Prenzlauer Berg, Berlin', d: 'שקט ונעים, הרבה משפחות' },
+           { n: 'קרויצברג', q: 'Kreuzberg, Berlin', d: 'צעיר ותוסס, הרבה אוכל' },
+           { n: 'שרלוטנבורג', q: 'Charlottenburg, Berlin', d: 'שקט, קניות' }] },
+    { k: 'prg', n: 'צ׳כיה · פראג', en: 'Prague', cc: 'צ׳כיה', f: 3.6, cur: 'קרונה צ׳כית', iso: 'CZK',
+      lang: 'צ׳כית', plug: 0, cl: 'euro', em: '112',
+      see: ['גשר קארל', 'כיכר העיר העתיקה', 'השעון האסטרונומי', 'מצודת פראג'],
+      ar: [{ n: 'העיר העתיקה', q: 'Old Town, Prague', d: 'הכיכר והשעון מתחת לחלון' },
+           { n: 'מאלה סטרנה', q: 'Mala Strana, Prague', d: 'מתחת למצודה, מעבר לגשר' },
+           { n: 'העיר החדשה', q: 'New Town, Prague', d: 'כיכר ואצלב, חנויות' },
+           { n: 'וינוהרדי', q: 'Vinohrady, Prague', d: 'שכונתי ושקט, פארקים' }] },
+    { k: 'tbs', n: 'גאורגיה · טביליסי', en: 'Tbilisi', cc: 'גאורגיה', f: 3, cur: 'לארי', iso: 'GEL',
+      lang: 'גאורגית', plug: 0, cl: 'euro', em: '112',
+      see: ['העיר העתיקה', 'מצודת נריקלה', 'הרכבל', 'טיול להרים'],
+      ar: [{ n: 'העיר העתיקה', q: 'Old Town, Tbilisi', d: 'המרחצאות והרכבל בהליכה' },
+           { n: 'רוסתוולי', q: 'Rustaveli Avenue, Tbilisi', d: 'השדרה הראשית, מרכזי' },
+           { n: 'ורה', q: 'Vera, Tbilisi', d: 'שקט, בתי קפה' },
+           { n: 'ואקה', q: 'Vake, Tbilisi', d: 'ירוק, פארק גדול' }] },
+    { k: 'dxb', n: 'דובאי', en: 'Dubai', cc: 'איחוד האמירויות', f: 3.25, cur: 'דירהם', iso: 'AED',
+      lang: 'ערבית ואנגלית', plug: 1, cl: 'desert', em: '999',
+      see: ['בורג׳ חליפה', 'ספארי במדבר', 'דובאי מול', 'מזרקות דובאי', 'פארק מים'],
+      ar: [{ n: 'דובאי מרינה', q: 'Dubai Marina', d: 'מגדלים על המים, חוף בהליכה' },
+           { n: 'JBR', q: 'Jumeirah Beach Residence, Dubai', d: 'ישר על החוף והטיילת' },
+           { n: 'דאון טאון', q: 'Downtown Dubai', d: 'בורג׳ חליפה, הקניון והמזרקות' },
+           { n: 'דיירה', q: 'Deira, Dubai', d: 'דובאי הישנה, השווקים, הכי זול' },
+           { n: 'פאלם ג׳ומיירה', q: 'Palm Jumeirah, Dubai', d: 'האי המלאכותי, מלונות נופש' }] },
+    { k: 'bkk', n: 'תאילנד · בנגקוק', en: 'Bangkok', cc: 'תאילנד', f: 10.5, cur: 'באט', iso: 'THB',
+      lang: 'תאית', plug: 0, cl: 'trop', em: '191 משטרה · 1669 אמבולנס · 1155 משטרת תיירים',
+      see: ['הארמון הגדול', 'שוק צ׳טוצ׳ק', 'שוק צף', 'מקדש וואט פו'],
+      ar: [{ n: 'סוקומוויט', q: 'Sukhumvit, Bangkok', d: 'על הרכבת העילית, קניונים ואוכל' },
+           { n: 'סיאם', q: 'Siam, Bangkok', d: 'מרכז הקניונים, הכי נוח לנסוע ממנו' },
+           { n: 'סילום', q: 'Silom, Bangkok', d: 'עסקים ביום, שווקים בלילה' },
+           { n: 'על הנהר', q: 'Riverside, Bangkok', d: 'שקט ויפה, סירות לאתרים' },
+           { n: 'קאו סאן והעיר העתיקה', q: 'Khao San Road, Bangkok', d: 'ליד הארמון, הכי זול' }] },
+    { k: 'nyc', n: 'ארה״ב · ניו יורק', en: 'New York', cc: 'ארצות הברית', f: 11.5, cur: 'דולר', iso: 'USD',
+      lang: 'אנגלית', plug: 2, cl: 'usne', em: '911',
+      see: ['סנטרל פארק', 'טיימס סקוור', 'פסל החירות', 'אמפייר סטייט', 'גשר ברוקלין'],
+      ar: [{ n: 'מידטאון', q: 'Midtown Manhattan, New York', d: 'טיימס סקוור, במרכז הכול' },
+           { n: 'אפר ווסט סייד', q: 'Upper West Side, New York', d: 'שקט, צמוד לסנטרל פארק' },
+           { n: 'צ׳לסי', q: 'Chelsea, New York', d: 'ההיי ליין והשוק, מרכזי' },
+           { n: 'דאון טאון', q: 'Financial District, New York', d: 'ליד פסל החירות והמעבורות' },
+           { n: 'וויליאמסבורג, ברוקלין', q: 'Williamsburg, Brooklyn', d: 'נוף למנהטן, יותר זול' }] },
+    { k: 'eth', n: 'אילת', en: 'Eilat', cc: 'ישראל', f: 0, cur: 'שקל', iso: 'ILS',
+      lang: 'עברית', plug: 0, cl: 'desert', em: '100 משטרה · 101 אמבולנס · 102 כבאות',
+      see: ['המצפה התת-ימי', 'חוף הדקל', 'שמורת האלמוגים', 'פארק תימנע', 'קניון האייס'],
+      ar: [{ n: 'הטיילת ומרכז העיר', q: 'Eilat promenade', d: 'הכול בהליכה, מסעדות וקניון' },
+           { n: 'חוף צפון', q: 'North Beach, Eilat', d: 'החוף המרכזי, ליד הכול' },
+           { n: 'חוף אלמוג', q: 'Coral Beach, Eilat', d: 'השנורקלינג הכי יפה' },
+           { n: 'שכונת האיילים', q: 'Eilat hotels area', d: 'מלונות גדולים עם בריכות' }] }
   ];
   function destOf(k) { for (var i = 0; i < DEST.length; i++) if (DEST[i].k === k) return DEST[i]; return null; }
+
+  /* ---------- קישורים ----------
+     הכול קישורי חיפוש רגילים, עם היעד, האזור, התאריכים וכמה אנשים כבר בפנים,
+     כדי שלא צריך למלא את זה שוב בכל אתר. */
+  function q(s) { return encodeURIComponent(String(s || '')); }
+  function gsearch(s) { return 'https://www.google.com/search?q=' + q(s); }
+  /* "קנדה · טורונטו" הוא שם יפה לכרטיס אבל לא שאילתת חיפוש */
+  function plain(s) { return String(s || '').replace(/\s*·\s*/g, ', ').trim(); }
+  function links(t) {
+    var d = destOf(t.destKey);
+    var abroad = !d || d.k !== 'eth';
+    var place = t.areaQ || (d ? d.en : plain(t.dest));   /* האזור שנבחר, אחרת העיר */
+    var city = d ? d.en : plain(t.dest);
+    var who = Math.max(1, Math.min(12, +t.who || 2));
+    var dates = (t.go && t.back) ? '&checkin=' + t.go + '&checkout=' + t.back : '';
+    var out = [];
+
+    out.push({ e: '🏨', t: t.areaN ? 'מלונות ב' + t.areaN : 'מלונות באזור',
+      u: 'https://www.booking.com/searchresults.html?ss=' + q(place) + dates +
+         '&group_adults=' + who + '&no_rooms=1' });
+    out.push({ e: '🏠', t: 'דירות באזור',
+      u: 'https://www.airbnb.com/s/' + q(place) + '/homes' +
+         ((t.go && t.back) ? '?checkin=' + t.go + '&checkout=' + t.back + '&adults=' + who : '') });
+    if (abroad)
+      out.push({ e: '✈️', t: 'טיסות מתל אביב',
+        u: 'https://www.google.com/travel/flights?q=' +
+           q('Flights from TLV to ' + city + (t.go ? ' on ' + t.go : '') + (t.back ? ' through ' + t.back : '')) });
+    if (abroad)
+      out.push({ e: '🚕', t: 'איך מגיעים משדה התעופה',
+        u: 'https://www.google.com/maps/dir/?api=1&origin=' + q(city + ' Airport') +
+           '&destination=' + q(place) });
+    out.push({ e: '🗺️', t: 'האזור במפה',
+      u: 'https://www.google.com/maps/search/?api=1&query=' + q(place) });
+    out.push({ e: '🍽️', t: 'מסעדות באזור',
+      u: 'https://www.google.com/maps/search/?api=1&query=' + q('restaurants ' + place) });
+    out.push({ e: '🎢', t: 'מה לעשות שם',
+      u: 'https://www.google.com/maps/search/?api=1&query=' + q('things to do in ' + city) });
+    out.push({ e: '🌦️', t: 'מזג האוויר', u: gsearch('מזג האוויר ' + (d ? d.n.split(' · ').pop() : t.dest)) });
+    if (d && d.iso && d.iso !== 'ILS')
+      out.push({ e: '💱', t: 'כמה זה בשקלים', u: gsearch('100 ' + d.iso + ' to ILS') });
+    if (abroad)
+      out.push({ e: '🛂', t: 'ויזה ודרכון',
+        u: gsearch('דרישות כניסה ל' + (d ? d.cc : plain(t.dest)) + ' לישראלים דרכון ויזה') });
+    return out;
+  }
 
   /* מזג האוויר הצפוי, לפי חודש הנסיעה. זה מה שקובע מה אורזים. */
   var CLIM = {
@@ -226,6 +355,15 @@
     '.agL li.on .bx{background:var(--mint,#6cf2a8)}',
     '.agL .tx{flex:1;min-width:0;padding-top:1px;word-break:break-word}',
     '.agL .del{flex:0 0 auto;background:none;border:0;color:#fff;opacity:.5;cursor:pointer;font-size:15px;padding:0 2px}',
+    /* קישורים */
+    '.agLinks{display:grid;grid-template-columns:1fr 1fr;gap:7px}',
+    '.agLink{display:flex;align-items:center;gap:8px;text-decoration:none;color:#fff;',
+    '  background:rgba(255,255,255,.08);border:2.5px solid var(--ink,#140a2e);border-radius:13px;',
+    '  padding:9px 11px;font-size:13.5px;font-weight:700;line-height:1.25;box-shadow:0 3px 0 var(--ink,#140a2e)}',
+    '.agLink:active{transform:translateY(3px);box-shadow:0 0 0 var(--ink,#140a2e)}',
+    '.agLink .e{flex:0 0 auto;font-size:17px}',
+    '.agLink span:last-child{min-width:0;word-break:break-word}',
+    '@media (max-width:360px){.agLinks{grid-template-columns:1fr}}',
     /* ימים */
     '.agD{display:flex;gap:10px;padding:8px 10px;border-radius:12px;background:rgba(255,255,255,.055);margin-bottom:5px}',
     '.agD b{flex:0 0 auto;background:var(--zap,#ffd43b);color:var(--ink,#140a2e);border-radius:9px;',
@@ -406,6 +544,19 @@
     if (d && d.plug === 2) h += '<span>🔌 מתאם אמריקאי</span>';
     h += '</div></article>';
 
+    /* הקישורים — כבר מלאים ביעד, באזור, בתאריכים ובכמה אנשים */
+    h += '<div class="agG"><h3>🔗 הכול מוכן, רק ללחוץ</h3>';
+    if (t.areaN) h += '<p class="agNote" style="margin:0 0 8px">האזור שבחרתם: <b>' + esc(t.areaN) + '</b>' +
+      (t.who ? ' · ' + num(t.who) + ' אנשים' : '') + '</p>';
+    h += '<div class="agLinks">';
+    links(t).forEach(function (l) {
+      h += '<a class="agLink" href="' + esc(l.u) + '" target="_blank" rel="noopener noreferrer">' +
+           '<span class="e">' + l.e + '</span><span>' + esc(l.t) + '</span></a>';
+    });
+    h += '</div>';
+    if (d && d.em) h += '<p class="agNote">🚨 מספר חירום ב' + esc(d.cc) + ': <b>' + esc(d.em) + '</b></p>';
+    h += '</div>';
+
     if (plan.length) {
       h += '<div class="agG"><h3>🗺️ התוכנית ליום-יום</h3>';
       plan.forEach(function (x, i) {
@@ -470,7 +621,7 @@
   }
 
   function tripForm() {
-    var t = editing && editing.id ? editing : { dest: '', destKey: '', go: '', back: '' };
+    var t = editing && editing.id ? editing : { dest: '', destKey: '', go: '', back: '', who: 2 };
     var opts = '<option value="">— בחרו יעד —</option>';
     DEST.forEach(function (d) {
       opts += '<option value="' + d.k + '"' + (d.k === t.destKey ? ' selected' : '') + '>' + esc(d.n) + '</option>';
@@ -484,15 +635,44 @@
       '<label for="agOtherN">שם המקום</label>' +
       '<input id="agOtherN" maxlength="40" placeholder="לדוגמה: קנדה · טורונטו" value="' +
         (t.destKey === 'other' ? esc(t.dest) : '') + '"></div>' +
+      '<div id="agAreaBox" hidden><label for="agArea">באיזה אזור לחפש מלונות?</label>' +
+      '<select id="agArea"></select><p class="agNote" id="agAreaD" style="margin:5px 0 0"></p></div>' +
       '<label for="agGo">תאריך יציאה</label><input id="agGo" type="date" value="' + esc(t.go) + '">' +
       '<label for="agBack">תאריך חזרה</label><input id="agBack" type="date" value="' + esc(t.back) + '">' +
+      '<label for="agWho">כמה אנשים נוסעים?</label>' +
+      '<input id="agWho" type="number" min="1" max="12" inputmode="numeric" value="' + (+t.who || 2) + '">' +
       '<button class="agB" id="agSave">' + (t.id ? '💾 שמירה' : '🧳 תכננו לי את הנסיעה') + '</button>' +
       (t.id || load(KT, []).length ? '<button class="agB alt" id="agCancel">ביטול</button>' : '') +
-      '<p class="agNote">אחרי שתבחרו, זה בונה לכם רשימת ציוד לפי מזג האוויר שם בחודש הזה, ' +
-      'תוכנית לכל יום, וספירה לאחור. הכול נשמר כאן במכשיר.</p></div>';
+      '<p class="agNote">אחרי שתבחרו, זה בונה לכם רשימת ציוד לפי מזג האוויר שם בחודש הזה, תוכנית לכל ' +
+      'יום, ספירה לאחור, וקישורים למלונות ולטיסות שכבר מלאים בתאריכים ובאזור שבחרתם. ' +
+      'הכול נשמר כאן במכשיר.</p></div>';
 
     var sel = bodyEl.querySelector('#agDest'), other = bodyEl.querySelector('#agOther');
-    sel.onchange = function () { other.hidden = sel.value !== 'other'; };
+    var box = bodyEl.querySelector('#agAreaBox'), area = bodyEl.querySelector('#agArea');
+    var adesc = bodyEl.querySelector('#agAreaD');
+
+    /* רשימת האזורים משתנה לפי היעד */
+    function fillAreas() {
+      var d = destOf(sel.value);
+      if (!d || !d.ar) { box.hidden = true; area.innerHTML = ''; return; }
+      box.hidden = false;
+      var o = '';
+      d.ar.forEach(function (a, i) {
+        o += '<option value="' + i + '"' + (a.n === t.areaN ? ' selected' : '') + '>' + esc(a.n) + '</option>';
+      });
+      o += '<option value="any"' + (t.areaN === '' ? ' selected' : '') + '>לא משנה — כל העיר</option>';
+      area.innerHTML = o;
+      showDesc();
+    }
+    function showDesc() {
+      var d = destOf(sel.value);
+      var a = d && d.ar && d.ar[+area.value];
+      adesc.textContent = a ? a.d : 'נחפש מלונות בכל העיר.';
+    }
+    area.onchange = showDesc;
+    sel.onchange = function () { other.hidden = sel.value !== 'other'; fillAreas(); };
+    fillAreas();
+
     var c = bodyEl.querySelector('#agCancel');
     if (c) c.onclick = function () { editing = null; paint(); };
 
@@ -505,11 +685,16 @@
       if (!name) { bodyEl.querySelector('#agOtherN').focus(); return; }
       var go = bodyEl.querySelector('#agGo').value, back = bodyEl.querySelector('#agBack').value;
       if (go && back && parseD(back) < parseD(go)) { alert('תאריך החזרה לפני תאריך היציאה 🙂'); return; }
+      var who = Math.max(1, Math.min(12, +bodyEl.querySelector('#agWho').value || 2));
+      var d = destOf(k), a = (d && d.ar && area.value !== 'any') ? d.ar[+area.value] : null;
+      var patch = { dest: name, destKey: k, go: go, back: back, who: who,
+                    areaN: a ? a.n : '', areaQ: a ? a.q : '' };
       var trips = load(KT, []), found = false;
       for (var i = 0; i < trips.length; i++) if (trips[i].id === (editing && editing.id)) {
-        trips[i].dest = name; trips[i].destKey = k; trips[i].go = go; trips[i].back = back; found = true;
+        for (var p2 in patch) trips[i][p2] = patch[p2];
+        found = true;
       }
-      if (!found) trips.push({ id: uid(), dest: name, destKey: k, go: go, back: back, done: {} });
+      if (!found) { patch.id = uid(); patch.done = {}; trips.push(patch); }
       save(KT, trips); editing = null; paint();
     };
   }
