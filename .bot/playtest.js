@@ -145,16 +145,22 @@ async function fps(page) {
   return Math.round((await cap(page.evaluate(() => window.__f || 0), 2000, 0)) / 3);
 }
 
-/* משחק, ומודד כמה זמן שורדים עד שמופיע מסך "נגמר" */
-async function survive(page, seconds) {
+/* משחק, ומודד כמה זמן שורדים עד שמופיע מסך "נגמר".
+   idle=true אומר לא ללחוץ על כלום — זה קו הבסיס שבלעדיו אי אפשר לדעת
+   אם המשחק אכזרי או שפשוט הבוט משחק גרוע. */
+async function survive(page, seconds, idle) {
   const DIRS = ['ArrowRight', 'ArrowLeft', 'ArrowUp', 'ArrowDown'];
   const t0 = Date.now();
   for (let i = 0; i < seconds * 4; i++) {
-    const k = DIRS[i % 4];
-    await cap(page.keyboard.down(k), 1200);
-    await page.waitForTimeout(140);
-    await cap(page.keyboard.up(k), 1200);
-    if (i % 3 === 0) await cap(page.keyboard.press(' '), 1200);
+    if (!idle) {
+      const k = DIRS[i % 4];
+      await cap(page.keyboard.down(k), 1200);
+      await page.waitForTimeout(140);
+      await cap(page.keyboard.up(k), 1200);
+      if (i % 3 === 0) await cap(page.keyboard.press(' '), 1200);
+    } else {
+      await page.waitForTimeout(190);
+    }
     if (i % 4 === 3) {
       const o = await overlay(page);
       if (o) return (Date.now() - t0) / 1000;
@@ -196,20 +202,32 @@ async function check(browser, game) {
     const f = await fps(page);
     if (f > 0 && f < FPS_MIN) add('med', 'המשחק רץ לאט', f + ' פריימים בשנייה');
 
-    /* שלוש מיתות ברצף אחרי פחות משלוש שניות = ההתחלה אכזרית מדי */
+    /* שלוש מיתות מהירות ברצף. אבל הבוט לוחץ כיוונים אקראיים, ובנחש
+       זה אומר להסתובב לתוך עצמך — אז לפני שמאשימים את המשחק בודקים
+       כמה זורדים בלי ללחוץ בכלל. אם בלי לגעת שורדים הרבה יותר, הבוט
+       הוא הבעיה ולא המשחק. */
     const runs = [];
     for (let i = 0; i < 3; i++) {
       if (!(await enter(page))) break;
       const s = await survive(page, 9);
       runs.push(s);
-      if (s === null) break;        /* שרד — אין טעם לחזור */
+      if (s === null) break;
     }
     const died = runs.filter(x => x !== null);
-    if (died.length >= 3 && died.every(x => x < 3))
-      add('med', 'נגמר כמעט מיד, שוב ושוב',
-        'שלושה ניסיונות: ' + died.map(x => x.toFixed(1) + 'ש׳').join(', '));
+    let idle = null;
+    if (died.length >= 3 && died.every(x => x < 3)) {
+      if (await enter(page)) idle = await survive(page, 9, true);
+      if (idle !== null && idle < 3)
+        add('med', 'נגמר כמעט מיד גם בלי לגעת',
+          'שלושה ניסיונות: ' + died.map(x => x.toFixed(1) + 'ש׳').join(', ') +
+          ' · בלי ללחוץ בכלל: ' + idle.toFixed(1) + 'ש׳ — ההתחלה אכזרית מדי');
+      else
+        add('low', 'הבוט מת מהר, אבל הוא פשוט שחקן גרוע',
+          'בלי ללחוץ הוא שרד ' + (idle === null ? 'עד הסוף' : idle.toFixed(1) + 'ש׳') +
+          ' — כנראה הקלט האקראי ולא המשחק');
+    }
 
-    return { ...game, notes, fps: f, runs };
+    return { ...game, notes, fps: f, runs, idle };
   } catch (e) {
     add('low', 'הבדיקה לא הסתיימה', String(e.message).slice(0, 120));
     return { ...game, notes };

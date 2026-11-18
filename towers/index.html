@@ -37,7 +37,9 @@ html,body{margin:0;height:100%;background:#121a14;color:#fff;overflow:hidden;
 #bar button{border:3px solid #070c09;border-radius:15px;background:#23362a;color:#fff;cursor:pointer;
   padding:8px 7px;font:900 12px Rubik,system-ui;display:grid;gap:1px;justify-items:center;min-width:72px}
 #bar button .em{font-size:21px}
-#bar button .pr{font-size:11px;opacity:.9}
+/* the price is the number you decide on mid-game, so it has to be
+   readable on a phone -- 11px was too small to scan quickly */
+#bar button .pr{font-size:13px;opacity:.95}
 #bar button.on{background:#9bff6a;color:#121a14}
 #bar button[disabled]{opacity:.45;cursor:default}
 #sel{position:fixed;inset-inline-start:12px;bottom:92px;z-index:22;background:rgba(7,12,9,.92);

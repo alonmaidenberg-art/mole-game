@@ -167,3 +167,28 @@ html[data-th="night"] body.hub .purse,html[data-th="night"] body.hub .ico,
 html[data-th="night"] body.hub .sr,html[data-th="night"] body.hub #chips button{background:#20356b!important;color:#e8f2ff!important}
 html[data-th="night"] body.hub .sec{color:#ffd43b!important}
 html[data-th="night"] body.hub .tag{background:#33508f!important;color:#dbe8ff!important}
+
+/* ---- tap targets ----------------------------------------------------
+   The chrome row (home, language, fun, online, fullscreen, shop) was
+   34x34 with 6px between buttons. A fingertip is about 7mm, so a child
+   aiming at "home" could land on "language" instead. 42px on a 48px
+   pitch gives each one a real target and a real gap.
+   Game pages only: the lobby lays this row out itself and its spacing
+   is deliberate, so it is left exactly as it is.                       */
+html:not(:has(#grid)) body>a[aria-label="חזרה לכל המשחקים"],
+html:not(:has(#grid)) body>button[aria-label="fun modes"],
+html:not(:has(#grid)) body>button[aria-label="online"],
+html:not(:has(#grid)) body>button[aria-label="fullscreen"],
+html:not(:has(#grid)) body>button[aria-label="shop"],
+html:not(:has(#grid)) body>button[aria-label="admin"]{
+  width:42px!important;height:42px!important;font-size:19px!important}
+html:not(:has(#grid)) body>#ag-lang{
+  height:42px!important;min-width:42px!important;border-radius:21px!important;
+  font-size:14px!important}
+html:not(:has(#grid)) body>a[aria-label="חזרה לכל המשחקים"]{left:6px!important}
+html:not(:has(#grid)) body>#ag-lang{left:54px!important}
+html:not(:has(#grid)) body>button[aria-label="fun modes"]{left:102px!important}
+html:not(:has(#grid)) body>button[aria-label="online"]{left:150px!important}
+html:not(:has(#grid)) body>button[aria-label="fullscreen"]{left:198px!important}
+html:not(:has(#grid)) body>button[aria-label="shop"]{left:246px!important}
+html:not(:has(#grid)) body>button[aria-label="admin"]{left:294px!important}

@@ -65,7 +65,7 @@ const $=s=>document.querySelector(s);
 const store={get(k,d){try{const v=localStorage.getItem(k);return v===null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
 let _ac=null;function tone(f,d=.1,t='triangle',v=.07){try{_ac=_ac||new (window.AudioContext||window.webkitAudioContext)();const o=_ac.createOscillator(),g=_ac.createGain();o.type=t;o.frequency.value=f;g.gain.value=v;o.connect(g);g.connect(_ac.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,_ac.currentTime+d);o.stop(_ac.currentTime+d+.02)}catch(e){}}
 
-const N=18,CS=20;let sp=+store.get('s_sp',2),wm=store.get('s_w','wall'),best=+store.get('s_best',0);
+const N=18,CS=20;let started=false;let sp=+store.get('s_sp',2),wm=store.get('s_w','wall'),best=+store.get('s_best',0);
 const cv=$('#cv'),ctx=cv.getContext('2d');
 R2.sharp(cv,ctx,N*CS,N*CS);
 function opt(id,v){[...$(id).children].forEach(c=>c.classList.toggle('on',c.dataset.v===String(v)))}
@@ -74,10 +74,14 @@ chips('#mSp',v=>{sp=+v;store.set('s_sp',v)});chips('#mW',v=>{wm=v;store.set('s_w
 function show(id){document.querySelectorAll('.scr').forEach(s=>s.classList.toggle('show',s.id===id))}
 let snake,dir,ndir,food,score,alive,timer,paused;
 const V={U:[0,-1],D:[0,1],L:[-1,0],R:[1,0]};
-function start(){snake=[[9,9],[8,9],[7,9]];dir=ndir='R';score=0;alive=true;paused=false;$('#pause').textContent='⏸';$('#sc').textContent=0;$('#end').classList.remove('show');place();clearInterval(timer);timer=setInterval(tick,[0,170,120,80][sp]);draw()}
+function start(){snake=[[9,9],[8,9],[7,9]];dir=ndir='R';score=0;alive=true;paused=false;started=false;$('#pause').textContent='⏸';$('#sc').textContent=0;$('#end').classList.remove('show');place();clearInterval(timer);timer=setInterval(tick,[0,170,120,80][sp]);draw()}
 function place(){do{food=[Math.floor(Math.random()*N),Math.floor(Math.random()*N)]}while(snake.some(s=>s[0]===food[0]&&s[1]===food[1]))}
-function turn(d){const o={U:'D',D:'U',L:'R',R:'L'};if(d!==o[dir])ndir=d}
-function tick(){if(!alive||paused)return;dir=ndir;let [x,y]=snake[0];x+=V[dir][0];y+=V[dir][1];
+/* הנחש מחכה לצעד הראשון שלכם. קודם הוא יצא לדרך לבד ימינה, ותשע
+   משבצות אחר כך נגמר המשחק — בערך שנייה, לפני שהספקתם להסתכל. */
+function turn(d){const o={U:'D',D:'U',L:'R',R:'L'};if(d!==o[dir]){ndir=d;started=true}}
+/* לפני הצעד הראשון עדיין מציירים בכל פעימה: משהו משנה את גודל הקנבס
+   אחרי הטעינה, וזה מוחק אותו — בלי ציור חוזר הלוח נשאר ריק עד שלוחצים */
+function tick(){if(!alive||paused)return;if(!started){draw();return}dir=ndir;let [x,y]=snake[0];x+=V[dir][0];y+=V[dir][1];
   if(wm==='wrap'){x=(x+N)%N;y=(y+N)%N}else if(x<0||y<0||x>=N||y>=N)return die();
   const eat=x===food[0]&&y===food[1];const body=eat?snake:snake.slice(0,-1);
   if(body.some(s=>s[0]===x&&s[1]===y))return die();
@@ -99,7 +103,11 @@ function draw(){const gb=ctx.createLinearGradient(0,0,N*CS,N*CS);gb.addColorStop
   // head
   const h=snake[0],hc=C(h),hg=ctx.createRadialGradient(hc[0]-3,hc[1]-4,2,hc[0],hc[1],CS*.5);hg.addColorStop(0,'#c9fff1');hg.addColorStop(1,'#1fd1a6');ctx.fillStyle=hg;ctx.beginPath();ctx.arc(hc[0],hc[1],CS*.46,0,7);ctx.fill();
   const nx=snake[1]?h[0]-snake[1][0]:1,ny=snake[1]?h[1]-snake[1][1]:0,dx=Math.abs(nx)>1?-Math.sign(nx):nx,dy=Math.abs(ny)>1?-Math.sign(ny):ny;
-  for(const sd of[-1,1]){const ex=hc[0]+dx*CS*.14-dy*sd*CS*.2,ey=hc[1]+dy*CS*.14+dx*sd*CS*.2;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(ex,ey,CS*.14,0,7);ctx.fill();ctx.fillStyle='#10204a';ctx.beginPath();ctx.arc(ex+dx*2,ey+dy*2,CS*.07,0,7);ctx.fill()}}
+  for(const sd of[-1,1]){const ex=hc[0]+dx*CS*.14-dy*sd*CS*.2,ey=hc[1]+dy*CS*.14+dx*sd*CS*.2;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(ex,ey,CS*.14,0,7);ctx.fill();ctx.fillStyle='#10204a';ctx.beginPath();ctx.arc(ex+dx*2,ey+dy*2,CS*.07,0,7);ctx.fill()}
+  if(!started&&alive){const w=N*CS;ctx.save();ctx.direction='rtl';ctx.textAlign='center';
+    ctx.fillStyle='rgba(8,22,44,.78)';ctx.fillRect(0,w*.72,w,w*.15);
+    ctx.fillStyle='#d6f6ff';ctx.font='700 '+Math.round(w*.052)+'px Rubik,system-ui,Arial';
+    ctx.fillText('החליקו או לחצו חץ כדי להתחיל',w/2,w*.818);ctx.restore()}}
 addEventListener('keydown',e=>{const m={ArrowUp:'U',ArrowDown:'D',ArrowLeft:'L',ArrowRight:'R',w:'U',s:'D',a:'L',d:'R',W:'U',S:'D',A:'L',D:'R'}[e.key];if(m){turn(m);e.preventDefault()}else if(e.key===' ')$('#pause').click()});
 document.querySelectorAll('#pad button').forEach(b=>b.onclick=()=>turn(b.dataset.d));
 let t0=null;cv.addEventListener('touchstart',e=>{t0=[e.touches[0].clientX,e.touches[0].clientY]},{passive:true});
