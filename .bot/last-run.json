@@ -1,6 +1,6 @@
 {
- "when": "2026-11-18T05:23:45.092Z",
- "games": 5,
+ "when": "2026-11-18T05:44:24.635Z",
+ "games": 3,
  "withFindings": 2,
  "results": [
   {
@@ -17,38 +17,24 @@
    "frames": 59
   },
   {
-   "id": "bedwars",
-   "name": "מלחמת המיטות",
-   "url": "bedwars/",
+   "id": "_t2",
+   "name": "בדיקה: יציאה מהמפה",
+   "url": "_t2/",
    "found": [
     {
      "sev": "med",
      "what": "יוצא מגבולות המפה (P)",
-     "detail": "הגיע ל-872,172 — 826 פיקסלים מחוץ למפה של 46×34"
+     "detail": "הגיע ל-590,-241 — 241 פיקסלים מחוץ למפה של 1180×700"
     }
    ],
-   "frames": 44
-  },
-  {
-   "id": "pong",
-   "name": "פונג",
-   "url": "pong/",
-   "found": [],
-   "frames": 42
-  },
-  {
-   "id": "tabletennis",
-   "name": "טניס שולחן",
-   "url": "tabletennis/",
-   "found": [],
-   "frames": 53
+   "frames": 60
   },
   {
    "id": "zombies",
    "name": "גלי הזומבים",
    "url": "zombies/",
    "found": [],
-   "frames": 56
+   "frames": 59
   }
  ]
 }

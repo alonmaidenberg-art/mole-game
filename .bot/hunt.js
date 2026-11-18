@@ -81,7 +81,21 @@ function probeSrc(names) {
           const o = { x: x, y: y };
           if (typeof z === 'number') o.z = z;
           ents[k] = o;
+          continue;
         }
+        /* גוף שבנוי מנקודות ואין לו מיקום משלו — למשל הרכב ב"נהיגה מטורפת",
+           שמורכב מגלגלים. לוקחים את הממוצע שלהן. */
+        try {
+          for (const pk of Object.keys(v)) {
+            const arr = v[pk];
+            if (!Array.isArray(arr) || arr.length < 2 || arr.length > 40) continue;
+            if (typeof arr[0] !== 'object' || arr[0] === null) continue;
+            if (typeof arr[0].x !== 'number' || typeof arr[0].y !== 'number') continue;
+            let sx = 0, sy = 0, n = 0;
+            for (const q of arr) { if (typeof q.x === 'number' && typeof q.y === 'number') { sx += q.x; sy += q.y; n++ } }
+            if (n >= 2) { ents[k] = { x: sx / n, y: sy / n }; break }
+          }
+        } catch (e) {}
       }
     }
     return { ents, nums, t: performance.now() };
@@ -136,6 +150,60 @@ function cap(promise, ms, dflt) {
 
 const DIRS = [['ArrowRight', 1, 0], ['ArrowLeft', -1, 0], ['ArrowUp', 0, -1], ['ArrowDown', 0, 1],
               ['d', 1, 0], ['a', -1, 0], ['w', 0, -1], ['s', 0, 1]];
+/* הקנבס הגדול ביותר הוא שטח המשחק. בכמה דפים יש גם קנבס זעיר לקישוט,
+   ולחיצה עליו במקום על המשחק נראית כאילו המשחק לא מגיב. */
+async function playBox(page) {
+  return await cap(page.evaluate(() => {
+    const cs = [...document.querySelectorAll('canvas')].filter(c => c.width > 20 && c.height > 20);
+    if (!cs.length) return null;
+    const c = cs.sort((a, b) => b.width * b.height - a.width * a.height)[0];
+    const r = c.getBoundingClientRect();
+    return { x: r.x, y: r.y, width: r.width, height: r.height };
+  }), 2000, null);
+}
+
+/* האם משהו חוסם את מרכז המסך — תפריט פתיחה, מסך "נגמר", הסבר.
+   בלי זה הבוט נותן ציונים לתפריטים ומדווח שהמשחק "קפוא". */
+async function overlay(page) {
+  return await cap(page.evaluate(() => {
+    const el = document.elementFromPoint(innerWidth / 2, innerHeight / 2);
+    if (!el) return null;
+    if (el.tagName === 'CANVAS') return null;
+    /* מטפסים למעלה עד הקופסה שחוסמת */
+    let box = el;
+    for (let i = 0; i < 6 && box.parentElement; i++) {
+      const r = box.getBoundingClientRect();
+      if (r.width > innerWidth * 0.5 && r.height > innerHeight * 0.3) break;
+      box = box.parentElement;
+    }
+    const btns = [...box.querySelectorAll('button, a, .btn')]
+      .filter(b => { const r = b.getBoundingClientRect(); return r.width > 40 && r.height > 18; });
+    /* הכפתור הראשי הוא הגדול ביותר שלא מחזיר לתפריט הראשי */
+    const back = /תפריט|חזרה|רשימת המשחקים|back|menu|בית/i;
+    const main = btns.filter(b => !back.test(b.textContent || ''))
+      .sort((a, b) => b.getBoundingClientRect().width * b.getBoundingClientRect().height
+                    - a.getBoundingClientRect().width * a.getBoundingClientRect().height)[0];
+    if (!main) return { text: (box.textContent || '').trim().slice(0, 40), btn: null };
+    main.setAttribute('data-agbot', '1');
+    return { text: (box.textContent || '').trim().slice(0, 40), btn: (main.textContent || '').trim().slice(0, 24) };
+  }), 2500, null);
+}
+
+/* מנסה להיכנס למשחק: לוחץ על הכפתור הראשי של מה שחוסם, עד 4 פעמים */
+async function enter(page) {
+  for (let i = 0; i < 4; i++) {
+    const o = await overlay(page);
+    if (!o) return true;
+    if (!o.btn) return false;
+    await cap(page.locator('[data-agbot="1"]').first().click({ timeout: 2000 }), 2500);
+    await cap(page.evaluate(() => {
+      const e = document.querySelector('[data-agbot="1"]'); if (e) e.removeAttribute('data-agbot');
+    }), 1500);
+    await page.waitForTimeout(600);
+  }
+  return !(await overlay(page));
+}
+
 async function drive(page, phase) {
   /* סדרת קלט קבועה: כל כיוון בתורו, ואז ירי/קפיצה. אותו דבר בכל משחק,
      כדי שאפשר יהיה להשוות ולשחזר, ולדעת לאיזה כיוון ביקשנו ללכת. */
@@ -145,13 +213,36 @@ async function drive(page, phase) {
   await cap(page.keyboard.up(k), 1500);
   if (phase % 3 === 0) {
     await page.keyboard.press(' ').catch(() => {});
-    const box = await cap(page.locator('canvas').first().boundingBox(), 1500, null);
+    const box = await playBox(page);
     if (box) {
       const x = box.x + box.width * (0.3 + 0.4 * Math.random());
       const y = box.y + box.height * (0.3 + 0.4 * Math.random());
       await cap(page.mouse.move(x, y), 1200);
       await cap(page.mouse.down(), 1200);
       await page.waitForTimeout(80);
+      await cap(page.mouse.up(), 1200);
+    }
+  }
+  /* כפתורי המסך. משחקים כמו נהיגה מטורפת נשלטים בגז ובלם ולא בחיצים,
+     ובלי ללחוץ עליהם הרכב פשוט עומד במקום. */
+  if (phase % 2 === 1) {
+    const pads = await cap(page.evaluate(() => {
+      const skip = /תפריט|חזרה|בית|menu|back|הגדרות|שמע|מסך/i;
+      const out = [];
+      for (const b of document.querySelectorAll('button, .btn, [id^="b"]')) {
+        const r = b.getBoundingClientRect();
+        if (r.width < 28 || r.height < 28) continue;
+        if (r.bottom < 0 || r.top > innerHeight) continue;
+        if (skip.test(b.textContent || '')) continue;
+        out.push({ x: r.x + r.width / 2, y: r.y + r.height / 2 });
+      }
+      return out.slice(0, 6);
+    }), 2000, []);
+    const pad = pads[(phase >> 1) % Math.max(1, pads.length)];
+    if (pad) {
+      await cap(page.mouse.move(pad.x, pad.y), 1200);
+      await cap(page.mouse.down(), 1200);
+      await page.waitForTimeout(260);
       await cap(page.mouse.up(), 1200);
     }
   }
@@ -211,10 +302,13 @@ async function hunt(browser, game) {
 
     const started = await startGame(page);
     await page.waitForTimeout(900);
+    /* הרבה משחקים נפתחים על מסך הסבר, ולא על המשחק עצמו */
+    let playing = await enter(page);
+    let playedSamples = 0, deaths = 0;
 
     /* האם בכלל יש לולאת ציור חיה */
-    /* סופרים את הפריימים שהמשחק עצמו מבקש. הגרסה הקודמת ספרה פריימים
-       שהבדיקה עצמה ייצרה, ולכן תמיד "הצליחה" — גם במשחק מת. */
+    /* נרשם לידיעה בלבד. משחק שמצייר רק כשלוחצים (סיימון, מאסטרמיינד,
+       פאזל) לא מבקש פריימים כלל, וזה לא תקלה — לכן אין על זה ממצא. */
     await cap(page.evaluate(() => {
       window.__raf = 0;
       const orig = window.requestAnimationFrame.bind(window);
@@ -223,23 +317,28 @@ async function hunt(browser, game) {
       };
     }), 2000);
     await page.waitForTimeout(1000);
-    const alive = await cap(page.evaluate(() => window.__raf || 0), 2000, 0);
-    aliveOut = alive;
+    aliveOut = await cap(page.evaluate(() => window.__raf || 0), 2000, 0);
 
     const samples = [];
     const shots = [];
     /* שלב א' — קלט מעורב, לראות שהמשחק חי ומגיב */
     for (let i = 0; i < SECONDS; i++) {
       const asked = await drive(page, i);
+      /* כל כמה צעדים בודקים אם מתנו או נתקענו בתפריט, ואם כן — חוזרים פנימה */
+      if (i % 5 === 4) {
+        const o = await overlay(page);
+        if (o) { deaths++; playing = await enter(page); }
+      }
+      if (!playing) continue;
       const s = await cap(page.evaluate(PROBE), 2500, null);
       const sh = await cap(page.evaluate(SHOT), 2500, null);
-      if (s) { s.ask = asked; samples.push(s); }
+      if (s) { s.ask = asked; samples.push(s); playedSamples++; }
       if (sh) shots.push(sh);
     }
     /* שלב א2' — הזזת מצביע. חלק מהמשחקים (מחבט, סמן, כוונת) לא מגיבים
        למקשים בכלל, ובלי זה הם היו נראים כאילו השליטה שלהם מתה. */
     {
-      const box = await cap(page.locator('canvas').last().boundingBox(), 2000, null);
+      const box = await playBox(page);
       if (box) {
         const cx0 = box.x + box.width / 2, cy0 = box.y + box.height / 2;
         const legs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
@@ -288,7 +387,7 @@ async function hunt(browser, game) {
       else if (flat > shots.length * 0.8) add('high', 'המסך ריק — צבע אחד בלבד', '');
       /* זו בדיקת "חי או מת", לא בדיקת מהירות: כשרצים כמה משחקים במקביל
          על עיבוד תוכנה הקצב צונח, וזו תקלה של הבדיקה ולא של המשחק. */
-      if (alive < 3) add('high', 'לולאת הציור לא רצה בכלל', 'המשחק ביקש ' + alive + ' פריימים בשנייה');
+
     } else if (await page.locator('canvas').count()) {
       add('low', 'לא הצלחתי לקרוא את הקנבס', '');
     }
@@ -366,6 +465,14 @@ async function hunt(browser, game) {
 
     if (!started && await page.locator('canvas').count())
       add('low', 'לא מצאתי כפתור התחלה', '');
+    if (playedSamples < 10) {
+      const o = await overlay(page);
+      found.length = 0;        /* כל מה שנאסף מתייחס לתפריט, לא למשחק */
+      add('low', 'לא הצלחתי להיכנס למשחק כדי לבדוק אותו',
+        o ? 'נתקעתי על: "' + o.text + '"' + (o.btn ? ' (כפתור: ' + o.btn + ')' : '') : '');
+    } else if (deaths > 3) {
+      add('low', 'הבוט מת הרבה פעמים', 'נכנס מחדש ' + deaths + ' פעמים');
+    }
 
     if (warn.length) add('low', 'שגיאות בקונסול', warn.slice(0, 2).join(' | '));
 
