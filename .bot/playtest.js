@@ -118,10 +118,15 @@ const LAYOUT = `(() => {
     if (r.right > innerWidth + 2 || r.left < -2)
       off.push(k + ' חורג ב-' + Math.round(Math.max(r.right - innerWidth, -r.left)) + 'px');
   }
+  /* שורת הזכויות בתחתית היא הערת שוליים ולא טקסט ששחקן צריך לקרוא
+     תוך כדי משחק. 10px שם היא בחירה נכונה, ולהגדיל אותה רק תפריע.
+     בלי החרגה כאן היא הייתה מדווחת על כל 96 המשחקים בכל שבוע. */
+  const legal = /©|כל הזכויות|נא לא להעתיק/;
   for (const el of document.querySelectorAll('body *')) {
     if (el.children.length) continue;
     const t = (el.textContent || '').trim();
     if (t.length < 2) continue;
+    if (legal.test(t)) continue;
     if (!vis(el)) continue;
     const r = el.getBoundingClientRect();
     if (r.bottom < 0 || r.top > innerHeight) continue;
