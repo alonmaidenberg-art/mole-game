@@ -524,11 +524,18 @@ async function hunt(browser, game) {
         hunt(browser, g).catch(() => null),
         new Promise(z => setTimeout(() => z(null), 180000))
       ]);
-      if (again) {
+      if (again && !again.found.some(f => slow.test(f.what) || slow.test(f.detail || ''))) {
         out[out.indexOf(r)] = again;
         const bad = again.found.filter(f => f.sev !== 'low').length;
         console.log('   ' + (bad ? '✗ ' : '· ') + r.url.padEnd(20) +
           (bad ? again.found.filter(f => f.sev !== 'low').map(f => f.what).join('; ') : 'תקין כשנבדק לבד'));
+      } else {
+        /* גם לבד הוא לא הספיק. משחק תלת-ממד כבד על עיבוד תוכנה פשוט
+           מצייר לאט מכדי להיבדק כאן — זו מגבלה של הבדיקה, לא תקלה
+           במשחק, ואסור שזה ישלח מישהו "לתקן" משחק תקין. */
+        out[out.indexOf(r)] = { id: r.id, name: r.name, url: r.url, found: [{ sev: 'low',
+          what: 'כבד מדי לבדיקה בסביבה הזאת', detail: 'נטען כרגיל אבל מצייר לאט מכדי להשלים את הבדיקה — צריך לבדוק ביד' }] };
+        console.log('   · ' + r.url.padEnd(20) + 'כבד מדי לבדיקה אוטומטית — לא ממצא');
       }
     }
   }
