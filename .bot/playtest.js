@@ -140,14 +140,22 @@ const LAYOUT = `(() => {
     hscroll: document.documentElement.scrollWidth > innerWidth + 2 };
 })()`;
 
-async function fps(page) {
+/* הקצב נמדד תוך כדי משחק אמיתי ולא בחלון נפרד: משחק שמחכה לנגיעה
+   הראשונה לא מחשב כלום לפני שנוגעים, ומדידה אז מחזירה מספר מחמיא
+   ולא נכון — ומדידה אחרי שהבוט כבר מת מחזירה אפס. */
+async function fpsStart(page) {
   await cap(page.evaluate(() => {
-    window.__f = 0;
+    window.__f = 0; window.__t0 = performance.now();
+    if (window.__hooked) return; window.__hooked = 1;
     const o = window.requestAnimationFrame.bind(window);
     window.requestAnimationFrame = function (cb) { return o(function (t) { window.__f++; return cb(t) }) };
   }), 2000);
-  await page.waitForTimeout(3000);
-  return Math.round((await cap(page.evaluate(() => window.__f || 0), 2000, 0)) / 3);
+}
+async function fpsRead(page) {
+  const r = await cap(page.evaluate(() => ({ f: window.__f || 0,
+    ms: performance.now() - (window.__t0 || performance.now()) })), 2000, null);
+  if (!r || r.ms < 900 || !r.f) return 0;
+  return Math.round(r.f / (r.ms / 1000));
 }
 
 /* משחק, ומודד כמה זמן שורדים עד שמופיע מסך "נגמר".
@@ -204,20 +212,22 @@ async function check(browser, game) {
         add('med', 'אפשר לגלול את הדף לצדדים', 'זה מזיז את המשחק תוך כדי משחק');
     }
 
-    const f = await fps(page);
-    if (f > 0 && f < FPS_MIN) add('med', 'המשחק רץ לאט', f + ' פריימים בשנייה');
 
     /* שלוש מיתות מהירות ברצף. אבל הבוט לוחץ כיוונים אקראיים, ובנחש
        זה אומר להסתובב לתוך עצמך — אז לפני שמאשימים את המשחק בודקים
        כמה זורדים בלי ללחוץ בכלל. אם בלי לגעת שורדים הרבה יותר, הבוט
        הוא הבעיה ולא המשחק. */
     const runs = [];
+    let f = 0;
     for (let i = 0; i < 3; i++) {
       if (!(await enter(page))) break;
+      if (i === 0) await fpsStart(page);
       const s = await survive(page, 9);
+      if (i === 0) f = await fpsRead(page);
       runs.push(s);
       if (s === null) break;
     }
+    if (f > 0 && f < FPS_MIN) add('med', 'המשחק רץ לאט', f + ' פריימים בשנייה תוך כדי משחק');
     const died = runs.filter(x => x !== null);
     let idle = null;
     if (died.length >= 3 && died.every(x => x < 3)) {

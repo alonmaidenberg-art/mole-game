@@ -65,7 +65,7 @@ const BK='zigzag'+'_best';let best=+store.get(BK,0);$('#best').textContent=best;
 function endGame(title,score,msg,coins,dia){$('#eT').textContent=title;$('#eS').textContent=score;let m=msg||'';if(window.AG&&coins>0){AG.add(coins,dia||0);m+=' +'+coins+' 🪙'+(dia?' +'+dia+' 💎':'')}$('#eM').textContent=m;$('#end').classList.add('show')}
 function saveBest(s){if(s>best){best=s;store.set(BK,s);$('#best').textContent=s}}
 
-let hits=[],on=false;
+let hits=[],on=false,ready=1;
 function rr(x,y,w,h,r){ctx.beginPath();ctx.roundRect?ctx.roundRect(x,y,w,h,r):ctx.rect(x,y,w,h)}
 function B(x,y,w,h,col,txt,fn,fs=22,tc='#fff'){if(window.R2){ctx.save();R2.shadow(ctx,Math.max(5,h*.22),'rgba(0,0,0,.33)',0,Math.max(2,h*.09));const _g=ctx.createLinearGradient(x,y,x,y+h);_g.addColorStop(0,R2.lighten(col,.28));_g.addColorStop(.52,col);_g.addColorStop(1,R2.darken(col,.26));ctx.fillStyle=_g;rr(x,y,w,h,12);ctx.fill();ctx.restore();ctx.save();ctx.globalAlpha=.38;ctx.strokeStyle=R2.lighten(col,.65);ctx.lineWidth=1.5;rr(x+1,y+1,w-2,Math.max(4,h*.52),11);ctx.stroke();ctx.restore()}else{ctx.fillStyle=col;rr(x,y,w,h,12);ctx.fill()}if(txt!=null){ctx.fillStyle=tc;ctx.font='bold '+fs+'px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(txt,x+w/2,y+h/2+1)}if(fn)hits.push({x,y,w,h,fn})}
 function T(t,x,y,fs=22,c='#fff',al='center'){ctx.fillStyle=c;ctx.font='bold '+fs+'px system-ui';ctx.textAlign=al;ctx.textBaseline='middle';ctx.fillText(t,x,y)}
@@ -76,11 +76,13 @@ function over(title,score,msg,coins,dia,delay=600){on=false;window.__show=true;s
 
 let bx,dir,off,path,gems,sc,sp,fr,pw=84,by=H-110,dead,gm;
 function extend(){while(path[path.length-1].y>by-off-H-300){const l=path[path.length-1],d=Math.random()<.5?1:-1,len=rnd(70,190);let nx=l.cx+d*len;if(nx<140||nx>W-140)nx=l.cx-d*len;path.push({y:l.y-len,cx:nx});if(Math.random()<.45)gems.push({y:l.y-len/2,x:(l.cx+nx)/2})}}
-function start(){bx=W/2;dir=1;off=0;sc=0;fr=0;sp=3.2;dead=0;gm=0;gems=[];path=[{y:by+60,cx:W/2-60},{y:by-90,cx:W/2+90}];extend()}
+function start(){ready=1;bx=W/2;dir=1;off=0;sc=0;fr=0;sp=3.2;dead=0;gm=0;gems=[];path=[{y:by+60,cx:W/2-60},{y:by-90,cx:W/2+90}];extend()}
 function cxAt(y){for(let i=0;i<path.length-1;i++){const a=path[i],b=path[i+1];if(y<=a.y&&y>=b.y){const t=(a.y-y)/(a.y-b.y);return a.cx+(b.cx-a.cx)*t}}return null}
-function flip(){if(on)dir*=-1}
+/* הכדור עומד עד הנגיעה הראשונה. קודם הוא יצא לדרך מיד והמשחק
+   נגמר תוך שנייה וחצי בלי שנגעת. */
+function flip(){if(!on)return;if(ready){ready=0;return}dir*=-1}
 cv.addEventListener('pointerdown',flip);addEventListener('keydown',e=>{if(e.code==='Space'&&!e.repeat)flip()});
-function upd(){fr++;sp=3.2+Math.min(3,fr/900);bx+=dir*sp;off+=sp;sc=Math.floor(off/10)+gm*10;
+function upd(){if(ready)return;fr++;sp=3.2+Math.min(3,fr/900);bx+=dir*sp;off+=sp;sc=Math.floor(off/10)+gm*10;
   const wy=by-off;const c=cxAt(wy);if(c===null||Math.abs(bx-c)>pw/2-2){if(!dead){dead=1;tone(100,.5,'sawtooth');over('נפלת!',sc,gm?'💎 '+gm:'',Math.floor(sc/10),sc>=150?1:0)}return}
   extend();for(const g of gems)if(!g.d&&Math.abs(g.y-wy)<22&&Math.abs(g.x-bx)<28){g.d=1;gm++;tone(900,.08)}
   while(path.length>3&&path[1].y+off>H+120)path.shift();gems=gems.filter(g=>!g.d&&g.y+off<H+60)}
@@ -93,7 +95,11 @@ function drw(){const ys=path.map(p=>({x:p.cx,y:p.y+off}));const trace=()=>{ctx.b
   ctx.globalAlpha=.38;ctx.strokeStyle='#c9fbf4';ctx.lineWidth=3;trace();ctx.stroke();
   ctx.restore();
   ctx.font='26px serif';ctx.textAlign='center';ctx.textBaseline='middle';for(const g of gems)ctx.fillText('💎',g.x,g.y+off);
-  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(bx,by,12,0,7);ctx.fill();T('⭐ '+sc+(gm?'   💎'+gm:''),W/2,26,24)}
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(bx,by,12,0,7);ctx.fill();T('⭐ '+sc+(gm?'   💎'+gm:''),W/2,26,24);
+  if(ready&&on){ctx.save();ctx.direction='rtl';ctx.textAlign='center';
+    ctx.fillStyle='rgba(6,20,20,.78)';ctx.fillRect(0,H*.70,W,H*.12);
+    ctx.fillStyle='#d6fff4';ctx.font='700 '+Math.round(Math.min(W,H)*.055)+'px Rubik,system-ui,Arial';
+    ctx.textBaseline='middle';ctx.fillText('לחצו כדי להתחיל',W/2,H*.76);ctx.restore()}}
 wire(start);run(upd,drw,'#102a2a');window.__s={step:upd,start:()=>{start();on=true},get on(){return on},get score(){return sc},flip,get bx(){return bx},get dir(){return dir},get path(){return path},get off(){return off},get by(){return by},cxAt};
 
 if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));

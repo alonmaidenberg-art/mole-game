@@ -24,8 +24,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0e1a2e;color:#fff;f
 #timer.urgent{color:#ff6060}
 #hotbar{position:absolute;bottom:max(12px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);display:flex;gap:6px;direction:ltr;pointer-events:auto}
 .slot{width:52px;height:54px;border-radius:12px;border:2px solid rgba(255,255,255,.22);background:rgba(6,10,20,.6);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:21px;line-height:1;cursor:pointer}
-.slot b{font-size:9px;font-weight:900;opacity:.8;margin-top:3px}
-.slot i{font-size:9px;font-style:normal;font-weight:900;color:#ffd05a}
+/* שם הנשק וכמות הכדורים — צריך לקרוא אותם תוך כדי קרב */
+.slot b{font-size:12px;font-weight:900;opacity:.85;margin-top:3px}
+.slot i{font-size:12px;font-style:normal;font-weight:900;color:#ffd05a}
 .slot.on{border-color:#ffd05a;background:rgba(255,208,90,.2);box-shadow:0 0 12px rgba(255,208,90,.35)}
 .slot.empty{opacity:.4}
 #dmg{position:fixed;inset:0;pointer-events:none;z-index:6;box-shadow:inset 0 0 120px 30px rgba(255,0,0,.8);opacity:0;transition:opacity .2s}

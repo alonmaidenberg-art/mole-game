@@ -19,8 +19,9 @@ html,body{margin:0;height:100%;background:#1d1040;color:#fff;
   font-family:Rubik,"Segoe UI",system-ui,sans-serif;overscroll-behavior:none}
 #wrap{display:flex;flex-direction:column;height:100%;gap:7px;padding:7px;padding-top:max(7px,env(safe-area-inset-top))}
 .bar{display:flex;gap:6px;align-items:center;flex-wrap:wrap;flex:0 0 auto}
+/* 8px ריפוד נתן גובה 36 — מתחת למה שאצבע פוגעת בו. 11 נותן 42. */
 .btn{border:3px solid #0d0624;border-radius:13px;background:#ffd43b;color:#2b1659;
-  font:900 14px Rubik,system-ui;padding:8px 12px;cursor:pointer;box-shadow:0 4px 0 #0d0624}
+  font:900 14px Rubik,system-ui;padding:11px 13px;cursor:pointer;box-shadow:0 4px 0 #0d0624}
 .btn:active{transform:translateY(3px);box-shadow:0 1px 0 #0d0624}
 .btn.g{background:#35e0ff}.btn.p{background:#ff3d8b;color:#fff}.btn.d{background:#cfc9df;color:#4b4463}
 .btn[disabled]{opacity:.5;cursor:default}
@@ -59,7 +60,7 @@ body:not(.play) #playOnly{display:none}
 .lv b{flex:1;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .lv button{border:0;border-radius:10px;padding:6px 9px;font:900 12.5px system-ui;cursor:pointer;background:#ffd43b;color:#2b1659}
 .lv button.x{background:#ff9a9a}
-@media(max-width:560px){.title{font-size:15px}.btn{padding:7px 10px;font-size:13px}
+@media(max-width:560px){.title{font-size:15px}.btn{padding:10px 11px;font-size:13px}
   .pal button{width:40px;height:40px}}
 </style>
 </head>

@@ -56,7 +56,7 @@ const cv=$('#cv'),c=cv.getContext('2d');const PT=[];function burst(x,y,col,n){n=
 const CFG={1:{gap:.34,sp:2.4,g:.34,j:-6.4},2:{gap:.28,sp:2.9,g:.4,j:-7},3:{gap:.22,sp:3.4,g:.44,j:-7.4}};
 [...$('#mLv').children].forEach(b=>{b.classList.toggle('on',+b.dataset.v===lv);b.onclick=()=>{lv=+b.dataset.v;store.set('b_lv',lv);[...$('#mLv').children].forEach(k=>k.classList.toggle('on',k===b))}});
 function resize(){const d=Math.min(devicePixelRatio||1,2);VW=innerWidth;VH=innerHeight;cv.width=VW*d;cv.height=VH*d;c.setTransform(d,0,0,d,0,0)}addEventListener('resize',resize);resize();
-function start(){bird={x:VW*.28,y:VH*.45,vy:0,r:16};pipes=[];score=0;t=0;state='play';$('#hud').textContent=0;['menu','end'].forEach(i=>$('#'+i).classList.remove('show'));$('#menuB').style.display='block';flap()}
+function start(){bird={x:VW*.28,y:VH*.45,vy:0,r:16};pipes=[];score=0;t=0;state='ready';$('#hud').textContent=0;['menu','end'].forEach(i=>$('#'+i).classList.remove('show'));$('#menuB').style.display='block'}
 function flap(){if(state!=='play')return;bird.vy=CFG[lv].j;tone(520,.07)}
 function die(){if(state!=='play')return;state='dead';tone(140,.4,'sawtooth');flash=8;burst(bird.x,bird.y,'#ffd23a',24);let nb=false;if(score>best){best=score;store.set('b_best',best);nb=true}$('#best').textContent=best;$('#eT').textContent=nb?'שיא חדש! 🏆':'נפלת!';$('#eM').textContent='עברת '+score+' צינורות';setTimeout(()=>$('#end').classList.add('show'),600)}
 function step(){const k=CFG[lv];t++;gnd=(gnd+k.sp)%40;
@@ -103,6 +103,10 @@ function draw(){const gy=VH-VH*.12;
     // body glow
     const bg=c.createRadialGradient(-4,-5,2,0,0,bird.r);bg.addColorStop(0,'#ffe87a');bg.addColorStop(1,'#f0a800');c.fillStyle=bg;c.beginPath();c.arc(0,0,bird.r,0,7);c.fill();
     c.fillStyle='#fff';c.beginPath();c.arc(7,-5,6,0,7);c.fill();c.fillStyle='#111';c.beginPath();c.arc(9,-5,3,0,7);c.fill();c.fillStyle='#ff7a3a';c.beginPath();c.moveTo(13,0);c.lineTo(26,3);c.lineTo(13,7);c.fill();c.restore()}
+  if(state==='ready'){c.save();c.direction='rtl';c.textAlign='center';
+    c.fillStyle='rgba(8,22,44,.72)';c.fillRect(0,VH*.60,VW,VH*.13);
+    c.fillStyle='#eaf7ff';c.font='700 '+Math.round(Math.min(VW,VH)*.062)+'px Rubik,system-ui,Arial';
+    c.fillText('לחצו כדי לעוף',VW/2,VH*.685);c.restore()}
   // Flash (orange-red on death instead of white)
   if(flash>0){c.fillStyle='rgba(255,80,30,'+flash/12+')';c.fillRect(0,0,VW,VH);flash--}
   // Advance particles
@@ -110,7 +114,9 @@ function draw(){const gy=VH-VH*.12;
   for(let i=PT.length-1;i>=0;i--)if(PT[i].t>PT[i].l)PT.splice(i,1)}
 let last=performance.now(),acc=0;function loop(n){requestAnimationFrame(loop);acc+=Math.min(100,n-last);last=n;while(acc>=1000/60){acc-=1000/60;step()}draw()}
 bird={x:VW*.28,y:VH*.45,vy:0,r:16};pipes=[];requestAnimationFrame(loop);
-function act(e){if(state==='play'){flap()}}
+/* הציפור מרחפת עד הנגיעה הראשונה. קודם היא נפלה מיד עם הכניסה
+   והמשחק נגמר תוך שנייה וחצי בלי שנגעת. */
+function act(e){if(state==='ready'){state='play';flap();return}if(state==='play'){flap()}}
 cv.addEventListener('pointerdown',e=>{e.preventDefault();act()});addEventListener('keydown',e=>{if(e.code==='Space'||e.code==='ArrowUp'){e.preventDefault();act()}});
 $('#go').onclick=start;$('#again').onclick=start;
 function toMenu(){state='menu';pipes=[];$('#hud').textContent=0;$('#end').classList.remove('show');$('#menu').classList.add('show');$('#menuB').style.display='none'}
