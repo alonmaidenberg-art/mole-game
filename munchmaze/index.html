@@ -113,7 +113,9 @@ function reset(){P={x:ctr(12)+OX,y:ctr(13),dx:0,dy:0,nx:0,ny:0,mo:0};pw=0;eatc=0
   mt=0}
 function i2(g){return gh.indexOf(g)%5}
 function start(){lvl=0;sc=0;lives=3;msg='';mkLevel();msg='שלב 1';mt=80}
-function setDir(dx,dy){P.nx=dx;P.ny=dy}
+// the key handler is live from the moment the page loads, but P only exists
+// once the game starts -- an arrow key on the title screen used to throw
+function setDir(dx,dy){if(!P)return;P.nx=dx;P.ny=dy}
 addEventListener('keydown',e=>{const k=e.code;if(k==='ArrowLeft'||k==='KeyA')setDir(-1,0);else if(k==='ArrowRight'||k==='KeyD')setDir(1,0);else if(k==='ArrowUp'||k==='KeyW')setDir(0,-1);else if(k==='ArrowDown'||k==='KeyS')setDir(0,1);if(k.startsWith('Arrow'))e.preventDefault()});
 let sx=0,sy=0;cv.addEventListener('pointerdown',e=>{const p=cpos(e);sx=p.x;sy=p.y});cv.addEventListener('pointermove',e=>{if(!sx&&!sy)return;const p=cpos(e),dx=p.x-sx,dy=p.y-sy;if(Math.hypot(dx,dy)>24){if(Math.abs(dx)>Math.abs(dy))setDir(dx>0?1:-1,0);else setDir(0,dy>0?1:-1);sx=p.x;sy=p.y}});cv.addEventListener('pointerup',()=>{sx=sy=0});
 function atC(o){return (o.x-OX-CS/2)%CS===0&&(o.y-CS/2)%CS===0}
