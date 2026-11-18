@@ -1,27 +1,54 @@
 {
- "when": "2026-11-17T20:24:34.196Z",
- "games": 2,
- "withFindings": 1,
+ "when": "2026-11-18T05:23:45.092Z",
+ "games": 5,
+ "withFindings": 2,
  "results": [
+  {
+   "id": "_t1",
+   "name": "בדיקה: תנועה שבורה",
+   "url": "_t1/",
+   "found": [
+    {
+     "sev": "high",
+     "what": "אי אפשר לזוז — שום דבר לא הגיב לקלט",
+     "detail": "נבדקו 1 משתנים; תזוזה כוללת 0 פיקסלים"
+    }
+   ],
+   "frames": 59
+  },
+  {
+   "id": "bedwars",
+   "name": "מלחמת המיטות",
+   "url": "bedwars/",
+   "found": [
+    {
+     "sev": "med",
+     "what": "יוצא מגבולות המפה (P)",
+     "detail": "הגיע ל-872,172 — 826 פיקסלים מחוץ למפה של 46×34"
+    }
+   ],
+   "frames": 44
+  },
+  {
+   "id": "pong",
+   "name": "פונג",
+   "url": "pong/",
+   "found": [],
+   "frames": 42
+  },
+  {
+   "id": "tabletennis",
+   "name": "טניס שולחן",
+   "url": "tabletennis/",
+   "found": [],
+   "frames": 53
+  },
   {
    "id": "zombies",
    "name": "גלי הזומבים",
    "url": "zombies/",
    "found": [],
-   "frames": 43
-  },
-  {
-   "id": "_t2",
-   "name": "בדיקה: יציאה מהמפה",
-   "url": "_t2/",
-   "found": [
-    {
-     "sev": "med",
-     "what": "יוצא מגבולות המפה (P)",
-     "detail": "הגיע ל-951,557 — 191 פיקסלים מחוץ למפה של 760×1120"
-    }
-   ],
-   "frames": 43
+   "frames": 56
   }
  ]
 }

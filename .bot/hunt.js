@@ -113,8 +113,9 @@ async function startGame(page) {
   for (const sel of tries) {
     const el = page.locator(sel).first();
     if (await el.count() && await el.isVisible().catch(() => false)) {
-      await el.click({ timeout: 2000 }).catch(() => {});
-      return sel;
+      let ok = true;
+      await el.click({ timeout: 2500 }).catch(() => { ok = false; });
+      if (ok) return sel;
     }
   }
   const byText = page.locator('button, a, .btn').filter({ hasText: /שחק|התחל|המשך|start|play|צא לדרך|קדימה/i }).first();
@@ -172,7 +173,13 @@ async function hunt(browser, game) {
     names = nameList(src);
   } catch (e) {}
   const PROBE = probeSrc(names);
-  const ctx = await browser.newContext({ ...devices['Pixel 5'], hasTouch: true, isMobile: true, locale: 'he-IL' });
+  /* רוב המשחקים דורשים מסך לרוחב ומציגים "סובבו את המכשיר" לאורך,
+     אז משחקים לרוחב. מי שבכל זאת מתעקש — מנסים גם לאורך. */
+  const LAND = { viewport: { width: 844, height: 390 }, deviceScaleFactor: 2,
+    isMobile: true, hasTouch: true, locale: 'he-IL',
+    userAgent: devices['Pixel 5'].userAgent };
+  const PORT_ = { ...devices['Pixel 5'], hasTouch: true, isMobile: true, locale: 'he-IL' };
+  const ctx = await browser.newContext(game._portrait ? PORT_ : LAND);
   const page = await ctx.newPage();
   const errs = [], warn = [];
   page.on('dialog', d => { warn.push('dialog: ' + d.message().slice(0, 60)); d.dismiss().catch(() => {}); });
@@ -189,15 +196,34 @@ async function hunt(browser, game) {
     await page.goto(url, { timeout: 20000, waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(1600);
 
+    const blocked = await cap(page.evaluate(() => {
+      const r = document.querySelector('#rot');
+      if (!r) return false;
+      const st = getComputedStyle(r);
+      return st.display !== 'none' && st.visibility !== 'hidden' && r.offsetHeight > 50;
+    }), 2000, false);
+    if (blocked) {
+      add('low', 'מסך "סובבו את המכשיר" חוסם את הבדיקה', 'נבדק במסך ' +
+        (game._portrait ? 'לאורך' : 'לרוחב'));
+      await ctx.close().catch(() => {});
+      return { id: game.id, name: game.name, url: game.url, found, rotBlocked: true };
+    }
+
     const started = await startGame(page);
     await page.waitForTimeout(900);
 
     /* האם בכלל יש לולאת ציור חיה */
-    const alive = await cap(page.evaluate(() => new Promise(r => {
-      let n = 0; const t0 = performance.now();
-      const c = () => { n++; if (performance.now() - t0 < 700) requestAnimationFrame(c); else r(n); };
-      requestAnimationFrame(c);
-    })), 3000, 0);
+    /* סופרים את הפריימים שהמשחק עצמו מבקש. הגרסה הקודמת ספרה פריימים
+       שהבדיקה עצמה ייצרה, ולכן תמיד "הצליחה" — גם במשחק מת. */
+    await cap(page.evaluate(() => {
+      window.__raf = 0;
+      const orig = window.requestAnimationFrame.bind(window);
+      window.requestAnimationFrame = function (cb) {
+        return orig(function (t) { window.__raf++; return cb(t); });
+      };
+    }), 2000);
+    await page.waitForTimeout(1000);
+    const alive = await cap(page.evaluate(() => window.__raf || 0), 2000, 0);
     aliveOut = alive;
 
     const samples = [];
@@ -210,6 +236,28 @@ async function hunt(browser, game) {
       if (s) { s.ask = asked; samples.push(s); }
       if (sh) shots.push(sh);
     }
+    /* שלב א2' — הזזת מצביע. חלק מהמשחקים (מחבט, סמן, כוונת) לא מגיבים
+       למקשים בכלל, ובלי זה הם היו נראים כאילו השליטה שלהם מתה. */
+    {
+      const box = await cap(page.locator('canvas').last().boundingBox(), 2000, null);
+      if (box) {
+        const cx0 = box.x + box.width / 2, cy0 = box.y + box.height / 2;
+        const legs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+        for (const [dx, dy] of legs) {
+          for (let j = 1; j <= 6; j++) {
+            await cap(page.mouse.move(
+              cx0 + dx * box.width * 0.07 * j, cy0 + dy * box.height * 0.07 * j), 1200);
+            await page.waitForTimeout(110);
+            const s2 = await cap(page.evaluate(PROBE), 2000, null);
+            if (s2) { s2.ask = { dx, dy }; s2.ptr = true; samples.push(s2); }
+            const sh2 = await cap(page.evaluate(SHOT), 2000, null);
+            if (sh2) shots.push(sh2);
+          }
+          await cap(page.mouse.move(cx0, cy0), 1200);
+        }
+      }
+    }
+
     /* שלב ב' — דוחפים חזק לכל קיר בתורו. ככה מוצאים חור בגבול:
        הולכים לכיוון אחד עד הסוף ובודקים אם נעצרנו. */
     for (const [k, dx, dy] of [['ArrowRight', 1, 0], ['ArrowLeft', -1, 0],
@@ -219,6 +267,8 @@ async function hunt(browser, game) {
         await page.waitForTimeout(280);
         const s = await cap(page.evaluate(PROBE), 2500, null);
         if (s) { s.ask = { dx, dy }; s.wall = true; samples.push(s); }
+        const sh3 = await cap(page.evaluate(SHOT), 2000, null);
+        if (sh3) shots.push(sh3);
       }
       await cap(page.keyboard.up(k), 1500);
       /* גם קפיצה תוך כדי, כי בכמה משחקים ככה בורחים מהמפה */
@@ -232,11 +282,13 @@ async function hunt(browser, game) {
     if (shots.length > 6) {
       const uniq = new Set(shots.map(s => s.h)).size;
       const flat = shots.filter(s => s.flat < 6).length;
-      if (uniq === 1) add('high', 'התמונה קפואה — שום דבר לא זז על המסך', String(shots.length) + ' דגימות זהות');
+      if (uniq === 1 && shots.length >= 25)
+        add('high', 'התמונה קפואה — שום דבר לא זז על המסך',
+          String(shots.length) + ' דגימות זהות לאורך כל הבדיקה, כולל אחרי לחיצות');
       else if (flat > shots.length * 0.8) add('high', 'המסך ריק — צבע אחד בלבד', '');
       /* זו בדיקת "חי או מת", לא בדיקת מהירות: כשרצים כמה משחקים במקביל
          על עיבוד תוכנה הקצב צונח, וזו תקלה של הבדיקה ולא של המשחק. */
-      if (alive < 3) add('high', 'לולאת הציור לא רצה בכלל', 'פריימים ב-700 אלפיות: ' + alive);
+      if (alive < 3) add('high', 'לולאת הציור לא רצה בכלל', 'המשחק ביקש ' + alive + ' פריימים בשנייה');
     } else if (await page.locator('canvas').count()) {
       add('low', 'לא הצלחתי לקרוא את הקנבס', '');
     }
@@ -244,7 +296,10 @@ async function hunt(browser, game) {
     /* ---- שליטה מתה / יציאה מהמפה / מספרים הרוסים ---- */
     if (samples.length > 6) {
       const last = samples[samples.length - 1];
-      const keys = Object.keys(last.ents);
+      /* הסמן עצמו הוא הקלט, לא תגובה לקלט — הוא זז תמיד ולכן היה מסתיר
+         בדיוק את המשחקים שבהם אי אפשר לזוז. */
+      const CURSOR = /^(mouse|ptr|pointer|cursor|touch|stick|aim|cam|camera|view|scroll|drag)$/i;
+      const keys = Object.keys(last.ents).filter(k => !CURSOR.test(k));
       const nums = last.nums || {};
       const W = nums.W || nums.MAPW || nums.GW || nums.WORLD;
       const H = nums.H || nums.MAPH || nums.GH;
@@ -276,6 +331,10 @@ async function hunt(browser, game) {
            נבדק רק על מי שמגיב לקלט, ורק בזמן הדחיפה לקירות, כדי שישות
            אחרת שמסתובבת מחוץ למסך לא תיחשב בטעות. */
         if (W && H && (k === bestName || k === 'P' || k === 'me' || k === 'player')) {
+          /* בכמה משחקים W ו-H הם מספר המשבצות ולא פיקסלים. אם המיקום גדול
+             בהרבה מהמפה, היחידות לא תואמות ואין מה להשוות. */
+          const far = Math.max(...trail.map(pt => Math.max(Math.abs(pt.x), Math.abs(pt.y))));
+          if (far > Math.max(W, H) * 3) continue;
           const pushed = samples.filter(s2 => s2.wall && s2.ents[k]).map(s2 => s2.ents[k]);
           let worst = null, by = 0;
           for (const pt of pushed) {
@@ -290,9 +349,17 @@ async function hunt(browser, game) {
       }
 
       /* אם שום דבר לא זז לכיוון שביקשנו — השליטה מתה */
-      if (keys.length && started && bestResponse < 12)
-        add('high', 'אי אפשר לזוז — שום דבר לא הגיב לכיוונים',
-          'נבדקו ' + keys.length + ' משתנים, התגובה הכי טובה הייתה ' + Math.round(bestResponse) + ' פיקסלים');
+      /* רק שיתוק מוחלט נחשב. משחק שמגיב קצת (מחבט בטווח קצר, סמן) הוא
+         משחק עובד, ועדיף לפספס באג מאשר לשלוח בוט לתקן משחק תקין. */
+      let anyMotion = 0;
+      for (const k of keys) {
+        const tr = samples.map(s2 => s2.ents[k]).filter(Boolean);
+        for (let i = 1; i < tr.length; i++)
+          anyMotion += Math.abs(tr[i].x - tr[i-1].x) + Math.abs(tr[i].y - tr[i-1].y);
+      }
+      if (keys.length && started && bestResponse < 3 && anyMotion < 6)
+        add('high', 'אי אפשר לזוז — שום דבר לא הגיב לקלט',
+          'נבדקו ' + keys.length + ' משתנים; תזוזה כוללת ' + Math.round(anyMotion) + ' פיקסלים');
     } else if (started && await page.locator('canvas').count()) {
       add('low', 'לא מצאתי מצב משחק לבדוק', '');
     }
