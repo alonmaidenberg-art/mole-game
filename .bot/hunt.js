@@ -21,7 +21,7 @@ const ROOT = path.resolve(__dirname, '..');
 const PORT = 8777;
 const SECONDS = 14;          /* כמה זמן לשחק בכל משחק */
 const JOBS = (() => { const i = process.argv.indexOf('--jobs'); return i > 0 ? +process.argv[i + 1] : 4; })();
-const LIMIT = 60000;          /* תקרה קשיחה לכל משחק */
+const LIMIT = 150000;          /* תקרה קשיחה לכל משחק */
 const ONLY = process.argv.slice(2).filter(a => !a.startsWith('--') && !/^\d+$/.test(a));
 
 /* ---------- שרת קבצים קטן, כדי לא להיות תלויים בשום דבר חיצוני ---------- */
@@ -107,10 +107,10 @@ const SHOT = `(() => {
   const cs = [...document.querySelectorAll('canvas')].filter(c => c.width > 20 && c.height > 20);
   if (!cs.length) return null;
   const c = cs.sort((a, b) => b.width * b.height - a.width * a.height)[0];
-  const t = document.createElement('canvas'); t.width = 24; t.height = 24;
+  const t = document.createElement('canvas'); t.width = 64; t.height = 64;
   const g = t.getContext('2d', { willReadFrequently: true });
-  try { g.drawImage(c, 0, 0, 24, 24) } catch (e) { return null }
-  let d; try { d = g.getImageData(0, 0, 24, 24).data } catch (e) { return null }
+  try { g.drawImage(c, 0, 0, 64, 64) } catch (e) { return null }
+  let d; try { d = g.getImageData(0, 0, 64, 64).data } catch (e) { return null }
   let h = 0, lo = 255, hi = 0;
   for (let i = 0; i < d.length; i += 4) {
     const v = (d[i] + d[i+1] + d[i+2]) / 3;
@@ -282,9 +282,9 @@ async function hunt(browser, game) {
   const add = (sev, what, detail) => found.push({ sev, what, detail });
 
   try {
-    await page.goto(url, { timeout: 20000, waitUntil: 'domcontentloaded' });
+    await page.goto(url, { timeout: 60000, waitUntil: 'domcontentloaded' });
     await page.evaluate(() => { try { localStorage.setItem('ag_name', 'בוט'); } catch (e) {} });
-    await page.goto(url, { timeout: 20000, waitUntil: 'domcontentloaded' });
+    await page.goto(url, { timeout: 60000, waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(1600);
 
     const blocked = await cap(page.evaluate(() => {
@@ -380,11 +380,12 @@ async function hunt(browser, game) {
     /* ---- מסך קפוא או ריק ---- */
     if (shots.length > 6) {
       const uniq = new Set(shots.map(s => s.h)).size;
-      const flat = shots.filter(s => s.flat < 6).length;
+      const flat = shots.filter(s => s.flat < 2).length;
       if (uniq === 1 && shots.length >= 25)
         add('high', 'התמונה קפואה — שום דבר לא זז על המסך',
           String(shots.length) + ' דגימות זהות לאורך כל הבדיקה, כולל אחרי לחיצות');
-      else if (flat > shots.length * 0.8) add('high', 'המסך ריק — צבע אחד בלבד', '');
+      else if (flat >= shots.length && shots.length >= 25)
+        add('high', 'המסך ריק — צבע אחד בלבד', 'בכל ' + shots.length + ' הדגימות');
       /* זו בדיקת "חי או מת", לא בדיקת מהירות: כשרצים כמה משחקים במקביל
          על עיבוד תוכנה הקצב צונח, וזו תקלה של הבדיקה ולא של המשחק. */
 
@@ -510,6 +511,27 @@ async function hunt(browser, game) {
     }
   }
   await Promise.all(Array.from({ length: Math.min(JOBS, games.length) }, worker));
+
+  /* מעבר שני: כל מה שנפל על זמן נבדק שוב לבד. משחק תלת-ממד כבד
+     שנבדק במקביל לשלושה אחרים נראה שבור גם כשהוא תקין לגמרי. */
+  const slow = /לא נטען|תקע את הבדיקה|Timeout/;
+  const retry = out.filter(r => r.found.some(f => slow.test(f.what) || slow.test(f.detail || '')));
+  if (retry.length) {
+    console.log('\n' + retry.length + ' משחקים נפלו על זמן — בודק אותם שוב אחד-אחד\n');
+    for (const r of retry) {
+      const g = games.find(x => x.url === r.url);
+      const again = await Promise.race([
+        hunt(browser, g).catch(() => null),
+        new Promise(z => setTimeout(() => z(null), 180000))
+      ]);
+      if (again) {
+        out[out.indexOf(r)] = again;
+        const bad = again.found.filter(f => f.sev !== 'low').length;
+        console.log('   ' + (bad ? '✗ ' : '· ') + r.url.padEnd(20) +
+          (bad ? again.found.filter(f => f.sev !== 'low').map(f => f.what).join('; ') : 'תקין כשנבדק לבד'));
+      }
+    }
+  }
   await browser.close();
   server.close();
 

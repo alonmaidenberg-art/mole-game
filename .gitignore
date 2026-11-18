@@ -1,1 +1,5 @@
 _src/
+
+# run reports from the bots, regenerated on every run
+.bot/last-run.json
+.bot/last-playtest.json
