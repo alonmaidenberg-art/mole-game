@@ -192,3 +192,48 @@ html:not(:has(#grid)) body>button[aria-label="online"]{left:150px!important}
 html:not(:has(#grid)) body>button[aria-label="fullscreen"]{left:198px!important}
 html:not(:has(#grid)) body>button[aria-label="shop"]{left:246px!important}
 html:not(:has(#grid)) body>button[aria-label="admin"]{left:294px!important}
+
+/* ---- "מה בא לך לשחק?" --------------------------------------------
+   הסיור בתחתית הלובי. חלק מאותו עולם של המשחקים — אותו קו דיו עבה
+   ואותו צל קשיח — אבל שקט יותר, כי כאן קוראים ולא משחקים. הכותרת
+   הגדולה היא הדבר הרועש היחיד; כל השאר נותן לטקסט מקום.             */
+/* לקטע יש לוח כהה משלו: רקע הדף בלובי בהיר מתחת לכרטיסים, והטקסט
+   הפתוח (הפתיחה ו"על האתר") היה בהיר על בהיר ולא נקרא. */
+.guide{max-width:1100px;margin:56px auto 0;padding:26px 20px 24px;
+  background:#2b1659;border:4px solid #140a2e;border-radius:26px;
+  box-shadow:0 8px 0 #140a2e}
+@media(max-width:620px){.guide{margin:40px 10px 0;padding:20px 14px 18px;border-radius:20px}}
+.guide h2{font-size:clamp(30px,6vw,46px);font-weight:900;line-height:1.05;margin:0 0 10px;
+  color:#ffd43b!important;text-shadow:0 5px 0 #140a2e;letter-spacing:-.5px}
+.guide .glead{font-size:17px;line-height:1.65;max-width:62ch;margin:0 0 30px;color:#e7dffb}
+.gblock{border:4px solid #140a2e;border-radius:22px;padding:18px 20px 20px;
+  margin:0 0 18px;background:#3a1d6e;box-shadow:0 6px 0 #140a2e}
+.gblock h3{display:flex;align-items:center;gap:10px;margin:0 0 9px;
+  font-size:21px;font-weight:900;line-height:1.2}
+.gblock h3 span{font-size:25px;line-height:1}
+.gblock h3 b{margin-inline-start:auto;font-size:14px;font-weight:900;
+  background:#140a2e;color:#fff;border-radius:999px;padding:3px 11px;flex:0 0 auto}
+.gblock p{margin:0 0 14px;font-size:15.5px;line-height:1.7;max-width:66ch;color:#e9e2fb}
+.g-zap  h3{color:#ffd43b!important}
+.g-hot  h3{color:#ff3d8b!important}
+.g-ice  h3{color:#35e0ff!important}
+.g-mint h3{color:#6cf2a8!important}
+.gchips{display:flex;flex-wrap:wrap;gap:8px}
+.gchip{display:inline-flex;align-items:center;gap:8px;text-decoration:none;color:#fff;
+  background:rgba(255,255,255,.09);border:3px solid #140a2e;border-radius:999px;
+  padding:7px 14px 7px 8px;font-size:14px;font-weight:800;min-height:42px;
+  box-shadow:0 3px 0 #140a2e}
+.gchip img{border-radius:50%;flex:0 0 auto;background:rgba(0,0,0,.25)}
+.gchip:hover{background:rgba(255,255,255,.17)}
+.gchip:active{transform:translateY(3px);box-shadow:0 0 0 #140a2e}
+.gabout{border:4px dashed rgba(255,255,255,.3);border-radius:22px;padding:18px 20px;margin-top:26px;
+  background:rgba(0,0,0,.22)}
+.gabout h3{margin:0 0 9px;font-size:20px;font-weight:900;color:#fff!important}
+.gabout p{margin:0 0 11px;font-size:15.5px;line-height:1.7;max-width:66ch;color:#ded5f5}
+.gabout p:last-child{margin-bottom:0}
+@media(max-width:560px){
+  .guide{margin-top:40px}
+  .gblock{padding:15px 15px 17px;border-radius:18px}
+  .gblock h3{font-size:19px;flex-wrap:wrap}
+  .gblock h3 b{margin-inline-start:0}
+}
