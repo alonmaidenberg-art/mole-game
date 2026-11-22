@@ -271,6 +271,18 @@ async function hunt(browser, game) {
     userAgent: devices['Pixel 5'].userAgent };
   const PORT_ = { ...devices['Pixel 5'], hasTouch: true, isMobile: true, locale: 'he-IL' };
   const ctx = await browser.newContext(game._portrait ? PORT_ : LAND);
+  /* משחקי THREE מציירים ב-WebGL, והדפדפן מנקה את מאגר הציור מיד אחרי
+     שהוא מראה אותו על המסך. בלי זה drawImage על הקנבס מחזיר שחור ריק,
+     והבוט חושב שכל משחק תלת-ממד "קפוא" — גם כשהוא רץ מצוין.
+     מבקשים preserveDrawingBuffer כדי שהתמונה תישאר קריאה לבדיקה. */
+  await ctx.addInitScript(() => {
+    const gc = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function (type, attrs) {
+      if (type === 'webgl' || type === 'webgl2' || type === 'experimental-webgl')
+        attrs = Object.assign({}, attrs, { preserveDrawingBuffer: true });
+      return gc.call(this, type, attrs);
+    };
+  });
   const page = await ctx.newPage();
   const errs = [], warn = [];
   page.on('dialog', d => { warn.push('dialog: ' + d.message().slice(0, 60)); d.dismiss().catch(() => {}); });
