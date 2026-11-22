@@ -75,7 +75,14 @@ function wire(start){$('#go').onclick=()=>{$('#menu').classList.remove('show');s
 function over(title,score,msg,coins,dia,delay=600){on=false;window.__show=true;saveBest(score);setTimeout(()=>endGame(title,score,msg,coins,dia),delay)}
 
 let me,bots,dots,sc,mx=null,my=null;
-function mkb(){const a=Math.random()*7,d=300;return{x:clamp(me.x+Math.cos(a)*d,20,1600-20),y:clamp(me.y+Math.sin(a)*d,20,1000-20),r:rnd(10,Math.max(16,me.r*1.6)),a:Math.random()*7,c:'hsl('+Math.floor(Math.random()*360)+',70%,55%)'}}
+/* יריב חדש אמור להופיע במרחק 300 מהשחקן. clamp על המיקום לא שומר על
+   המרחק הזה: ליד קיר הוא פשוט מוחק את ההיסט, והיריב נולד על השחקן.
+   לכן מגרילים זווית שהנקודה שלה נופלת בתוך המפה, במקום לרסק אותה. */
+function mkb(){const d=300;let x=null,y=0,a=0;
+  for(let i=0;i<24;i++){a=Math.random()*7;const px=me.x+Math.cos(a)*d,py=me.y+Math.sin(a)*d;
+    if(px>=20&&px<=1580&&py>=20&&py<=980){x=px;y=py;break}}
+  if(x===null){a=Math.atan2(500-me.y,800-me.x)+rnd(-.6,.6);x=clamp(me.x+Math.cos(a)*d,20,1580);y=clamp(me.y+Math.sin(a)*d,20,980)}
+  return{x,y,r:rnd(10,Math.max(16,me.r*1.6)),a:Math.random()*7,c:'hsl('+Math.floor(Math.random()*360)+',70%,55%)'}}
 function start(){me={x:800,y:500,r:16};bots=[];dots=[];sc=0;for(let i=0;i<160;i++)dots.push({x:rnd(10,1590),y:rnd(10,990),c:Math.floor(Math.random()*360)});for(let i=0;i<14;i++)bots.push(mkb())}
 cv.addEventListener('pointermove',e=>{const p=cpos(e);mx=p.x;my=p.y});cv.addEventListener('pointerdown',e=>{const p=cpos(e);mx=p.x;my=p.y});
 function upd(){let dx=(keys.ArrowRight||keys.KeyD?1:0)-(keys.ArrowLeft||keys.KeyA?1:0),dy=(keys.ArrowDown||keys.KeyS?1:0)-(keys.ArrowUp||keys.KeyW?1:0);
