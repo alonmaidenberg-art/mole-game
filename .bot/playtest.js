@@ -122,8 +122,11 @@ const LAYOUT = `(() => {
      תוך כדי משחק. 10px שם היא בחירה נכונה, ולהגדיל אותה רק תפריע.
      בלי החרגה כאן היא הייתה מדווחת על כל 96 המשחקים בכל שבוע. */
   const legal = /©|כל הזכויות|נא לא להעתיק/;
+  /* מונה הפריימים בפינה הוא כלי עבודה של אלון, לא טקסט ששחקן קורא.
+     הוא נכתב קטן ובשקיפות בכוונה כדי לא להפריע, ולהגדיל אותו רק יזיק. */
   for (const el of document.querySelectorAll('body *')) {
     if (el.children.length) continue;
+    if (el.id === 'fps' || el.closest('#fps')) continue;
     const t = (el.textContent || '').trim();
     if (t.length < 2) continue;
     if (legal.test(t)) continue;
