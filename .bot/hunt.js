@@ -447,6 +447,15 @@ async function hunt(browser, game) {
              בהרבה מהמפה, היחידות לא תואמות ואין מה להשוות. */
           const far = Math.max(...trail.map(pt => Math.max(Math.abs(pt.x), Math.abs(pt.y))));
           if (far > Math.max(W, H) * 3) continue;
+          /* ועוד מקרה: W ו-H הם גודל הקנבס, אבל העולם גדול בהרבה ומצלמה
+             נעה בתוכו — ב"אכלו ותגדלו" הקנבס 800x450 והעולם 1600x1000.
+             מפה אמיתית מכילה את השחקן כמעט כל הזמן, ולכן אם הוא נמצא
+             מחוץ ל-W×H ברוב הדגימות אלה פשוט לא הגבולות שלו. באג אמיתי
+             של יציאה מהמפה הוא חריגה קצרה מגבול שנשמר כל שאר הזמן. */
+          const m = Math.max(24, W * 0.04);
+          const outside = trail.filter(pt =>
+            pt.x < -m || pt.x > W + m || pt.y < -m || pt.y > H + m).length;
+          if (outside > trail.length * 0.25) continue;
           const pushed = samples.filter(s2 => s2.wall && s2.ents[k]).map(s2 => s2.ents[k]);
           let worst = null, by = 0;
           for (const pt of pushed) {
