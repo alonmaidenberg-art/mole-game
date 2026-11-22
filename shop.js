@@ -18,7 +18,7 @@
   window.AG_SHOP={items:ITEMS,read:rd,write:wr};
   function isAdm(){return !!(window.AG&&AG.isAdmin&&AG.isAdmin())}
   function isMini(){return !!(window.AG&&AG.isMini&&AG.isMini())||isAdm()}
-  try{fetch((window.AG&&AG.root?AG.root:'/')+'shop.json?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.json()}).then(function(j){(j.items||[]).forEach(function(n){var i=ITEMS.findIndex(function(x){return x.id===n.id});if(i>=0)ITEMS[i]=n;else ITEMS.push(n)});if(ov)draw()}).catch(function(){})}catch(e){}
+  try{fetch((window.AG&&AG.root?AG.root:'/')+'shop.json?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.json()}).then(function(j){(j.items||[]).forEach(function(n){var i=ITEMS.findIndex(function(x){return x.id===n.id});if(i>=0)ITEMS[i]=n;else ITEMS.push(n)});applyTheme();if(ov)draw()}).catch(function(){})}catch(e){}
   function deal(){var list=ITEMS.filter(function(i){return i.k==='p'&&!i.admin&&!rd().own[i.id]&&(i.c||0)>0});if(!list.length)return null;var d=Math.floor(Date.now()/86400000);return list[d%list.length]}
   function price(i){var dl=deal();return dl&&dl.id===i.id?Math.round(i.c*.6):i.c}
   function active(id){var o=rd();return (o.until[id]||0)>Date.now()}
