@@ -47,7 +47,7 @@ body{overflow:hidden;position:fixed;inset:0;width:100%;background:#0e2338}
 <body>
 <canvas id="cv"></canvas><div id="hud"></div>
 <div id="rot">📱↔️<br>סובבו את הטלפון לרוחב</div>
-<div class="ov show" id="menu"><div class="ovc" style="max-width:440px"><div style="font-size:56px">💣</div><h2>תותח</h2><div class="lb">גררו אחורה מהתותח כדי לכוון ולקבוע עוצמה, ושחררו כדי לירות. פגעו בכל המטרות 🎯 עם מעט כדורים. 5 כדורים בכל שלב</div><button class="btn" id="go">▶ שחק</button><div style="opacity:.8;margin-top:10px;font-size:15px">שיא: <b id="best">0</b></div></div></div>
+<div class="ov show" id="menu"><div class="ovc" style="max-width:440px"><div style="font-size:56px">💣</div><h2>תותח</h2><div class="lb">גררו אחורה מהתותח כדי לכוון ולקבוע עוצמה, ושחררו כדי לירות. פגעו בכל המטרות 🎯 עם מעט כדורים. 5 כדורים בכל שלב</div><button class="btn" id="go">▶ שחק</button><button class="btn alt" id="gostorm">🌪 מצב סערה</button><div style="opacity:.75;margin-top:8px;font-size:14px;line-height:1.5">בסערה הרוח דוחפת את הכדור והמטרות לא עומדות במקום.</div><div style="opacity:.8;margin-top:10px;font-size:15px">שיא: <b id="best">0</b> · שיא סערה: <b id="bestS">0</b></div></div></div>
 <div class="ov" id="end"><div class="ovc"><h2 id="eT">נגמר</h2><div style="font-size:48px;font-weight:900;color:#ffd05a" id="eS"></div><p id="eM"></p><button class="btn" id="again">🔁 שוב</button><button class="btn alt" id="menu2">תפריט</button></div></div>
 <script src="../lib/real2d.js"></script>
 <script>
@@ -61,9 +61,9 @@ addEventListener('resize',resize);resize();
 addEventListener('keydown',e=>{keys[e.code]=1;if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault()});addEventListener('keyup',e=>{keys[e.code]=0});
 function cpos(e){const r=cv.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width*W,y:(e.clientY-r.top)/r.height*H}}
 function holdBtn(id,fn){const b=$(id);b.addEventListener('pointerdown',e=>{e.preventDefault();fn(1);b.classList.add('on')});for(const t of['pointerup','pointerleave','pointercancel'])b.addEventListener(t,e=>{fn(0);b.classList.remove('on')})}
-const BK='cannon'+'_best';let best=+store.get(BK,0);$('#best').textContent=best;
+const BK='cannon'+'_best',BKS='cannon'+'_best_storm';let best=+store.get(BK,0),bestS=+store.get(BKS,0);$('#best').textContent=best;$('#bestS').textContent=bestS;
 function endGame(title,score,msg,coins,dia){$('#eT').textContent=title;$('#eS').textContent=score;let m=msg||'';if(window.AG&&coins>0){AG.add(coins,dia||0);m+=' +'+coins+' 🪙'+(dia?' +'+dia+' 💎':'')}$('#eM').textContent=m;$('#end').classList.add('show')}
-function saveBest(s){if(s>best){best=s;store.set(BK,s);$('#best').textContent=s}}
+function saveBest(s){if(storm){if(s>bestS){bestS=s;store.set(BKS,s);$('#bestS').textContent=s}}else if(s>best){best=s;store.set(BK,s);$('#best').textContent=s}}
 
 let hits=[],on=false;
 function rr(x,y,w,h,r){ctx.beginPath();ctx.roundRect?ctx.roundRect(x,y,w,h,r):ctx.rect(x,y,w,h)}
@@ -74,14 +74,20 @@ function run(upd,drw,bg){let last=performance.now(),acc=0;const _bg=bg||'#111';l
 function wire(start){$('#go').onclick=()=>{$('#menu').classList.remove('show');start();on=true};$('#again').onclick=()=>{$('#end').classList.remove('show');start();on=true};$('#menu2').onclick=()=>{on=false;$('#end').classList.remove('show');$('#menu').classList.add('show')}}
 function over(title,score,msg,coins,dia,delay=600){on=false;window.__show=true;saveBest(score);setTimeout(()=>endGame(title,score,msg,coins,dia),delay)}
 
-let ball,tg,wl,shots,sc,lvl,drag=null,gx=90,gy=H-70,fin;
+let ball,tg,wl,shots,sc,lvl,drag=null,gx=90,gy=H-70,fin,storm=false,wind=0;
 function level(){shots=5;ball=null;tg=[];wl=[];const n=2+Math.min(4,lvl);for(let i=0;i<n;i++)tg.push({x:rnd(420,740),y:rnd(120,H-60),r:22,a:1});
+  /* מצב סערה: רוח קבועה לשלב, ומטרות שמשייטות למעלה ולמטה בתוך רצועה.
+     המצב הרגיל לא נוגע בשורות האלה בכלל. */
+  if(storm){wind=rnd(.05,.13)*(Math.random()<.5?-1:1)*(1+Math.min(lvl,5)*.12);
+    for(const t of tg){t.vy=rnd(.45,1.05)*(Math.random()<.5?-1:1)*(1+Math.min(lvl,5)*.1);t.lo=Math.max(70,t.y-rnd(45,95));t.hi=Math.min(H-50,t.y+rnd(45,95))}}
+  else wind=0;
   for(let i=0;i<Math.min(3,lvl+1);i++)wl.push({x:rnd(300,600),y:rnd(140,H-140),w:16,h:rnd(70,130)});wl=wl.filter(w=>!tg.some(t=>t.x>w.x-30&&t.x<w.x+46&&t.y>w.y-30&&t.y<w.y+w.h+30))}
-function start(){sc=0;lvl=0;fin=0;level()}
+function start(){sc=0;lvl=0;fin=0;wind=0;level()}
 cv.addEventListener('pointerdown',e=>{if(!on||ball)return;const p=cpos(e);if(Math.hypot(p.x-gx,p.y-gy)<110)drag=p});
 cv.addEventListener('pointermove',e=>{if(drag)drag=cpos(e)});
 addEventListener('pointerup',()=>{if(drag&&on&&!ball){const dx=gx-drag.x,dy=gy-drag.y,d=Math.min(150,Math.hypot(dx,dy));if(d>15){const k=d/150*17;ball={x:gx,y:gy,vx:dx/Math.hypot(dx,dy)*k,vy:dy/Math.hypot(dx,dy)*k};shots--;tone(160,.2,'square')}}drag=null});
-function upd(){if(!ball)return;ball.x+=ball.vx;ball.y+=ball.vy;ball.vy+=.28;
+function upd(){if(storm)for(const t of tg){if(!t.a)continue;t.y+=t.vy;if(t.y<t.lo){t.y=t.lo;t.vy=-t.vy}else if(t.y>t.hi){t.y=t.hi;t.vy=-t.vy}}
+  if(!ball)return;ball.vx+=wind;ball.x+=ball.vx;ball.y+=ball.vy;ball.vy+=.28;
   for(const t of tg)if(t.a&&Math.hypot(t.x-ball.x,t.y-ball.y)<t.r+10){t.a=0;sc+=100;tone(700,.15)}
   for(const w of wl)if(ball.x>w.x-8&&ball.x<w.x+w.w+8&&ball.y>w.y-8&&ball.y<w.y+w.h+8){ball.vx*=-.5;ball.x+=ball.vx*3}
   if(ball.y>H-20||ball.x>W+30||ball.x<-30||ball.y<-300){ball=null;if(!tg.some(t=>t.a)){sc+=shots*50;lvl++;tone(900,.3);level()}else if(shots<=0){over('נגמרו הכדורים',sc,'שלב '+(lvl+1),Math.floor(sc/20),lvl>=4?1:0)}}
@@ -93,10 +99,19 @@ function drw(){
   for(let i=0;i<W;i+=7){ctx.beginPath();ctx.moveTo(i,H-20);ctx.lineTo(i+2,H-26);ctx.stroke()}ctx.restore();
   for(const w of wl)R2.block(ctx,w.x,w.y,w.w,w.h,4,'#8a6a3a');
   ctx.font='40px serif';ctx.textAlign='center';ctx.textBaseline='middle';for(const t of tg)if(t.a)ctx.fillText('🎯',t.x,t.y);ctx.fillText('💣',gx,gy);
-  if(drag&&!ball){const dx=gx-drag.x,dy=gy-drag.y;const L=Math.hypot(dx,dy),d=Math.min(150,L),k=d/150*17;let x=gx,y=gy,vx=dx/(L||1)*k,vy=dy/(L||1)*k;ctx.fillStyle='#fff8';for(let i=0;i<28;i++){x+=vx;y+=vy;vy+=.28;if(i%3==0){ctx.beginPath();ctx.arc(x,y,3,0,7);ctx.fill()}}}
+  if(drag&&!ball){const dx=gx-drag.x,dy=gy-drag.y;const L=Math.hypot(dx,dy),d=Math.min(150,L),k=d/150*17;let x=gx,y=gy,vx=dx/(L||1)*k,vy=dy/(L||1)*k;ctx.fillStyle='#fff8';for(let i=0;i<28;i++){vx+=wind;x+=vx;y+=vy;vy+=.28;if(i%3==0){ctx.beginPath();ctx.arc(x,y,3,0,7);ctx.fill()}}}
   if(ball){ctx.beginPath();ctx.fillStyle='#222';ctx.arc(ball.x,ball.y,10,0,7);ctx.fill()}
-  T('⭐ '+sc,80,26,24);T('שלב '+(lvl+1),W/2,26,22);T('כדורים: '+shots,W-80,26,22)}
-wire(start);run(upd,drw,'#12263a');window.__s={step:upd,start:()=>{start();on=true},get on(){return on},get score(){return sc},get tg(){return tg},get ball(){return ball},fire:(vx,vy)=>{ball={x:gx,y:gy,vx,vy};shots--}};
+  T('⭐ '+sc,80,26,24);T('שלב '+(lvl+1),W/2,26,22);T('כדורים: '+shots,W-80,26,22);
+  if(storm){const a=Math.abs(wind),bars='▮'.repeat(Math.max(1,Math.min(4,Math.round(a/.045))));
+    T('רוח',W/2+52,56,19,'#ffd05a');
+    T((wind>0?'▶':'◀')+bars,W/2-6,56,19,'#ffd05a')}}
+wire(start);
+/* כפתור הסערה מפעיל את אותו start, רק עם הדגל דלוק. כפתור 'שוב' בסוף
+   ממשיך באותו מצב, כי הדגל נשמר עד שחוזרים לתפריט. */
+$('#go').addEventListener('click',()=>{storm=false});
+$('#gostorm').onclick=()=>{storm=true;$('#menu').classList.remove('show');start();on=true};
+run(upd,drw,'#12263a');
+window.__s={step:upd,start:()=>{storm=false;start();on=true},startStorm:()=>{storm=true;start();on=true},get on(){return on},get score(){return sc},get tg(){return tg},get ball(){return ball},get storm(){return storm},get wind(){return wind},fire:(vx,vy)=>{ball={x:gx,y:gy,vx,vy};shots--}};
 
 if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 </script>
