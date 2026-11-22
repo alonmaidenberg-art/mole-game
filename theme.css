@@ -237,3 +237,21 @@ html:not(:has(#grid)) body>button[aria-label="admin"]{left:294px!important}
   .gblock h3{font-size:19px;flex-wrap:wrap}
   .gblock h3 b{margin-inline-start:0}
 }
+
+/* ===== Lava theme (c) Alon Maidenberg 2026 =====
+   ערכה כהה. בנויה על אותה רשימת כללים כמו ערכת הלילה, כדי שכל מקום
+   שהלילה כבר תיקן בו קריאוּת יתוקן גם כאן, רק בצבעי לבה. */
+html[data-th="lava"],html[data-th="lava"] body{background:radial-gradient(70% 55% at 50% 0,#ff7a1a 0,rgba(255,122,26,0) 62%),linear-gradient(180deg,#2a0b06 0%,#4a1208 55%,#6d1d09 100%) fixed!important;color:#ffeede!important}
+html[data-th="lava"]{--ink:#ffeede;--ink2:#ffb382;--card:rgba(255,255,255,.1)}
+html[data-th="lava"] a.card,html[data-th="lava"] .box,html[data-th="lava"] .ovc{background:linear-gradient(135deg,rgba(255,170,90,.18),rgba(255,120,40,.06))!important;border-color:rgba(255,180,120,.26)!important}
+html[data-th="lava"] .ov{background:rgba(28,8,4,.9)!important}
+html[data-th="lava"] .sr:not(#cmpB){color:#0b4553!important}
+html[data-th="lava"]:has(#grid)::before{background:rgba(40,10,5,.9)}
+html[data-th="lava"] .sec,html[data-th="lava"] h1+p,html[data-th="lava"] footer,html[data-th="lava"] .stat,html[data-th="lava"] header p,html[data-th="lava"] .t,html[data-th="lava"] .d{color:#ffeede!important}
+html[data-th="lava"] .ovc,html[data-th="lava"] .box{--ink:#ffeede;--ink2:#ffb382}
+html[data-th="lava"] body.hub a.card{background:#5a1a0c!important;color:#ffeede!important}
+html[data-th="lava"] body.hub a.card .t{color:#ffeede!important}
+html[data-th="lava"] body.hub .purse,html[data-th="lava"] body.hub .ico,
+html[data-th="lava"] body.hub .sr,html[data-th="lava"] body.hub #chips button{background:#5a1a0c!important;color:#ffeede!important}
+html[data-th="lava"] body.hub .sec{color:#ffb02e!important}
+html[data-th="lava"] body.hub .tag{background:#8a2f12!important;color:#ffe2cd!important}
