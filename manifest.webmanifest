@@ -1,0 +1,19 @@
+{
+  "name": "המשחקים של אלון מידנברג",
+  "short_name": "משחקי אלון",
+  "description": "96 משחקים בעברית שרצים ישר בדפדפן — בטלפון, בטאבלט ובמחשב. בלי להוריד ובלי להירשם.",
+  "lang": "he",
+  "dir": "rtl",
+  "start_url": "/?src=app",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#2b1659",
+  "theme_color": "#2b1659",
+  "categories": ["games", "entertainment", "kids"],
+  "icons": [
+    { "src": "/assets/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/assets/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/assets/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
