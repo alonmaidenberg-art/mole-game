@@ -75,10 +75,28 @@ for(const x of[-1.1,1.1]){for(let i=0;i<14;i++){}}
 const side=[];for(let i=0;i<30;i++){const h=rnd(3,12),b=new THREE.Mesh(new THREE.BoxGeometry(rnd(3,6),h,rnd(3,6)),M([0xe86a5a,0x5a8ae8,0xf2c24a,0x7ad07a,0xb48ae8][i%5]));b.position.set((i%2?1:-1)*rnd(7,12),h/2,-Math.floor(i/2)*9);scene.add(b);side.push(b)}
 const P=new THREE.Group();const body=new THREE.Mesh(new THREE.BoxGeometry(.9,1.1,.6),M(0xe8433f));body.position.y=.95;const head=new THREE.Mesh(new THREE.SphereGeometry(.38,16,12),M(0xf0c8a0));head.position.y=1.85;const legL=new THREE.Mesh(new THREE.BoxGeometry(.3,.6,.3),M(0x223));const legR=legL.clone();legL.position.set(-.22,.3,0);legR.position.set(.22,.3,0);P.add(body,head,legL,legR);scene.add(P);
 let state='menu',lane,px,py,vy,slide,speed,dist,obs,coins,score,got,frame;
-function reset(){for(const o of obs||[])scene.remove(o.m);for(const c of coins||[])scene.remove(c.m);obs=[];coins=[];lane=1;px=0;py=0;vy=0;slide=0;speed=.34;dist=0;score=0;got=0;frame=0;state='play'}
+/* שדרוגים שנאספים בדרך: מגנט מושך מטבעות, מגן סופג פגיעה אחת,
+   וכפול מכפיל כל מטבע. כל אחד נמדד בפריימים שנותרו. */
+let pows,mag,shield,dbl,inv,nextPow;
+const POW={mag:{c:0x35e0ff,e:'🧲',t:520},shield:{c:0x6cf2a8,e:'🛡️',t:0},dbl:{c:0xffd43b,e:'✖️2',t:520}};
+/* בועת המגן נראית רק כשיש מגן */
+const bub=new THREE.Mesh(new THREE.SphereGeometry(1.35,18,14),
+  new THREE.MeshBasicMaterial({color:0x6cf2a8,transparent:true,opacity:.26}));
+bub.visible=false;scene.add(bub);
+function reset(){for(const o of obs||[])scene.remove(o.m);for(const c of coins||[])scene.remove(c.m);
+  for(const w of pows||[])scene.remove(w.m);
+  obs=[];coins=[];pows=[];mag=0;shield=0;dbl=0;inv=0;nextPow=rnd(70,110);   /* הראשון מוקדם — ריצה רגילה נגמרת סביב 100 מ׳ */
+  bub.visible=false;
+  lane=1;px=0;py=0;vy=0;slide=0;speed=.34;dist=0;score=0;got=0;frame=0;state='play'}
 function mkObs(z){const l=Math.floor(Math.random()*3),t=Math.random();let m,type;if(t<.4){type='block';m=new THREE.Mesh(new THREE.BoxGeometry(1.8,2.4,1.4),M(0xc0392b))}else if(t<.7){type='low';m=new THREE.Mesh(new THREE.BoxGeometry(2,.8,.6),M(0xf2b400))}else{type='high';m=new THREE.Group();const bar=new THREE.Mesh(new THREE.BoxGeometry(2.2,.5,.5),M(0x7a3ad0));bar.position.y=1.5;for(const s of[-1,1]){const p=new THREE.Mesh(new THREE.BoxGeometry(.2,1.8,.2),M(0x333));p.position.set(s,.9,0);m.add(p)}m.add(bar)}
   m.position.set(LANES[l],type==='block'?1.2:type==='low'?.4:0,z);scene.add(m);obs.push({m,l,type,z})}
 function mkCoin(l,z){const m=new THREE.Mesh(new THREE.CylinderGeometry(.35,.35,.1,16),M(0xffd05a));m.rotation.x=Math.PI/2;m.position.set(LANES[l],1,z);scene.add(m);coins.push({m,l,z})}
+function mkPow(l,z,kind){const k=POW[kind];
+  const m=new THREE.Group();
+  const box=new THREE.Mesh(new THREE.BoxGeometry(.8,.8,.8),M(k.c));
+  const ring=new THREE.Mesh(new THREE.TorusGeometry(.62,.08,8,20),M(0xffffff));
+  m.add(box,ring);m.position.set(LANES[l],1.25,z);scene.add(m);
+  pows.push({m,kind,z});}
 function move(d){if(state!=='play')return;if(d==='l')lane=Math.max(0,lane-1);if(d==='r')lane=Math.min(2,lane+1);if(d==='u'&&py<=.01){vy=.26;tone(500,.06)}if(d==='d'){slide=40;if(py>.01)vy=-.4}}
 addEventListener('keydown',e=>{const m={ArrowLeft:'l',KeyA:'l',ArrowRight:'r',KeyD:'r',ArrowUp:'u',KeyW:'u',Space:'u',ArrowDown:'d',KeyS:'d'}[e.code];if(m)move(m)});onSwipe(move,()=>move('u'));
 let nextSpawn=0;
@@ -88,10 +106,41 @@ function step(){frame++;speed=Math.min(.95,.34+frame/3000);dist+=speed;score=Mat
   for(const g of ground){g.position.z+=speed;if(g.position.z>15)g.position.z-=140}for(const b of side){b.position.z+=speed;if(b.position.z>15)b.position.z-=140}
   nextSpawn-=speed;if(nextSpawn<=0){mkObs(-90);if(Math.random()<.7)mkCoin(Math.floor(Math.random()*3),-86-Math.random()*6);nextSpawn=rnd(9,16)-speed*5}
   if(frame%25===0)for(let k=0;k<3;k++)if(Math.random()<.35)mkCoin(lane,-90-k*2.5);
-  for(const o of obs){o.m.position.z+=speed;o.z=o.m.position.z;if(Math.abs(o.z)<.9&&Math.abs(o.m.position.x-px)<1.0){let hit=false;if(o.type==='block')hit=true;if(o.type==='low'&&py<.7)hit=true;if(o.type==='high'&&!(slide>0&&py<.01))hit=true;if(hit&&state==='play')die()}}
-  for(const c of coins){c.m.position.z+=speed;c.m.rotation.z+=.1;if(Math.abs(c.m.position.z)<.9&&Math.abs(c.m.position.x-px)<1&&py<1.8&&!c.got){c.got=1;c.m.visible=false;got++;tone(900,.05)}}
+  for(const o of obs){o.m.position.z+=speed;o.z=o.m.position.z;if(Math.abs(o.z)<.9&&Math.abs(o.m.position.x-px)<1.0){let hit=false;if(o.type==='block')hit=true;if(o.type==='low'&&py<.7)hit=true;if(o.type==='high'&&!(slide>0&&py<.01))hit=true;if(hit&&state==='play'){
+      if(shield>0||inv>0){
+        if(shield>0){shield=0;bub.visible=false;inv=45;tone(420,.18,'triangle',.1);
+          scene.remove(o.m);o.m.position.z=99}      /* הצילה אותך — המכשול נעלם */
+      } else die()}}}
+  /* המגנט מושך מטבעות אליך, גם מנתיב אחר */
+  for(const c of coins){c.m.position.z+=speed;c.m.rotation.z+=.1;
+    if(mag>0&&!c.got&&c.m.position.z>-22){
+      c.m.position.x+=(px-c.m.position.x)*.16;
+      c.m.position.y+=((py+1)-c.m.position.y)*.16;}
+    const reach=mag>0?1.9:1;
+    if(Math.abs(c.m.position.z)<(mag>0?1.6:.9)&&Math.abs(c.m.position.x-px)<reach&&(py<1.8||mag>0)&&!c.got){
+      c.got=1;c.m.visible=false;got+=dbl>0?2:1;tone(dbl>0?1050:900,.05)}}
+  for(const w of pows){w.m.position.z+=speed;w.m.rotation.y+=.07;w.m.children[1].rotation.z+=.1;
+    if(Math.abs(w.m.position.z)<1.2&&Math.abs(w.m.position.x-px)<1.3&&py<2.2&&!w.got){
+      w.got=1;w.m.visible=false;
+      if(w.kind==='shield'){shield=1;bub.visible=true}
+      else if(w.kind==='mag')mag=POW.mag.t;
+      else dbl=POW.dbl.t;
+      tone(1200,.12)}}
+  pows=pows.filter(w=>{if(w.m.position.z>8){scene.remove(w.m);return false}return true});
+  if(mag>0)mag--;
+  if(dbl>0)dbl--;
+  if(inv>0)inv--;
+  bub.position.set(px,py+1,0);bub.visible=shield>0;
+  if(shield>0)bub.scale.setScalar(1+Math.sin(frame*.2)*.05);
+  nextPow-=speed;
+  if(nextPow<=0){const ks=Object.keys(POW);mkPow(Math.floor(Math.random()*3),-92,ks[Math.floor(Math.random()*ks.length)]);
+    nextPow=rnd(300,520)}
   obs=obs.filter(o=>{if(o.m.position.z>8){scene.remove(o.m);return false}return true});coins=coins.filter(c=>{if(c.m.position.z>8){scene.remove(c.m);return false}return true});
-  cam.position.set(px*.5,4.2,7);cam.lookAt(px*.3,1.2,-8);$('#hud').textContent=score+' מ׳  🪙 '+got}
+  cam.position.set(px*.5,4.2,7);cam.lookAt(px*.3,1.2,-8);let tag='';
+  if(shield>0)tag+=' 🛡️';
+  if(mag>0)tag+=' 🧲'+Math.ceil(mag/60);
+  if(dbl>0)tag+=' ✖️2·'+Math.ceil(dbl/60);
+  $('#hud').textContent=score+' מ׳  🪙 '+got+tag}
 function die(){state='dead';tone(110,.5,'sawtooth',.12);saveBest(score);setTimeout(()=>endGame('התנגשת!',score+' מ׳','',Math.floor(score/15)+got,score>=500?1:0),700)}
 $('#go').onclick=()=>{$('#menu').classList.remove('show');reset()};$('#again').onclick=()=>{$('#end').classList.remove('show');reset()};$('#menu2').onclick=()=>{state='menu';$('#end').classList.remove('show');$('#menu').classList.add('show')};
 window.__s={reset,step,move,get state(){return state},get score(){return score}};
