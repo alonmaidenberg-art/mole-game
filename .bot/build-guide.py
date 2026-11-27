@@ -147,3 +147,19 @@ idx.write_text(s, encoding='utf-8')
 
 n_blocks = len([p for p in parts if p])
 print('נבנו %d מדפים, %d משחקים, %d תווים' % (n_blocks, len(games), len(guide)))
+
+# ---- ה-sitemap מתוחזק מכאן, ולא ביד ----
+# פעם אחת כבר קרה ש-13 משחקים חדשים לא היו בו וגוגל פשוט לא ידע עליהם.
+# כל עוד מריצים את הסקריפט הזה אחרי הוספת משחק, זה לא יכול לקרות שוב.
+BASE = 'https://alon-maidenberg.pages.dev/'
+sm = ROOT / 'sitemap.xml'
+if sm.exists():
+    txt = sm.read_text(encoding='utf-8')
+    missing = [g for g in games if (BASE + g['url']) not in txt and g['url'] not in txt]
+    if missing:
+        add = ''.join('<url><loc>%s%s</loc></url>\n' % (BASE, g['url']) for g in missing)
+        sm.write_text(txt.replace('</urlset>', add + '</urlset>'), encoding='utf-8')
+        print('נוספו ל-sitemap: %d משחקים (%s)'
+              % (len(missing), ', '.join(g['url'] for g in missing)))
+    else:
+        print('ה-sitemap מעודכן — כל %d המשחקים בפנים' % len(games))
