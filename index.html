@@ -526,10 +526,39 @@ function card(x,isNew){
   f.onclick=function(e){e.preventDefault();e.stopPropagation();var k=FAV.indexOf(x.id);if(k>-1)FAV.splice(k,1);else FAV.push(x.id);sv('ag_fav',FAV);render()};w.append(f);
   if(isNew){var n=document.createElement('span');n.className='new';n.textContent='חדש';w.append(n)}
   return w}
+/* חיפוש: מילים נרדפות ושמות באנגלית.
+   ילד שמקליד "snake" או "פוטבול" או "טטריס" לא מצא כלום, כי החיפוש
+   השווה רק לשם, לתיאור ולתגית בעברית. המילון הזה מוסיף לכל משחק
+   מחרוזת חיפוש נוספת. אלה מילים כלליות של סוג המשחק, לא שמות של
+   משחקים של חברות אחרות. */
+var ALIAS={
+ 'נחש':'snake','שחמט':'chess','כדורגל':'football soccer','כדורסל':'basketball',
+ 'הוקי':'hockey air','טניס':'tennis pingpong פינג פונג','סנוקר':'snooker pool ביליארד',
+ 'באולינג':'bowling','גולף':'golf','מירוץ':'race racing מרוץ','ריצה':'run runner running',
+ 'טנק':'tank','חלל':'space','אסטרואיד':'asteroids','פונג':'pong','לבנים':'breakout bricks',
+ 'בלוקים':'blocks tetris טטריס','2048':'2048 puzzle','זיכרון':'memory','פאזל':'puzzle',
+ 'מבוך':'maze','בועות':'bubble','פירות':'fruit','דיג':'fishing','קצב':'rhythm music',
+ 'בלונים':'balloon','תותח':'cannon','מגדל':'tower','הגנת':'defense defence td',
+ 'זומבי':'zombie zombies','מיטות':'bed wars','כיבוש':'territory paper io',
+ 'נהיגה':'drive driving car רכב','טיסה':'fly flight plane מטוס','פארקור':'parkour',
+ 'ציפור':'bird flappy','דינוזאור':'dino dinosaur','קפצן':'jump jumper','זיגזג':'zigzag',
+ 'נדנדה':'swing','חור שחור':'hole','צפרדע':'frog','חפרפרת':'mole whack',
+ 'איקס עיגול':'tic tac toe xo','4 בשורה':'connect four','מוקשים':'minesweeper',
+ 'איש תלוי':'hangman','סיימון':'simon','מאסטרמיינד':'mastermind','קליקר':'clicker idle',
+ 'אימפוסטר':'impostor','תגובה':'reaction','חשבון':'math','צבע':'color colour',
+ 'עוגיות':'cookie','מטאור':'meteor','פלינקו':'plinko','בוס':'boss','ירי':'shooter shooting',
+ 'שורטס':'shorts','העיר':'city','בונה':'builder level editor','ארקייד':'arcade'};
+function aliasOf(x){
+  var k,out='',hay=(x.name+' '+(x.tag||''));
+  for(k in ALIAS)if(hay.indexOf(k)>-1)out+=' '+ALIAS[k];
+  return out}
+
 function render(){
+
+  
   var g=$('grid');g.textContent='';
   var newIds=LIST.slice(-6).map(function(x){return x.id});
-  var shown=LIST.filter(function(x){return (cat==='הכל'||x.tag===cat||(cat==='⭐ מועדפים'&&FAV.indexOf(x.id)>-1))&&(!q||(x.name+' '+(x.description||'')+' '+(x.tag||'')).toLowerCase().indexOf(q)>-1)});
+  var shown=LIST.filter(function(x){return (cat==='הכל'||x.tag===cat||(cat==='⭐ מועדפים'&&FAV.indexOf(x.id)>-1))&&(!q||(x.name+' '+(x.description||'')+' '+(x.tag||'')+aliasOf(x)).toLowerCase().indexOf(q)>-1)});
   if(!shown.length){g.innerHTML='<p class="empty">לא נמצאו משחקים.</p>';return}
   function sec(t){var h=document.createElement('div');h.className='sec';h.textContent=t;g.append(h)}
   if(cat==='הכל'&&!q){
