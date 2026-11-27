@@ -76,7 +76,8 @@ body[data-ph="drive"] #radar{display:block}
 .sItem button{border:0;border-radius:11px;padding:9px 12px;font:inherit;font-size:13px;font-weight:900;color:#06101e;background:linear-gradient(180deg,#8fd0ff,#3f9fe0);cursor:pointer;white-space:nowrap}
 .sItem button:disabled{background:#2a3446;color:#6b7a90;cursor:default}
 .sItem.done{border-color:rgba(127,255,136,.3)}
-#fps{position:fixed;bottom:2px;left:4px;font-size:10px;opacity:.35;z-index:9;pointer-events:none}
+#fps{position:fixed;bottom:2px;left:4px;font-size:10px;z-index:9;pointer-events:none;display:none;opacity:.35}
+html[data-fps] #fps{display:block}
 #secHud{position:fixed;top:max(52px,calc(env(safe-area-inset-top) + 52px));left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:5px;z-index:7;pointer-events:none}
 #camWrap{display:none;flex-direction:column;align-items:center;gap:3px}
 #camWrap.on{display:flex}
@@ -133,6 +134,7 @@ body[data-ph="drive"] #secHud,body[data-ph="drive"] #prompt{display:none!importa
 <div id="jump">⤒</div>
 <div id="lockMsg">🖱 לחצו לשחק</div>
 <div id="fps"></div>
+<script>if(/[?&]fps\b/.test(location.search))document.documentElement.dataset.fps=1;</script>
 
 <div class="ov show" id="menu"><div class="ovc">
   <div style="font-size:54px">🏦</div>

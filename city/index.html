@@ -39,7 +39,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:#9ed6a0;color:#2c3a2
 #joy{position:fixed;bottom:max(16px,calc(env(safe-area-inset-bottom) + 16px));left:16px;width:112px;height:112px;border-radius:50%;border:4px solid rgba(44,58,39,.3);background:rgba(255,255,255,.45);display:none;touch-action:none;z-index:7}
 #jk{position:absolute;width:48px;height:48px;border-radius:50%;background:#fff;border:3px solid #2c3a27;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none}
 body.touch #joy{display:block}
-#fps{position:fixed;bottom:2px;left:4px;font-size:10px;opacity:.25;z-index:9;pointer-events:none}
+#fps{position:fixed;bottom:2px;left:4px;font-size:10px;z-index:9;pointer-events:none;display:none;opacity:.25}
+html[data-fps] #fps{display:block}
 </style>
 </head>
 <body>
@@ -54,6 +55,7 @@ body.touch #joy{display:block}
 <canvas id="mini" width="264" height="264"></canvas>
 <div id="joy"><div id="jk"></div></div>
 <div id="fps"></div>
+<script>if(/[?&]fps\b/.test(location.search))document.documentElement.dataset.fps=1;</script>
 
 <div class="ov show" id="menu"><div class="ovc">
   <div style="font-size:50px">🏙️</div>
